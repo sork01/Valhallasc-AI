@@ -64018,154 +64018,6 @@
       ]
     },
     {
-      "id": "fisher_meadow_0",
-      "name": "Fisher",
-      "role": "Fishing and cooking",
-      "x": 248.25,
-      "y": 189.25,
-      "dialogue": "Bring me fish and I can cook a meal or make a stronger rod. Each upgrade replaces your old rod. Platinum line fishes water and Crags lava; tempered platinum also reaches Emberwake. Cooked fish grant one food bonus for ten minutes.",
-      "offers": [
-        {
-          "id": "fishing_workshop",
-          "label": "Fisher workshop",
-          "cost": 0
-        },
-        {
-          "id": "buy_twig_rod",
-          "label": "Buy a Twig Rod",
-          "cost": 50,
-          "item": "rod_twig_rod"
-        },
-        {
-          "id": "rod:emberline",
-          "label": "Craft rod",
-          "cost": 100
-        },
-        {
-          "id": "rod:2",
-          "label": "Craft rod",
-          "cost": 250
-        },
-        {
-          "id": "cook:fish_pier_sprat",
-          "label": "Cook fish",
-          "cost": 1
-        },
-        {
-          "id": "cook:fish_saltby_herring",
-          "label": "Cook fish",
-          "cost": 2
-        },
-        {
-          "id": "cook:fish_sand_dab",
-          "label": "Cook fish",
-          "cost": 2
-        },
-        {
-          "id": "cook:fish_copper_mackerel",
-          "label": "Cook fish",
-          "cost": 4
-        },
-        {
-          "id": "cook:fish_tide_flounder",
-          "label": "Cook fish",
-          "cost": 6
-        },
-        {
-          "id": "cook:fish_glass_eel",
-          "label": "Cook fish",
-          "cost": 15
-        },
-        {
-          "id": "cook:fish_moonscale_carp",
-          "label": "Cook fish",
-          "cost": 50
-        }
-      ],
-      "buys": true,
-      "color": "#527e89",
-      "look": {
-        "skin": "#dca480",
-        "hair": "#694737",
-        "style": "short",
-        "hat": "straw"
-      }
-    },
-    {
-      "id": "fisher_meadow_1",
-      "name": "Fisher",
-      "role": "Fishing and cooking",
-      "x": 200.5,
-      "y": 284,
-      "dialogue": "Bring me fish and I can cook a meal or make a stronger rod. Each upgrade replaces your old rod. Platinum line fishes water and Crags lava; tempered platinum also reaches Emberwake. Cooked fish grant one food bonus for ten minutes.",
-      "offers": [
-        {
-          "id": "fishing_workshop",
-          "label": "Fisher workshop",
-          "cost": 0
-        },
-        {
-          "id": "buy_twig_rod",
-          "label": "Buy a Twig Rod",
-          "cost": 50,
-          "item": "rod_twig_rod"
-        },
-        {
-          "id": "rod:emberline",
-          "label": "Craft rod",
-          "cost": 100
-        },
-        {
-          "id": "rod:2",
-          "label": "Craft rod",
-          "cost": 250
-        },
-        {
-          "id": "cook:fish_pier_sprat",
-          "label": "Cook fish",
-          "cost": 1
-        },
-        {
-          "id": "cook:fish_saltby_herring",
-          "label": "Cook fish",
-          "cost": 2
-        },
-        {
-          "id": "cook:fish_sand_dab",
-          "label": "Cook fish",
-          "cost": 2
-        },
-        {
-          "id": "cook:fish_copper_mackerel",
-          "label": "Cook fish",
-          "cost": 4
-        },
-        {
-          "id": "cook:fish_tide_flounder",
-          "label": "Cook fish",
-          "cost": 6
-        },
-        {
-          "id": "cook:fish_glass_eel",
-          "label": "Cook fish",
-          "cost": 15
-        },
-        {
-          "id": "cook:fish_moonscale_carp",
-          "label": "Cook fish",
-          "cost": 50
-        }
-      ],
-      "buys": true,
-      "color": "#527e89",
-      "look": {
-        "skin": "#dca480",
-        "hair": "#694737",
-        "style": "short",
-        "hat": "straw"
-      }
-    },
-    {
       "id": "alder_enchanting",
       "name": "Enchanting Master",
       "role": "Enchanting trainer and recipe vendor",
@@ -64326,6 +64178,154 @@
         }
       ],
       "buys": false
+    },
+    {
+      "id": "fisher_meadow_0",
+      "name": "Fisher",
+      "role": "Fishing and cooking",
+      "x": 248.25,
+      "y": 189.25,
+      "dialogue": "Bring me fish and I can cook a meal or make a stronger rod. Each upgrade replaces your old rod. Platinum line fishes water and Crags lava; tempered platinum also reaches Emberwake. Cooked fish grant one food bonus for ten minutes.",
+      "offers": [
+        {
+          "id": "fishing_workshop",
+          "label": "Fisher workshop",
+          "cost": 0
+        },
+        {
+          "id": "buy_twig_rod",
+          "label": "Buy a Twig Rod",
+          "cost": 50,
+          "item": "rod_twig_rod"
+        },
+        {
+          "id": "rod:emberline",
+          "label": "Craft rod",
+          "cost": 100
+        },
+        {
+          "id": "rod:2",
+          "label": "Craft rod",
+          "cost": 250
+        },
+        {
+          "id": "cook:fish_pier_sprat",
+          "label": "Cook fish",
+          "cost": 1
+        },
+        {
+          "id": "cook:fish_saltby_herring",
+          "label": "Cook fish",
+          "cost": 2
+        },
+        {
+          "id": "cook:fish_sand_dab",
+          "label": "Cook fish",
+          "cost": 2
+        },
+        {
+          "id": "cook:fish_copper_mackerel",
+          "label": "Cook fish",
+          "cost": 4
+        },
+        {
+          "id": "cook:fish_tide_flounder",
+          "label": "Cook fish",
+          "cost": 6
+        },
+        {
+          "id": "cook:fish_glass_eel",
+          "label": "Cook fish",
+          "cost": 15
+        },
+        {
+          "id": "cook:fish_moonscale_carp",
+          "label": "Cook fish",
+          "cost": 50
+        }
+      ],
+      "buys": true,
+      "color": "#527e89",
+      "look": {
+        "skin": "#dca480",
+        "hair": "#694737",
+        "style": "short",
+        "hat": "straw"
+      }
+    },
+    {
+      "id": "fisher_meadow_1",
+      "name": "Fisher",
+      "role": "Fishing and cooking",
+      "x": 200.5,
+      "y": 284,
+      "dialogue": "Bring me fish and I can cook a meal or make a stronger rod. Each upgrade replaces your old rod. Platinum line fishes water and Crags lava; tempered platinum also reaches Emberwake. Cooked fish grant one food bonus for ten minutes.",
+      "offers": [
+        {
+          "id": "fishing_workshop",
+          "label": "Fisher workshop",
+          "cost": 0
+        },
+        {
+          "id": "buy_twig_rod",
+          "label": "Buy a Twig Rod",
+          "cost": 50,
+          "item": "rod_twig_rod"
+        },
+        {
+          "id": "rod:emberline",
+          "label": "Craft rod",
+          "cost": 100
+        },
+        {
+          "id": "rod:2",
+          "label": "Craft rod",
+          "cost": 250
+        },
+        {
+          "id": "cook:fish_pier_sprat",
+          "label": "Cook fish",
+          "cost": 1
+        },
+        {
+          "id": "cook:fish_saltby_herring",
+          "label": "Cook fish",
+          "cost": 2
+        },
+        {
+          "id": "cook:fish_sand_dab",
+          "label": "Cook fish",
+          "cost": 2
+        },
+        {
+          "id": "cook:fish_copper_mackerel",
+          "label": "Cook fish",
+          "cost": 4
+        },
+        {
+          "id": "cook:fish_tide_flounder",
+          "label": "Cook fish",
+          "cost": 6
+        },
+        {
+          "id": "cook:fish_glass_eel",
+          "label": "Cook fish",
+          "cost": 15
+        },
+        {
+          "id": "cook:fish_moonscale_carp",
+          "label": "Cook fish",
+          "cost": 50
+        }
+      ],
+      "buys": true,
+      "color": "#527e89",
+      "look": {
+        "skin": "#dca480",
+        "hair": "#694737",
+        "style": "short",
+        "hat": "straw"
+      }
     }
   ],
   "quests": [
@@ -351925,14 +351925,6 @@
           "y": 117,
           "r": 0.2,
           "v": 2
-        },
-        {
-          "kind": "meetingstone",
-          "x": 18.0,
-          "y": 111.0,
-          "r": 0.55,
-          "v": 0,
-          "label": "Dungeon Meeting Stone"
         }
       ],
       "slimes": [
@@ -352273,23 +352265,6 @@
               "label": "Send my mercenaries away",
               "cost": 0,
               "merc": "dismiss"
-            }
-          ]
-        },
-        {
-          "id": "dungeon_stone_5",
-          "name": "The Meeting Stone",
-          "role": "Party summons",
-          "dialogue": "Use this stone to invite your party members to join you here.",
-          "x": 18.0,
-          "y": 111.0,
-          "color": "#8e87ad",
-          "art": "stone",
-          "offers": [
-            {
-              "id": "summon_party",
-              "label": "Summon party members",
-              "cost": 0
             }
           ]
         }
@@ -436591,6 +436566,14 @@
           "r": 0.4,
           "v": 2,
           "layout": "wyrdwood_design_v1"
+        },
+        {
+          "kind": "meetingstone",
+          "x": 145.5,
+          "y": 179.0,
+          "r": 0.55,
+          "v": 0,
+          "label": "Dungeon Meeting Stone"
         }
       ],
       "slimes": [
@@ -440130,6 +440113,23 @@
             "style": "short",
             "hat": "straw"
           }
+        },
+        {
+          "id": "dungeon_stone_41",
+          "name": "The Meeting Stone",
+          "role": "Party summons",
+          "dialogue": "Use this stone to invite your party members to join you here.",
+          "x": 145.5,
+          "y": 179.0,
+          "color": "#8e87ad",
+          "art": "stone",
+          "offers": [
+            {
+              "id": "summon_party",
+              "label": "Summon party members",
+              "cost": 0
+            }
+          ]
         }
       ],
       "quests": [
@@ -459318,6 +459318,16 @@
           [
             296.5,
             257.5
+          ]
+        ],
+        [
+          [
+            232.5,
+            303.5
+          ],
+          [
+            236.5,
+            309.5
           ]
         ]
       ],
@@ -491105,6 +491115,14 @@
           "y": 175.25,
           "r": 3.7,
           "fishingWater": "fishing_pond_7_2"
+        },
+        {
+          "kind": "meetingstone",
+          "x": 240.5,
+          "y": 313.5,
+          "r": 0.55,
+          "v": 0,
+          "label": "Dungeon Meeting Stone"
         }
       ],
       "slimes": [
@@ -492274,10 +492292,10 @@
           "id": "span_guide",
           "name": "Valkyrie Astrid Bridgeward",
           "role": "Keeper of the Shattered Span",
-          "x": 169,
-          "y": 185,
+          "x": 231.5,
+          "y": 309.5,
           "color": "#82d4f2",
-          "dialogue": "Beneath the west cliff of the Perch hangs the Shattered Span, the oldest arch of the Bifrost. Torstein still demands the bridge-toll from anyone who crosses. The Repair Smith inside hires fighters to help you break his watch.",
+          "dialogue": "Below the Shardfields near the Lightning Spire hangs the Shattered Span, the oldest arch of the Bifrost. Torstein still demands the bridge-toll from anyone who crosses. The Repair Smith inside hires fighters to help you break his watch.",
           "offers": [],
           "look": {
             "skin": "#edc5a1",
@@ -492291,8 +492309,8 @@
           "id": "span_chronicler",
           "name": "Soren Shardkeeper",
           "role": "Chronicler of the old bridge",
-          "x": 169,
-          "y": 189,
+          "x": 231.5,
+          "y": 312.5,
           "color": "#d49cf0",
           "dialogue": "Sunniva weaves the broken light of the eastern gallery into blinding spears, and beyond her stands Archon Vaelor himself. Reclaim the span and the bridge-ward relics are yours.",
           "offers": [],
@@ -492966,6 +492984,16 @@
               "cost": 0
             },
             {
+              "id": "rod:3",
+              "label": "Craft rod",
+              "cost": 1500
+            },
+            {
+              "id": "rod:4",
+              "label": "Craft rod",
+              "cost": 5000
+            },
+            {
               "id": "cook:fish_cloud_minnow",
               "label": "Cook fish",
               "cost": 30
@@ -493009,6 +493037,23 @@
             "style": "short",
             "hat": "straw"
           }
+        },
+        {
+          "id": "dungeon_stone_42",
+          "name": "The Meeting Stone",
+          "role": "Party summons",
+          "dialogue": "Use this stone to invite your party members to join you here.",
+          "x": 240.5,
+          "y": 313.5,
+          "color": "#8e87ad",
+          "art": "stone",
+          "offers": [
+            {
+              "id": "summon_party",
+              "label": "Summon party members",
+              "cost": 0
+            }
+          ]
         }
       ],
       "quests": [
@@ -493538,7 +493583,7 @@
           "title": "Across the Shattered Span",
           "npc": "span_guide",
           "level": 30,
-          "description": "Enter The Shattered Span from the west edge of Heimdall's Perch and speak to Torvald, the Last Watcher.",
+          "description": "Take the side trail near the Lightning Spire in the Shardfields. Enter The Shattered Span and speak to Torvald, the Last Watcher.",
           "objectives": [
             {
               "kind": "talk",
@@ -493993,10 +494038,10 @@
           "npc": "fisher_sky_0",
           "requires": null,
           "repeatable": false,
-          "level": 45,
-          "rewardXp": 2740,
-          "rewardGold": 135,
-          "description": "Use a Tempered Platinum Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
+          "level": 30,
+          "rewardXp": 1320,
+          "rewardGold": 90,
+          "description": "Use a Reedglass Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -494012,10 +494057,10 @@
           "npc": "fisher_sky_0",
           "requires": "fisher_sky_0_1",
           "repeatable": false,
-          "level": 45,
-          "rewardXp": 2740,
-          "rewardGold": 135,
-          "description": "Use a Tempered Platinum Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
+          "level": 30,
+          "rewardXp": 1320,
+          "rewardGold": 90,
+          "description": "Use a Reedglass Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -494031,10 +494076,10 @@
           "npc": "fisher_sky_0",
           "requires": "fisher_sky_0_2",
           "repeatable": false,
-          "level": 45,
-          "rewardXp": 2740,
-          "rewardGold": 135,
-          "description": "Use a Tempered Platinum Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
+          "level": 30,
+          "rewardXp": 1320,
+          "rewardGold": 90,
+          "description": "Use a Reedglass Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -494050,10 +494095,10 @@
           "npc": "fisher_sky_0",
           "requires": "fisher_sky_0_1",
           "repeatable": true,
-          "level": 45,
-          "rewardXp": 2740,
-          "rewardGold": 135,
-          "description": "Use a Tempered Platinum Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
+          "level": 30,
+          "rewardXp": 1320,
+          "rewardGold": 90,
+          "description": "Use a Reedglass Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -494113,8 +494158,8 @@
         {
           "id": "sky_shattered_span",
           "name": "The Shattered Span",
-          "x": 165,
-          "y": 186,
+          "x": 236.5,
+          "y": 309.5,
           "r": 1.3,
           "to": 42,
           "tx": 56,
@@ -522327,6 +522372,14 @@
           "y": 56.6,
           "r": 0.2,
           "v": 0
+        },
+        {
+          "kind": "meetingstone",
+          "x": 67.0,
+          "y": 198.0,
+          "r": 0.55,
+          "v": 0,
+          "label": "Dungeon Meeting Stone"
         }
       ],
       "slimes": [
@@ -523959,6 +524012,23 @@
             {
               "id": "spirit_resurrect",
               "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "dungeon_stone_43",
+          "name": "The Meeting Stone",
+          "role": "Party summons",
+          "dialogue": "Use this stone to invite your party members to join you here.",
+          "x": 67.0,
+          "y": 198.0,
+          "color": "#8e87ad",
+          "art": "stone",
+          "offers": [
+            {
+              "id": "summon_party",
+              "label": "Summon party members",
               "cost": 0
             }
           ]
@@ -544525,6 +544595,22 @@
           "r": 0.55,
           "v": 0,
           "v_": 3
+        },
+        {
+          "kind": "meetingstone",
+          "x": 146.0,
+          "y": 54.5,
+          "r": 0.55,
+          "v": 0,
+          "label": "Dungeon Meeting Stone"
+        },
+        {
+          "kind": "meetingstone",
+          "x": 134.0,
+          "y": 56.5,
+          "r": 0.55,
+          "v": 0,
+          "label": "Dungeon Meeting Stone"
         }
       ],
       "slimes": [],
@@ -546408,6 +546494,40 @@
             }
           ],
           "buys": false
+        },
+        {
+          "id": "dungeon_stone_11",
+          "name": "The Meeting Stone",
+          "role": "Party summons",
+          "dialogue": "Use this stone to invite your party members to join you here.",
+          "x": 146.0,
+          "y": 54.5,
+          "color": "#8e87ad",
+          "art": "stone",
+          "offers": [
+            {
+              "id": "summon_party",
+              "label": "Summon party members",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "dungeon_stone_12",
+          "name": "The Meeting Stone",
+          "role": "Party summons",
+          "dialogue": "Use this stone to invite your party members to join you here.",
+          "x": 134.0,
+          "y": 56.5,
+          "color": "#8e87ad",
+          "art": "stone",
+          "offers": [
+            {
+              "id": "summon_party",
+              "label": "Summon party members",
+              "cost": 0
+            }
+          ]
         }
       ],
       "places": [
@@ -599587,14 +599707,6 @@
           "y": 29,
           "r": 0.7,
           "v": 3
-        },
-        {
-          "kind": "meetingstone",
-          "x": 27,
-          "y": 140,
-          "r": 0.55,
-          "v": 0,
-          "label": "Dungeon Meeting Stone"
         }
       ],
       "slimes": [
@@ -599845,23 +599957,6 @@
               "label": "Send my mercenaries away",
               "cost": 0,
               "merc": "dismiss"
-            }
-          ]
-        },
-        {
-          "id": "dungeon_stone_10",
-          "name": "The Meeting Stone",
-          "role": "Party summons",
-          "dialogue": "Use this stone to invite your party members to join you here.",
-          "x": 27,
-          "y": 140,
-          "color": "#8e87ad",
-          "art": "stone",
-          "offers": [
-            {
-              "id": "summon_party",
-              "label": "Summon party members",
-              "cost": 0
             }
           ]
         }
@@ -605858,14 +605953,6 @@
           "y": 33,
           "r": 0.7,
           "v": 1
-        },
-        {
-          "kind": "meetingstone",
-          "x": 139,
-          "y": 140,
-          "r": 0.55,
-          "v": 0,
-          "label": "Dungeon Meeting Stone"
         }
       ],
       "slimes": [
@@ -606128,23 +606215,6 @@
               "label": "Send my mercenaries away",
               "cost": 0,
               "merc": "dismiss"
-            }
-          ]
-        },
-        {
-          "id": "dungeon_stone_11",
-          "name": "The Meeting Stone",
-          "role": "Party summons",
-          "dialogue": "Use this stone to invite your party members to join you here.",
-          "x": 139,
-          "y": 140,
-          "color": "#8e87ad",
-          "art": "stone",
-          "offers": [
-            {
-              "id": "summon_party",
-              "label": "Summon party members",
-              "cost": 0
             }
           ]
         }
@@ -614013,14 +614083,6 @@
           "y": 45,
           "r": 0.7,
           "v": 3
-        },
-        {
-          "kind": "meetingstone",
-          "x": 99,
-          "y": 172,
-          "r": 0.55,
-          "v": 0,
-          "label": "Dungeon Meeting Stone"
         }
       ],
       "slimes": [
@@ -614211,23 +614273,6 @@
               "label": "Send my mercenaries away",
               "cost": 0,
               "merc": "dismiss"
-            }
-          ]
-        },
-        {
-          "id": "dungeon_stone_12",
-          "name": "The Meeting Stone",
-          "role": "Party summons",
-          "dialogue": "Use this stone to invite your party members to join you here.",
-          "x": 99,
-          "y": 172,
-          "color": "#8e87ad",
-          "art": "stone",
-          "offers": [
-            {
-              "id": "summon_party",
-              "label": "Summon party members",
-              "cost": 0
             }
           ]
         }
@@ -651600,6 +651645,16 @@
               "cost": 0
             },
             {
+              "id": "rod:4",
+              "label": "Craft rod",
+              "cost": 5000
+            },
+            {
+              "id": "rod:magma",
+              "label": "Craft rod",
+              "cost": 7500
+            },
+            {
               "id": "cook:fish_cloud_minnow",
               "label": "Cook fish",
               "cost": 30
@@ -653260,10 +653315,10 @@
           "npc": "fisher_astral_0",
           "requires": null,
           "repeatable": false,
-          "level": 45,
-          "rewardXp": 2740,
-          "rewardGold": 135,
-          "description": "Use a Tempered Platinum Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
+          "level": 40,
+          "rewardXp": 2210,
+          "rewardGold": 120,
+          "description": "Use a Silverline Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -653279,10 +653334,10 @@
           "npc": "fisher_astral_0",
           "requires": "fisher_astral_0_1",
           "repeatable": false,
-          "level": 45,
-          "rewardXp": 2740,
-          "rewardGold": 135,
-          "description": "Use a Tempered Platinum Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
+          "level": 40,
+          "rewardXp": 2210,
+          "rewardGold": 120,
+          "description": "Use a Silverline Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -653298,10 +653353,10 @@
           "npc": "fisher_astral_0",
           "requires": "fisher_astral_0_2",
           "repeatable": false,
-          "level": 45,
-          "rewardXp": 2740,
-          "rewardGold": 135,
-          "description": "Use a Tempered Platinum Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
+          "level": 40,
+          "rewardXp": 2210,
+          "rewardGold": 120,
+          "description": "Use a Silverline Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -653317,10 +653372,10 @@
           "npc": "fisher_astral_0",
           "requires": "fisher_astral_0_1",
           "repeatable": true,
-          "level": 45,
-          "rewardXp": 2740,
-          "rewardGold": 135,
-          "description": "Use a Tempered Platinum Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
+          "level": 40,
+          "rewardXp": 2210,
+          "rewardGold": 120,
+          "description": "Use a Silverline Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -698685,6 +698740,11 @@
               "cost": 0
             },
             {
+              "id": "rod:magma",
+              "label": "Craft rod",
+              "cost": 7500
+            },
+            {
               "id": "cook:fish_prism_gudgeon",
               "label": "Cook fish",
               "cost": 30
@@ -699887,9 +699947,9 @@
           "npc": "fisher_prism_0",
           "requires": null,
           "repeatable": false,
-          "level": 50,
-          "rewardXp": 3330,
-          "rewardGold": 150,
+          "level": 45,
+          "rewardXp": 2740,
+          "rewardGold": 135,
           "description": "Use a Tempered Platinum Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
@@ -699906,9 +699966,9 @@
           "npc": "fisher_prism_0",
           "requires": "fisher_prism_0_1",
           "repeatable": false,
-          "level": 50,
-          "rewardXp": 3330,
-          "rewardGold": 150,
+          "level": 45,
+          "rewardXp": 2740,
+          "rewardGold": 135,
           "description": "Use a Tempered Platinum Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
@@ -699925,9 +699985,9 @@
           "npc": "fisher_prism_0",
           "requires": "fisher_prism_0_2",
           "repeatable": false,
-          "level": 50,
-          "rewardXp": 3330,
-          "rewardGold": 150,
+          "level": 45,
+          "rewardXp": 2740,
+          "rewardGold": 135,
           "description": "Use a Tempered Platinum Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
@@ -699944,9 +700004,9 @@
           "npc": "fisher_prism_0",
           "requires": "fisher_prism_0_1",
           "repeatable": true,
-          "level": 50,
-          "rewardXp": 3330,
-          "rewardGold": 150,
+          "level": 45,
+          "rewardXp": 2740,
+          "rewardGold": 135,
           "description": "Use a Tempered Platinum Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
@@ -752407,6 +752467,11 @@
               "cost": 0
             },
             {
+              "id": "rod:5",
+              "label": "Craft rod",
+              "cost": 12000
+            },
+            {
               "id": "cook:fish_prism_gudgeon",
               "label": "Cook fish",
               "cost": 30
@@ -753605,9 +753670,9 @@
           "npc": "fisher_orrery_0",
           "requires": null,
           "repeatable": false,
-          "level": 55,
-          "rewardXp": 3970,
-          "rewardGold": 165,
+          "level": 50,
+          "rewardXp": 3330,
+          "rewardGold": 150,
           "description": "Use a Tempered Platinum Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
@@ -753624,9 +753689,9 @@
           "npc": "fisher_orrery_0",
           "requires": "fisher_orrery_0_1",
           "repeatable": false,
-          "level": 55,
-          "rewardXp": 3970,
-          "rewardGold": 165,
+          "level": 50,
+          "rewardXp": 3330,
+          "rewardGold": 150,
           "description": "Use a Tempered Platinum Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
@@ -753643,9 +753708,9 @@
           "npc": "fisher_orrery_0",
           "requires": "fisher_orrery_0_2",
           "repeatable": false,
-          "level": 55,
-          "rewardXp": 3970,
-          "rewardGold": 165,
+          "level": 50,
+          "rewardXp": 3330,
+          "rewardGold": 150,
           "description": "Use a Tempered Platinum Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
@@ -753662,9 +753727,9 @@
           "npc": "fisher_orrery_0",
           "requires": "fisher_orrery_0_1",
           "repeatable": true,
-          "level": 55,
-          "rewardXp": 3970,
-          "rewardGold": 165,
+          "level": 50,
+          "rewardXp": 3330,
+          "rewardGold": 150,
           "description": "Use a Tempered Platinum Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
@@ -811877,6 +811942,11 @@
               "cost": 0
             },
             {
+              "id": "rod:5",
+              "label": "Craft rod",
+              "cost": 12000
+            },
+            {
               "id": "cook:fish_spore_rasbora",
               "label": "Cook fish",
               "cost": 30
@@ -812774,9 +812844,9 @@
           "npc": "fisher_moonspore_0",
           "requires": null,
           "repeatable": false,
-          "level": 60,
-          "rewardXp": 4670,
-          "rewardGold": 180,
+          "level": 55,
+          "rewardXp": 3970,
+          "rewardGold": 165,
           "description": "Use a Starcatch Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
@@ -812793,9 +812863,9 @@
           "npc": "fisher_moonspore_0",
           "requires": "fisher_moonspore_0_1",
           "repeatable": false,
-          "level": 60,
-          "rewardXp": 4670,
-          "rewardGold": 180,
+          "level": 55,
+          "rewardXp": 3970,
+          "rewardGold": 165,
           "description": "Use a Starcatch Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
@@ -812812,9 +812882,9 @@
           "npc": "fisher_moonspore_0",
           "requires": "fisher_moonspore_0_2",
           "repeatable": false,
-          "level": 60,
-          "rewardXp": 4670,
-          "rewardGold": 180,
+          "level": 55,
+          "rewardXp": 3970,
+          "rewardGold": 165,
           "description": "Use a Starcatch Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
@@ -812831,9 +812901,9 @@
           "npc": "fisher_moonspore_0",
           "requires": "fisher_moonspore_0_1",
           "repeatable": true,
-          "level": 60,
-          "rewardXp": 4670,
-          "rewardGold": 180,
+          "level": 55,
+          "rewardXp": 3970,
+          "rewardGold": 165,
           "description": "Use a Starcatch Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
@@ -820558,64 +820628,6 @@
           ]
         },
         {
-          "id": "fisher_asterion_0",
-          "name": "Fisher",
-          "role": "Fishing and cooking",
-          "x": 95.55271419845968,
-          "y": 149.2171680604919,
-          "dialogue": "Bring me fish and I can cook a meal or make a stronger rod. Each upgrade replaces your old rod. Platinum line fishes water and Crags lava; tempered platinum also reaches Emberwake. Cooked fish grant one food bonus for ten minutes.",
-          "offers": [
-            {
-              "id": "fishing_workshop",
-              "label": "Fisher workshop",
-              "cost": 0
-            },
-            {
-              "id": "cook:fish_spore_rasbora",
-              "label": "Cook fish",
-              "cost": 30
-            },
-            {
-              "id": "cook:fish_veil_catfish",
-              "label": "Cook fish",
-              "cost": 45
-            },
-            {
-              "id": "cook:fish_dreamfin_pike",
-              "label": "Cook fish",
-              "cost": 65
-            },
-            {
-              "id": "cook:fish_moonwake_dragonfish",
-              "label": "Cook fish",
-              "cost": 100
-            },
-            {
-              "id": "cook:fish_crescent_bleak",
-              "label": "Cook fish",
-              "cost": 30
-            },
-            {
-              "id": "cook:fish_silver_crescent_eel",
-              "label": "Cook fish",
-              "cost": 45
-            },
-            {
-              "id": "cook:fish_ringwater_koi",
-              "label": "Cook fish",
-              "cost": 65
-            }
-          ],
-          "buys": true,
-          "color": "#527e89",
-          "look": {
-            "skin": "#dca480",
-            "hair": "#694737",
-            "style": "short",
-            "hat": "straw"
-          }
-        },
-        {
           "id": "asterion_enchanting",
           "name": "Enchanting Master",
           "role": "Enchanting trainer and recipe vendor",
@@ -820784,6 +820796,69 @@
             }
           ],
           "buys": false
+        },
+        {
+          "id": "fisher_asterion_0",
+          "name": "Fisher",
+          "role": "Fishing and cooking",
+          "x": 95.55271419845968,
+          "y": 149.2171680604919,
+          "dialogue": "Bring me fish and I can cook a meal or make a stronger rod. Each upgrade replaces your old rod. Platinum line fishes water and Crags lava; tempered platinum also reaches Emberwake. Cooked fish grant one food bonus for ten minutes.",
+          "offers": [
+            {
+              "id": "fishing_workshop",
+              "label": "Fisher workshop",
+              "cost": 0
+            },
+            {
+              "id": "rod:5",
+              "label": "Craft rod",
+              "cost": 12000
+            },
+            {
+              "id": "cook:fish_spore_rasbora",
+              "label": "Cook fish",
+              "cost": 30
+            },
+            {
+              "id": "cook:fish_veil_catfish",
+              "label": "Cook fish",
+              "cost": 45
+            },
+            {
+              "id": "cook:fish_dreamfin_pike",
+              "label": "Cook fish",
+              "cost": 65
+            },
+            {
+              "id": "cook:fish_moonwake_dragonfish",
+              "label": "Cook fish",
+              "cost": 100
+            },
+            {
+              "id": "cook:fish_crescent_bleak",
+              "label": "Cook fish",
+              "cost": 30
+            },
+            {
+              "id": "cook:fish_silver_crescent_eel",
+              "label": "Cook fish",
+              "cost": 45
+            },
+            {
+              "id": "cook:fish_ringwater_koi",
+              "label": "Cook fish",
+              "cost": 65
+            }
+          ],
+          "buys": true,
+          "color": "#527e89",
+          "look": {
+            "skin": "#dca480",
+            "hair": "#694737",
+            "style": "short",
+            "hat": "straw"
+          }
         }
       ],
       "quests": [
@@ -866222,14 +866297,6 @@
           "y": 98,
           "r": 0.2,
           "v": 0
-        },
-        {
-          "kind": "meetingstone",
-          "x": 18,
-          "y": 64,
-          "r": 0.55,
-          "v": 0,
-          "label": "Dungeon Meeting Stone"
         }
       ],
       "slimes": [
@@ -866394,23 +866461,6 @@
               "label": "Send my mercenaries away",
               "cost": 0,
               "merc": "dismiss"
-            }
-          ]
-        },
-        {
-          "id": "dungeon_stone_18",
-          "name": "The Meeting Stone",
-          "role": "Party summons",
-          "dialogue": "Use this stone to invite your party members to join you here.",
-          "x": 18,
-          "y": 64,
-          "color": "#8e87ad",
-          "art": "stone",
-          "offers": [
-            {
-              "id": "summon_party",
-              "label": "Summon party members",
-              "cost": 0
             }
           ]
         }
@@ -887694,6 +887744,14 @@
           "r": 0.9,
           "v": 2,
           "layout": "storm_design_v1"
+        },
+        {
+          "kind": "meetingstone",
+          "x": 244.0,
+          "y": 108.0,
+          "r": 0.55,
+          "v": 0,
+          "label": "Dungeon Meeting Stone"
         }
       ],
       "slimes": [
@@ -890614,6 +890672,23 @@
             "style": "short",
             "hat": "straw"
           }
+        },
+        {
+          "id": "dungeon_stone_29",
+          "name": "The Meeting Stone",
+          "role": "Party summons",
+          "dialogue": "Use this stone to invite your party members to join you here.",
+          "x": 244.0,
+          "y": 108.0,
+          "color": "#8e87ad",
+          "art": "stone",
+          "offers": [
+            {
+              "id": "summon_party",
+              "label": "Summon party members",
+              "cost": 0
+            }
+          ]
         }
       ],
       "places": [
@@ -891836,9 +891911,9 @@
           "npc": "fisher_storm_0",
           "requires": null,
           "repeatable": false,
-          "level": 40,
-          "rewardXp": 2210,
-          "rewardGold": 120,
+          "level": 60,
+          "rewardXp": 4670,
+          "rewardGold": 180,
           "description": "Use a Silverline Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
@@ -891855,9 +891930,9 @@
           "npc": "fisher_storm_0",
           "requires": "fisher_storm_0_1",
           "repeatable": false,
-          "level": 40,
-          "rewardXp": 2210,
-          "rewardGold": 120,
+          "level": 60,
+          "rewardXp": 4670,
+          "rewardGold": 180,
           "description": "Use a Silverline Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
@@ -891874,9 +891949,9 @@
           "npc": "fisher_storm_0",
           "requires": "fisher_storm_0_2",
           "repeatable": false,
-          "level": 40,
-          "rewardXp": 2210,
-          "rewardGold": 120,
+          "level": 60,
+          "rewardXp": 4670,
+          "rewardGold": 180,
           "description": "Use a Silverline Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
@@ -891893,9 +891968,9 @@
           "npc": "fisher_storm_0",
           "requires": "fisher_storm_0_1",
           "repeatable": true,
-          "level": 40,
-          "rewardXp": 2210,
-          "rewardGold": 120,
+          "level": 60,
+          "rewardXp": 4670,
+          "rewardGold": 180,
           "description": "Use a Silverline Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
@@ -936828,6 +936903,14 @@
           "r": 0.12,
           "v": 1,
           "layout": "sunward_design_v1"
+        },
+        {
+          "kind": "meetingstone",
+          "x": 179.0,
+          "y": 46.0,
+          "r": 0.55,
+          "v": 0,
+          "label": "Dungeon Meeting Stone"
         }
       ],
       "slimes": [
@@ -939769,6 +939852,11 @@
               "cost": 5000
             },
             {
+              "id": "rod:6",
+              "label": "Craft rod",
+              "cost": 30000
+            },
+            {
               "id": "cook:fish_alder_trout",
               "label": "Cook fish",
               "cost": 1
@@ -939812,6 +939900,23 @@
             "style": "short",
             "hat": "straw"
           }
+        },
+        {
+          "id": "dungeon_stone_30",
+          "name": "The Meeting Stone",
+          "role": "Party summons",
+          "dialogue": "Use this stone to invite your party members to join you here.",
+          "x": 179.0,
+          "y": 46.0,
+          "color": "#8e87ad",
+          "art": "stone",
+          "offers": [
+            {
+              "id": "summon_party",
+              "label": "Summon party members",
+              "cost": 0
+            }
+          ]
         }
       ],
       "places": [
@@ -941077,9 +941182,9 @@
           "npc": "fisher_sun_0",
           "requires": null,
           "repeatable": false,
-          "level": 40,
-          "rewardXp": 2210,
-          "rewardGold": 120,
+          "level": 65,
+          "rewardXp": 5420,
+          "rewardGold": 195,
           "description": "Use a Reedglass Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
@@ -941096,9 +941201,9 @@
           "npc": "fisher_sun_0",
           "requires": "fisher_sun_0_1",
           "repeatable": false,
-          "level": 40,
-          "rewardXp": 2210,
-          "rewardGold": 120,
+          "level": 65,
+          "rewardXp": 5420,
+          "rewardGold": 195,
           "description": "Use a Reedglass Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
@@ -941115,9 +941220,9 @@
           "npc": "fisher_sun_0",
           "requires": "fisher_sun_0_2",
           "repeatable": false,
-          "level": 40,
-          "rewardXp": 2210,
-          "rewardGold": 120,
+          "level": 65,
+          "rewardXp": 5420,
+          "rewardGold": 195,
           "description": "Use a Reedglass Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
@@ -941134,9 +941239,9 @@
           "npc": "fisher_sun_0",
           "requires": "fisher_sun_0_1",
           "repeatable": true,
-          "level": 40,
-          "rewardXp": 2210,
-          "rewardGold": 120,
+          "level": 65,
+          "rewardXp": 5420,
+          "rewardGold": 195,
           "description": "Use a Reedglass Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
@@ -987651,6 +987756,14 @@
           "y": 202.25,
           "r": 3.7,
           "fishingWater": "fishing_pond_21_2"
+        },
+        {
+          "kind": "meetingstone",
+          "x": 305.0,
+          "y": 191.5,
+          "r": 0.55,
+          "v": 0,
+          "label": "Dungeon Meeting Stone"
         }
       ],
       "slimes": [
@@ -989782,6 +989895,11 @@
               "cost": 0
             },
             {
+              "id": "rod:6",
+              "label": "Craft rod",
+              "cost": 30000
+            },
+            {
               "id": "rod:rootbraid",
               "label": "Craft rod",
               "cost": 50000
@@ -989830,6 +989948,23 @@
             "style": "short",
             "hat": "straw"
           }
+        },
+        {
+          "id": "dungeon_stone_31",
+          "name": "The Meeting Stone",
+          "role": "Party summons",
+          "dialogue": "Use this stone to invite your party members to join you here.",
+          "x": 305.0,
+          "y": 191.5,
+          "color": "#8e87ad",
+          "art": "stone",
+          "offers": [
+            {
+              "id": "summon_party",
+              "label": "Summon party members",
+              "cost": 0
+            }
+          ]
         }
       ],
       "places": [
@@ -991087,9 +991222,9 @@
           "npc": "fisher_ribbon_0",
           "requires": null,
           "repeatable": false,
-          "level": 80,
-          "rewardXp": 8030,
-          "rewardGold": 240,
+          "level": 70,
+          "rewardXp": 6240,
+          "rewardGold": 210,
           "description": "Use a Worldwire Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
@@ -991106,9 +991241,9 @@
           "npc": "fisher_ribbon_0",
           "requires": "fisher_ribbon_0_1",
           "repeatable": false,
-          "level": 80,
-          "rewardXp": 8030,
-          "rewardGold": 240,
+          "level": 70,
+          "rewardXp": 6240,
+          "rewardGold": 210,
           "description": "Use a Worldwire Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
@@ -991125,9 +991260,9 @@
           "npc": "fisher_ribbon_0",
           "requires": "fisher_ribbon_0_2",
           "repeatable": false,
-          "level": 80,
-          "rewardXp": 8030,
-          "rewardGold": 240,
+          "level": 70,
+          "rewardXp": 6240,
+          "rewardGold": 210,
           "description": "Use a Worldwire Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
@@ -991144,9 +991279,9 @@
           "npc": "fisher_ribbon_0",
           "requires": "fisher_ribbon_0_1",
           "repeatable": true,
-          "level": 80,
-          "rewardXp": 8030,
-          "rewardGold": 240,
+          "level": 70,
+          "rewardXp": 6240,
+          "rewardGold": 210,
           "description": "Use a Worldwire Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
@@ -1057495,6 +1057630,14 @@
           "r": 0.18,
           "v": 0,
           "layout": "tangle_design_v1"
+        },
+        {
+          "kind": "meetingstone",
+          "x": 257.0,
+          "y": 135.0,
+          "r": 0.55,
+          "v": 0,
+          "label": "Dungeon Meeting Stone"
         }
       ],
       "slimes": [
@@ -1059324,6 +1059467,23 @@
             "style": "short",
             "hat": "straw"
           }
+        },
+        {
+          "id": "dungeon_stone_32",
+          "name": "The Meeting Stone",
+          "role": "Party summons",
+          "dialogue": "Use this stone to invite your party members to join you here.",
+          "x": 257.0,
+          "y": 135.0,
+          "color": "#8e87ad",
+          "art": "stone",
+          "offers": [
+            {
+              "id": "summon_party",
+              "label": "Summon party members",
+              "cost": 0
+            }
+          ]
         }
       ],
       "places": [
@@ -1060706,9 +1060866,9 @@
           "npc": "fisher_tangle_0",
           "requires": null,
           "repeatable": false,
-          "level": 70,
-          "rewardXp": 6240,
-          "rewardGold": 210,
+          "level": 75,
+          "rewardXp": 7100,
+          "rewardGold": 225,
           "description": "Use a Reedglass Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
@@ -1060725,9 +1060885,9 @@
           "npc": "fisher_tangle_0",
           "requires": "fisher_tangle_0_1",
           "repeatable": false,
-          "level": 70,
-          "rewardXp": 6240,
-          "rewardGold": 210,
+          "level": 75,
+          "rewardXp": 7100,
+          "rewardGold": 225,
           "description": "Use a Reedglass Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
@@ -1060744,9 +1060904,9 @@
           "npc": "fisher_tangle_0",
           "requires": "fisher_tangle_0_2",
           "repeatable": false,
-          "level": 70,
-          "rewardXp": 6240,
-          "rewardGold": 210,
+          "level": 75,
+          "rewardXp": 7100,
+          "rewardGold": 225,
           "description": "Use a Reedglass Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
@@ -1060763,9 +1060923,9 @@
           "npc": "fisher_tangle_0",
           "requires": "fisher_tangle_0_1",
           "repeatable": true,
-          "level": 70,
-          "rewardXp": 6240,
-          "rewardGold": 210,
+          "level": 75,
+          "rewardXp": 7100,
+          "rewardGold": 225,
           "description": "Use a Reedglass Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
@@ -1109587,9 +1109747,9 @@
           "npc": "fisher_veyr_0",
           "requires": null,
           "repeatable": false,
-          "level": 85,
-          "rewardXp": 9010,
-          "rewardGold": 255,
+          "level": 80,
+          "rewardXp": 8030,
+          "rewardGold": 240,
           "description": "Use a Rootbraid Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
@@ -1109606,9 +1109766,9 @@
           "npc": "fisher_veyr_0",
           "requires": "fisher_veyr_0_1",
           "repeatable": false,
-          "level": 85,
-          "rewardXp": 9010,
-          "rewardGold": 255,
+          "level": 80,
+          "rewardXp": 8030,
+          "rewardGold": 240,
           "description": "Use a Rootbraid Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
@@ -1109625,9 +1109785,9 @@
           "npc": "fisher_veyr_0",
           "requires": "fisher_veyr_0_2",
           "repeatable": false,
-          "level": 85,
-          "rewardXp": 9010,
-          "rewardGold": 255,
+          "level": 80,
+          "rewardXp": 8030,
+          "rewardGold": 240,
           "description": "Use a Rootbraid Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
@@ -1109644,9 +1109804,9 @@
           "npc": "fisher_veyr_0",
           "requires": "fisher_veyr_0_1",
           "repeatable": true,
-          "level": 85,
-          "rewardXp": 9010,
-          "rewardGold": 255,
+          "level": 80,
+          "rewardXp": 8030,
+          "rewardGold": 240,
           "description": "Use a Rootbraid Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
@@ -1143233,6 +1143393,14 @@
           "y": 188.25,
           "r": 3.7,
           "fishingWater": "fishing_pond_24_2"
+        },
+        {
+          "kind": "meetingstone",
+          "x": 110.0,
+          "y": 21.0,
+          "r": 0.55,
+          "v": 0,
+          "label": "Dungeon Meeting Stone"
         }
       ],
       "slimes": [],
@@ -1144478,74 +1144646,6 @@
           ]
         },
         {
-          "id": "fisher_heartwood_0",
-          "name": "Fisher",
-          "role": "Fishing and cooking",
-          "x": 98.44728580154032,
-          "y": 163.7171680604919,
-          "dialogue": "Bring me fish and I can cook a meal or make a stronger rod. Each upgrade replaces your old rod. Platinum line fishes water and Crags lava; tempered platinum also reaches Emberwake. Cooked fish grant one food bonus for ten minutes.",
-          "offers": [
-            {
-              "id": "fishing_workshop",
-              "label": "Fisher workshop",
-              "cost": 0
-            },
-            {
-              "id": "rod:rootbraid",
-              "label": "Craft rod",
-              "cost": 50000
-            },
-            {
-              "id": "rod:cairnsteel",
-              "label": "Craft rod",
-              "cost": 75000
-            },
-            {
-              "id": "cook:fish_heartwood_whitefish",
-              "label": "Cook fish",
-              "cost": 30
-            },
-            {
-              "id": "cook:fish_pithscale_char",
-              "label": "Cook fish",
-              "cost": 45
-            },
-            {
-              "id": "cook:fish_amberroot_gar",
-              "label": "Cook fish",
-              "cost": 65
-            },
-            {
-              "id": "cook:fish_mountainheart_paddlefish",
-              "label": "Cook fish",
-              "cost": 100
-            },
-            {
-              "id": "cook:fish_cairn_minnow",
-              "label": "Cook fish",
-              "cost": 30
-            },
-            {
-              "id": "cook:fish_tarn_grayling",
-              "label": "Cook fish",
-              "cost": 45
-            },
-            {
-              "id": "cook:fish_graniteback_sturgeon",
-              "label": "Cook fish",
-              "cost": 65
-            }
-          ],
-          "buys": true,
-          "color": "#527e89",
-          "look": {
-            "skin": "#dca480",
-            "hair": "#694737",
-            "style": "short",
-            "hat": "straw"
-          }
-        },
-        {
           "id": "hw_enchanting",
           "name": "Enchanting Master",
           "role": "Enchanting trainer and recipe vendor",
@@ -1144712,6 +1144812,91 @@
             }
           ],
           "buys": false
+        },
+        {
+          "id": "fisher_heartwood_0",
+          "name": "Fisher",
+          "role": "Fishing and cooking",
+          "x": 98.44728580154032,
+          "y": 163.7171680604919,
+          "dialogue": "Bring me fish and I can cook a meal or make a stronger rod. Each upgrade replaces your old rod. Platinum line fishes water and Crags lava; tempered platinum also reaches Emberwake. Cooked fish grant one food bonus for ten minutes.",
+          "offers": [
+            {
+              "id": "fishing_workshop",
+              "label": "Fisher workshop",
+              "cost": 0
+            },
+            {
+              "id": "rod:rootbraid",
+              "label": "Craft rod",
+              "cost": 50000
+            },
+            {
+              "id": "rod:cairnsteel",
+              "label": "Craft rod",
+              "cost": 75000
+            },
+            {
+              "id": "cook:fish_heartwood_whitefish",
+              "label": "Cook fish",
+              "cost": 30
+            },
+            {
+              "id": "cook:fish_pithscale_char",
+              "label": "Cook fish",
+              "cost": 45
+            },
+            {
+              "id": "cook:fish_amberroot_gar",
+              "label": "Cook fish",
+              "cost": 65
+            },
+            {
+              "id": "cook:fish_mountainheart_paddlefish",
+              "label": "Cook fish",
+              "cost": 100
+            },
+            {
+              "id": "cook:fish_cairn_minnow",
+              "label": "Cook fish",
+              "cost": 30
+            },
+            {
+              "id": "cook:fish_tarn_grayling",
+              "label": "Cook fish",
+              "cost": 45
+            },
+            {
+              "id": "cook:fish_graniteback_sturgeon",
+              "label": "Cook fish",
+              "cost": 65
+            }
+          ],
+          "buys": true,
+          "color": "#527e89",
+          "look": {
+            "skin": "#dca480",
+            "hair": "#694737",
+            "style": "short",
+            "hat": "straw"
+          }
+        },
+        {
+          "id": "dungeon_stone_33",
+          "name": "The Meeting Stone",
+          "role": "Party summons",
+          "dialogue": "Use this stone to invite your party members to join you here.",
+          "x": 110.0,
+          "y": 21.0,
+          "color": "#8e87ad",
+          "art": "stone",
+          "offers": [
+            {
+              "id": "summon_party",
+              "label": "Summon party members",
+              "cost": 0
+            }
+          ]
         }
       ],
       "places": [
@@ -1145936,9 +1146121,9 @@
           "npc": "fisher_heartwood_0",
           "requires": null,
           "repeatable": false,
-          "level": 85,
-          "rewardXp": 9010,
-          "rewardGold": 255,
+          "level": 80,
+          "rewardXp": 8030,
+          "rewardGold": 240,
           "description": "Use a Rootbraid Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
@@ -1145955,9 +1146140,9 @@
           "npc": "fisher_heartwood_0",
           "requires": "fisher_heartwood_0_1",
           "repeatable": false,
-          "level": 85,
-          "rewardXp": 9010,
-          "rewardGold": 255,
+          "level": 80,
+          "rewardXp": 8030,
+          "rewardGold": 240,
           "description": "Use a Rootbraid Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
@@ -1145974,9 +1146159,9 @@
           "npc": "fisher_heartwood_0",
           "requires": "fisher_heartwood_0_2",
           "repeatable": false,
-          "level": 85,
-          "rewardXp": 9010,
-          "rewardGold": 255,
+          "level": 80,
+          "rewardXp": 8030,
+          "rewardGold": 240,
           "description": "Use a Rootbraid Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
@@ -1145993,9 +1146178,9 @@
           "npc": "fisher_heartwood_0",
           "requires": "fisher_heartwood_0_1",
           "repeatable": true,
-          "level": 85,
-          "rewardXp": 9010,
-          "rewardGold": 255,
+          "level": 80,
+          "rewardXp": 8030,
+          "rewardGold": 240,
           "description": "Use a Rootbraid Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
@@ -1211387,6 +1211572,14 @@
           "r": 0.8,
           "v": 2,
           "layout": "lapis_design_v1"
+        },
+        {
+          "kind": "meetingstone",
+          "x": 136.0,
+          "y": 67.0,
+          "r": 0.55,
+          "v": 0,
+          "label": "Dungeon Meeting Stone"
         }
       ],
       "slimes": [
@@ -1213349,6 +1213542,23 @@
             "style": "short",
             "hat": "straw"
           }
+        },
+        {
+          "id": "dungeon_stone_34",
+          "name": "The Meeting Stone",
+          "role": "Party summons",
+          "dialogue": "Use this stone to invite your party members to join you here.",
+          "x": 136.0,
+          "y": 67.0,
+          "color": "#8e87ad",
+          "art": "stone",
+          "offers": [
+            {
+              "id": "summon_party",
+              "label": "Summon party members",
+              "cost": 0
+            }
+          ]
         }
       ],
       "places": [
@@ -1256441,9 +1256651,9 @@
           "npc": "fisher_fws_0",
           "requires": null,
           "repeatable": false,
-          "level": 90,
-          "rewardXp": 10050,
-          "rewardGold": 270,
+          "level": 85,
+          "rewardXp": 9010,
+          "rewardGold": 255,
           "description": "Use a Starcatch Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
@@ -1256460,9 +1256670,9 @@
           "npc": "fisher_fws_0",
           "requires": "fisher_fws_0_1",
           "repeatable": false,
-          "level": 90,
-          "rewardXp": 10050,
-          "rewardGold": 270,
+          "level": 85,
+          "rewardXp": 9010,
+          "rewardGold": 255,
           "description": "Use a Starcatch Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
@@ -1256479,9 +1256689,9 @@
           "npc": "fisher_fws_0",
           "requires": "fisher_fws_0_2",
           "repeatable": false,
-          "level": 90,
-          "rewardXp": 10050,
-          "rewardGold": 270,
+          "level": 85,
+          "rewardXp": 9010,
+          "rewardGold": 255,
           "description": "Use a Starcatch Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
@@ -1256498,9 +1256708,9 @@
           "npc": "fisher_fws_0",
           "requires": "fisher_fws_0_1",
           "repeatable": true,
-          "level": 90,
-          "rewardXp": 10050,
-          "rewardGold": 270,
+          "level": 85,
+          "rewardXp": 9010,
+          "rewardGold": 255,
           "description": "Use a Starcatch Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
@@ -1301913,6 +1302123,14 @@
           "y": 185.25,
           "r": 3.7,
           "fishingWater": "fishing_pond_27_2"
+        },
+        {
+          "kind": "meetingstone",
+          "x": 166.0,
+          "y": 30.5,
+          "r": 0.55,
+          "v": 0,
+          "label": "Dungeon Meeting Stone"
         }
       ],
       "slimes": [
@@ -1303661,6 +1303879,23 @@
             "style": "short",
             "hat": "straw"
           }
+        },
+        {
+          "id": "dungeon_stone_35",
+          "name": "The Meeting Stone",
+          "role": "Party summons",
+          "dialogue": "Use this stone to invite your party members to join you here.",
+          "x": 166.0,
+          "y": 30.5,
+          "color": "#8e87ad",
+          "art": "stone",
+          "offers": [
+            {
+              "id": "summon_party",
+              "label": "Summon party members",
+              "cost": 0
+            }
+          ]
         }
       ],
       "places": [
@@ -1449761,6 +1449996,46 @@
           "width": 11,
           "depth": 3,
           "layout": "shape_v1"
+        },
+        {
+          "kind": "meetingstone",
+          "x": 238.0,
+          "y": 606.0,
+          "r": 0.55,
+          "v": 0,
+          "label": "Dungeon Meeting Stone"
+        },
+        {
+          "kind": "meetingstone",
+          "x": 696.0,
+          "y": 601.5,
+          "r": 0.55,
+          "v": 0,
+          "label": "Dungeon Meeting Stone"
+        },
+        {
+          "kind": "meetingstone",
+          "x": 708.0,
+          "y": 410.0,
+          "r": 0.55,
+          "v": 0,
+          "label": "Dungeon Meeting Stone"
+        },
+        {
+          "kind": "meetingstone",
+          "x": 268.0,
+          "y": 392.0,
+          "r": 0.55,
+          "v": 0,
+          "label": "Dungeon Meeting Stone"
+        },
+        {
+          "kind": "meetingstone",
+          "x": 448.0,
+          "y": 486.0,
+          "r": 0.55,
+          "v": 0,
+          "label": "Dungeon Meeting Stone"
         }
       ],
       "slimes": [
@@ -1454824,6 +1455099,91 @@
             "style": "short",
             "hat": "straw"
           }
+        },
+        {
+          "id": "dungeon_stone_36",
+          "name": "The Meeting Stone",
+          "role": "Party summons",
+          "dialogue": "Use this stone to invite your party members to join you here.",
+          "x": 238.0,
+          "y": 606.0,
+          "color": "#8e87ad",
+          "art": "stone",
+          "offers": [
+            {
+              "id": "summon_party",
+              "label": "Summon party members",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "dungeon_stone_37",
+          "name": "The Meeting Stone",
+          "role": "Party summons",
+          "dialogue": "Use this stone to invite your party members to join you here.",
+          "x": 696.0,
+          "y": 601.5,
+          "color": "#8e87ad",
+          "art": "stone",
+          "offers": [
+            {
+              "id": "summon_party",
+              "label": "Summon party members",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "dungeon_stone_38",
+          "name": "The Meeting Stone",
+          "role": "Party summons",
+          "dialogue": "Use this stone to invite your party members to join you here.",
+          "x": 708.0,
+          "y": 410.0,
+          "color": "#8e87ad",
+          "art": "stone",
+          "offers": [
+            {
+              "id": "summon_party",
+              "label": "Summon party members",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "dungeon_stone_39",
+          "name": "The Meeting Stone",
+          "role": "Party summons",
+          "dialogue": "Use this stone to invite your party members to join you here.",
+          "x": 268.0,
+          "y": 392.0,
+          "color": "#8e87ad",
+          "art": "stone",
+          "offers": [
+            {
+              "id": "summon_party",
+              "label": "Summon party members",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "dungeon_stone_44",
+          "name": "The Meeting Stone",
+          "role": "Party summons",
+          "dialogue": "Use this stone to invite your party members to join you here.",
+          "x": 448.0,
+          "y": 486.0,
+          "color": "#8e87ad",
+          "art": "stone",
+          "offers": [
+            {
+              "id": "summon_party",
+              "label": "Summon party members",
+              "cost": 0
+            }
+          ]
         }
       ],
       "quests": [
@@ -1495503,14 +1495863,6 @@
           "y": 30,
           "r": 0,
           "v": 2
-        },
-        {
-          "kind": "meetingstone",
-          "x": 51,
-          "y": 82,
-          "r": 0.55,
-          "v": 0,
-          "label": "Dungeon Meeting Stone"
         }
       ],
       "slimes": [
@@ -1495635,23 +1495987,6 @@
               "label": "Send my mercenaries away",
               "cost": 0,
               "merc": "dismiss"
-            }
-          ]
-        },
-        {
-          "id": "dungeon_stone_29",
-          "name": "The Meeting Stone",
-          "role": "Party summons",
-          "dialogue": "Use this stone to invite your party members to join you here.",
-          "x": 51,
-          "y": 82,
-          "color": "#8e87ad",
-          "art": "stone",
-          "offers": [
-            {
-              "id": "summon_party",
-              "label": "Summon party members",
-              "cost": 0
             }
           ]
         }
@@ -1498875,14 +1499210,6 @@
           "y": 79,
           "r": 0,
           "v": 0
-        },
-        {
-          "kind": "meetingstone",
-          "x": 51,
-          "y": 83,
-          "r": 0.55,
-          "v": 0,
-          "label": "Dungeon Meeting Stone"
         }
       ],
       "slimes": [
@@ -1499007,23 +1499334,6 @@
               "label": "Send my mercenaries away",
               "cost": 0,
               "merc": "dismiss"
-            }
-          ]
-        },
-        {
-          "id": "dungeon_stone_30",
-          "name": "The Meeting Stone",
-          "role": "Party summons",
-          "dialogue": "Use this stone to invite your party members to join you here.",
-          "x": 51,
-          "y": 83,
-          "color": "#8e87ad",
-          "art": "stone",
-          "offers": [
-            {
-              "id": "summon_party",
-              "label": "Summon party members",
-              "cost": 0
             }
           ]
         }
@@ -1502082,14 +1502392,6 @@
           "y": 79,
           "r": 0,
           "v": 0
-        },
-        {
-          "kind": "meetingstone",
-          "x": 51,
-          "y": 83,
-          "r": 0.55,
-          "v": 0,
-          "label": "Dungeon Meeting Stone"
         }
       ],
       "slimes": [
@@ -1502214,23 +1502516,6 @@
               "label": "Send my mercenaries away",
               "cost": 0,
               "merc": "dismiss"
-            }
-          ]
-        },
-        {
-          "id": "dungeon_stone_31",
-          "name": "The Meeting Stone",
-          "role": "Party summons",
-          "dialogue": "Use this stone to invite your party members to join you here.",
-          "x": 51,
-          "y": 83,
-          "color": "#8e87ad",
-          "art": "stone",
-          "offers": [
-            {
-              "id": "summon_party",
-              "label": "Summon party members",
-              "cost": 0
             }
           ]
         }
@@ -1504896,14 +1505181,6 @@
           "y": 79,
           "r": 0,
           "v": 0
-        },
-        {
-          "kind": "meetingstone",
-          "x": 51,
-          "y": 83,
-          "r": 0.55,
-          "v": 0,
-          "label": "Dungeon Meeting Stone"
         }
       ],
       "slimes": [
@@ -1505028,23 +1505305,6 @@
               "label": "Send my mercenaries away",
               "cost": 0,
               "merc": "dismiss"
-            }
-          ]
-        },
-        {
-          "id": "dungeon_stone_32",
-          "name": "The Meeting Stone",
-          "role": "Party summons",
-          "dialogue": "Use this stone to invite your party members to join you here.",
-          "x": 51,
-          "y": 83,
-          "color": "#8e87ad",
-          "art": "stone",
-          "offers": [
-            {
-              "id": "summon_party",
-              "label": "Summon party members",
-              "cost": 0
             }
           ]
         }
@@ -1507773,14 +1508033,6 @@
           "y": 78,
           "r": 0,
           "v": 0
-        },
-        {
-          "kind": "meetingstone",
-          "x": 51,
-          "y": 82,
-          "r": 0.55,
-          "v": 0,
-          "label": "Dungeon Meeting Stone"
         }
       ],
       "slimes": [
@@ -1508013,23 +1508265,6 @@
               "label": "Send my mercenaries away",
               "cost": 0,
               "merc": "dismiss"
-            }
-          ]
-        },
-        {
-          "id": "dungeon_stone_33",
-          "name": "The Meeting Stone",
-          "role": "Party summons",
-          "dialogue": "Use this stone to invite your party members to join you here.",
-          "x": 51,
-          "y": 82,
-          "color": "#8e87ad",
-          "art": "stone",
-          "offers": [
-            {
-              "id": "summon_party",
-              "label": "Summon party members",
-              "cost": 0
             }
           ]
         }
@@ -1511177,14 +1511412,6 @@
           "y": 78,
           "r": 0,
           "v": 0
-        },
-        {
-          "kind": "meetingstone",
-          "x": 51,
-          "y": 82,
-          "r": 0.55,
-          "v": 0,
-          "label": "Dungeon Meeting Stone"
         }
       ],
       "slimes": [
@@ -1511309,23 +1511536,6 @@
               "label": "Send my mercenaries away",
               "cost": 0,
               "merc": "dismiss"
-            }
-          ]
-        },
-        {
-          "id": "dungeon_stone_34",
-          "name": "The Meeting Stone",
-          "role": "Party summons",
-          "dialogue": "Use this stone to invite your party members to join you here.",
-          "x": 51,
-          "y": 82,
-          "color": "#8e87ad",
-          "art": "stone",
-          "offers": [
-            {
-              "id": "summon_party",
-              "label": "Summon party members",
-              "cost": 0
             }
           ]
         }
@@ -1514252,14 +1514462,6 @@
           "y": 78,
           "r": 0,
           "v": 0
-        },
-        {
-          "kind": "meetingstone",
-          "x": 51,
-          "y": 82,
-          "r": 0.55,
-          "v": 0,
-          "label": "Dungeon Meeting Stone"
         }
       ],
       "slimes": [
@@ -1514384,23 +1514586,6 @@
               "label": "Send my mercenaries away",
               "cost": 0,
               "merc": "dismiss"
-            }
-          ]
-        },
-        {
-          "id": "dungeon_stone_35",
-          "name": "The Meeting Stone",
-          "role": "Party summons",
-          "dialogue": "Use this stone to invite your party members to join you here.",
-          "x": 51,
-          "y": 82,
-          "color": "#8e87ad",
-          "art": "stone",
-          "offers": [
-            {
-              "id": "summon_party",
-              "label": "Summon party members",
-              "cost": 0
             }
           ]
         }
@@ -1517771,14 +1517956,6 @@
           "y": 78,
           "r": 0,
           "v": 0
-        },
-        {
-          "kind": "meetingstone",
-          "x": 51,
-          "y": 82,
-          "r": 0.55,
-          "v": 0,
-          "label": "Dungeon Meeting Stone"
         }
       ],
       "slimes": [
@@ -1517903,23 +1518080,6 @@
               "label": "Send my mercenaries away",
               "cost": 0,
               "merc": "dismiss"
-            }
-          ]
-        },
-        {
-          "id": "dungeon_stone_36",
-          "name": "The Meeting Stone",
-          "role": "Party summons",
-          "dialogue": "Use this stone to invite your party members to join you here.",
-          "x": 51,
-          "y": 82,
-          "color": "#8e87ad",
-          "art": "stone",
-          "offers": [
-            {
-              "id": "summon_party",
-              "label": "Summon party members",
-              "cost": 0
             }
           ]
         }
@@ -1521026,14 +1521186,6 @@
           "y": 78,
           "r": 0,
           "v": 0
-        },
-        {
-          "kind": "meetingstone",
-          "x": 51,
-          "y": 82,
-          "r": 0.55,
-          "v": 0,
-          "label": "Dungeon Meeting Stone"
         }
       ],
       "slimes": [
@@ -1521164,23 +1521316,6 @@
               "label": "Send my mercenaries away",
               "cost": 0,
               "merc": "dismiss"
-            }
-          ]
-        },
-        {
-          "id": "dungeon_stone_37",
-          "name": "The Meeting Stone",
-          "role": "Party summons",
-          "dialogue": "Use this stone to invite your party members to join you here.",
-          "x": 51,
-          "y": 82,
-          "color": "#8e87ad",
-          "art": "stone",
-          "offers": [
-            {
-              "id": "summon_party",
-              "label": "Summon party members",
-              "cost": 0
             }
           ]
         }
@@ -1524638,14 +1524773,6 @@
           "y": 78,
           "r": 0,
           "v": 0
-        },
-        {
-          "kind": "meetingstone",
-          "x": 51,
-          "y": 82,
-          "r": 0.55,
-          "v": 0,
-          "label": "Dungeon Meeting Stone"
         }
       ],
       "slimes": [
@@ -1524806,23 +1524933,6 @@
               "label": "Send my mercenaries away",
               "cost": 0,
               "merc": "dismiss"
-            }
-          ]
-        },
-        {
-          "id": "dungeon_stone_38",
-          "name": "The Meeting Stone",
-          "role": "Party summons",
-          "dialogue": "Use this stone to invite your party members to join you here.",
-          "x": 51,
-          "y": 82,
-          "color": "#8e87ad",
-          "art": "stone",
-          "offers": [
-            {
-              "id": "summon_party",
-              "label": "Summon party members",
-              "cost": 0
             }
           ]
         }
@@ -1528142,14 +1528252,6 @@
           "y": 78,
           "r": 0,
           "v": 0
-        },
-        {
-          "kind": "meetingstone",
-          "x": 51,
-          "y": 82,
-          "r": 0.55,
-          "v": 0,
-          "label": "Dungeon Meeting Stone"
         }
       ],
       "slimes": [
@@ -1528274,23 +1528376,6 @@
               "label": "Send my mercenaries away",
               "cost": 0,
               "merc": "dismiss"
-            }
-          ]
-        },
-        {
-          "id": "dungeon_stone_39",
-          "name": "The Meeting Stone",
-          "role": "Party summons",
-          "dialogue": "Use this stone to invite your party members to join you here.",
-          "x": 51,
-          "y": 82,
-          "color": "#8e87ad",
-          "art": "stone",
-          "offers": [
-            {
-              "id": "summon_party",
-              "label": "Summon party members",
-              "cost": 0
             }
           ]
         }
@@ -1531742,14 +1531827,6 @@
           "y": 44,
           "r": 0,
           "v": 0
-        },
-        {
-          "kind": "meetingstone",
-          "x": 53,
-          "y": 99,
-          "r": 0.55,
-          "v": 0,
-          "label": "Dungeon Meeting Stone"
         }
       ],
       "slimes": [
@@ -1531906,23 +1531983,6 @@
               "label": "Send my mercenaries away",
               "cost": 0,
               "merc": "dismiss"
-            }
-          ]
-        },
-        {
-          "id": "dungeon_stone_41",
-          "name": "The Meeting Stone",
-          "role": "Party summons",
-          "dialogue": "Use this stone to invite your party members to join you here.",
-          "x": 53,
-          "y": 99,
-          "color": "#8e87ad",
-          "art": "stone",
-          "offers": [
-            {
-              "id": "summon_party",
-              "label": "Summon party members",
-              "cost": 0
             }
           ]
         }
@@ -1535727,14 +1535787,6 @@
           "y": 9,
           "r": 0,
           "v": 0
-        },
-        {
-          "kind": "meetingstone",
-          "x": 53,
-          "y": 99,
-          "r": 0.55,
-          "v": 0,
-          "label": "Dungeon Meeting Stone"
         }
       ],
       "slimes": [
@@ -1535891,23 +1535943,6 @@
               "label": "Send my mercenaries away",
               "cost": 0,
               "merc": "dismiss"
-            }
-          ]
-        },
-        {
-          "id": "dungeon_stone_42",
-          "name": "The Meeting Stone",
-          "role": "Party summons",
-          "dialogue": "Use this stone to invite your party members to join you here.",
-          "x": 53,
-          "y": 99,
-          "color": "#8e87ad",
-          "art": "stone",
-          "offers": [
-            {
-              "id": "summon_party",
-              "label": "Summon party members",
-              "cost": 0
             }
           ]
         }
@@ -1536094,8 +1536129,8 @@
           "y": 99,
           "r": 1.2,
           "to": 7,
-          "tx": 165,
-          "ty": 191,
+          "tx": 236.5,
+          "ty": 314.5,
           "look": "skybridge"
         },
         {
@@ -1536105,8 +1536140,8 @@
           "y": 10,
           "r": 1.2,
           "to": 7,
-          "tx": 165,
-          "ty": 191,
+          "tx": 236.5,
+          "ty": 314.5,
           "look": "skybridge",
           "after_clear": true
         }
@@ -1541515,14 +1541550,6 @@
           "y": 22,
           "r": 0,
           "v": 0
-        },
-        {
-          "kind": "meetingstone",
-          "x": 61,
-          "y": 110,
-          "r": 0.55,
-          "v": 0,
-          "label": "Dungeon Meeting Stone"
         }
       ],
       "slimes": [
@@ -1541679,23 +1541706,6 @@
               "label": "Send my mercenaries away",
               "cost": 0,
               "merc": "dismiss"
-            }
-          ]
-        },
-        {
-          "id": "dungeon_stone_43",
-          "name": "The Meeting Stone",
-          "role": "Party summons",
-          "dialogue": "Use this stone to invite your party members to join you here.",
-          "x": 61,
-          "y": 110,
-          "color": "#8e87ad",
-          "art": "stone",
-          "offers": [
-            {
-              "id": "summon_party",
-              "label": "Summon party members",
-              "cost": 0
             }
           ]
         }
@@ -1551580,14 +1551590,6 @@
           "y": 58,
           "r": 0,
           "v": 0
-        },
-        {
-          "kind": "meetingstone",
-          "x": 77,
-          "y": 143,
-          "r": 0.55,
-          "v": 0,
-          "label": "Dungeon Meeting Stone"
         }
       ],
       "slimes": [
@@ -1552020,23 +1552022,6 @@
               "label": "Send my mercenaries away",
               "cost": 0,
               "merc": "dismiss"
-            }
-          ]
-        },
-        {
-          "id": "dungeon_stone_44",
-          "name": "The Meeting Stone",
-          "role": "Party summons",
-          "dialogue": "Use this stone to invite your party members to join you here.",
-          "x": 77,
-          "y": 143,
-          "color": "#8e87ad",
-          "art": "stone",
-          "offers": [
-            {
-              "id": "summon_party",
-              "label": "Summon party members",
-              "cost": 0
             }
           ]
         }
@@ -1645707,14 +1645692,6 @@
           "y": 47.0,
           "r": 0,
           "v": 9
-        },
-        {
-          "kind": "meetingstone",
-          "x": 27,
-          "y": 303,
-          "r": 0.55,
-          "v": 0,
-          "label": "Dungeon Meeting Stone"
         }
       ],
       "slimes": [
@@ -1646082,23 +1646059,6 @@
               "label": "Send my mercenaries away",
               "cost": 0,
               "merc": "dismiss"
-            }
-          ]
-        },
-        {
-          "id": "dungeon_stone_46",
-          "name": "The Meeting Stone",
-          "role": "Party summons",
-          "dialogue": "Use this stone to invite your party members to join you here.",
-          "x": 27,
-          "y": 303,
-          "color": "#8e87ad",
-          "art": "stone",
-          "offers": [
-            {
-              "id": "summon_party",
-              "label": "Summon party members",
-              "cost": 0
             }
           ]
         }

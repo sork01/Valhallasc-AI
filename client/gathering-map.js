@@ -1,49 +1,24 @@
 'use strict';
 (() => {
-  const button = document.getElementById('mini-gather');
-  const tr = text => window.Locale?.translate(text) || text;
-  const modes = [null, 'ore', 'flowers'];
-  const labels = {off: 'Track', ore: 'Ore', flowers: 'Flowers'};
-  const titles = {off: 'Track gathering', ore: 'Tracking ore veins', flowers: 'Tracking flower patches'};
-  let learned, mode = null, veins = [], patches = [];
-
-  function paintButton() {
-    const hidden = !(learned?.ore || learned?.flowers);
-    if (button.hidden !== hidden) button.hidden = hidden;
-    const state = mode || 'off';
-    if (button.dataset.mode === state) return;
-    button.dataset.mode = state;
-    button.textContent = tr(labels[state]);
-    button.title = tr(titles[state]);
-    button.setAttribute('aria-label', button.title);
-    button.setAttribute('aria-pressed', String(!!mode));
-  }
-
-  function updateMode(next) {
-    mode = next;
-    paintButton();
-  }
-  button.addEventListener('click', () => {
-    const available = modes.filter(key => !key || learned?.[key]);
-    updateMode(available[(available.indexOf(mode) + 1) % available.length]);
-  });
+  let learned, veins = [], patches = [];
 
   function sync(packet, own) {
     learned = own.gathering;
     veins = packet.miningVeins || [];
     patches = packet.flowerPatches || [];
-    updateMode(learned?.[mode] ? mode : null);
   }
   function reset() {
     learned = null;
     veins = [];
     patches = [];
-    updateMode(null);
   }
 
   function draw(g, scale, vx, vy, width) {
-    if (!mode) return;
-    const markers = mode === 'ore' ? veins : patches;
+    if (learned?.ore && window.Prefs?.trackOre !== false) drawMarkers(g, scale, vx, vy, width, 'ore', veins);
+    if (learned?.flowers && window.Prefs?.trackFlowers !== false) drawMarkers(g, scale, vx, vy, width, 'flowers', patches);
+  }
+
+  function drawMarkers(g, scale, vx, vy, width, mode, markers) {
     if (!markers.length) return;
     const cx = vx * scale + width / 2, cy = vy * scale + width / 2;
     const edge = width / 2 - 7;

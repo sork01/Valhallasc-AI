@@ -87,7 +87,7 @@ pub struct Catalog {
     pub tiers: Vec<Tier>,
     pub picks: Vec<Pick>,
     pub recipes: Vec<Recipe>,
-    pub expert_zones: Vec<usize>,
+    pub training_zones: Vec<Vec<usize>>,
     epic_bosses: Vec<String>,
 }
 
@@ -113,12 +113,8 @@ impl Catalog {
             return None;
         }
         let band = usize::from(skill / SKILL_BAND);
-        let (tier, zones) = if let Some(tier) = self.tiers.get(band) {
-            (band, tier.zones.as_slice())
-        } else {
-            let zone = self.expert_zones.get(band - self.tiers.len())?;
-            (self.tier(*zone)?, std::slice::from_ref(zone))
-        };
+        let zones = self.training_zones.get(band)?;
+        let tier = self.tier(*zones.first()?)?;
         Some(TrainingBand {
             tier,
             zones,

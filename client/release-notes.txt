@@ -1,12 +1,20 @@
 [
   {
-    "version": "1.13.9",
+    "version": "1.14.0",
     "date": "2026-11-25",
-    "new": [],
+    "new": [
+      "Filter the System log or create your own chat tabs. The log includes profession skill gains, gathering, catches, and items received."
+    ],
     "changed": [
       "Dropped bags go into your inventory, even with all four expansion slots occupied. Fit one from inventory or choose which bag to replace. The replaced bag goes back into inventory.",
       "Tooltips mark Enchanting recipes, Blacksmithing blueprints and Alchemy formulas you have already learned.",
-      "You can have up to 20 active quests. Turn in or abandon one to make room when your quest log is full."
+      "You can have up to 20 active quests. Turn in or abandon one to make room when your quest log is full.",
+      "The Shattered Span entrance is near the Lightning Spire in the Shardfields. The dungeon crossing plays no Bifrost ascent or descent.",
+      "Dungeon Meeting Stones are now outside the entrances.",
+      "Fishing and mining training follow the order of the zones. Bifrost Reach opens at skill 150 for both.",
+      "The Skuldwatch beacon lights the plaza from its flame.",
+      "Ore and flower tracking turns on when you learn the profession. Use Settings to turn either one off.",
+      "Click an ore vein or flower patch to walk into range and gather when you arrive."
     ],
     "removed": []
   },

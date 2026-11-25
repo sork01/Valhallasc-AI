@@ -6,6 +6,7 @@
   const tr = s => window.Locale?.translate(s) || s;
   let active = null, timer;
   function route(from, to) {
+    if (from?.theme === 'skybridge' || to?.theme === 'skybridge') return null;
     if (sky(to) && !sky(from)) return { kind: 'sky', up: true, text: 'Ascending into the sky', detail: 'The clouds fall away beneath you.' };
     if (sea(to) && !sea(from)) return { kind: 'sea', up: false, text: 'Descending to the ocean floor', detail: 'The surface fades far above you.' };
     if (sea(to) && sea(from)) return { kind: 'sea', up: null, text: 'Along the ocean floor', detail: 'Beneath the waves, the seabed continues.' };

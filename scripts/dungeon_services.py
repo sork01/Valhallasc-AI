@@ -13,6 +13,11 @@ GATE = (143, 169.5)
 RETURN = (144.5, 175)
 GUIDES = {'barrow_guide': (140.5, 174.5), 'barrow_scribe': (149, 176.5)}
 SPUR = [[140, 184], [144.5, 179.5], list(RETURN), list(GATE)]
+SPAN_GATE = (236.5, 309.5)
+SPAN_RETURN = (236.5, 314.5)
+SPAN_GUIDES = {'span_guide': (231.5, 309.5), 'span_chronicler': (231.5, 312.5)}
+SPAN_SPUR = [[232.5, 303.5], list(SPAN_GATE)]
+SPAN_DESCRIPTION = 'Take the side trail near the Lightning Spire in the Shardfields. Enter The Shattered Span and speak to Torvald, the Last Watcher.'
 
 
 def collision(o, point, margin=.4):
@@ -59,34 +64,87 @@ def relocate_barrow(zones):
     zone['paths'] = roads + [SPUR]
 
 
-def stone_position(zone):
-    sx, sy = zone['spawn']['x'], zone['spawn']['y']
-    for dx, dy in ((-3, 0), (3, 0), (-3, 2), (3, 2), (0, -3), (-4, -2), (4, -2), (0, 6)):
-        x, y = sx+dx, sy+dy
-        if not (2 < x < zone['size']-2 and 2 < y < zone['size']-2):
-            continue
-        if any(collision(o, (sx+dx*t/20, sy+dy*t/20), .8)
-               for t in range(21) for o in zone['objects']):
-            continue
-        if any(math.dist((x,y), (p['x'], p['y'])) < p['r']+2.8 for p in zone['portals']):
-            continue
-        if any(math.dist((x,y), (n['x'], n['y'])) < 2.6 for n in zone['npcs']):
-            continue
-        if any(math.dist((x,y), (s['x'], s['y'])) < 9 for s in zone['slimes']):
-            continue
-        return x, y
-    raise ValueError(f"No safe Meeting Stone position in {zone['name']}")
+def relocate_span(zones):
+    zone = zones[7]
+    door = next(p for p in zone['portals'] if p['id'] == 'sky_shattered_span')
+    door['x'], door['y'] = SPAN_GATE
+    for portal in zones[42]['portals']:
+        if portal['to'] == 7:
+            portal['tx'], portal['ty'] = SPAN_RETURN
+    for npc in zone['npcs']:
+        if npc['id'] in SPAN_GUIDES:
+            npc['x'], npc['y'] = SPAN_GUIDES[npc['id']]
+        if npc['id'] == 'span_guide':
+            npc['dialogue'] = npc['dialogue'].replace(
+                'Beneath the west cliff of the Perch',
+                'Below the Shardfields near the Lightning Spire')
+    next(q for q in zone['quests'] if q['id'] == 'span_entry')['description'] = SPAN_DESCRIPTION
+    if SPAN_SPUR not in zone['paths']:
+        zone['paths'].append(SPAN_SPUR)
+
+
+def point_at(entry):
+    return entry['x'], entry['y']
+
+
+def clear_path(zone, start, end):
+    x, y = start
+    steps = max(1, math.ceil(math.dist(start, end) * 3))
+    nearby = [obj for obj in zone['objects'] if collision(obj, start, math.dist(start, end) + .8)]
+    for step in range(steps + 1):
+        proportion = step / steps
+        point = x + (end[0] - x) * proportion, y + (end[1] - y) * proportion
+        if any(collision(obj, point, .8) for obj in nearby):
+            return False
+    return True
+
+
+def stone_position(zone, door, returns):
+    centre = point_at(door)
+    arrivals = [(p['tx'], p['ty']) for p in returns]
+    anchors = [(p['tx'], p['ty']) for p in returns
+               if not p.get('after_clear') and math.dist(centre, (p['tx'], p['ty'])) <= 12]
+    if not anchors:
+        anchors = [centre]
+    for radius in (6, 8, 10, 12):
+        for i in range(24):
+            angle = i * math.tau / 24
+            x = round((centre[0] + radius * math.cos(angle)) * 2) / 2
+            y = round((centre[1] + radius * math.sin(angle)) * 2) / 2
+            point = x, y
+            if not (2 < x < zone['size']-2 and 2 < y < zone['size']-2):
+                continue
+            if any(math.dist(point, point_at(p)) < max(p['r'], 2.8)+2.6 for p in zone['portals']):
+                continue
+            if any(math.dist(point, arrival) < 2.5 for arrival in arrivals):
+                continue
+            if any(math.dist(point, point_at(n)) < 2.8 for n in zone['npcs']):
+                continue
+            if any(math.dist(point, point_at(spawn)) < 8 for spawn in zone['slimes']):
+                continue
+            if not any(clear_path(zone, anchor, point) for anchor in anchors):
+                continue
+            if any(clear_path(zone, point, (x + dx, y + dy))
+                   for dx, dy in ((1.8, 0), (-1.8, 0), (0, 1.8), (0, -1.8))):
+                return point
+    raise ValueError(f"No safe Meeting Stone position at {door['id']} in {zone['name']}")
 
 
 def install(world):
     zones = [world, *world['zones']]
+    instances = {index for index, zone in enumerate(zones) if zone.get('copies') and zone.get('players')}
     if len(zones) > 41 and zones[6].get('shape'):
         relocate_barrow(zones)
+    if len(zones) > 42 and zones[7].get('shape'):
+        relocate_span(zones)
     for index, zone in enumerate(zones):
-        instance = zone.get('copies', 0) > 0 and bool(zone.get('players'))
-        if instance:
-            zone['npcs'] = [n for n in zone['npcs'] if n['id'] != f'dungeon_stone_{index}']
-            zone['objects'] = [o for o in zone['objects'] if o.get('label') != 'Dungeon Meeting Stone']
+        instance = index in instances
+        zone['npcs'] = [n for n in zone.get('npcs', [])
+                        if not n['id'].startswith('dungeon_stone_')
+                        and not (instance and 'Meeting Stone' in n['name'])]
+        zone['objects'] = [o for o in zone['objects']
+                           if o.get('label') != 'Dungeon Meeting Stone'
+                           and not (instance and o['kind'] == 'meetingstone')]
         for npc in zone.get('npcs', []):
             meeting = 'Meeting Stone' in npc['name']
             old = npc.get('offers', [])
@@ -112,10 +170,26 @@ def install(world):
             for offer in hire[:-1]:
                 offer['raid'] = True
         smith['offers'].extend(hire)
-        x, y = stone_position(zone)
-        zone['npcs'].append(dict(id=f'dungeon_stone_{index}', name='The Meeting Stone', role='Party summons',
-                                 dialogue=STONE_DIALOGUE, x=x, y=y, color='#8e87ad', art='stone', offers=[dict(SUMMON)]))
-        zone['objects'].append(dict(kind='meetingstone', x=x, y=y, r=.55, v=0, label='Dungeon Meeting Stone'))
+
+    for index, zone in enumerate(zones):
+        if index in instances:
+            continue
+        for door in zone.get('portals', []):
+            destination = door['to']
+            if destination not in instances:
+                continue
+            if any('Meeting Stone' in npc['name'] and not npc['id'].startswith('dungeon_stone_')
+                   and math.dist(point_at(door), point_at(npc)) <= 12 for npc in zone['npcs']):
+                continue
+            returns = [p for p in zones[destination]['portals'] if p['to'] == index]
+            x, y = stone_position(zone, door, returns)
+            stone_id = f'dungeon_stone_{destination}'
+            if any(npc['id'] == stone_id for npc in zone['npcs']):
+                stone_id = f'{stone_id}_{door["id"]}'
+            zone['npcs'].append(dict(id=stone_id, name='The Meeting Stone',
+                                     role='Party summons', dialogue=STONE_DIALOGUE, x=x, y=y,
+                                     color='#8e87ad', art='stone', offers=[dict(SUMMON)]))
+            zone['objects'].append(dict(kind='meetingstone', x=x, y=y, r=.55, v=0, label='Dungeon Meeting Stone'))
 
 
 if __name__ == '__main__':

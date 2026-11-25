@@ -3,12 +3,8 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
 
-const button = {
-  hidden: true, dataset: {}, attributes: {},
-  setAttribute(name, value) { this.attributes[name] = value; },
-  addEventListener(type, fn) { this[type] = fn; },
-};
-const context = vm.createContext({ window: {}, document: {getElementById: () => button} });
+const prefs = {};
+const context = vm.createContext({ window: { Prefs: prefs } });
 let source = fs.readFileSync(require.resolve('../client/gathering-map.js'), 'utf8');
 const mutations = {
   untrained: ['learned = own.gathering;', 'learned = {ore:true,flowers:true};'],
@@ -33,37 +29,23 @@ function plot() {
   draw(g, 1, 0, 0, 144);
   return calls;
 }
-const mode = () => button.dataset.mode;
+const oreMarker = () => plot().some(call => call.join() === 'moveTo,88,55');
+const flowerMarker = () => plot().some(call => call.slice(0,4).join() === 'arc,35,80,5');
 sync(packets, {});
-assert.equal(button.hidden, true, 'an untrained character cannot track resources');
-button.click();
-assert.deepEqual(plot(), []);
-
+assert.deepEqual(plot(), [], 'an untrained character sees no markers');
 sync(packets, oreOnly);
-assert.equal(button.hidden, false);
-assert.equal(mode(), 'off');
-button.click();
-assert.equal(mode(), 'ore');
-assert.equal(button.attributes['aria-pressed'], 'true');
-assert(plot().some(call => call.join() === 'moveTo,88,55'), 'the active vein uses its snapshot coordinates');
-button.click();
-assert.equal(mode(), 'off', 'an ore-only character skips the flower mode');
-
+assert(oreMarker(), 'learning mining automatically shows ore');
+assert(!flowerMarker());
 sync(packets, both);
-button.click();
-button.click();
-assert.equal(mode(), 'flowers');
-assert(plot().some(call => call.slice(0,4).join() === 'arc,35,80,5'), 'flower mode draws a differently shaped mark');
-button.click();
-assert.equal(mode(), 'off');
-assert.deepEqual(plot(), []);
-
+assert(oreMarker() && flowerMarker(), 'learning Alchemy adds flowers without hiding ore');
+prefs.trackOre = false;
+assert(!oreMarker() && flowerMarker(), 'the ore setting is independent');
+prefs.trackFlowers = false;
+assert.deepEqual(plot(), [], 'both settings can be disabled');
+prefs.trackOre = true;
+prefs.trackFlowers = true;
 sync(packets, {gathering:{flowers:true}});
-button.click();
-assert.equal(mode(), 'flowers', 'a flower-only character skips the ore mode');
-sync(packets, oreOnly);
-assert.equal(mode(), 'off', 'a missing profession clears that mode');
-button.click();
+assert(!oreMarker() && flowerMarker(), 'training is per character');
 
 sync({miningVeins:[{id:13,x:500,y:72},{id:14,x:72,y:-40}]}, oreOnly);
 assert(plot().some(call => call.join() === 'translate,72,7'), 'the edge arrow points toward the closest off-map vein');
@@ -72,9 +54,7 @@ const relocated = plot();
 assert(relocated.some(call => call.join() === 'moveTo,38,43'), 'a replacement marker follows the next snapshot');
 assert(!relocated.some(call => call[0] === 'rotate'), 'an in-view resource needs no edge arrow');
 sync({flowerPatches:packets.flowerPatches}, oreOnly);
-assert.equal(mode(), 'ore', 'the selected mode survives a zone change');
 assert.deepEqual(plot(), [], 'an empty zone clears old vein positions');
 reset();
-assert.equal(mode(), 'off');
-assert.equal(button.hidden, true);
-console.log('Gathering minimap passed skill gating, mode cycling, marker geometry, edge direction and snapshot replacement.');
+assert.deepEqual(plot(), [], 'reset clears the training and latest positions');
+console.log('Gathering minimap passed automatic tracking, independent Settings, marker geometry, edge direction and snapshot replacement.');

@@ -6,44 +6,41 @@ On phones and tablets, **Go fishing** is available in fishing zones. Keep a rod 
 
 Each fishing area opens when you reach its training band's starting skill. A cast at an advanced shore tells you the skill required and where to train next. The fishing log and catch card also point to the current training waters. Earlier waters stay open for fish and collection progress after you outgrow their skill band.
 
-| Skill points earned | Training waters | Minimum rod level along the main route |
-| --- | --- | ---: |
-| 2–30 | Greenmeadow | 1 |
-| 31–60 | Emberfall Crags | 5 |
-| 61–90 | Rimeveil Glacier | 1 |
-| 91–120 | Gloamfen | 1 |
-| 121–150 | Wyrdwood | 5 |
-| 151–180 | Sunward Vale | 25 |
-| 181–210 | The Tanglecrown | 25 |
-| 211–240 | The Stormglass Flats | 40 |
-| 241–270 | The Lapis Erg | 40 |
-| 271–300 | Emberwake Caldera, Frostwake Shelf or The Yearwheel | 45 in Emberwake |
+| Fishing skill to train | Waters | Minimum rod for an ordinary cast |
+| --- | --- | --- |
+| 1–29 | Greenmeadow | Twig |
+| 30–59 | Emberfall Crags | Platinum |
+| 60–89 | Rimeveil Glacier | Twig |
+| 90–119 | Gloamfen | Twig |
+| 120–149 | Wyrdwood | Platinum |
+| 150–179 | Bifrost Reach, Stormcatch Basins | Reedglass |
+| 180–209 | Astralhollow, Constellation Springs | Silverline |
+| 210–239 | The Prismwaste, Mirrorglass Seeps | Tempered Platinum |
+| 240–269 | The Obsidian Orrery, Stillpoint Cisterns | Tempered Platinum |
+| 270–299 | The Moonspore Canopy or Asterion | Starcatch |
+| 300–329 | The Stormglass Flats | Silverline |
+| 330–359 | Sunward Vale | Reedglass |
+| 360–389 | The Ribbonwild, Jubilee Ponds | Worldwire |
+| 390–419 | The Tanglecrown | Reedglass |
+| 420–449 | Veyrroot Canopy, Rootfoot Catchments | Rootbraid |
+| 450–479 | Veyrroot Heartwood, Pithspring Pools | Rootbraid |
+| 480–509 | The Lapis Erg | Silverline |
+| 510–539 | Frostwake Shelf | Starcatch |
+| 540–569 | The Cairnspine, Boulderwatch Tarns | Cairnsteel |
+| 570–599 | The Yearwheel or Emberwake Caldera | Worldwire in The Yearwheel, Tempered Platinum in Emberwake |
 
-The route to 300 uses rods available by character level 45. Later waters can be in zones with higher recommended combat levels. Existing rods and habitat requirements apply. Ordinary water is sufficient when a band also has richer spots.
+The ten named pond regions have two ponds apiece and four quests at the local
+Fisher. Rán's Deep is underwater. The Fishing route resumes in Astralhollow
+with a Silverline Rod made from Bifrost catches and a Gale Fang. Make Tempered
+Platinum with Astralhollow catches, Starcatch with Orrery catches, and Worldwire
+with Sunward Vale catches. The minimum upgrade levels are 40, 45, 55 and 70.
 
 A real fish gives one skill roll in the current band. The chance on a common fish starts at 90% and approaches 60% near 300 and stays there through 600. Rarer fish improve the odds. After two eligible catches without a point, the next eligible catch gives a point. Junk, treasure, extra copies from the same hook, misses and catches outside the band give no roll.
 
 Existing anglers whose logs predate Fishing skill receive one point per two recorded fish, up to the first cap of 30. A saved skill is preserved. The new level and the number of unsuccessful eligible rolls are saved with the fishing log. `world/fishing-skill.txt` defines the same training waters on the authority and in the generated client data.
 
 
-### Expert waters
-
-| Skill points earned | Region | Waters | Minimum rod |
-| --- | --- | --- | --- |
-| 301–330 | Bifrost Reach | Stormcatch Basins | Tempered Platinum |
-| 331–360 | Astralhollow | Constellation Springs | Tempered Platinum |
-| 361–390 | The Prismwaste | Mirrorglass Seeps | Tempered Platinum |
-| 391–420 | The Obsidian Orrery | Stillpoint Cisterns | Tempered Platinum |
-| 421–450 | The Moonspore Canopy | Sporelight Pools | Starcatch |
-| 451–480 | Asterion | Seven Rings Fountains | Starcatch |
-| 481–510 | The Ribbonwild | Jubilee Ponds | Worldwire |
-| 511–540 | Veyrroot Canopy | Rootfoot Catchments | Rootbraid |
-| 541–570 | Veyrroot Heartwood | Pithspring Pools | Rootbraid |
-| 571–600 | The Cairnspine | Boulderwatch Tarns | Cairnsteel |
-
-Each region has two ponds and a Fisher with four quests. The ten waters share five habitats and add 35 species, including five legendary fish. Each habitat has a cooked dish. The fishing log names the current region and waters. Small blue ponds on the local minimap show where to cast. The existing collections and achievement requirements use their original species lists.
-
-Craft the Rootbraid Rod at level 85 with Worldwire, five Ribbon Shiners, a Ribbon Gecko Tail, and five gold. Fish for Ribbon Shiners at the Jubilee Ponds with Worldwire. Craft the Cairnsteel Rod at level 90 with Rootbraid, five Heartwood Whitefish, a Lantern Hornet Amber, and seven gold and fifty silver. Rootbraid can catch Heartwood Whitefish in the Pithspring Pools. Both upgrades retain earlier water and lava access.
+Craft the Rootbraid Rod at level 80 with Worldwire, five Ribbon Shiners, a Ribbon Gecko Tail, and five gold. Fish for Ribbon Shiners at the Jubilee Ponds with Worldwire. Craft the Cairnsteel Rod at level 90 with Rootbraid, five Heartwood Whitefish, a Lantern Hornet Amber, and seven gold and fifty silver. Rootbraid can catch Heartwood Whitefish in the Pithspring Pools. Both upgrades retain earlier water and lava access.
 
 The new ponds are placed by the normal post-shape fishing overlay using `world/fishing-waters.txt`. `world/fish.txt`, `world/rods.txt`, and `world/fishing-workshop.txt` hold the roster and recipes. Run `python3 scripts/make_fishing_art.py extend` to regenerate the expert icon cells. The original atlas cells remain intact.
 

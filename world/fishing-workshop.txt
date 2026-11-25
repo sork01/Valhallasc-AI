@@ -67,7 +67,8 @@
     "zones": [
       2,
       3,
-      6
+      6,
+      7
     ]
   },
   {
@@ -80,15 +81,17 @@
         1
       ],
       [
-        "fish_alder_trout",
+        "fish_cloud_minnow",
         5
       ],
       [
-        "mosshide_scrap",
+        "gale_fang",
         1
       ]
     ],
     "zones": [
+      7,
+      13,
       6,
       20,
       22
@@ -104,15 +107,17 @@
         1
       ],
       [
-        "fish_cinder_fry",
+        "fish_star_dace",
         5
       ],
       [
-        "ember_core",
+        "astral_scale",
         1
       ]
     ],
     "zones": [
+      13,
+      14,
       1,
       19,
       22,
@@ -131,15 +136,18 @@
         1
       ],
       [
-        "fish_copper_mackerel",
+        "fish_clockwork_chub",
         5
       ],
       [
-        "glassfin",
+        "gearling_tooth",
         1
       ]
     ],
     "zones": [
+      15,
+      16,
+      17,
       19,
       22,
       25,
@@ -156,15 +164,17 @@
         1
       ],
       [
-        "fish_sand_tilapia",
+        "fish_alder_trout",
         5
       ],
       [
-        "scorpion_glass",
+        "sunback_shell",
         1
       ]
     ],
     "zones": [
+      20,
+      21,
       25,
       26,
       28

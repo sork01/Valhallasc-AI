@@ -42,14 +42,25 @@ async function shore(zone){
  await shore(2);
  await w.action(bot,{type:'fish'});
  await w.waitFor(()=>w.player(bot).fishing,5000,'Rimeveil opens at 60');
- await seedFishingSkill(w,bot,270);
+ await w.debug(bot,{op:'take_item',item:finalRod,quantity:1});
+ await w.debug(bot,{op:'give_item',item:'rod_reedglass_rod',quantity:1});
+ await w.debug(bot,{op:'set_level',level:30});
+ await seedFishingSkill(w,bot,150);
+ await shore(7);
+ await w.action(bot,{type:'fish'});
+ await w.waitFor(()=>w.player(bot).fishing,5000,'Bifrost opens at 150 with Reedglass at level 30');
+ await w.action(bot,{type:'fish'});await w.waitFor(()=>!w.player(bot).fishing);
+ await w.debug(bot,{op:'take_item',item:'rod_reedglass_rod',quantity:1});
+ await w.debug(bot,{op:'give_item',item:finalRod,quantity:1});
+ await w.debug(bot,{op:'set_level',level:99});
+ await seedFishingSkill(w,bot,570);
  for(const zone of [0,1,45,28]){
   await shore(zone);await w.action(bot,{type:'fish'});await w.waitFor(()=>w.player(bot).fishing,5000,`The final rod casts in zone ${zone}`);
   assert.equal(w.player(bot).fishing.lava,zone===1||zone===45);await w.action(bot,{type:'fish'});await w.waitFor(()=>!w.player(bot).fishing);
  }
  await w.debug(bot,{op:'take_item',item:finalRod,quantity:1});await w.debug(bot,{op:'give_item',item:'rod_twig_rod',quantity:1});
  await shore(28);const start=w.events.length;await w.action(bot,{type:'fish'});
- await w.waitFor(()=>w.events.slice(start).some(e=>e.bot===bot&&e.text==='This water requires Worldwire Rod (level 80).'));
+ await w.waitFor(()=>w.events.slice(start).some(e=>e.bot===bot&&e.text==='This water requires Worldwire Rod (level 70).'));
  await w.debug(bot,{op:'take_item',item:'rod_twig_rod',quantity:1});await w.debug(bot,{op:'give_item',item:finalRod,quantity:1});
  await w.debug(bot,{op:'give_item',item:'dish_shore_grill',quantity:1});await w.debug(bot,{op:'give_item',item:'dish_cold_feast',quantity:1});
  await w.action(bot,{type:'use_item',item:'dish_shore_grill'});await w.waitFor(()=>w.player(bot).buffs.some(b=>b.id==='meal:dish_shore_grill'));

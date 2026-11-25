@@ -1,21 +1,156 @@
-/* The chat window's System tab: every combat and game event for the player's own character - damage dealt and taken (and by what),
-   misses and dodges, kills and XP, loot, healing, level-ups. Lines come from the server's events; every string goes through textContent.
-   API: SystemLog.add(text, cls, mark?) (mark = { name, rarity } colours that item name), SystemLog.event(packet, selfId), SystemLog.show('chat' | 'system'). */
+/* The chat window shows typed game messages and independently filtered views of the current session. */
 (() => {
   const $ = name => document.getElementById(name);
-  const MAX = 200;
-  const tabs = { chat: ['tab-chat', 'chat-log'], system: ['tab-system', 'system-log'] };
-  let current = 'chat';
-  function show(name) {
-    if (!tabs[name]) return;
-    current = name;
-    for (const [key, [tab, log]] of Object.entries(tabs)) {
-      const on = key === name;
-      $(tab).setAttribute('aria-selected', String(on)); $(tab).classList.toggle('on', on);
-      if (on) $(tab).classList.remove('unread');
-      $(log).hidden = !on;
+  const tr = text => window.Locale?.translate(text) || text;
+  const STORAGE = 'valhallasc.chat-tabs.v1';
+  const MAX = 500;
+  const categories = {
+    combat: 'Combat', abilities: 'Abilities and healing', progress: 'Experience and skill gains',
+    items: 'Items and currency', fishing: 'Fishing', mining: 'Mining', alchemy: 'Alchemy',
+    enchanting: 'Enchanting', crafting: 'Blacksmithing', quests: 'Quests',
+    travel: 'Travel', notices: 'Game notices', chat: 'World chat', party: 'Party chat',
+  };
+  const playerChat = category => category === 'chat' || category === 'party';
+  const selections = value => Array.isArray(value) ? value.filter(key => Object.hasOwn(categories, key)) : null;
+  let custom = [], systemFilter = null;
+  try {
+    const prefs = JSON.parse(localStorage.getItem(STORAGE)) || {};
+    systemFilter = selections(prefs.system);
+    if (Array.isArray(prefs.tabs)) custom = prefs.tabs.filter(tab => typeof tab.name === 'string')
+      .map(tab => ({ name: tab.name.trim().slice(0, 24), filters: selections(tab.filters) }))
+      .filter(tab => tab.name);
+  } catch (_) {}
+  function persist() {
+    try { localStorage.setItem(STORAGE, JSON.stringify({ system: systemFilter, tabs: custom })); } catch (_) {}
+  }
+
+  const history = [];
+  let current = 'chat', editing = null, editorButton = null;
+  const panel = key => $(key === 'chat' ? 'chat-log' : key === 'system' ? 'system-log' : 'custom-chat-log');
+  const tabs = () => [...($('chat-tab-list')?.children || [])];
+  const filterFor = key => key === 'system' ? systemFilter : custom[key]?.filters;
+  function matches(key, entry) {
+    if (key === 'chat') return false;
+    if (key === 'system' && playerChat(entry.category)) return false;
+    return filterFor(key)?.includes(entry.category) ?? true;
+  }
+  function renderLine(entry) {
+    const line = document.createElement('p');
+    line.className = entry.cls || '';
+    line.dataset.category = entry.category;
+    if (entry.name) {
+      const speaker = document.createElement('b');
+      speaker.textContent = entry.name + ': ';
+      if (entry.name.startsWith('[GM]')) speaker.className = 'gm';
+      line.append(speaker, entry.text);
+    } else if (entry.mark) fill(line, entry.text, entry.mark);
+    else line.textContent = entry.text;
+    return line;
+  }
+  function render(key) {
+    const log = panel(key);
+    log.replaceChildren(...history.filter(entry => matches(key, entry)).map(renderLine));
+    log.scrollTop = log.scrollHeight;
+  }
+  function hideEditor() {
+    editing = null;
+    $('chat-filters').hidden = true;
+    $('chat-filter-open').setAttribute('aria-expanded', 'false');
+    $('chat-tab-add').setAttribute('aria-expanded', 'false');
+  }
+  function show(key) {
+    key = String(key);
+    if (key !== 'chat' && key !== 'system' && !custom[key]) return;
+    hideEditor();
+    current = key;
+    for (const tab of tabs()) {
+      const selected = tab.dataset.tab === String(key);
+      tab.setAttribute('aria-selected', String(selected));
+      tab.tabIndex = selected ? 0 : -1;
+      tab.classList.toggle('on', selected);
+      if (selected) {
+        tab.classList.remove('unread');
+        tab.scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
+      }
     }
-    const log = $(tabs[name][1]); log.scrollTop = log.scrollHeight;
+    $('chat-filter-open').hidden = key === 'chat';
+    for (const name of ['chat-log', 'system-log', 'custom-chat-log']) $(name).hidden = panel(key).id !== name;
+    if (key !== 'chat') render(key);
+    else panel(key).scrollTop = panel(key).scrollHeight;
+  }
+  function rebuildTabs() {
+    for (const tab of tabs()) if (tab.classList.contains('custom-chat-tab')) tab.remove();
+    for (const [index, tab] of custom.entries()) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'custom-chat-tab';
+      button.dataset.tab = String(index);
+      button.setAttribute('role', 'tab');
+      button.setAttribute('aria-controls', 'custom-chat-log');
+      button.setAttribute('translate', 'no');
+      button.textContent = tab.name;
+      $('chat-tab-list').append(button);
+    }
+  }
+  function openEditor(key, button) {
+    if (editing === key) { show(current); return; }
+    hideEditor();
+    editing = key;
+    editorButton = button;
+    panel(current).hidden = true;
+    $('chat-filters').hidden = false;
+    button.setAttribute('aria-expanded', 'true');
+    $('chat-tab-label').hidden = key === 'system';
+    $('chat-tab-name').required = key !== 'system';
+    $('chat-tab-name').value = custom[key]?.name || '';
+    $('chat-tab-delete').hidden = !custom[key];
+    const options = $('chat-filter-options');
+    options.replaceChildren();
+    for (const [category, title] of Object.entries(categories)) {
+      if (key === 'system' && playerChat(category)) continue;
+      const label = document.createElement('label'), checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.name = 'category';
+      checkbox.value = category;
+      checkbox.checked = filterFor(key)?.includes(category) ?? !playerChat(category);
+      label.append(checkbox, tr(title));
+      options.append(label);
+    }
+    if (key !== 'system') $('chat-tab-name').focus({ preventScroll:true });
+    else options.querySelector('input')?.focus({ preventScroll:true });
+  }
+  function saveEditor(event) {
+    event.preventDefault();
+    const key = editing;
+    if (key === null) return;
+    const filters = [...$('chat-filter-options').querySelectorAll('input')].filter(box => box.checked).map(box => box.value);
+    if (key === 'system') {
+      systemFilter = filters.length === Object.keys(categories).filter(key => !playerChat(key)).length ? null : filters;
+      persist(); show(key); editorButton?.focus({ preventScroll:true });
+      return;
+    }
+    const input = $('chat-tab-name'), name = input.value.trim();
+    if (!name) { input.focus(); return; }
+    const index = key === 'new' ? custom.length : Number(key);
+    custom[index] = { name, filters };
+    persist(); rebuildTabs(); show(String(index));
+    tabs().find(tab => tab.dataset.tab === String(index))?.focus({ preventScroll:true });
+  }
+  function record(entry) {
+    history.push(entry);
+    const removed = history.length > MAX ? history.shift() : null;
+    for (const tab of tabs()) {
+      const key = tab.dataset.tab;
+      if (key === 'chat') continue;
+      if (key === 'system' || key === current) {
+        const log = panel(key);
+        const following = log.scrollHeight - log.clientHeight - log.scrollTop < 16;
+        if (removed && matches(key, removed)) log.firstElementChild?.remove();
+        if (matches(key, entry)) log.append(renderLine(entry));
+        if (following) log.scrollTop = log.scrollHeight;
+      }
+      if (key !== current && matches(key, entry)) tab.classList.add('unread');
+    }
   }
   // An item name in its rarity colour: `mark` = { name, rarity }. The sentence is translated first (Locale would otherwise see three
   // text nodes and miss the "{0}" template), the translated name is located in it, and the line then opts out of Locale. Built with
@@ -29,14 +164,11 @@
     line.setAttribute('translate', 'no');
     line.append(shown.slice(0, at), span, shown.slice(at + name.length));
   }
-  function add(text, cls, mark) {
-    const log = $('system-log'), line = document.createElement('p');
-    if (cls) line.className = cls;
-    if (mark) fill(line, text, mark); else line.textContent = text;
-    log.append(line);
-    while (log.children.length > MAX) log.firstElementChild.remove();
-    log.scrollTop = log.scrollHeight;
-    if (current !== 'system') $('tab-system').classList.add('unread');
+  function add(text, cls, mark, category = 'notices') {
+    if (typeof text === 'string' && text.trim()) record({ text, cls, mark, category });
+  }
+  function chat(text, name, channel) {
+    record({ text, name, cls: channel ? 'chat-' + channel : '', category: channel === 'party' ? 'party' : 'chat' });
   }
   const enemyName = kind => (window.Field?.enemyName?.(kind)) || kind || 'something';
   const skillName = id => (id?.startsWith('enchant_proc_') && window.Enchanting?.name(id.slice('enchant_proc_'.length)))
@@ -47,6 +179,7 @@
   const playerName = id => (window.Field?.remotePlayers || []).find(p => p.id === id)?.look?.name || 'A party member';
   // The lines for one event. Only events about the player's own character are shown.
   function lines(e, me) {
+    if (e.kind === 'cleared') return [['The dungeon is cleared.', 'sys-xp']];
     if (e.actor !== me) return [];
     switch (e.kind) {
       case 'hit': return [[`You hit ${who(e.enemy, e.level)} for ${e.value}${e.crit ? ' (critical)' : ''} with ${e.skill ? skillName(e.skill) : 'a basic attack'}.`, e.crit ? 'sys-crit' : 'sys-dealt']];
@@ -74,16 +207,162 @@
       case 'pickup': return [[`You pick up ${Money.text(e.value)}.`, 'sys-loot']];
       case 'levelup': return [[`You reached level ${e.level}!${e.unlocked?.length ? ` New skills: ${e.unlocked.map(skillName).join(', ')}.` : ''}`, 'sys-xp']];
       case 'portal': return [['You pass through a portal.', 'sys-skill']];
+      case 'chestOpen': return [['You open a chest.', 'sys-loot']];
+      case 'immune': return [['The target is immune.', 'sys-dealt']];
       default: return [];
     }
   }
+  const eventCategories = {
+    hit: 'combat', miss: 'combat', hurt: 'combat', dodge: 'combat', death: 'combat', immune: 'combat',
+    shotBlocked: 'combat', respawn: 'abilities', ghost: 'abilities', skill: 'abilities', healed: 'abilities',
+    consume: 'items', itemPickup: 'items', pickup: 'items', chestOpen: 'items',
+    slimeDie: 'progress', partyXp: 'progress', levelup: 'progress', cleared: 'progress',
+    fish_catch: 'fishing', fish_miss: 'fishing', portal: 'travel',
+  };
+  const professions = {
+    fishing: 'Fishing', blacksmithing: 'Blacksmithing', alchemy: 'Alchemy', enchanting: 'Enchanting',
+  };
+  const services = {
+    dialogue: 'notices', blacksmithing: 'crafting', enchanting: 'enchanting', alchemy: 'alchemy',
+    picking: 'alchemy', mining: 'mining', bank: 'items', mail: 'items', shop: 'items', trade: 'items', pvp: 'combat',
+  };
+  let owner, inventory, skills, unreadMail;
+  const reported = new Map();
+  const inventoryCounts = entries => new Map(entries.map(({item, quantity}) => [item, quantity]));
+  function noteReceipt(item, quantity) {
+    reported.set(item, (reported.get(item) ?? 0) + quantity);
+  }
+  function trackInventory(packet) {
+    if (!Array.isArray(packet.inventory)) return;
+    const next = inventoryCounts(packet.inventory);
+    if (inventory) {
+      for (const [item, total] of next) {
+        const quantity = total - (inventory.get(item) ?? 0) - (reported.get(item) ?? 0);
+        if (quantity <= 0) continue;
+        const name = itemName(item);
+        const copy = packet.gearInstances?.filter(gear => gear.item === item).at(-1);
+        const mark = copy ? { name, rarity: copy.rarity } : rarityOf(item);
+        add(`You receive ${quantity} × ${name}.`, 'sys-loot sys-item', mark, 'items');
+      }
+    }
+    inventory = next;
+    reported.clear();
+  }
+  function skillGain(key, skill) {
+    if (!skills || !Number.isFinite(skill)) return;
+    const previous = skills[key];
+    skills[key] = skill;
+    if (previous != null && skill > previous) {
+      add(`${professions[key]} skill increased to ${skill}.`, 'sys-xp', null, 'progress');
+    }
+  }
+  function mailCount(count) {
+    if (!Number.isFinite(count)) return;
+    if (unreadMail != null && count > unreadMail) add('You have new mail.', 'sys-note');
+    unreadMail = count;
+  }
+  function snapshot(own) {
+    mailCount(own.mailUnread || 0);
+    trackInventory(own);
+    for (const key of Object.keys(professions)) skillGain(key, own.professions?.[key]?.skill);
+  }
+  function welcome(own) {
+    if (owner && owner !== own.id) {
+      history.length = 0;
+      for (const name of ['chat-log', 'system-log', 'custom-chat-log']) $(name).replaceChildren();
+      tabs().forEach(tab => tab.classList.remove('unread'));
+      show('chat');
+    }
+    owner = own.id;
+    inventory = null;
+    skills = {};
+    unreadMail = null;
+    reported.clear();
+    snapshot(own);
+  }
+  function categoryFor(text, kind) {
+    if (kind === 'quest' || /^(?:Quest |You abandon|A new quest|Your questlog)/i.test(text)) return 'quests';
+    if (kind === 'treasure' || /^(?:Roll for |Everyone passed on )/.test(text)) return 'items';
+    if (/^Spark Travel/.test(text)) return 'travel';
+    return 'notices';
+  }
+  function notice(text, kind, failed, name) {
+    if (name && text) {
+      record({ text, name, cls: 'chat-npc', category: 'notices' });
+      return;
+    }
+    add(text, failed ? 'sys-taken' : 'sys-note', null, categoryFor(text, kind));
+  }
+  function packet(p) {
+    if (p.type === 'mail_unread') mailCount(p.count);
+    if (p.type === 'roll' && p.op === 'start') {
+      add(`Loot roll started for ${itemName(p.item)}.`, 'sys-loot sys-item', rarityOf(p.item), 'items');
+    }
+    const category = services[p.type];
+    if (!category) return;
+    const message = p.notice || p.text;
+    const failed = p.ok === false || p.state === 'error';
+    if (message && (p.type !== 'dialogue' || history.at(-1)?.text !== message)) {
+      add(message, failed ? 'sys-taken' : 'sys-note', null,
+        p.type === 'dialogue' ? categoryFor(message, p.kind) : category);
+    }
+    if (p.state === 'done' && (p.type === 'picking' || p.type === 'mining')) {
+      const name = itemName(p.item);
+      const text = p.type === 'mining' ? `You mine ${p.quantity} × ${name}.` : `You pick ${p.quantity} × ${name}.`;
+      add(text, 'sys-loot sys-item', rarityOf(p.item), category);
+      noteReceipt(p.item, p.quantity);
+    }
+    const key = p.type === 'mining' ? 'blacksmithing' : p.type === 'picking' ? 'alchemy' : p.type;
+    if (Object.hasOwn(professions, key)) skillGain(key, p.skill);
+    trackInventory(p);
+  }
   window.SystemLog = {
-    add, show, lines,
-    event(packet, me) { for (const [text, cls, mark] of lines(packet, me)) add(text, cls, mark); },
+    add, show, lines, chat, notice, packet, snapshot, welcome,
+    event(packet, me) {
+      const category = eventCategories[packet.kind];
+      for (const [text, cls, mark] of lines(packet, me)) add(text, cls, mark, category);
+      if (packet.actor !== me) return;
+      if (packet.kind === 'itemPickup' || packet.kind === 'fish_catch') noteReceipt(packet.item, packet.quantity || 1);
+      if (packet.kind === 'fish_catch') skillGain('fishing', packet.skillUp);
+    },
   };
   document.addEventListener('DOMContentLoaded', () => {
-    // A mouse click hands the keyboard back to the game, so Enter still opens the chat box afterwards.
-    for (const [name, [tab]] of Object.entries(tabs)) $(tab).addEventListener('click', event => { show(name); if (event.detail > 0) event.currentTarget.blur(); });
+    const list = $('chat-tab-list');
+    $('tab-chat').dataset.tab = 'chat';
+    $('tab-system').dataset.tab = 'system';
+    rebuildTabs();
+    show('chat');
+    list.addEventListener('click', event => {
+      const button = event.target.closest('button');
+      if (!button) return;
+      show(button.dataset.tab);
+      if (event.detail > 0) button.blur();
+    });
+    list.addEventListener('keydown', event => {
+      const buttons = tabs(), at = buttons.indexOf(event.target);
+      const offset = { ArrowRight: 1, ArrowLeft: -1 }[event.key];
+      const index = offset ? (at + offset + buttons.length) % buttons.length
+        : event.key === 'Home' ? 0 : event.key === 'End' ? buttons.length - 1 : null;
+      if (index === null) return;
+      event.preventDefault();
+      show(buttons[index].dataset.tab);
+      buttons[index].focus();
+    });
     $('chat-input').addEventListener('focus', () => show('chat'));
+    $('chat-filter-open').addEventListener('click', event => openEditor(current, event.currentTarget));
+    $('chat-tab-add').addEventListener('click', event => openEditor('new', event.currentTarget));
+    $('chat-filters').addEventListener('submit', saveEditor);
+    const cancel = () => { show(current); editorButton?.focus({ preventScroll:true }); };
+    $('chat-filter-cancel').addEventListener('click', cancel);
+    $('chat-filters').addEventListener('keydown', event => {
+      if (event.key !== 'Escape') return;
+      event.stopPropagation();
+      cancel();
+    });
+    $('chat-tab-delete').addEventListener('click', () => {
+      if (!custom[editing]) return;
+      custom.splice(Number(editing), 1);
+      persist(); rebuildTabs(); show('system'); $('chat-filter-open').focus();
+    });
   });
 })();

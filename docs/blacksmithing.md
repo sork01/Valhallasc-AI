@@ -1,6 +1,6 @@
 # Blacksmithing
 
-Speak to Bram Emberforge in Alderhaven and choose the Blacksmithing workshop to learn the profession and receive a starter pick. Keep a pick in your bags. Click or tap an active vein within reach, then stay still for the pull. On phones and tablets, **Mine ore** appears beside the skill buttons when a vein is within reach. Moving, taking damage, or losing access to the vein ends the action. Town smiths sell components and replacement starter picks through their Buy menu.
+Speak to Bram Emberforge in Alderhaven and choose the Blacksmithing workshop to learn the profession and receive a starter pick. Keep a pick in your bags. Click or tap an active vein to walk into reach and begin mining. Stay still for the pull. Learned miners see ore on the minimap by default. Settings can hide ore markers. On phones and tablets, **Mine ore** appears beside the skill buttons when a vein is within reach. Moving, taking damage, or losing access to the vein ends the action. Town smiths sell components and replacement starter picks through their Buy menu.
 
 Three veins are active in each of 21 shared adventure zones. Each supports three to five pulls shared by everyone nearby. A successful pull places one or two ore in the miner's bag. If a bag cannot hold the ore, the pull remains available. After the last pull the vein relocates to an unoccupied candidate and receives a fresh ID. Town service maps, private instances and the Arena have no veins.
 
@@ -14,12 +14,12 @@ Three veins are active in each of 21 shared adventure zones. Each supports three
 | 90–119 | Silver | Gloamfen | Copper |
 | 120–149 | Gold | Wyrdwood | Silver |
 | 150–179 | Cobalt | Bifrost Reach | Silver |
-| 180–209 | Mithril | The Prismwaste | Cobalt |
-| 210–239 | Stormsilver | The Stormglass Flats | Cobalt |
-| 240–269 | Sunsteel | The Lapis Erg | Stormsilver |
-| 270–299 | Stariron | The Yearwheel | Stormsilver |
+| 180–209 | Cobalt | Rán’s Deep | Silver |
+| 210–239 | Mithril | Astralhollow | Cobalt |
+| 240–269 | Mithril | The Prismwaste | Cobalt |
+| 270–299 | Mithril | The Obsidian Orrery | Cobalt |
 
-The workshop lists the current tier's primary and alternate mining areas. A completed pull or equipment craft in the current band rolls once for one point. Two eligible misses guarantee the next gain. Earlier tiers still produce their ore and equipment. Smelting and pick upgrades use materials without increasing skill. Copper, Silver, Cobalt and Stormsilver pick upgrades unlock at skills 30, 90, 150 and 210. Each uses the previous pick, four current bars, two Hardwood and a fee of 1 silver, 3 silver 50 copper, 9 silver or 18 silver.
+The workshop lists the mining areas that currently award skill. The region sets the training band even when two regions contain the same ore. A completed pull or equipment craft in the current band rolls once for one point. Two eligible misses guarantee the next gain. Earlier tiers still produce their ore and equipment. Smelting and pick upgrades use materials without increasing skill. Copper, Silver, Cobalt and Stormsilver pick upgrades unlock at skills 30, 90, 150 and 210. Each uses the previous pick, four current bars, two Hardwood and a fee of 1 silver, 3 silver 50 copper, 9 silver or 18 silver.
 
 Smiths teach green recipes when their bands open. Level-appropriate monsters in shared adventure zones drop a blue blueprint at 1.5%, or 4.5% for elites and bosses. The final bosses of Black Hour Foundry, The Amber Archive, The Silent Solstice and The Chained Forge have a 20% chance to award one of eight level-99 epic plans. Unused plans can be traded. Study a plan from the bags or the workshop to learn it permanently. Five of the epic recipes require skill 300 and three master recipes require 600. Their stats use 90% of the equivalent level-99 epic budget.
 
@@ -34,7 +34,7 @@ From skill 300, mine in the region named in the workshop with its required pick,
 | 360–389 | Stormsilver | Sunward Vale | Sunward | Sunward Trail Leggings (trainer) |
 | 390–419 | Stormsilver | The Ribbonwild | Sunward | Jubilee Signet (drop) |
 | 420–449 | Sunsteel | The Tanglecrown | Tanglecrown | Tanglecrown Mantle (trainer) |
-| 450–479 | Sunsteel | The Lapis Erg | Tanglecrown | Duneglass Longbow (drop) |
+| 450–479 | Sunsteel | Veyrroot Canopy or The Lapis Erg | Tanglecrown | Duneglass Longbow (drop) |
 | 480–509 | Sunsteel | Frostwake Shelf | Frostwake | Frostwake Pauldrons (trainer) |
 | 510–539 | Stariron | The Cairnspine | Frostwake | Slatewing Pendant (drop) |
 | 540–569 | Stariron | The Yearwheel | Yearwheel | Yearwheel Band (trainer) |

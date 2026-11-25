@@ -27,7 +27,7 @@ el('fieldcv').getBoundingClientRect=()=>({left:0,top:0,width:1600,height:900});
 const map=JSON.parse(read(path.join(root,'world/map.txt'))),hero={id:'self',zone:0,...map.dock.start,level:99,fx:1,fy:0,inventory:[]};let checks=0;
 const check=(condition,message)=>{assert(condition,message);checks++;};
 check(fish.requirement(28).includes('Worldwire Rod'),'Yearwheel names Worldwire');
-for(const [zone,name] of [[0,'Twig Rod'],[1,'Platinum Rod'],[6,'Willow Rod'],[19,'Silverline Rod'],[20,'Reedglass Rod'],[22,'Reedglass Rod'],[25,'Silverline Rod'],[26,'Starcatch Rod'],[45,'Tempered Platinum Rod'],[23,'Rootbraid Rod'],[24,'Rootbraid Rod'],[27,'Cairnsteel Rod']])check(fish.requirement(zone).includes(name),`required rod in zone ${zone}`);
+for(const [zone,name] of [[0,'Twig Rod'],[1,'Platinum Rod'],[6,'Platinum Rod'],[7,'Reedglass Rod'],[13,'Silverline Rod'],[14,'Tempered Platinum Rod'],[19,'Silverline Rod'],[20,'Reedglass Rod'],[22,'Reedglass Rod'],[25,'Silverline Rod'],[26,'Starcatch Rod'],[45,'Tempered Platinum Rod'],[23,'Rootbraid Rod'],[24,'Rootbraid Rod'],[27,'Cairnsteel Rod']])check(fish.requirement(zone).includes(name),`required rod in zone ${zone}`);
 check(fish.requirement(2,true).includes('Willow Rod')&&fish.requirement(2).includes('Twig Rod'),'rich cold water names its higher requirement');
 const small={objects:[{kind:'water',x:5,y:5,r:2}]};f.sync({...hero,x:2,y:5},[],small);f.ops.length=0;f.draw();
 // The former passive shoreline requirement was deliberately removed: cast errors own this feedback.
@@ -47,7 +47,7 @@ check(fish.press()&&f.sent.at(-1).type==='fish','shore cast reaches authoritativ
  c.Field.error=text=>c.WorldFeedback.error(text);c.log=()=>{};
  const online=controlled.readFileSync(path.join(root,'client/online.js'),'utf8');
  const handler=online.slice(online.indexOf("        case 'error':"),online.indexOf('\n      }',online.indexOf("        case 'error':")));
- c.packet={type:'error',text:'This water requires Worldwire Rod (level 80).'};
+ c.packet={type:'error',text:'This water requires Worldwire Rod (level 70).'};
  vm.runInContext('switch(packet.type){'+handler+'}',c);
  const lines=feedback.el('error-messages').children;
  check(lines.length===1&&lines[0].dataset.kind==='error'&&lines[0].textContent===c.packet.text,'cast refusal appears in the red error stack');

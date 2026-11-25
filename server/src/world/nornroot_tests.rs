@@ -315,45 +315,36 @@ fn nornroot_dungeon_hires_stay_after_arn_until_the_instance_clears() {
 }
 
 #[test]
-fn nornroot_stone_summons_into_the_same_copy_with_only_the_level_gate() {
+fn nornroot_stone_summons_to_the_outdoor_trail() {
     let mut w = world();
-    let (_leader_rx, mut ally_rx, _other_rx) = (
+    let (_leader_rx, _ally_rx) = (
         join(&mut w, 1, Class::Warrior),
         join(&mut w, 2, Class::Mage),
-        join(&mut w, 3, Class::Hunter),
     );
-    w.players.get_mut(&3).unwrap().character.level = 25;
-    enter(&mut w, 3);
-    let other_copy = w.players[&3].character.zone;
     w.players.get_mut(&1).unwrap().character.level = 25;
     enter(&mut w, 1);
     let copy = w.players[&1].character.zone;
-    assert_ne!(copy, other_copy);
+    assert!(w.maps[copy].npcs.iter().all(|n| n.offers.iter().all(|o| o.id != "summon_party")));
 
     let leader = w.players[&1].character.id.clone();
     let ally = w.players[&2].character.id.clone();
     w.social(1, SocialCommand::PartyInvite { id: Some(ally), name: None });
     w.social(2, SocialCommand::PartyAccept { id: leader.clone() });
-    let stone = w.maps[copy].npcs.iter().find(|n| n.id == "dungeon_stone_41")
+    let stone = w.maps[WYRD].npcs.iter().find(|n| n.id == "dungeon_stone_41")
         .unwrap().position_at(w.time);
-    place(&mut w, 1, copy, stone);
+    place(&mut w, 1, WYRD, stone);
     w.players.get_mut(&2).unwrap().character.level = 24;
     let home = w.players[&2].character.zone;
     w.time += 1.;
     w.interact(1, "dungeon_stone_41", Some("summon_party"));
     assert_eq!(w.players[&2].character.zone, home, "a summon is an invitation");
-    w.social(2, SocialCommand::SummonAccept { id: leader.clone() });
-    assert_eq!(w.players[&2].character.zone, home);
-    assert!(super::wyrd_tests::lines(&mut ally_rx).iter().any(|s| s.contains("level 25")));
-
-    w.players.get_mut(&2).unwrap().character.level = 25;
-    w.time += 1.;
-    w.interact(1, "dungeon_stone_41", Some("summon_party"));
-    assert!(w.players[&2].character.quests.iter().all(|q| q.id != "entry_norn"));
     w.social(2, SocialCommand::SummonAccept { id: leader });
     let c = &w.players[&2].character;
-    assert_eq!(c.zone, copy);
+    assert_eq!(c.zone, WYRD);
     assert!(c.point().distance(stone) < 3.);
+    assert!(c.quests.iter().all(|q| q.id != "entry_norn"));
+    enter(&mut w, 2);
+    assert_eq!(w.players[&2].character.zone, WYRD);
 }
 
 #[test]

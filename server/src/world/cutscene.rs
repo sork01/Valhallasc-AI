@@ -31,7 +31,7 @@ impl Env {
     pub fn of(map: &Map) -> Env {
         if map.underwater() {
             Env::Sea
-        } else if map.theme == "sky" {
+        } else if matches!(map.theme.as_str(), "sky" | "skybridge") {
             Env::Sky
         } else {
             Env::Land

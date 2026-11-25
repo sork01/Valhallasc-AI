@@ -914,7 +914,7 @@
   {
     "item": "fish_cloud_minnow",
     "habitat": "Cloudwater",
-    "min_tier": 6,
+    "min_tier": 4,
     "kg": [
       2,
       5
@@ -923,14 +923,14 @@
     "name": "Cloud Minnow",
     "rarity": "common",
     "sell": 55,
-    "level": 45,
+    "level": 30,
     "raw_heal": 125,
     "dish": "dish_cloudwater_grill"
   },
   {
     "item": "fish_storm_barb",
     "habitat": "Cloudwater",
-    "min_tier": 6,
+    "min_tier": 4,
     "kg": [
       5,
       11
@@ -939,14 +939,14 @@
     "name": "Storm Barb",
     "rarity": "uncommon",
     "sell": 110,
-    "level": 45,
+    "level": 30,
     "raw_heal": 150,
     "dish": "dish_cloudwater_grill"
   },
   {
     "item": "fish_gale_eel",
     "habitat": "Cloudwater",
-    "min_tier": 6,
+    "min_tier": 4,
     "kg": [
       9,
       19
@@ -955,14 +955,14 @@
     "name": "Gale Eel",
     "rarity": "rare",
     "sell": 240,
-    "level": 45,
+    "level": 30,
     "raw_heal": 175,
     "dish": "dish_cloudwater_grill"
   },
   {
     "item": "fish_thundercrest_ray",
     "habitat": "Cloudwater",
-    "min_tier": 6,
+    "min_tier": 4,
     "kg": [
       20,
       30
@@ -971,14 +971,14 @@
     "name": "Thundercrest Ray",
     "rarity": "legendary",
     "sell": 900,
-    "level": 45,
+    "level": 35,
     "raw_heal": 200,
     "dish": "dish_cloudwater_grill"
   },
   {
     "item": "fish_star_dace",
     "habitat": "Cloudwater",
-    "min_tier": 6,
+    "min_tier": 5,
     "kg": [
       2,
       5
@@ -987,14 +987,14 @@
     "name": "Star Dace",
     "rarity": "common",
     "sell": 60,
-    "level": 45,
+    "level": 40,
     "raw_heal": 125,
     "dish": "dish_cloudwater_grill"
   },
   {
     "item": "fish_comet_perch",
     "habitat": "Cloudwater",
-    "min_tier": 6,
+    "min_tier": 5,
     "kg": [
       5,
       11
@@ -1003,14 +1003,14 @@
     "name": "Comet Perch",
     "rarity": "uncommon",
     "sell": 115,
-    "level": 45,
+    "level": 40,
     "raw_heal": 150,
     "dish": "dish_cloudwater_grill"
   },
   {
     "item": "fish_nebula_gar",
     "habitat": "Cloudwater",
-    "min_tier": 6,
+    "min_tier": 5,
     "kg": [
       9,
       19
@@ -1019,7 +1019,7 @@
     "name": "Nebula Gar",
     "rarity": "rare",
     "sell": 245,
-    "level": 45,
+    "level": 40,
     "raw_heal": 175,
     "dish": "dish_cloudwater_grill"
   },
@@ -1035,7 +1035,7 @@
     "name": "Prism Gudgeon",
     "rarity": "common",
     "sell": 65,
-    "level": 50,
+    "level": 45,
     "raw_heal": 130,
     "dish": "dish_glasswater_grill"
   },
@@ -1051,7 +1051,7 @@
     "name": "Glass Spindlefish",
     "rarity": "uncommon",
     "sell": 120,
-    "level": 50,
+    "level": 45,
     "raw_heal": 155,
     "dish": "dish_glasswater_grill"
   },
@@ -1067,7 +1067,7 @@
     "name": "Suncut Carp",
     "rarity": "rare",
     "sell": 250,
-    "level": 50,
+    "level": 45,
     "raw_heal": 180,
     "dish": "dish_glasswater_grill"
   },
@@ -1099,7 +1099,7 @@
     "name": "Clockwork Chub",
     "rarity": "common",
     "sell": 70,
-    "level": 55,
+    "level": 50,
     "raw_heal": 135,
     "dish": "dish_glasswater_grill"
   },
@@ -1115,7 +1115,7 @@
     "name": "Obsidian Bream",
     "rarity": "uncommon",
     "sell": 125,
-    "level": 55,
+    "level": 50,
     "raw_heal": 160,
     "dish": "dish_glasswater_grill"
   },
@@ -1131,7 +1131,7 @@
     "name": "Orrery Sturgeon",
     "rarity": "rare",
     "sell": 255,
-    "level": 55,
+    "level": 50,
     "raw_heal": 185,
     "dish": "dish_glasswater_grill"
   },
@@ -1147,7 +1147,7 @@
     "name": "Spore Rasbora",
     "rarity": "common",
     "sell": 75,
-    "level": 60,
+    "level": 55,
     "raw_heal": 140,
     "dish": "dish_moonwater_grill"
   },
@@ -1163,7 +1163,7 @@
     "name": "Veil Catfish",
     "rarity": "uncommon",
     "sell": 130,
-    "level": 60,
+    "level": 55,
     "raw_heal": 165,
     "dish": "dish_moonwater_grill"
   },
@@ -1179,7 +1179,7 @@
     "name": "Dreamfin Pike",
     "rarity": "rare",
     "sell": 260,
-    "level": 60,
+    "level": 55,
     "raw_heal": 190,
     "dish": "dish_moonwater_grill"
   },
@@ -1259,7 +1259,7 @@
     "name": "Ribbon Shiner",
     "rarity": "common",
     "sell": 85,
-    "level": 80,
+    "level": 70,
     "raw_heal": 160,
     "dish": "dish_greenwater_grill"
   },
@@ -1275,7 +1275,7 @@
     "name": "Jubilee Guppy",
     "rarity": "uncommon",
     "sell": 140,
-    "level": 80,
+    "level": 70,
     "raw_heal": 185,
     "dish": "dish_greenwater_grill"
   },
@@ -1291,7 +1291,7 @@
     "name": "Parade Gourami",
     "rarity": "rare",
     "sell": 270,
-    "level": 80,
+    "level": 70,
     "raw_heal": 210,
     "dish": "dish_greenwater_grill"
   },
@@ -1323,7 +1323,7 @@
     "name": "Rootfoot Dace",
     "rarity": "common",
     "sell": 90,
-    "level": 85,
+    "level": 80,
     "raw_heal": 165,
     "dish": "dish_greenwater_grill"
   },
@@ -1339,7 +1339,7 @@
     "name": "Nectar Perch",
     "rarity": "uncommon",
     "sell": 145,
-    "level": 85,
+    "level": 80,
     "raw_heal": 190,
     "dish": "dish_greenwater_grill"
   },
@@ -1355,7 +1355,7 @@
     "name": "Canopy Lungfish",
     "rarity": "rare",
     "sell": 275,
-    "level": 85,
+    "level": 80,
     "raw_heal": 215,
     "dish": "dish_greenwater_grill"
   },
@@ -1371,7 +1371,7 @@
     "name": "Heartwood Whitefish",
     "rarity": "common",
     "sell": 95,
-    "level": 85,
+    "level": 80,
     "raw_heal": 165,
     "dish": "dish_deep_springs_grill"
   },
@@ -1387,7 +1387,7 @@
     "name": "Pithscale Char",
     "rarity": "uncommon",
     "sell": 150,
-    "level": 85,
+    "level": 80,
     "raw_heal": 190,
     "dish": "dish_deep_springs_grill"
   },
@@ -1403,7 +1403,7 @@
     "name": "Amberroot Gar",
     "rarity": "rare",
     "sell": 280,
-    "level": 85,
+    "level": 80,
     "raw_heal": 215,
     "dish": "dish_deep_springs_grill"
   },

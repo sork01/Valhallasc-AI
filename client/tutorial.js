@@ -432,8 +432,8 @@ window.Tutorial = (() => {
     },
     blacksmithing: {
       title: 'Blacksmithing',
-      body: 'Learn from Bram Emberforge in Alderhaven. Keep his starter pick in your bags and select Ore with Track beside the minimap. Dismount, click a nearby tin vein and stay still.',
-      touchBody: 'Learn from Bram Emberforge in Alderhaven. Keep his starter pick in your bags and select Ore with Track beside the minimap. Dismount, get close to a tin vein and tap Mine ore. Stay still.',
+      body: 'Learn from Bram Emberforge in Alderhaven. Keep his starter pick in your bags and look for ore veins on the minimap. Dismount, click a nearby tin vein and stay still.',
+      touchBody: 'Learn from Bram Emberforge in Alderhaven. Keep his starter pick in your bags and look for ore veins on the minimap. Dismount, get close to a tin vein and tap Mine ore. Stay still.',
     },
     enchanting: {
       title: 'Enchanting',
@@ -441,7 +441,7 @@ window.Tutorial = (() => {
     },
     alchemy: {
       title: 'Alchemy',
-      body: 'Learn from Maera Petalbrook in Alderhaven. Select Flowers with Track beside the minimap and pick nearby flowers. Buy empty vials and return to the Alchemy workshop to brew potions.',
+      body: 'Learn from Maera Petalbrook in Alderhaven. Find flower patches on the minimap and pick nearby flowers. Buy empty vials and return to the Alchemy workshop to brew potions.',
     },
   };
   const professionBody = lesson => COARSE() && lesson.touchBody ? lesson.touchBody : lesson.body;

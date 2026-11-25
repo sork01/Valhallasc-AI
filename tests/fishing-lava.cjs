@@ -55,7 +55,7 @@ async function cadence() {
 (async () => {
   await w.start();
   await w.connect({bot, class:'warrior', gender:'male'});
-  await seedFishingSkill(w, bot, 270);
+  await seedFishingSkill(w, bot, 570);
   await w.debug(bot, {op:'give_item', item:'rod_twig_rod', quantity:1});
   await shore(1);
   await rejected('This water requires Platinum Rod (level 5).');

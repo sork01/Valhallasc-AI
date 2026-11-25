@@ -489,7 +489,7 @@
     window.DayNight?.setZone(zdef);
     window.Weather?.setZone(zdef);
     if (mini) buildMini();
-    if (hero) { pendingNpc = null; pendingChest = null; cityRoute = []; hero.target = null; hero.pvpTargetId = null; hero.goal = null; }
+    if (hero) { pendingNpc = null; pendingChest = null; pendingGather = null; cityRoute = []; hero.target = null; hero.pvpTargetId = null; hero.goal = null; }
     floaters = []; parts = []; effects = []; bolts = []; ebolts = []; drops = []; chests = []; signs = []; marker = null; slimes = []; farDots = []; remotePlayers.clear(); guards.clear(); ghostSlimes.clear(); ghostPlayers.clear(); bubbles.clear();
     instanceCleared = false; clearedAt = -99;
   }
@@ -1114,7 +1114,7 @@
   const bagColor = item => BAG_COLORS[Math.max(0, Math.min(9, Math.floor((item.requiredLevel || 1) / 10)))];
   let ebolts = [], instanceCleared = false, clearedAt = -99;   // missiles shot by ranged enemies; the dungeon's exit opens when its last boss falls
   let mageSpr = null, spriteGeneration = 0;
-  let pendingNpc = null, pendingChest = null, cityRoute = [], routeTime = 0;
+  let pendingNpc = null, pendingChest = null, pendingGather = null, cityRoute = [], routeTime = 0;
   // A townsperson picked by clicking: shown in the target frame (portrait, name, level) until something else is picked or the hero walks off.
   let npcTarget = null;
   const npcLevel = n => { const q = window.Quests?.npcLevel?.(n.id), top = zdef.levels?.[1]; return Number.isFinite(top) ? top : Number.isFinite(q) ? q : 99; };
@@ -1363,7 +1363,7 @@
   }
   let corpses = []; const corpseSprites = new Map();
   function reset() {
-    pendingNpc = null; pendingChest = null; cityRoute = [];
+    pendingNpc = null; pendingChest = null; pendingGather = null; cityRoute = [];
     window.Quests?.reset(); window.WorldMap?.reset(); window.GatheringMap?.reset(); explored = [];
     hero = newHero(); drops = []; chests = []; signs = []; corpses = []; corpseSprites.clear(); floaters = []; parts = []; effects = []; bolts = []; marker = null; shake = 0; msg = null; hudT = 0; tAll = 0;
     touchDirection = [0, 0]; keys = new Set(); pointer = { down: false, x: 0, y: 0 };
@@ -1412,7 +1412,7 @@
     for (const [action, step] of [['minimapIn', 1], ['minimapOut', -1]]) if (Keys.is(e, action)) { e.preventDefault(); if (!e.repeat) Field.minimapZoom(step); return; }
     for (const action of ['interact', 'talk', 'mount', 'fish']) if (Keys.is(e, action) && !e.repeat) { e.preventDefault(); Field.action(action); return; }
     if (!e.ctrlKey && !e.altKey && !e.metaKey && heldDirection(code)) {
-      pendingNpc = null; cityRoute = []; keys.add(code);
+      pendingNpc = null; pendingGather = null; cityRoute = []; keys.add(code);
       if (autoAttackTarget === hero.pvpTargetId) autoAttackTarget = null;
       hero.target = null; hero.goal = null; npcTarget = null; emitHud(); e.preventDefault();
     }
@@ -1452,27 +1452,57 @@
     marker = {x:portal.x,y:portal.y,t:0}; emitHud();
   }
   const SIGN_W = 28, SIGN_TOP = 70;   // the clickable body of a boss sign, in screen pixels
-  function startGathering(target, start) {
+  const gatherOrigin = () => ({ x: hero.nx ?? hero.x, y: hero.ny ?? hero.y });
+  const withinGatherReach = (point, target) =>
+    Math.hypot(point.x - target.x, point.y - target.y) <= 2.3 && segmentFree(point, target, .05);
+
+  function startGathering(target, source, list) {
     hero.target = null;
     hero.goal = null;
     hero.pvpTargetId = null;
     npcTarget = null;
     Field.stopMoving();
-    start(target);
     emitHud();
+    const origin = gatherOrigin();
+    if (withinGatherReach(origin, target)) {
+      source.start(target);
+      return;
+    }
+    cityRoute = routeTo(target, true, origin, 2.15, point => withinGatherReach(point, target));
+    if (!cityRoute.length) {
+      Field.error('That gathering spot is out of reach.');
+      return;
+    }
+    pendingGather = { id: target.id, source, list, until: tAll + Math.max(20, cityRoute.length * .6) };
+    routeTime = tAll;
+    Online.send({ type:'move', ...cityRoute[0] });
+  }
+
+  function followGathering() {
+    const { id, source, list, until } = pendingGather;
+    const target = source[list].find(entry => entry.id === id);
+    if (hero.dead || !target) {
+      Field.stopMoving();
+    } else if (withinGatherReach(gatherOrigin(), target)) {
+      Field.stopMoving();
+      source.start(target);
+    } else if (!cityRoute.length || tAll >= until) {
+      Field.stopMoving();
+      Field.error('That gathering spot is out of reach.');
+    }
   }
   function onPointerDown(e) {
     window.WorldFeedback?.leave();
     const ghostWalking = !!(hero.dead && hero.ghost);
     if (!running || paused || !Online.connected || (hero.dead && !ghostWalking) || hero.sparkTravel) return;
-    pendingNpc = null; pendingChest = null; cityRoute = [];
+    pendingNpc = null; pendingChest = null; pendingGather = null; cityRoute = [];
     const r = cv.getBoundingClientRect(), mx=(e.clientX-r.left)/r.width*VW, my=(e.clientY-r.top)/r.height*VH;
     if (!ghostWalking) {
       if (window.RaidKey?.click(mx,my,w2s)) return;
       const vein = window.Blacksmithing?.pick(mx,my,w2s);
       const flower = window.Alchemy?.hit(mx,my,w2s);
-      if (flower) { startGathering(flower, window.Alchemy.start); return; }
-      if (vein) { startGathering(vein, window.Blacksmithing.start); return; }
+      if (flower) { startGathering(flower, window.Alchemy, 'patches'); return; }
+      if (vein) { startGathering(vein, window.Blacksmithing, 'veins'); return; }
     }
     const npc = City.npcs.find(n => {
       if (ghostWalking && n.art !== 'spirit_guide') return false;
@@ -1499,6 +1529,7 @@
   // A boss sign is read with its own message; every townsperson is spoken to with `interact`.
   const askNpc = npc => Online.send(npc.sign ? {type:'sign_read',sign:npc.id} : {type:'interact',npc:npc.id});
   function talkTo(npc) {
+    pendingGather = null;
     keys.clear(); pointer.down = false; hero.target = null; hero.pvpTargetId = null; hero.goal = null; cityRoute = [];
     npcTarget = npc.sign ? null : { npc, zone }; emitHud();
     if (Math.hypot(hero.x-npc.x,hero.y-npc.y) <= 2.5) askNpc(npc);
@@ -1516,6 +1547,7 @@
   }
   function askForChest(chest) { Online.send({type:'stop'}); Online.send({type:'open_chest',id:chest.id}); }
   function openChest(chest) {
+    pendingGather = null;
     keys.clear(); pointer.down = false; hero.target = null; hero.pvpTargetId = null; hero.goal = null; cityRoute = []; emitHud();
     if (Math.hypot(hero.x-chest.x,hero.y-chest.y) <= 1.95) { askForChest(chest); pendingChest = {id:chest.id, until:tAll+4, sentAt:tAll}; }
     else { cityRoute = chestRoute(chest, false); pendingChest = {id:chest.id, until:tAll+Math.max(20,cityRoute.length*.6)}; routeTime = 0; }
@@ -1544,7 +1576,7 @@
     }
     return true;
   }
-  function routeTo(goal, approach = false, origin = hero, approachRange = 2) {
+  function routeTo(goal, approach = false, origin = hero, approachRange = 2, canReach = null) {
     const free = (x,y) => x>=1 && y>=1 && x<MAP-1 && y<MAP-1 && nearObjects(x,y).every(o => o.width ? Math.abs(x-o.x)>o.width/2+.55 || Math.abs(y-o.y)>o.depth/2+.55 : Math.hypot(x-o.x,y-o.y)>o.r+.55);
     // Loot can leave a player against a tree, with its rounded cell blocked.
     // Connect the real position to a nearby clear cell before searching the grid.
@@ -1555,17 +1587,20 @@
     sources.sort((a,b)=>Math.hypot(a[0]-origin.x,a[1]-origin.y)-Math.hypot(b[0]-origin.x,b[1]-origin.y));
     if(!sources.length)return [];
     const start=sources[0], key=([x,y])=>y*MAP+x;
-    let end=[Math.round(goal.x),Math.round(goal.y)];
+    let end=[Math.round(goal.x),Math.round(goal.y)], alternatives;
     if(approach) {
       const candidates=[];
       for(let x=Math.floor(goal.x)-2;x<=Math.ceil(goal.x)+2;x++) for(let y=Math.floor(goal.y)-2;y<=Math.ceil(goal.y)+2;y++) {
         const distance=Math.hypot(x-goal.x,y-goal.y);
-        if(distance<=approachRange && free(x,y))candidates.push({point:[x,y],score:distance+Math.hypot(x-origin.x,y-origin.y)*.1});
+        if(distance<=approachRange && free(x,y) && (!canReach || canReach({x,y})))candidates.push({point:[x,y],score:distance+Math.hypot(x-origin.x,y-origin.y)*.1});
       }
       candidates.sort((a,b)=>a.score-b.score);if(!candidates.length)return [];end=candidates[0].point;
+      if (canReach) alternatives = new Set(candidates.map(candidate => key(candidate.point)));
     }
     const queue=[start], prev=new Map([[key(start),null]]);
-    for(let i=0;i<queue.length;i++) { const p=queue[i]; if(key(p)===key(end))break;
+    for(let i=0;i<queue.length;i++) {
+      const p=queue[i];
+      if (alternatives ? alternatives.has(key(p)) : key(p)===key(end)) { end=p; break; }
       for(const [dx,dy] of [[0,1],[0,-1],[1,0],[-1,0]]) {const q=[p[0]+dx,p[1]+dy];if(free(...q)&&!prev.has(key(q))&&segmentFree({x:p[0],y:p[1]},{x:q[0],y:q[1]})){prev.set(key(q),p);queue.push(q);}}
     }
     if(!prev.has(key(end)))return [];
@@ -1743,7 +1778,7 @@
         say('setTier', { name: source.replaceAll('_', ' '), tier, active: after >= tier });
     }
     window.Weather?.sync(packet.weather, own.x, own.y, !!own.inside);
-    if(hero.sparkTravel){City.close();keys.clear();pointer.down=false;cityRoute=[];pendingNpc=null;pendingChest=null;hero.target=null;hero.goal=null;}
+    if(hero.sparkTravel){City.close();keys.clear();pointer.down=false;cityRoute=[];pendingNpc=null;pendingChest=null;pendingGather=null;hero.target=null;hero.goal=null;}
     window.RaidKey?.sync(packet, own, zone);
     window.EmptySeat?.sync(own, zone);
     window.Fishing?.sync(packet, own, zdef, cue => say('fishingSound', cue));
@@ -3286,6 +3321,7 @@
           pendingChest.until = Math.max(pendingChest.until, tAll + 8);
         }
       }
+      if (!paused && pendingGather) followGathering();
       if(!paused && cityRoute.length) {
         if(hero.dead && !hero.ghost)cityRoute=[];
         else {
@@ -5808,12 +5844,12 @@
       running = true; paused = false; last = 0; cancelAnimationFrame(raf); raf = requestAnimationFrame(loop);
     },
     // A crossing cutscene starts: let go of everything the hero was doing, so nothing carries on underneath it.
-    cutsceneBegin() { City.close(false); keys.clear(); pointer.down = false; cityRoute = []; pendingNpc = null; pendingChest = null; hero.target = null; hero.pvpTargetId = null; hero.goal = null; emitHud(); },
+    cutsceneBegin() { City.close(false); keys.clear(); pointer.down = false; cityRoute = []; pendingNpc = null; pendingChest = null; pendingGather = null; hero.target = null; hero.pvpTargetId = null; hero.goal = null; emitHud(); },
     stop() { window.WorldFeedback?.reset(); window.ZoneJourney?.clear(); window.Cutscene?.reset(); window.Inventory?.hideTooltip(); window.Skillbar?.close(false); window.Quests?.close(false); City.close(false); Online.stop(); running = false; spriteGeneration++; remotePlayers.clear(); guards.clear(); cancelAnimationFrame(raf); },
     setTouchDirection(x, y) {
       if (!running || paused || !Online.connected || (hero.dead && !hero.ghost) || hero.sparkTravel) { x = 0; y = 0; }
       if ((x || y) && !touchDirection.some(Boolean)) {
-        pendingNpc = null; pendingChest = null; cityRoute = []; pointer.down = false;
+        pendingNpc = null; pendingChest = null; pendingGather = null; cityRoute = []; pointer.down = false;
         autoAttackTarget = null; hero.target = null; hero.pvpTargetId = null; hero.goal = null; emitHud();
       }
       const wasMoving = touchDirection.some(Boolean);
@@ -5852,7 +5888,7 @@
       if (action === 'mine') {
         const smithing = window.Blacksmithing, vein = smithing?.nearbyVein;
         if (!vein || smithing.isMining) return false;
-        startGathering(vein, smithing.start);
+        startGathering(vein, smithing, 'veins');
         return true;
       }
       if (action === 'attack') return Field.useSkill('attack');
@@ -5861,7 +5897,7 @@
       if (action === 'interact') return !!window.RaidKey?.interact();
       return false;
     },
-    clearInput() { autoAttackTarget = null; blockedAttack = null; touchDirection = [0, 0]; inputT = 0; window.TouchControls?.resetStick(); pendingNpc=null; pendingChest=null; cityRoute=[]; keys?.clear(); if (pointer) pointer.down = false; },
+    clearInput() { autoAttackTarget = null; blockedAttack = null; touchDirection = [0, 0]; inputT = 0; window.TouchControls?.resetStick(); pendingNpc=null; pendingChest=null; pendingGather=null; cityRoute=[]; keys?.clear(); if (pointer) pointer.down = false; },
     // Windows and chat halt held movement while keeping a selected autoattack target.
     stopMoving() {
       const id = autoAttackTarget, keepAttack = id !== null && (hero.target?.id === id || hero.pvpTargetId === id) && !hero.dead;

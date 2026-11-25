@@ -1,11 +1,12 @@
 //! Only the level-30 Shattered Span addition: collision, travel, private copies, real kills and quest loot.
 use super::wyrd_tests::{at, blocked, flood, join, place, reached, world};
 use super::*;
+use super::cutscene::Env;
 
 const SPAN: usize = 42;
 const BIFROST: usize = 7;
 
-/// The Span's door in Bifrost Reach: it moved with the Perch (the shapes pilot), so read it from the map.
+/// The Span's door is on the Shardfields side trail in Bifrost Reach.
 fn door(w: &World) -> Point {
     let d = w.maps[BIFROST]
         .portals
@@ -92,9 +93,13 @@ fn skybridge_data_and_actual_collision_are_reachable() {
 #[test]
 fn skybridge_travel_enters_and_leaves_cleanly() {
     let mut w = world();
-    let _rx = join(&mut w, 1, Class::Warrior);
-    w.players.get_mut(&1).unwrap().character.level = 30;
+    let mut rx = join(&mut w, 1, Class::Warrior);
+    let player = w.players.get_mut(&1).unwrap();
+    player.character.level = 30;
+    player.env = Some(Env::Sky);
     enter(&mut w, 1);
+    w.update_lead_shoes();
+    assert!(w.players[&1].cutscene_until <= w.time);
     let p = &w.players[&1].character;
     assert_eq!(w.public_zone(p.zone), SPAN);
     assert_eq!(p.point(), w.maps[SPAN].spawn);
@@ -106,6 +111,11 @@ fn skybridge_travel_enters_and_leaves_cleanly() {
     assert_eq!(p.zone, BIFROST);
     let door = door(&w);
     assert_eq!(w.players[&1].character.point(), at(door.x, door.y + 5.));
+    w.update_lead_shoes();
+    let p = &w.players[&1];
+    assert!(p.cutscene_until <= w.time);
+    assert!(!p.character.cutscenes.iter().any(|scene| scene.starts_with("sky_")));
+    assert!(super::wyrd_tests::drain(&mut rx).iter().all(|packet| packet["type"] != "cutscene"));
 }
 
 #[test]

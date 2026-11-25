@@ -26,7 +26,7 @@ let browser;
   });
   if (process.env.MUTATE === 'no-vein-click') {
     const text = fs.readFileSync(path.join(root,'client/field.js'),'utf8');
-    const call = touch ? 'startGathering(vein, smithing.start);' : 'startGathering(vein, window.Blacksmithing.start);';
+    const call = touch ? "startGathering(vein, smithing, 'veins');" : "startGathering(vein, window.Blacksmithing, 'veins');";
     assert(text.includes(call));
     await page.route('**/field.js', route => route.fulfill({
       contentType:'application/javascript',

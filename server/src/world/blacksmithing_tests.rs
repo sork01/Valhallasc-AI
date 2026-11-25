@@ -228,20 +228,17 @@ fn blacksmithing_simultaneous_last_pull_relocates_once_and_persists_once() {
 fn blacksmithing_mining_trains_every_band_with_its_pick_and_never_an_earlier_band() {
     let (mut w, _, _) = smiths();
     train(&mut w, 1);
-    let gear = CATALOG
-        .recipes
-        .iter()
-        .find(|r| r.method == Method::Epic)
-        .unwrap();
-    for (tier, entry) in CATALOG.tiers.iter().enumerate() {
+    let route = [0, 1, 2, 3, 6, 7, 8, 13, 14, 15];
+    for (band, zone) in route.into_iter().enumerate() {
+        let tier = CATALOG.tier(zone).unwrap();
+        let entry = &CATALOG.tiers[tier];
         let c = &mut w.players.get_mut(&1).unwrap().character;
         c.inventory.clear();
         c.blacksmithing.proficiency = Skill::default();
         c.blacksmithing
             .proficiency
-            .initialize(training_cap(tier) - 1);
+            .initialize(training_cap(band) - 1);
         let pick = CATALOG.picks.iter().find(|p| p.reaches >= tier).unwrap();
-        let zone = entry.zones[0];
         w.ensure_veins(zone);
         let vein = w.mining_veins[&zone][0];
         player_at(&mut w, 1, zone, vein.point);
@@ -256,7 +253,7 @@ fn blacksmithing_mining_trains_every_band_with_its_pick_and_never_an_earlier_ban
         w.time += DURATION;
         w.update_mining(1);
         let skill = w.players[&1].character.blacksmithing.proficiency.skill;
-        assert_eq!(skill, training_cap(tier), "band {tier}");
+        assert_eq!(skill, training_cap(band), "band {band}");
         let qty = w.players[&1].character.quantity(&entry.ore);
         start(&mut w, 1, vein, zone);
         w.time += DURATION;
@@ -269,7 +266,7 @@ fn blacksmithing_mining_trains_every_band_with_its_pick_and_never_an_earlier_ban
     }
     assert_eq!(
         w.players[&1].character.blacksmithing.proficiency.skill,
-        gear.skill
+        300
     );
 }
 
@@ -294,15 +291,14 @@ fn blacksmithing_expert_mining_advances_a_saved_skill_through_all_ten_regions() 
         300
     );
 
-    let [first, wrong, ..] = CATALOG.expert_zones.as_slice() else {
-        panic!("missing expert route")
-    };
+    let first = CATALOG.training_zones[10][0];
+    let wrong = CATALOG.training_zones[11][0];
     let pick = CATALOG.expert_pick(330).unwrap();
     assert_eq!(training_view(300).unwrap()["pick"], pick.item);
-    w.ensure_veins(*first);
-    let vein = w.mining_veins[first][0];
+    w.ensure_veins(first);
+    let vein = w.mining_veins[&first][0];
     w.smith_rng = 0;
-    start(&mut w, 1, vein, *first);
+    start(&mut w, 1, vein, first);
     w.time += DURATION;
     w.update_mining(1);
     let done = std::iter::from_fn(|| replies[0].try_recv().ok())
@@ -312,7 +308,7 @@ fn blacksmithing_expert_mining_advances_a_saved_skill_through_all_ten_regions() 
     assert_eq!(done["quantity"], 1, "the old pick can still gather ore");
     assert_eq!(done["requiredPick"], pick.item);
     w.players.get_mut(&1).unwrap().character.add_item(&pick.item, 1);
-    for (zone, skill) in [(*wrong, 300), (*first, 301)] {
+    for (zone, skill) in [(wrong, 300), (first, 301)] {
         w.ensure_veins(zone);
         let vein = w.mining_veins[&zone][0];
         w.smith_rng = 0;
@@ -324,8 +320,9 @@ fn blacksmithing_expert_mining_advances_a_saved_skill_through_all_ten_regions() 
             "zone {zone}"
         );
     }
-    for (index, &zone) in CATALOG.expert_zones.iter().enumerate() {
-        let cap = 330 + index as u16 * 30;
+    for (index, zones) in CATALOG.training_zones.iter().enumerate().skip(10) {
+        let cap = training_cap(index);
+        let zone = zones[0];
         let c = &mut w.players.get_mut(&1).unwrap().character;
         c.blacksmithing.proficiency.skill = cap - 1;
         let pick = CATALOG.expert_pick(cap).unwrap();
@@ -391,7 +388,7 @@ fn blacksmithing_expert_pick_chain_crafts_and_masterwork_yields_extra_ore() {
         assert_eq!(c.blacksmithing.proficiency.skill, recipe.skill);
     }
 
-    let zone = *CATALOG.expert_zones.last().unwrap();
+    let zone = CATALOG.training_zones.last().unwrap()[0];
     w.ensure_veins(zone);
     let vein = w.mining_veins[&zone][0];
     w.smith_rng = 0;

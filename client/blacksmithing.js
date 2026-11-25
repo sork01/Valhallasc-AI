@@ -168,7 +168,7 @@
       }
       return;
     }
-    if (packet.ok) Online.log?.(packet.text);
+    if (packet.ok) Online.logChat?.(packet.text);
     else Field.error(packet.text);
   }
 

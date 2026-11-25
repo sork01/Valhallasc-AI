@@ -484,7 +484,7 @@ impl World {
             n.id == npc_id && n.offers.iter().any(|o| o.id == "summon_party")
         });
         let Some(stone) = stone.filter(|n| {
-            p.is_human() && !p.is_hidden() && c.hp > 0.
+            !self.is_instance(zone) && p.is_human() && !p.is_hidden() && c.hp > 0.
                 && c.point().distance(n.position_at(self.time)) <= 2.8
         }) else {
             self.tell(&id, "Walk closer to a Meeting Stone to summon your party.", false);
@@ -540,7 +540,7 @@ impl World {
         let invite = self.social.invites.remove(at);
         self.push_social(&[me]);
         let (zone, arrival) = invite.summon.expect("a summon has a destination");
-        if invite.expires <= self.time || self.party_index(me).is_none()
+        if invite.expires <= self.time || self.is_instance(zone) || self.party_index(me).is_none()
             || self.party_index(me) != self.party_index(from)
             || !self.online(from).is_some_and(|p| p.character.zone == zone && !p.is_hidden())
         {
@@ -567,6 +567,7 @@ impl World {
         p.attack = 0.;
         p.dash = 0.;
         p.portal_at = self.time;
+        p.env = Some(super::cutscene::Env::of(&self.maps[zone]));
         self.separate_enemies();
         self.save();
         self.tell(me, "You arrive at the Meeting Stone.", true);

@@ -48,7 +48,8 @@
     "sell": 10,
     "zones": [
       20,
-      22
+      22,
+      7
     ],
     "richZones": []
   },
@@ -61,7 +62,8 @@
     "sell": 10,
     "zones": [
       19,
-      25
+      25,
+      13
     ],
     "richZones": []
   },
@@ -74,8 +76,6 @@
     "sell": 10,
     "zones": [
       45,
-      7,
-      13,
       14,
       15
     ],
@@ -86,7 +86,7 @@
     "tier": 7,
     "lava": true,
     "name": "Starcatch Rod",
-    "level": 60,
+    "level": 55,
     "sell": 10,
     "zones": [
       26,
@@ -100,7 +100,7 @@
     "tier": 8,
     "lava": true,
     "name": "Worldwire Rod",
-    "level": 80,
+    "level": 70,
     "sell": 10,
     "zones": [
       28,
@@ -113,7 +113,7 @@
     "tier": 9,
     "lava": true,
     "name": "Rootbraid Rod",
-    "level": 85,
+    "level": 80,
     "sell": 10,
     "zones": [
       23,

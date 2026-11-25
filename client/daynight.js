@@ -55,7 +55,6 @@
     brazier: [0, -68],
     torch: [0, -88],
     campfire: [0, -24],
-    beacon: [0, -90],                         // between the great beacon's flame and the plaza it lights
     lamphouse: [0, -164],
     house: [0, -52],
     aetherhouse: [0, -34],
@@ -68,6 +67,8 @@
   function lightAnchor(light) {
     const k = light?.kind;
     if (!k) return [0, -46];
+    const art = window.City?.art?.[k];
+    if (art?.lightAnchor) return art.lightAnchor(light);
     if (LIGHT_ANCHORS[k]) return LIGHT_ANCHORS[k];
     if (k.includes('campfire')) return [0, -24];
     if (k.includes('brazier')) return [0, -68];

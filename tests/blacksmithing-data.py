@@ -31,11 +31,14 @@ if os.getenv('MUTATE') == 'no-alternate':
     veins['0'] = veins['0'][:1]
 
 assert len(catalog['tiers']) == 10
-expert = catalog['expertZones']
-assert len(expert) == len(set(expert)) == 10
+bands = catalog['trainingZones']
+assert len(bands) == 20
+expert = bands[10:]
 zone_tiers = {zone: tier for tier, row in enumerate(catalog['tiers']) for zone in row['zones']}
-assert [zone_tiers[zone] for zone in expert] == [7] * 4 + [8] * 3 + [9] * 3
-assert all(len(veins[str(zone)]) >= 2 for zone in expert), 'Every expert band has reachable vein candidates'
+assert set(zone_tiers) == {zone for band in bands for zone in band}
+assert all(len({zone_tiers[zone] for zone in band}) == 1 for band in bands)
+assert [zone_tiers[band[0]] for band in expert] == [7] * 4 + [8] * 3 + [9] * 3
+assert all(len(veins[str(zone)]) >= 2 for band in bands for zone in band), 'Every band has reachable vein candidates'
 
 eligible = {str(i) for i,z in enumerate(regions) if z['slimes'] and not z.get('copies') and not z.get('interior')}
 assert set(veins) == eligible
@@ -96,10 +99,10 @@ for tier, row in enumerate(catalog['tiers']):
 expert_gear = [r for r in recipes.values() if r['method'] == 'staple' and r['skill'] >= 300
                or 'dropZone' in r]
 assert [r['skill'] for r in expert_gear] == list(range(300, 600, 30))
-for r, zone in zip(expert_gear, expert):
-    assert r['tier'] == zone_tiers[zone]
+for r, band in zip(expert_gear, expert):
+    assert r['tier'] == zone_tiers[band[0]]
     if r['method'] == 'rare':
-        assert r['dropZone'] == zone and r['plan']
+        assert r['dropZone'] in band and r['plan']
 assert [r['skill'] for r in recipes.values() if r['method'] == 'epic'] == [300] * 5 + [600] * 3
 modes = {'staple':'uncommon', 'rare':'rare', 'epic':'epic'}
 for r in recipes.values():

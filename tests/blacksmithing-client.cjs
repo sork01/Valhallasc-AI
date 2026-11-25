@@ -178,8 +178,13 @@ const fieldSource = read('field.js');
 const touchSource = read('touch.js');
 const hero = {x:100,y:60};
 const stop = () => sent.push({type:'stop'});
-Object.assign(context, { hero, npcTarget:null, Field:{canAct:true, hero, stopMoving:stop}, emitHud() {} });
-vm.runInContext('function startGathering'+fieldSource.split('  function startGathering')[1].split('  function onPointerDown')[0]
+Object.assign(context, {
+  hero, npcTarget:null, Field:{canAct:true, hero, stopMoving:stop}, emitHud() {},
+  segmentFree: () => true, tAll:0, routeTime:0, cityRoute:[], pendingGather:null,
+  routeTo: target => [{x:target.x-1,y:target.y}],
+});
+const gathering = fieldSource.slice(fieldSource.indexOf('  const gatherOrigin'),fieldSource.indexOf('  function onPointerDown'));
+vm.runInContext(gathering
   +'\nField.action = function('+fieldSource.split('    action(')[1].split('\n    clearInput()')[0].replace(/},\s*$/, '}'), context);
 const controls = { fish:new Node('button'), mine:new Node('button'), coarse:{matches:true}, tr:context.Locale.translate };
 Object.assign(context, controls);
@@ -202,6 +207,15 @@ context.updateProfessionButtons();
 assert.equal(controls.mine.disabled,true,'an active pull disables the button');
 assert.equal(controls.mine.textContent,'Bryter malm …');
 assert.equal(context.Field.action('mine'),false,'an active pull ignores repeated input');
+syncVeins(100, null);
+const distant = {id:13,x:110,y:60};
+context.startGathering(distant, Blacksmithing, 'veins');
+assert.deepEqual(sent.slice(-2),[{type:'stop'},{type:'move',x:109,y:60}],
+  'distant mining walks toward the selected vein before sending mine');
+hero.x = 109;
+context.followGathering();
+assert.deepEqual(sent.slice(-2),[{type:'stop'},{type:'mine',id:13}],
+  'arriving in range stops walking and begins the pull');
 Blacksmithing.reset();
 assert.equal(Blacksmithing.nearbyVein,null);
 console.log('Blacksmithing client passed Swedish rendering, action gating, canvas hit detection, animated art and cues.');

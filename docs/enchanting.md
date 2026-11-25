@@ -24,7 +24,7 @@ One recipe can drop per eligible kill. The roll reserves the legendary band firs
 
 Green yields two dust, blue yields two essence, purple yields two shards, and orange yields one core. Orange gear is the sole source of cores. Gray, starter, Hierloom and GM gear are excluded from disenchanting. An enchanter can study recipes before reaching their crafting tier.
 
-Enchanting starts at skill 1 and caps at 600. Applying an enchant or disenchanting level 1–5 gear can raise skill through 30. Every five item levels add another 30 points to the cap. Level 46–50 gear can train through 300, level 51–55 through 330, level 91–95 through 570, and level 96–99 through 600. Gear above the current minimum can still grant a point. Lower-level gear still yields materials or takes eligible enchants.
+Enchanting starts at skill 1 and caps at 600. Applying an enchant or disenchanting level 1–5 gear can raise skill through 30. Every five item levels add another 30 points to the cap. Level 46–50 gear can train through 300, level 51–55 through 330, level 91–95 through 570, and level 96–99 through 600. Gear above the current minimum can still grant a point. Lower-level gear still yields materials or takes eligible enchants. Bifrost's level 31–35 gear can advance Enchanting from 180 through 210, and the level 36–40 gear found after Bifrost can train through 240. The workshop shows the minimum gear level for the next point.
 
 Crafting trains through the band in which a recipe tier unlocks. Each eligible action can award one point. Higher rarities improve the odds, and two eligible attempts without a point guarantee the next one. The base chance stays at 60% throughout the expert bands. Untrained characters can apply crafted scrolls.
 

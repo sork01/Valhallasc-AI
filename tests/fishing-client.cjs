@@ -93,12 +93,15 @@ function reachableZones(level) {
   return visited;
 }
 check(skillWaters.length === 20, 'the route has twenty 30-point bands');
-for (const [bands, level] of [[skillWaters.slice(0,10),50],[skillWaters.slice(10),90]]) {
-  const reachable = reachableZones(level);
-  check(bands.every(band => band.some(zone => reachable.has(zone) &&
-    items.some(rod => rod.kind === 'rod' && rod.requiredLevel <= level && rod.fishing.zones.includes(zone)))),
-  `All training bands in the segment have an accessible zone and rod by level ${level}`);
+for (const [band, zones] of skillWaters.entries()) {
+  for (const zone of zones) {
+    const level = areas[zone].levels?.[0] ?? (zone === 17 ? 60 : 1);
+    check(reachableZones(level).has(zone) &&
+      items.some(rod => rod.kind === 'rod' && rod.requiredLevel <= level && rod.fishing.zones.includes(zone)),
+    `Fishing band ${band} opens in ${areas[zone].name} by level ${level}`);
+  }
 }
+
 const twig=items.find(i=>i.kind==='rod'&&!i.fishing.lava), lava=items.find(i=>i.kind==='rod'&&i.fishing.lava), allRods=items.filter(i=>i.kind==='rod').map(i=>({item:i.id,quantity:1}));
 const hero={id:'self',x:map.dock.start.x,y:map.dock.start.y,zone:0,level:99,fx:1,fy:0,inventory:allRods};
 check(el('fishing-hint').textContent.includes('press R to cast')&&!el('fishing-hint').textContent.includes('‹fish›'),'log hint resolves the initial fishing key');
@@ -208,10 +211,14 @@ f.sync({...hero,fishingLog:{skill:29}});
 check(el('fishing-training').textContent === 'Fish in Greenmeadow to reach skill 30.', 'first band starts in Greenmeadow');
 f.sync({...hero,fishingLog:{skill:30}});
 check(el('fishing-training').textContent === 'Fish in Emberfall Crags to reach skill 60.', 'skill 30 sends the angler to the Crags');
-f.sync({...hero,fishingLog:{skill:300}});
-check(el('fishing-training').textContent === 'Fish in Bifrost Reach · Stormcatch Basins to reach skill 330.', 'skill 300 sends the angler to Bifrost Reach');
+f.sync({...hero,fishingLog:{skill:120}});
+check(el('fishing-training').textContent === 'Fish in Wyrdwood to reach skill 150.', 'Wyrdwood is the band before Bifrost');
+f.sync({...hero,fishingLog:{skill:150}});
+check(el('fishing-training').textContent === 'Fish in Bifrost Reach · Stormcatch Basins to reach skill 180.', 'skill 150 sends the angler to Bifrost Reach');
+f.sync({...hero,fishingLog:{skill:540}});
+check(el('fishing-training').textContent === 'Fish in The Cairnspine · Boulderwatch Tarns to reach skill 570.', 'the Cairnspine pools train before the level 95 waters');
 f.sync({...hero,fishingLog:{skill:570}});
-check(el('fishing-training').textContent === 'Fish in The Cairnspine · Boulderwatch Tarns to reach skill 600.', 'the final training band names the Cairnspine pools');
+check(el('fishing-training').textContent === 'Fish in The Yearwheel / Emberwake Caldera to reach skill 600.', 'the final training band names both level 95 zones');
 f.sync({...hero,fishingLog:{skill:600}});
 check(el('fishing-training').hidden, 'training hint hides at maximum skill');
 f.sync({...hero,fishingLog:{skill:78,total:1,legendary:1,longestStreak:1,species:{[fish.id]:{count:1,bestKg:22}}}});

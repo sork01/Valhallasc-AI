@@ -88,12 +88,12 @@ def install(world, recipes, fish, levels, rods):
             for stage, rarity, count in [(1,'common',5),(2,'uncommon',3),(3,'rare',1),(4,'common',5)]:
                 f = next(f for f in pool if f['rarity']==rarity)
                 # Region entry tiers constrain where a species can actually be caught.
-                rod_level = {0:1,1:5,2:10,3:15,6:25,19:40,20:40,22:70,25:80,26:90,28:95,45:95}.get(zone, f['level'])
-                level = max(f['level'],rod_level, 25 if rarity=='rare' and habitat!='Lava' else 1,
-                            45 if rarity=='rare' and habitat=='Lava' else 1)
+                rod = rod_by_tier[max(water_tier, f['min_tier'])]
+                region_level = area.get('levels', [1])[0]
+                trophy_level = (45 if habitat == 'Lava' else 25) if rarity == 'rare' else 1
+                level = max(f['level'], rod['level'], region_level, trophy_level)
                 qid = f'{key}_{stage}'
                 title = ('Fresh Fish for ' if stage==1 else 'A Finer Catch for ' if stage==2 else 'A Trophy for ' if stage==3 else 'The Daily Creel at ') + anchor
-                rod = rod_by_tier[max(water_tier, f['min_tier'])]
                 description = quest_description(zone, f, rod)
                 area['quests'].append(dict(id=qid,title=title,npc=key,requires=previous if stage<4 else f'{key}_1',
                     repeatable=stage==4,level=level,rewardXp=levels[level-1]//10,rewardGold=max(5,level*3),

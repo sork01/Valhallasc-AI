@@ -2,8 +2,8 @@
 
 The shaped Wyrdwood entrance is at **(143, 169.5)** on a side trail north of
 Skuldwatch. Both exits return to **(144.5, 175)** on that trail. Runa Threadreader
-and Egil Spindlekeeper stand in the clearing. The Repair Smith and Meeting Stone
-are inside the entrance. Public zone **41** is appended after the Arena (40).
+and Egil Spindlekeeper stand in the clearing. The Meeting Stone is beside the
+trail outside and the Repair Smith is inside the entrance. Public zone **41** is appended after the Arena (40).
 
 The 112 × 112 private interior has four party copies, a level-25 access gate
 and a recommended party size of five. An amber burial court and a violet thread

@@ -911,6 +911,10 @@ mod data_tests {
         let points: Value =
             serde_json::from_str(include_str!("../../../world/fishing-spots.txt")).unwrap();
         for rod in [
+            "rod_emberline_rod",
+            "rod_willow_rod",
+            "rod_reedglass_rod",
+            "rod_silverline_rod",
             "rod_magma_reel",
             "rod_starcatch_rod",
             "rod_worldwire_rod",
@@ -920,10 +924,10 @@ mod data_tests {
             w.players.get_mut(&1).unwrap().character.add_item(rod, 1);
         }
         let route = [
-            0, 1, 2, 3, 6, 20, 22, 19, 25, 45, 7, 13, 14, 15, 16, 17, 21, 23, 24, 27,
+            0, 1, 2, 3, 6, 7, 13, 14, 15, 16, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28,
         ];
         let levels = [
-            50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 55, 60, 60, 80, 85, 85, 90,
+            1, 5, 10, 15, 25, 30, 40, 45, 50, 55, 60, 65, 70, 75, 80, 80, 80, 85, 90, 95,
         ];
         for (index, zone) in route.into_iter().enumerate() {
             let cap = (index as u16 + 1) * SKILL_BAND;
@@ -995,8 +999,9 @@ mod data_tests {
                 });
         }
         assert_eq!(w.players[&1].character.fishing.proficiency.skill, MAX_SKILL);
-        assert_eq!(water_skill_cap(26, 270), 300);
-        assert_eq!(water_skill_cap(28, 269), 0);
+        assert_eq!(water_skill_cap(17, 270), 300);
+        assert_eq!(water_skill_cap(45, 570), 600);
+        assert_eq!(water_skill_cap(28, 569), 0);
     }
 
     #[test]
