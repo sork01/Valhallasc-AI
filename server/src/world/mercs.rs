@@ -235,7 +235,8 @@ impl World {
         let Some(p) = self.players.get(&session) else {
             return;
         };
-        let _ = p.peer.try_send(json!({"type":"dialogue","npc":npc_json,"notice":notice,"gold":p.character.gold,"level":p.character.level,"mercPrice":merc_price(p.character.level),"quests":p.character.quests,"inventory":p.character.inventory,"equipment":p.character.equipment,"bags":p.character.bags,"bagCapacity":p.character.bag_capacity(),"look":p.character.look}));
+        let repair_multiplier = if self.is_instance(zone) { 4 } else { 1 };
+        let _ = p.peer.try_send(json!({"type":"dialogue","npc":npc_json,"notice":notice,"gold":p.character.gold,"level":p.character.level,"mercPrice":merc_price(p.character.level),"quests":p.character.quests,"abandonedQuests":p.character.abandoned_quests,"inventory":p.character.inventory,"equipment":p.character.equipment,"gearInstances":p.character.gear_instances,"repairQuote":p.character.repair_quote(repair_multiplier),"repairMultiplier":repair_multiplier,"bags":p.character.bags,"bagCapacity":p.character.bag_capacity(),"look":p.character.look}));
         self.save();
     }
 
@@ -280,7 +281,7 @@ impl World {
         let mut merc = Player::new(character, tx);
         merc.merc = Some(owner.to_owned());
         merc.merc_quest = contract;
-        merc.merc_raid = raid_contract.then_some(zone);
+        merc.merc_instance = self.is_instance(zone).then_some(zone);
         self.players.insert(merc_session, merc);
         Ok(name)
     }
@@ -300,10 +301,16 @@ impl World {
         let c = &p.character;
         // The selected offer determines the contract, even when its NPC also gives a group quest.
         let raid_contract = offer.raid;
+        if (raid_contract || offer.open) && !self.is_instance(c.zone) {
+            return Err("Hire dungeon mercenaries at the Repair Smith inside the dungeon.".into());
+        }
+        if self.instance_cleared(c.zone) {
+            return Err("This instance is already cleared.".into());
+        }
         let (wanted, title, contract) = if raid_contract {
             (social::RAID_MAX, "The raid contract".to_owned(), None)
         } else if offer.open {
-            (social::PARTY_MAX, "The Meeting Stone".to_owned(), None)
+            (social::PARTY_MAX, "The dungeon contract".to_owned(), None)
         } else {
             let seasons = self.seasonal.active();
             let quest = self
@@ -426,15 +433,18 @@ impl World {
                                 .is_none_or(|q| q.ready(progress))
                     })
             });
-            // A raid contract's fighters follow their hirer only to the raid: anywhere else they are let go.
-            let left_raid = p
-                .merc_raid
-                .is_some_and(|door| hirer.zone != door && !self.maps[hirer.zone].raid);
-            if left_raid {
+            let out_of_scope = match p.merc_instance {
+                Some(copy) => hirer.zone != copy,
+                None => self.is_instance(hirer.zone),
+            };
+            if out_of_scope {
                 let name = p.character.look.name.clone();
-                let _ = self.players[&owner].peer.try_send(
-                    json!({"type":"system","text":format!("{name} departs: the raid contract ends outside the raid.")}),
-                );
+                let text = if p.merc_instance.is_some() {
+                    format!("{name} departs after you leave the instance.")
+                } else {
+                    format!("{name} departs: outdoor contracts end at the dungeon door.")
+                };
+                let _ = self.players[&owner].peer.try_send(json!({"type":"system","text":text}));
                 self.remove_mercenary(session);
                 continue;
             }

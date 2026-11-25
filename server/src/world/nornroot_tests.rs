@@ -139,6 +139,29 @@ fn nornroot_entry_gate_and_party_isolation_and_return() {
 }
 
 #[test]
+fn nornroot_gate_is_reachable_off_the_skuldwatch_through_road() {
+    let mut w = world();
+    let _rx = join(&mut w, 1, Class::Warrior);
+    let door = w.maps[WYRD].portals.iter().find(|p| p.id == "wyrd_nornroot").unwrap();
+    let gate = at(door.x, door.y);
+    let approached = at(144.5, 175.);
+    assert!(w.maps[WYRD].line_clear(approached, gate, PLAYER_RADIUS));
+    for x in [160., 158., 155.5, 154., 151., 149.] {
+        place(&mut w, 1, WYRD, at(x, 185.5));
+        let p = w.players.get_mut(&1).unwrap();
+        p.moving = true;
+        p.input = at(-1., 0.);
+        w.time += 2.;
+        w.use_portal(1);
+        assert_eq!(w.players[&1].character.zone, WYRD);
+        assert!(w.players[&1].portal_at < w.time, "passing the gate cannot trigger admission");
+    }
+    w.players.get_mut(&1).unwrap().character.level = 25;
+    enter(&mut w, 1);
+    assert_eq!(w.public_zone(w.players[&1].character.zone), BARROW);
+}
+
+#[test]
 fn nornroot_bosses_drop_exclusive_gear_and_only_clear_their_copy() {
     let mut w = world();
     let _receivers: Vec<_> = (1..=2).map(|id| join(&mut w, id, Class::Warrior)).collect();
@@ -241,10 +264,17 @@ fn nornroot_dungeon_hires_stay_after_arn_until_the_instance_clears() {
 
     w.time += 1.;
     w.interact(1, "barrow_guide", Some("merc_priest"));
-    let (&hire, _) = w.players.iter().find(|(_, p)| p.merc.is_some()).unwrap();
+    assert!(w.players.values().all(|p| p.merc.is_none()));
+    assert_eq!(w.players[&1].character.gold, 10_000);
     enter(&mut w, 1);
     let zone = w.players[&1].character.zone;
     assert_eq!(w.public_zone(zone), BARROW);
+    let smith = w.maps[zone].npcs.iter().find(|n| n.id == "dungeon_repair_41")
+        .unwrap().position_at(w.time);
+    place(&mut w, 1, zone, smith);
+    w.time += 1.;
+    w.interact(1, "dungeon_repair_41", Some("merc_priest"));
+    let (&hire, _) = w.players.iter().find(|(_, p)| p.merc.is_some()).unwrap();
     w.update_mercenaries();
     assert_eq!(w.players[&hire].character.zone, zone);
 
@@ -276,14 +306,83 @@ fn nornroot_dungeon_hires_stay_after_arn_until_the_instance_clears() {
         }
     }
 
-    place(&mut w, 1, WYRD, guide);
+    place(&mut w, 1, zone, smith);
     w.time += 1.;
-    w.interact(1, "barrow_guide", Some("merc_mage"));
+    w.interact(1, "dungeon_repair_41", Some("merc_mage"));
     let notices = super::wyrd_tests::lines(&mut rx);
-    assert!(
-        w.players.values().any(|p| p.merc.is_some()),
-        "a ready quest cannot block a new dungeon hire: {notices:?}"
+    assert!(w.players.values().all(|p| p.merc.is_none()));
+    assert!(notices.iter().any(|notice| notice.contains("already cleared")), "{notices:?}");
+}
+
+#[test]
+fn nornroot_stone_summons_into_the_same_copy_with_only_the_level_gate() {
+    let mut w = world();
+    let (_leader_rx, mut ally_rx, _other_rx) = (
+        join(&mut w, 1, Class::Warrior),
+        join(&mut w, 2, Class::Mage),
+        join(&mut w, 3, Class::Hunter),
     );
+    w.players.get_mut(&3).unwrap().character.level = 25;
+    enter(&mut w, 3);
+    let other_copy = w.players[&3].character.zone;
+    w.players.get_mut(&1).unwrap().character.level = 25;
+    enter(&mut w, 1);
+    let copy = w.players[&1].character.zone;
+    assert_ne!(copy, other_copy);
+
+    let leader = w.players[&1].character.id.clone();
+    let ally = w.players[&2].character.id.clone();
+    w.social(1, SocialCommand::PartyInvite { id: Some(ally), name: None });
+    w.social(2, SocialCommand::PartyAccept { id: leader.clone() });
+    let stone = w.maps[copy].npcs.iter().find(|n| n.id == "dungeon_stone_41")
+        .unwrap().position_at(w.time);
+    place(&mut w, 1, copy, stone);
+    w.players.get_mut(&2).unwrap().character.level = 24;
+    let home = w.players[&2].character.zone;
+    w.time += 1.;
+    w.interact(1, "dungeon_stone_41", Some("summon_party"));
+    assert_eq!(w.players[&2].character.zone, home, "a summon is an invitation");
+    w.social(2, SocialCommand::SummonAccept { id: leader.clone() });
+    assert_eq!(w.players[&2].character.zone, home);
+    assert!(super::wyrd_tests::lines(&mut ally_rx).iter().any(|s| s.contains("level 25")));
+
+    w.players.get_mut(&2).unwrap().character.level = 25;
+    w.time += 1.;
+    w.interact(1, "dungeon_stone_41", Some("summon_party"));
+    assert!(w.players[&2].character.quests.iter().all(|q| q.id != "entry_norn"));
+    w.social(2, SocialCommand::SummonAccept { id: leader });
+    let c = &w.players[&2].character;
+    assert_eq!(c.zone, copy);
+    assert!(c.point().distance(stone) < 3.);
+}
+
+#[test]
+fn nornroot_dungeon_hires_end_at_the_boundary_in_both_directions() {
+    let mut w = world();
+    let _rx = join(&mut w, 1, Class::Warrior);
+    let c = &mut w.players.get_mut(&1).unwrap().character;
+    c.level = 25;
+    c.gold = 10_000;
+    let owner = c.id.clone();
+    w.place_mercenary(&owner, Class::Priest, 25, WYRD, at(175., 184.), false, None)
+        .unwrap();
+    enter(&mut w, 1);
+    w.update_mercenaries();
+    assert!(w.players.values().all(|p| p.merc.is_none()));
+
+    let copy = w.players[&1].character.zone;
+    let smith = w.maps[copy].npcs.iter().find(|n| n.id == "dungeon_repair_41")
+        .unwrap().position_at(w.time);
+    place(&mut w, 1, copy, smith);
+    w.time += 1.;
+    w.interact(1, "dungeon_repair_41", Some("merc_priest"));
+    assert!(w.players.values().any(|p| p.merc_instance == Some(copy)));
+    place(&mut w, 1, copy, at(49., 99.));
+    w.time += 2.;
+    w.use_portal(1);
+    assert_eq!(w.players[&1].character.zone, WYRD);
+    w.update_mercenaries();
+    assert!(w.players.values().all(|p| p.merc.is_none()));
 }
 
 #[test]

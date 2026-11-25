@@ -531,5 +531,9 @@
   "Bought {0} × {1}.": "Köpte {0} × {1:t}.",
   "Fitted {0} × {1}. You now have {2} bag slots.": "Monterade {0} × {1:t}. Du har nu {2} väskplatser.",
   "Requires equipment level {0} or higher.": "Kräver utrustning på minst nivå {0}.",
-  "Craft {0} to reach skill {1}.": "Tillverka {0} för att nå färdighetsnivå {1}."
+  "Craft {0} to reach skill {1}.": "Tillverka {0} för att nå färdighetsnivå {1}.",
+  "You must be level {0} to accept this summon.": "Du måste vara på nivå {0} för att tacka ja till kallelsen.",
+  "{0} departs after you leave the instance.": "{0} går sin väg när du lämnar instansen.",
+  "{0} departs: outdoor contracts end at the dungeon door.": "{0} går sin väg när du går in. Uppdraget utomhus slutar vid ingången.",
+  "{0} summoned you to {1}.": "{0} kallar dig till {1}."
 }

@@ -105,9 +105,9 @@ const suite = {
     await page.evaluate(() => Social.show('party')); await audit('#social-panel .social-panel', 'raid-members'); await clear();
     await other.context().close();
     await debug(page, { op: 'set_level', level: 99 });
-    await debug(page, { op: 'teleport', zone: 46, x: 36, y: 303 });
+    await debug(page, { op: 'teleport', zone: 46, x: 30, y: 305 });
     await page.waitForFunction(() => Field.zone === 46 || Field.zoneTheme === 'chained_forge'); await sleep(550);
-    await page.evaluate(() => Online.send({ type: 'interact', npc: 'cf_quartermaster' })); await audit('#npc-dialogue .gossip-window', 'raid-hiring'); await clear();
+    await page.evaluate(() => Online.send({ type: 'interact', npc: 'dungeon_repair_46' })); await audit('#npc-dialogue .gossip-window', 'raid-hiring'); await clear();
     await debug(page, { op: 'teleport', zone: 41, x: 56, y: 99 });
     await page.waitForFunction(() => Field.zoneTheme === 'nornroot');
     const sign = await page.evaluate(() => Field.signs[0]);

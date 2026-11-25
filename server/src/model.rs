@@ -1764,6 +1764,12 @@ pub enum SocialCommand {
     PartyDecline {
         id: String,
     },
+    SummonAccept {
+        id: String,
+    },
+    SummonDecline {
+        id: String,
+    },
     PartyLeave,
     PartyKick {
         id: String,

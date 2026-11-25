@@ -319798,48 +319798,12 @@
           "x": 81.2,
           "y": 122.7,
           "color": "#59d9ff",
-          "dialogue": "The runes brighten as you near. A voice that is not a voice offers you company: fighters of every calling answer the Stone for a fee that grows with your level, and fight at your side until you dismiss them, leave your party or log out. A party holds five. The stairs beside the Stone lead down to the Undervault, a dungeon made for five heroes of level 20.",
+          "dialogue": "Use this stone to invite your party members to join you here.",
           "offers": [
             {
-              "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary · holds the line",
-              "cost": 250,
-              "merc": "warrior",
-              "open": true
-            },
-            {
-              "id": "merc_mage",
-              "label": "Hire a Mage mercenary · casts from range",
-              "cost": 250,
-              "merc": "mage",
-              "open": true
-            },
-            {
-              "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary · strikes fast",
-              "cost": 250,
-              "merc": "assassin",
-              "open": true
-            },
-            {
-              "id": "merc_priest",
-              "label": "Hire a Priest mercenary · heals the party",
-              "cost": 250,
-              "merc": "priest",
-              "open": true
-            },
-            {
-              "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary · shoots from range",
-              "cost": 250,
-              "merc": "hunter",
-              "open": true
-            },
-            {
-              "id": "merc_dismiss",
-              "label": "Send my mercenaries away",
-              "cost": 0,
-              "merc": "dismiss"
+              "id": "summon_party",
+              "label": "Summon party members",
+              "cost": 0
             }
           ],
           "buys": false,
@@ -351961,6 +351925,14 @@
           "y": 117,
           "r": 0.2,
           "v": 2
+        },
+        {
+          "kind": "meetingstone",
+          "x": 18.0,
+          "y": 111.0,
+          "r": 0.55,
+          "v": 0,
+          "label": "Dungeon Meeting Stone"
         }
       ],
       "slimes": [
@@ -352248,7 +352220,7 @@
           "role": "Dungeon repairs",
           "x": 15.0,
           "y": 114.0,
-          "dialogue": "I can repair your gear here. Dungeon repairs cost four times the town price.",
+          "dialogue": "I can hire fighters for this run and repair your gear. Dungeon repairs cost four times the town price.",
           "color": "#b96e45",
           "look": {
             "skin": "#dca480",
@@ -352259,6 +352231,64 @@
             {
               "id": "repair",
               "label": "Repair worn gear",
+              "cost": 0
+            },
+            {
+              "id": "merc_warrior",
+              "label": "Hire a Warrior mercenary · holds the line",
+              "cost": 250,
+              "merc": "warrior",
+              "open": true
+            },
+            {
+              "id": "merc_mage",
+              "label": "Hire a Mage mercenary · casts from range",
+              "cost": 250,
+              "merc": "mage",
+              "open": true
+            },
+            {
+              "id": "merc_assassin",
+              "label": "Hire a Assassin mercenary · strikes fast",
+              "cost": 250,
+              "merc": "assassin",
+              "open": true
+            },
+            {
+              "id": "merc_priest",
+              "label": "Hire a Priest mercenary · heals the party",
+              "cost": 250,
+              "merc": "priest",
+              "open": true
+            },
+            {
+              "id": "merc_hunter",
+              "label": "Hire a Hunter mercenary · shoots from range",
+              "cost": 250,
+              "merc": "hunter",
+              "open": true
+            },
+            {
+              "id": "merc_dismiss",
+              "label": "Send my mercenaries away",
+              "cost": 0,
+              "merc": "dismiss"
+            }
+          ]
+        },
+        {
+          "id": "dungeon_stone_5",
+          "name": "The Meeting Stone",
+          "role": "Party summons",
+          "dialogue": "Use this stone to invite your party members to join you here.",
+          "x": 18.0,
+          "y": 111.0,
+          "color": "#8e87ad",
+          "art": "stone",
+          "offers": [
+            {
+              "id": "summon_party",
+              "label": "Summon party members",
               "cost": 0
             }
           ]
@@ -352650,6 +352680,24 @@
           [
             143.09,
             333.82
+          ]
+        ],
+        [
+          [
+            140,
+            184
+          ],
+          [
+            144.5,
+            179.5
+          ],
+          [
+            144.5,
+            175
+          ],
+          [
+            143,
+            169.5
           ]
         ]
       ],
@@ -424634,14 +424682,6 @@
         },
         {
           "kind": "bush",
-          "x": 141.52,
-          "y": 174.21,
-          "r": 0.3,
-          "v": 2,
-          "layout": "wyrdwood_design_v1"
-        },
-        {
-          "kind": "bush",
           "x": 124.7,
           "y": 203.24,
           "r": 0.3,
@@ -426378,14 +426418,6 @@
         },
         {
           "kind": "rock",
-          "x": 144.41,
-          "y": 169.71,
-          "r": 0.4,
-          "v": 2,
-          "layout": "wyrdwood_design_v1"
-        },
-        {
-          "kind": "rock",
           "x": 126.78,
           "y": 158.11,
           "r": 0.4,
@@ -426618,14 +426650,6 @@
         },
         {
           "kind": "rock",
-          "x": 142.97,
-          "y": 168.15,
-          "r": 0.4,
-          "v": 1,
-          "layout": "wyrdwood_design_v1"
-        },
-        {
-          "kind": "rock",
           "x": 237.52,
           "y": 186.04,
           "r": 0.4,
@@ -426654,14 +426678,6 @@
           "y": 185.01,
           "r": 0.4,
           "v": 2,
-          "layout": "wyrdwood_design_v1"
-        },
-        {
-          "kind": "rock",
-          "x": 143.05,
-          "y": 172.51,
-          "r": 0.4,
-          "v": 3,
           "layout": "wyrdwood_design_v1"
         },
         {
@@ -437731,8 +437747,8 @@
           "layout": "wyrdwood_design_v1"
         },
         {
-          "x": 144.9,
-          "y": 167.42,
+          "x": 132.5,
+          "y": 190.5,
           "kind": "weaver",
           "layout": "wyrdwood_design_v1"
         },
@@ -439336,53 +439352,11 @@
           "id": "barrow_guide",
           "name": "Runa Threadreader",
           "role": "Barrow guide",
-          "x": 158,
-          "y": 185.5,
+          "x": 140.5,
+          "y": 174.5,
           "color": "#b599d6",
-          "dialogue": "The Norn Stones have opened. Arn guards the amber hall. Free him, and the road to the loom will be yours. I can hire fighters to help you.",
-          "offers": [
-            {
-              "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary · holds the line",
-              "cost": 250,
-              "merc": "warrior",
-              "open": true
-            },
-            {
-              "id": "merc_mage",
-              "label": "Hire a Mage mercenary · casts from range",
-              "cost": 250,
-              "merc": "mage",
-              "open": true
-            },
-            {
-              "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary · strikes fast",
-              "cost": 250,
-              "merc": "assassin",
-              "open": true
-            },
-            {
-              "id": "merc_priest",
-              "label": "Hire a Priest mercenary · heals the party",
-              "cost": 250,
-              "merc": "priest",
-              "open": true
-            },
-            {
-              "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary · shoots from range",
-              "cost": 250,
-              "merc": "hunter",
-              "open": true
-            },
-            {
-              "id": "merc_dismiss",
-              "label": "Send my mercenaries away",
-              "cost": 0,
-              "merc": "dismiss"
-            }
-          ],
+          "dialogue": "The Norn Stones have opened. Arn guards the amber hall. Free him, and the road to the loom will be yours.",
+          "offers": [],
           "look": {
             "skin": "#edc5a1",
             "hair": "#c4b49a",
@@ -439395,8 +439369,8 @@
           "id": "barrow_scribe",
           "name": "Egil Spindlekeeper",
           "role": "Keeper of the old threads",
-          "x": 162,
-          "y": 185.5,
+          "x": 149,
+          "y": 176.5,
           "color": "#bfa368",
           "dialogue": "Vessa has tied the dead to their old promises. Break her spell. Beyond her waits a king whose story was never written. The forgotten names are Alva, who tended the cradle; Tor, who kept his oath; and Sif, who stayed for the farewell. Tell Runa: remembered, released, returned.",
           "offers": [],
@@ -441420,8 +441394,8 @@
         {
           "id": "wyrd_nornroot",
           "name": "Nornroot Barrow",
-          "x": 154,
-          "y": 183.5,
+          "x": 143,
+          "y": 169.5,
           "r": 1.3,
           "to": 41,
           "tx": 56,
@@ -492303,50 +492277,8 @@
           "x": 169,
           "y": 185,
           "color": "#82d4f2",
-          "dialogue": "Beneath the west cliff of the Perch hangs the Shattered Span, the oldest arch of the Bifrost. Torstein still demands the bridge-toll from anyone who crosses. Take a party, or hire fighters from me, and break his watch.",
-          "offers": [
-            {
-              "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary · holds the line",
-              "cost": 250,
-              "merc": "warrior",
-              "open": true
-            },
-            {
-              "id": "merc_mage",
-              "label": "Hire a Mage mercenary · casts from range",
-              "cost": 250,
-              "merc": "mage",
-              "open": true
-            },
-            {
-              "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary · strikes fast",
-              "cost": 250,
-              "merc": "assassin",
-              "open": true
-            },
-            {
-              "id": "merc_priest",
-              "label": "Hire a Priest mercenary · heals the party",
-              "cost": 250,
-              "merc": "priest",
-              "open": true
-            },
-            {
-              "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary · shoots from range",
-              "cost": 250,
-              "merc": "hunter",
-              "open": true
-            },
-            {
-              "id": "merc_dismiss",
-              "label": "Send my mercenaries away",
-              "cost": 0,
-              "merc": "dismiss"
-            }
-          ],
+          "dialogue": "Beneath the west cliff of the Perch hangs the Shattered Span, the oldest arch of the Bifrost. Torstein still demands the bridge-toll from anyone who crosses. The Repair Smith inside hires fighters to help you break his watch.",
+          "offers": [],
           "look": {
             "skin": "#edc5a1",
             "hair": "#e8d088",
@@ -523331,49 +523263,7 @@
           "x": 74,
           "y": 193,
           "color": "#88bca6",
-          "offers": [
-            {
-              "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary · holds the line",
-              "cost": 250,
-              "merc": "warrior",
-              "open": true
-            },
-            {
-              "id": "merc_mage",
-              "label": "Hire a Mage mercenary · casts from range",
-              "cost": 250,
-              "merc": "mage",
-              "open": true
-            },
-            {
-              "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary · strikes fast",
-              "cost": 250,
-              "merc": "assassin",
-              "open": true
-            },
-            {
-              "id": "merc_priest",
-              "label": "Hire a Priest mercenary · heals the party",
-              "cost": 250,
-              "merc": "priest",
-              "open": true
-            },
-            {
-              "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary · shoots from range",
-              "cost": 250,
-              "merc": "hunter",
-              "open": true
-            },
-            {
-              "id": "merc_dismiss",
-              "label": "Send my mercenaries away",
-              "cost": 0,
-              "merc": "dismiss"
-            }
-          ],
+          "offers": [],
           "dialogue": "Svala sailed into Ran's net to save her crew. The debt kept them all below. Follow the mooring west of Keelhaven, take a party and free Gullveig from the hold.",
           "look": {
             "skin": "#d4a483",
@@ -545315,45 +545205,9 @@
           "color": "#81d6cc",
           "offers": [
             {
-              "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary · holds the line",
-              "cost": 250,
-              "merc": "warrior",
-              "open": true
-            },
-            {
-              "id": "merc_mage",
-              "label": "Hire a Mage mercenary · casts from range",
-              "cost": 250,
-              "merc": "mage",
-              "open": true
-            },
-            {
-              "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary · strikes fast",
-              "cost": 250,
-              "merc": "assassin",
-              "open": true
-            },
-            {
-              "id": "merc_priest",
-              "label": "Hire a Priest mercenary · heals the party",
-              "cost": 250,
-              "merc": "priest",
-              "open": true
-            },
-            {
-              "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary · shoots from range",
-              "cost": 250,
-              "merc": "hunter",
-              "open": true
-            },
-            {
-              "id": "merc_dismiss",
-              "label": "Send my mercenaries away",
-              "cost": 0,
-              "merc": "dismiss"
+              "id": "summon_party",
+              "label": "Summon party members",
+              "cost": 0
             }
           ],
           "buys": false,
@@ -545365,7 +545219,7 @@
             "hair": "#ebdbbd",
             "style": "short"
           },
-          "dialogue": "The sea-blue runes offer companions of every calling for a fee that grows with your level, up to five in your party. The sealed Drowned Cathedral stands beside you. Its expedition has not opened yet.",
+          "dialogue": "Use this stone to invite your party members to join you here.",
           "art": "stone"
         },
         {
@@ -599733,6 +599587,14 @@
           "y": 29,
           "r": 0.7,
           "v": 3
+        },
+        {
+          "kind": "meetingstone",
+          "x": 27,
+          "y": 140,
+          "r": 0.55,
+          "v": 0,
+          "label": "Dungeon Meeting Stone"
         }
       ],
       "slimes": [
@@ -599930,7 +599792,7 @@
           "role": "Dungeon repairs",
           "x": 24,
           "y": 143,
-          "dialogue": "I can repair your gear here. Dungeon repairs cost four times the town price.",
+          "dialogue": "I can hire fighters for this run and repair your gear. Dungeon repairs cost four times the town price.",
           "color": "#b96e45",
           "look": {
             "skin": "#dca480",
@@ -599941,6 +599803,64 @@
             {
               "id": "repair",
               "label": "Repair worn gear",
+              "cost": 0
+            },
+            {
+              "id": "merc_warrior",
+              "label": "Hire a Warrior mercenary · holds the line",
+              "cost": 250,
+              "merc": "warrior",
+              "open": true
+            },
+            {
+              "id": "merc_mage",
+              "label": "Hire a Mage mercenary · casts from range",
+              "cost": 250,
+              "merc": "mage",
+              "open": true
+            },
+            {
+              "id": "merc_assassin",
+              "label": "Hire a Assassin mercenary · strikes fast",
+              "cost": 250,
+              "merc": "assassin",
+              "open": true
+            },
+            {
+              "id": "merc_priest",
+              "label": "Hire a Priest mercenary · heals the party",
+              "cost": 250,
+              "merc": "priest",
+              "open": true
+            },
+            {
+              "id": "merc_hunter",
+              "label": "Hire a Hunter mercenary · shoots from range",
+              "cost": 250,
+              "merc": "hunter",
+              "open": true
+            },
+            {
+              "id": "merc_dismiss",
+              "label": "Send my mercenaries away",
+              "cost": 0,
+              "merc": "dismiss"
+            }
+          ]
+        },
+        {
+          "id": "dungeon_stone_10",
+          "name": "The Meeting Stone",
+          "role": "Party summons",
+          "dialogue": "Use this stone to invite your party members to join you here.",
+          "x": 27,
+          "y": 140,
+          "color": "#8e87ad",
+          "art": "stone",
+          "offers": [
+            {
+              "id": "summon_party",
+              "label": "Summon party members",
               "cost": 0
             }
           ]
@@ -605938,6 +605858,14 @@
           "y": 33,
           "r": 0.7,
           "v": 1
+        },
+        {
+          "kind": "meetingstone",
+          "x": 139,
+          "y": 140,
+          "r": 0.55,
+          "v": 0,
+          "label": "Dungeon Meeting Stone"
         }
       ],
       "slimes": [
@@ -606147,7 +606075,7 @@
           "role": "Dungeon repairs",
           "x": 136,
           "y": 143,
-          "dialogue": "I can repair your gear here. Dungeon repairs cost four times the town price.",
+          "dialogue": "I can hire fighters for this run and repair your gear. Dungeon repairs cost four times the town price.",
           "color": "#b96e45",
           "look": {
             "skin": "#dca480",
@@ -606158,6 +606086,64 @@
             {
               "id": "repair",
               "label": "Repair worn gear",
+              "cost": 0
+            },
+            {
+              "id": "merc_warrior",
+              "label": "Hire a Warrior mercenary · holds the line",
+              "cost": 250,
+              "merc": "warrior",
+              "open": true
+            },
+            {
+              "id": "merc_mage",
+              "label": "Hire a Mage mercenary · casts from range",
+              "cost": 250,
+              "merc": "mage",
+              "open": true
+            },
+            {
+              "id": "merc_assassin",
+              "label": "Hire a Assassin mercenary · strikes fast",
+              "cost": 250,
+              "merc": "assassin",
+              "open": true
+            },
+            {
+              "id": "merc_priest",
+              "label": "Hire a Priest mercenary · heals the party",
+              "cost": 250,
+              "merc": "priest",
+              "open": true
+            },
+            {
+              "id": "merc_hunter",
+              "label": "Hire a Hunter mercenary · shoots from range",
+              "cost": 250,
+              "merc": "hunter",
+              "open": true
+            },
+            {
+              "id": "merc_dismiss",
+              "label": "Send my mercenaries away",
+              "cost": 0,
+              "merc": "dismiss"
+            }
+          ]
+        },
+        {
+          "id": "dungeon_stone_11",
+          "name": "The Meeting Stone",
+          "role": "Party summons",
+          "dialogue": "Use this stone to invite your party members to join you here.",
+          "x": 139,
+          "y": 140,
+          "color": "#8e87ad",
+          "art": "stone",
+          "offers": [
+            {
+              "id": "summon_party",
+              "label": "Summon party members",
               "cost": 0
             }
           ]
@@ -614027,6 +614013,14 @@
           "y": 45,
           "r": 0.7,
           "v": 3
+        },
+        {
+          "kind": "meetingstone",
+          "x": 99,
+          "y": 172,
+          "r": 0.55,
+          "v": 0,
+          "label": "Dungeon Meeting Stone"
         }
       ],
       "slimes": [
@@ -614164,7 +614158,7 @@
           "role": "Dungeon repairs",
           "x": 96,
           "y": 175,
-          "dialogue": "I can repair your gear here. Dungeon repairs cost four times the town price.",
+          "dialogue": "I can hire fighters for this run and repair your gear. Dungeon repairs cost four times the town price.",
           "color": "#b96e45",
           "look": {
             "skin": "#dca480",
@@ -614175,6 +614169,64 @@
             {
               "id": "repair",
               "label": "Repair worn gear",
+              "cost": 0
+            },
+            {
+              "id": "merc_warrior",
+              "label": "Hire a Warrior mercenary · holds the line",
+              "cost": 250,
+              "merc": "warrior",
+              "open": true
+            },
+            {
+              "id": "merc_mage",
+              "label": "Hire a Mage mercenary · casts from range",
+              "cost": 250,
+              "merc": "mage",
+              "open": true
+            },
+            {
+              "id": "merc_assassin",
+              "label": "Hire a Assassin mercenary · strikes fast",
+              "cost": 250,
+              "merc": "assassin",
+              "open": true
+            },
+            {
+              "id": "merc_priest",
+              "label": "Hire a Priest mercenary · heals the party",
+              "cost": 250,
+              "merc": "priest",
+              "open": true
+            },
+            {
+              "id": "merc_hunter",
+              "label": "Hire a Hunter mercenary · shoots from range",
+              "cost": 250,
+              "merc": "hunter",
+              "open": true
+            },
+            {
+              "id": "merc_dismiss",
+              "label": "Send my mercenaries away",
+              "cost": 0,
+              "merc": "dismiss"
+            }
+          ]
+        },
+        {
+          "id": "dungeon_stone_12",
+          "name": "The Meeting Stone",
+          "role": "Party summons",
+          "dialogue": "Use this stone to invite your party members to join you here.",
+          "x": 99,
+          "y": 172,
+          "color": "#8e87ad",
+          "art": "stone",
+          "offers": [
+            {
+              "id": "summon_party",
+              "label": "Summon party members",
               "cost": 0
             }
           ]
@@ -817124,49 +817176,13 @@
           "x": 120.5,
           "y": 88.0,
           "color": "#9ec8dd",
-          "dialogue": "The runes call companions to this court. The stair beside the stone opens a private Moonwell for each party.",
+          "dialogue": "Use this stone to invite your party members to join you here.",
           "look": {},
           "offers": [
             {
-              "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary · holds the line",
-              "cost": 250,
-              "merc": "warrior",
-              "open": true
-            },
-            {
-              "id": "merc_mage",
-              "label": "Hire a Mage mercenary · casts from range",
-              "cost": 250,
-              "merc": "mage",
-              "open": true
-            },
-            {
-              "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary · strikes fast",
-              "cost": 250,
-              "merc": "assassin",
-              "open": true
-            },
-            {
-              "id": "merc_priest",
-              "label": "Hire a Priest mercenary · heals the party",
-              "cost": 250,
-              "merc": "priest",
-              "open": true
-            },
-            {
-              "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary · shoots from range",
-              "cost": 250,
-              "merc": "hunter",
-              "open": true
-            },
-            {
-              "id": "merc_dismiss",
-              "label": "Send my mercenaries away",
-              "cost": 0,
-              "merc": "dismiss"
+              "id": "summon_party",
+              "label": "Summon party members",
+              "cost": 0
             }
           ],
           "buys": false,
@@ -866206,6 +866222,14 @@
           "y": 98,
           "r": 0.2,
           "v": 0
+        },
+        {
+          "kind": "meetingstone",
+          "x": 18,
+          "y": 64,
+          "r": 0.55,
+          "v": 0,
+          "label": "Dungeon Meeting Stone"
         }
       ],
       "slimes": [
@@ -866317,7 +866341,7 @@
           "role": "Dungeon repairs",
           "x": 21,
           "y": 67,
-          "dialogue": "I can repair your gear here. Dungeon repairs cost four times the town price.",
+          "dialogue": "I can hire fighters for this run and repair your gear. Dungeon repairs cost four times the town price.",
           "color": "#b96e45",
           "look": {
             "skin": "#dca480",
@@ -866328,6 +866352,64 @@
             {
               "id": "repair",
               "label": "Repair worn gear",
+              "cost": 0
+            },
+            {
+              "id": "merc_warrior",
+              "label": "Hire a Warrior mercenary · holds the line",
+              "cost": 250,
+              "merc": "warrior",
+              "open": true
+            },
+            {
+              "id": "merc_mage",
+              "label": "Hire a Mage mercenary · casts from range",
+              "cost": 250,
+              "merc": "mage",
+              "open": true
+            },
+            {
+              "id": "merc_assassin",
+              "label": "Hire a Assassin mercenary · strikes fast",
+              "cost": 250,
+              "merc": "assassin",
+              "open": true
+            },
+            {
+              "id": "merc_priest",
+              "label": "Hire a Priest mercenary · heals the party",
+              "cost": 250,
+              "merc": "priest",
+              "open": true
+            },
+            {
+              "id": "merc_hunter",
+              "label": "Hire a Hunter mercenary · shoots from range",
+              "cost": 250,
+              "merc": "hunter",
+              "open": true
+            },
+            {
+              "id": "merc_dismiss",
+              "label": "Send my mercenaries away",
+              "cost": 0,
+              "merc": "dismiss"
+            }
+          ]
+        },
+        {
+          "id": "dungeon_stone_18",
+          "name": "The Meeting Stone",
+          "role": "Party summons",
+          "dialogue": "Use this stone to invite your party members to join you here.",
+          "x": 18,
+          "y": 64,
+          "color": "#8e87ad",
+          "art": "stone",
+          "offers": [
+            {
+              "id": "summon_party",
+              "label": "Summon party members",
               "cost": 0
             }
           ]
@@ -889776,48 +889858,12 @@
           "x": 224,
           "y": 108,
           "color": "#a8dfe4",
-          "dialogue": "The runes gather companions for a fee that grows with your level. The Eye Below is open to heroes of level 65 and above. Enter together; each party receives its own descent.",
+          "dialogue": "Use this stone to invite your party members to join you here.",
           "offers": [
             {
-              "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary · holds the line",
-              "cost": 250,
-              "merc": "warrior",
-              "open": true
-            },
-            {
-              "id": "merc_mage",
-              "label": "Hire a Mage mercenary · casts from range",
-              "cost": 250,
-              "merc": "mage",
-              "open": true
-            },
-            {
-              "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary · strikes fast",
-              "cost": 250,
-              "merc": "assassin",
-              "open": true
-            },
-            {
-              "id": "merc_priest",
-              "label": "Hire a Priest mercenary · heals the party",
-              "cost": 250,
-              "merc": "priest",
-              "open": true
-            },
-            {
-              "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary · shoots from range",
-              "cost": 250,
-              "merc": "hunter",
-              "open": true
-            },
-            {
-              "id": "merc_dismiss",
-              "label": "Send my mercenaries away",
-              "cost": 0,
-              "merc": "dismiss"
+              "id": "summon_party",
+              "label": "Summon party members",
+              "cost": 0
             }
           ],
           "buys": false,
@@ -939014,48 +939060,12 @@
           "x": 185.5,
           "y": 71.5,
           "color": "#ffe6a5",
-          "dialogue": "The stone gathers companions for a fee that grows with your level. The Elder Hollow is open to prepared parties.",
+          "dialogue": "Use this stone to invite your party members to join you here.",
           "offers": [
             {
-              "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary · holds the line",
-              "cost": 250,
-              "merc": "warrior",
-              "open": true
-            },
-            {
-              "id": "merc_mage",
-              "label": "Hire a Mage mercenary · casts from range",
-              "cost": 250,
-              "merc": "mage",
-              "open": true
-            },
-            {
-              "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary · strikes fast",
-              "cost": 250,
-              "merc": "assassin",
-              "open": true
-            },
-            {
-              "id": "merc_priest",
-              "label": "Hire a Priest mercenary · heals the party",
-              "cost": 250,
-              "merc": "priest",
-              "open": true
-            },
-            {
-              "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary · shoots from range",
-              "cost": 250,
-              "merc": "hunter",
-              "open": true
-            },
-            {
-              "id": "merc_dismiss",
-              "label": "Send my mercenaries away",
-              "cost": 0,
-              "merc": "dismiss"
+              "id": "summon_party",
+              "label": "Summon party members",
+              "cost": 0
             }
           ],
           "buys": false,
@@ -989015,48 +989025,12 @@
           "x": 287.0,
           "y": 201.0,
           "color": "#fff0b5",
-          "dialogue": "Five companions may face the masked giant. The Pavilion itself stays sealed.",
+          "dialogue": "Use this stone to invite your party members to join you here.",
           "offers": [
             {
-              "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary · holds the line",
-              "cost": 250,
-              "merc": "warrior",
-              "open": true
-            },
-            {
-              "id": "merc_mage",
-              "label": "Hire a Mage mercenary · casts from range",
-              "cost": 250,
-              "merc": "mage",
-              "open": true
-            },
-            {
-              "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary · strikes fast",
-              "cost": 250,
-              "merc": "assassin",
-              "open": true
-            },
-            {
-              "id": "merc_priest",
-              "label": "Hire a Priest mercenary · heals the party",
-              "cost": 250,
-              "merc": "priest",
-              "open": true
-            },
-            {
-              "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary · shoots from range",
-              "cost": 250,
-              "merc": "hunter",
-              "open": true
-            },
-            {
-              "id": "merc_dismiss",
-              "label": "Send my mercenaries away",
-              "cost": 0,
-              "merc": "dismiss"
+              "id": "summon_party",
+              "label": "Summon party members",
+              "cost": 0
             }
           ],
           "buys": false,
@@ -1058457,48 +1058431,12 @@
           "x": 260,
           "y": 148,
           "color": "#d6f1a2",
-          "dialogue": "Gather companions for the jungle elites. The temple itself remains sealed.",
+          "dialogue": "Use this stone to invite your party members to join you here.",
           "offers": [
             {
-              "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary · holds the line",
-              "cost": 250,
-              "merc": "warrior",
-              "open": true
-            },
-            {
-              "id": "merc_mage",
-              "label": "Hire a Mage mercenary · casts from range",
-              "cost": 250,
-              "merc": "mage",
-              "open": true
-            },
-            {
-              "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary · strikes fast",
-              "cost": 250,
-              "merc": "assassin",
-              "open": true
-            },
-            {
-              "id": "merc_priest",
-              "label": "Hire a Priest mercenary · heals the party",
-              "cost": 250,
-              "merc": "priest",
-              "open": true
-            },
-            {
-              "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary · shoots from range",
-              "cost": 250,
-              "merc": "hunter",
-              "open": true
-            },
-            {
-              "id": "merc_dismiss",
-              "label": "Send my mercenaries away",
-              "cost": 0,
-              "merc": "dismiss"
+              "id": "summon_party",
+              "label": "Summon party members",
+              "cost": 0
             }
           ],
           "buys": false,
@@ -1107984,48 +1107922,12 @@
           "x": 222,
           "y": 245,
           "color": "#e4f7ae",
-          "dialogue": "Meet your companions here before the Seed Vault opens.",
+          "dialogue": "Use this stone to invite your party members to join you here.",
           "offers": [
             {
-              "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary · holds the line",
-              "cost": 250,
-              "merc": "warrior",
-              "open": true
-            },
-            {
-              "id": "merc_mage",
-              "label": "Hire a Mage mercenary · casts from range",
-              "cost": 250,
-              "merc": "mage",
-              "open": true
-            },
-            {
-              "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary · strikes fast",
-              "cost": 250,
-              "merc": "assassin",
-              "open": true
-            },
-            {
-              "id": "merc_priest",
-              "label": "Hire a Priest mercenary · heals the party",
-              "cost": 250,
-              "merc": "priest",
-              "open": true
-            },
-            {
-              "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary · shoots from range",
-              "cost": 250,
-              "merc": "hunter",
-              "open": true
-            },
-            {
-              "id": "merc_dismiss",
-              "label": "Send my mercenaries away",
-              "cost": 0,
-              "merc": "dismiss"
+              "id": "summon_party",
+              "label": "Summon party members",
+              "cost": 0
             }
           ],
           "buys": false,
@@ -1143749,48 +1143651,12 @@
           "name": "Heartwood Meeting Stone",
           "role": "Gather a party · hire fighters",
           "color": "#e4f7ae",
-          "dialogue": "Meet your companions here before the Seed Vault opens.",
+          "dialogue": "Use this stone to invite your party members to join you here.",
           "offers": [
             {
-              "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary · holds the line",
-              "cost": 250,
-              "merc": "warrior",
-              "open": true
-            },
-            {
-              "id": "merc_mage",
-              "label": "Hire a Mage mercenary · casts from range",
-              "cost": 250,
-              "merc": "mage",
-              "open": true
-            },
-            {
-              "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary · strikes fast",
-              "cost": 250,
-              "merc": "assassin",
-              "open": true
-            },
-            {
-              "id": "merc_priest",
-              "label": "Hire a Priest mercenary · heals the party",
-              "cost": 250,
-              "merc": "priest",
-              "open": true
-            },
-            {
-              "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary · shoots from range",
-              "cost": 250,
-              "merc": "hunter",
-              "open": true
-            },
-            {
-              "id": "merc_dismiss",
-              "label": "Send my mercenaries away",
-              "cost": 0,
-              "merc": "dismiss"
+              "id": "summon_party",
+              "label": "Summon party members",
+              "cost": 0
             }
           ],
           "buys": false,
@@ -1212652,48 +1212518,12 @@
           "x": 136,
           "y": 80,
           "color": "#b7e5dc",
-          "dialogue": "Gather here before descending into the Sunken Astrolabe.",
+          "dialogue": "Use this stone to invite your party members to join you here.",
           "offers": [
             {
-              "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary · holds the line",
-              "cost": 250,
-              "merc": "warrior",
-              "open": true
-            },
-            {
-              "id": "merc_mage",
-              "label": "Hire a Mage mercenary · casts from range",
-              "cost": 250,
-              "merc": "mage",
-              "open": true
-            },
-            {
-              "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary · strikes fast",
-              "cost": 250,
-              "merc": "assassin",
-              "open": true
-            },
-            {
-              "id": "merc_priest",
-              "label": "Hire a Priest mercenary · heals the party",
-              "cost": 250,
-              "merc": "priest",
-              "open": true
-            },
-            {
-              "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary · shoots from range",
-              "cost": 250,
-              "merc": "hunter",
-              "open": true
-            },
-            {
-              "id": "merc_dismiss",
-              "label": "Send my mercenaries away",
-              "cost": 0,
-              "merc": "dismiss"
+              "id": "summon_party",
+              "label": "Summon party members",
+              "cost": 0
             }
           ],
           "buys": false,
@@ -1254758,48 +1254588,12 @@
           "x": 177.5,
           "y": 45.5,
           "color": "#b5daef",
-          "dialogue": "The last warm lantern before the deep ice.",
+          "dialogue": "Use this stone to invite your party members to join you here.",
           "offers": [
             {
-              "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary · holds the line",
-              "cost": 250,
-              "merc": "warrior",
-              "open": true
-            },
-            {
-              "id": "merc_mage",
-              "label": "Hire a Mage mercenary · casts from range",
-              "cost": 250,
-              "merc": "mage",
-              "open": true
-            },
-            {
-              "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary · strikes fast",
-              "cost": 250,
-              "merc": "assassin",
-              "open": true
-            },
-            {
-              "id": "merc_priest",
-              "label": "Hire a Priest mercenary · heals the party",
-              "cost": 250,
-              "merc": "priest",
-              "open": true
-            },
-            {
-              "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary · shoots from range",
-              "cost": 250,
-              "merc": "hunter",
-              "open": true
-            },
-            {
-              "id": "merc_dismiss",
-              "label": "Send my mercenaries away",
-              "cost": 0,
-              "merc": "dismiss"
+              "id": "summon_party",
+              "label": "Summon party members",
+              "cost": 0
             }
           ],
           "buys": false,
@@ -1303193,48 +1302987,12 @@
           "x": 185.5,
           "y": 63.5,
           "color": "#d4b8aa",
-          "dialogue": "Meet your companions here before the Thunderheart Gate opens.",
+          "dialogue": "Use this stone to invite your party members to join you here.",
           "offers": [
             {
-              "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary · holds the line",
-              "cost": 250,
-              "merc": "warrior",
-              "open": true
-            },
-            {
-              "id": "merc_mage",
-              "label": "Hire a Mage mercenary · casts from range",
-              "cost": 250,
-              "merc": "mage",
-              "open": true
-            },
-            {
-              "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary · strikes fast",
-              "cost": 250,
-              "merc": "assassin",
-              "open": true
-            },
-            {
-              "id": "merc_priest",
-              "label": "Hire a Priest mercenary · heals the party",
-              "cost": 250,
-              "merc": "priest",
-              "open": true
-            },
-            {
-              "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary · shoots from range",
-              "cost": 250,
-              "merc": "hunter",
-              "open": true
-            },
-            {
-              "id": "merc_dismiss",
-              "label": "Send my mercenaries away",
-              "cost": 0,
-              "merc": "dismiss"
+              "id": "summon_party",
+              "label": "Summon party members",
+              "cost": 0
             }
           ],
           "buys": false,
@@ -1452703,49 +1452461,7 @@
           "y": 765,
           "color": "#78b48a",
           "dialogue": "The Springmere road circles our court. Follow its colored stones to the Equinox Crossing.",
-          "offers": [
-            {
-              "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary · holds the line",
-              "cost": 250,
-              "merc": "warrior",
-              "open": true
-            },
-            {
-              "id": "merc_mage",
-              "label": "Hire a Mage mercenary · casts from range",
-              "cost": 250,
-              "merc": "mage",
-              "open": true
-            },
-            {
-              "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary · strikes fast",
-              "cost": 250,
-              "merc": "assassin",
-              "open": true
-            },
-            {
-              "id": "merc_priest",
-              "label": "Hire a Priest mercenary · heals the party",
-              "cost": 250,
-              "merc": "priest",
-              "open": true
-            },
-            {
-              "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary · shoots from range",
-              "cost": 250,
-              "merc": "hunter",
-              "open": true
-            },
-            {
-              "id": "merc_dismiss",
-              "label": "Send my mercenaries away",
-              "cost": 0,
-              "merc": "dismiss"
-            }
-          ],
+          "offers": [],
           "buys": false,
           "look": {
             "skin": "#c99d78",
@@ -1453103,49 +1452819,7 @@
           "y": 655,
           "color": "#e6b45c",
           "dialogue": "The Solhaven road circles our court. Follow its colored stones to the Equinox Crossing.",
-          "offers": [
-            {
-              "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary · holds the line",
-              "cost": 250,
-              "merc": "warrior",
-              "open": true
-            },
-            {
-              "id": "merc_mage",
-              "label": "Hire a Mage mercenary · casts from range",
-              "cost": 250,
-              "merc": "mage",
-              "open": true
-            },
-            {
-              "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary · strikes fast",
-              "cost": 250,
-              "merc": "assassin",
-              "open": true
-            },
-            {
-              "id": "merc_priest",
-              "label": "Hire a Priest mercenary · heals the party",
-              "cost": 250,
-              "merc": "priest",
-              "open": true
-            },
-            {
-              "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary · shoots from range",
-              "cost": 250,
-              "merc": "hunter",
-              "open": true
-            },
-            {
-              "id": "merc_dismiss",
-              "label": "Send my mercenaries away",
-              "cost": 0,
-              "merc": "dismiss"
-            }
-          ],
+          "offers": [],
           "buys": false,
           "look": {
             "skin": "#c99d78",
@@ -1453503,49 +1453177,7 @@
           "y": 295,
           "color": "#bb835e",
           "dialogue": "The Harvestwatch road circles our court. Follow its colored stones to the Equinox Crossing.",
-          "offers": [
-            {
-              "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary · holds the line",
-              "cost": 250,
-              "merc": "warrior",
-              "open": true
-            },
-            {
-              "id": "merc_mage",
-              "label": "Hire a Mage mercenary · casts from range",
-              "cost": 250,
-              "merc": "mage",
-              "open": true
-            },
-            {
-              "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary · strikes fast",
-              "cost": 250,
-              "merc": "assassin",
-              "open": true
-            },
-            {
-              "id": "merc_priest",
-              "label": "Hire a Priest mercenary · heals the party",
-              "cost": 250,
-              "merc": "priest",
-              "open": true
-            },
-            {
-              "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary · shoots from range",
-              "cost": 250,
-              "merc": "hunter",
-              "open": true
-            },
-            {
-              "id": "merc_dismiss",
-              "label": "Send my mercenaries away",
-              "cost": 0,
-              "merc": "dismiss"
-            }
-          ],
+          "offers": [],
           "buys": false,
           "look": {
             "skin": "#c99d78",
@@ -1453903,49 +1453535,7 @@
           "y": 295,
           "color": "#9dbbd0",
           "dialogue": "The Rimehold road circles our court. Follow its colored stones to the Equinox Crossing.",
-          "offers": [
-            {
-              "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary · holds the line",
-              "cost": 250,
-              "merc": "warrior",
-              "open": true
-            },
-            {
-              "id": "merc_mage",
-              "label": "Hire a Mage mercenary · casts from range",
-              "cost": 250,
-              "merc": "mage",
-              "open": true
-            },
-            {
-              "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary · strikes fast",
-              "cost": 250,
-              "merc": "assassin",
-              "open": true
-            },
-            {
-              "id": "merc_priest",
-              "label": "Hire a Priest mercenary · heals the party",
-              "cost": 250,
-              "merc": "priest",
-              "open": true
-            },
-            {
-              "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary · shoots from range",
-              "cost": 250,
-              "merc": "hunter",
-              "open": true
-            },
-            {
-              "id": "merc_dismiss",
-              "label": "Send my mercenaries away",
-              "cost": 0,
-              "merc": "dismiss"
-            }
-          ],
+          "offers": [],
           "buys": false,
           "look": {
             "skin": "#c99d78",
@@ -1454421,49 +1454011,7 @@
           "x": 452,
           "y": 485,
           "color": "#b58be9",
-          "offers": [
-            {
-              "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary · holds the line",
-              "cost": 250,
-              "merc": "warrior",
-              "open": true
-            },
-            {
-              "id": "merc_mage",
-              "label": "Hire a Mage mercenary · casts from range",
-              "cost": 250,
-              "merc": "mage",
-              "open": true
-            },
-            {
-              "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary · strikes fast",
-              "cost": 250,
-              "merc": "assassin",
-              "open": true
-            },
-            {
-              "id": "merc_priest",
-              "label": "Hire a Priest mercenary · heals the party",
-              "cost": 250,
-              "merc": "priest",
-              "open": true
-            },
-            {
-              "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary · shoots from range",
-              "cost": 250,
-              "merc": "hunter",
-              "open": true
-            },
-            {
-              "id": "merc_dismiss",
-              "label": "Send my mercenaries away",
-              "cost": 0,
-              "merc": "dismiss"
-            }
-          ],
+          "offers": [],
           "dialogue": "Below the Equinox axle lies the Black Hour Foundry. Five fighters in full blue equipment can survive its long shifts. Green equipment will not carry a party through. Silence Vark and return the missing minute.",
           "look": {
             "skin": "#d4af9d",
@@ -1495955,6 +1495503,14 @@
           "y": 30,
           "r": 0,
           "v": 2
+        },
+        {
+          "kind": "meetingstone",
+          "x": 51,
+          "y": 82,
+          "r": 0.55,
+          "v": 0,
+          "label": "Dungeon Meeting Stone"
         }
       ],
       "slimes": [
@@ -1496026,7 +1495582,7 @@
           "role": "Dungeon repairs",
           "x": 48,
           "y": 85,
-          "dialogue": "I can repair your gear here. Dungeon repairs cost four times the town price.",
+          "dialogue": "I can hire fighters for this run and repair your gear. Dungeon repairs cost four times the town price.",
           "color": "#b96e45",
           "look": {
             "skin": "#dca480",
@@ -1496037,6 +1495593,64 @@
             {
               "id": "repair",
               "label": "Repair worn gear",
+              "cost": 0
+            },
+            {
+              "id": "merc_warrior",
+              "label": "Hire a Warrior mercenary · holds the line",
+              "cost": 250,
+              "merc": "warrior",
+              "open": true
+            },
+            {
+              "id": "merc_mage",
+              "label": "Hire a Mage mercenary · casts from range",
+              "cost": 250,
+              "merc": "mage",
+              "open": true
+            },
+            {
+              "id": "merc_assassin",
+              "label": "Hire a Assassin mercenary · strikes fast",
+              "cost": 250,
+              "merc": "assassin",
+              "open": true
+            },
+            {
+              "id": "merc_priest",
+              "label": "Hire a Priest mercenary · heals the party",
+              "cost": 250,
+              "merc": "priest",
+              "open": true
+            },
+            {
+              "id": "merc_hunter",
+              "label": "Hire a Hunter mercenary · shoots from range",
+              "cost": 250,
+              "merc": "hunter",
+              "open": true
+            },
+            {
+              "id": "merc_dismiss",
+              "label": "Send my mercenaries away",
+              "cost": 0,
+              "merc": "dismiss"
+            }
+          ]
+        },
+        {
+          "id": "dungeon_stone_29",
+          "name": "The Meeting Stone",
+          "role": "Party summons",
+          "dialogue": "Use this stone to invite your party members to join you here.",
+          "x": 51,
+          "y": 82,
+          "color": "#8e87ad",
+          "art": "stone",
+          "offers": [
+            {
+              "id": "summon_party",
+              "label": "Summon party members",
               "cost": 0
             }
           ]
@@ -1499261,6 +1498875,14 @@
           "y": 79,
           "r": 0,
           "v": 0
+        },
+        {
+          "kind": "meetingstone",
+          "x": 51,
+          "y": 83,
+          "r": 0.55,
+          "v": 0,
+          "label": "Dungeon Meeting Stone"
         }
       ],
       "slimes": [
@@ -1499332,7 +1498954,7 @@
           "role": "Dungeon repairs",
           "x": 48,
           "y": 86,
-          "dialogue": "I can repair your gear here. Dungeon repairs cost four times the town price.",
+          "dialogue": "I can hire fighters for this run and repair your gear. Dungeon repairs cost four times the town price.",
           "color": "#b96e45",
           "look": {
             "skin": "#dca480",
@@ -1499343,6 +1498965,64 @@
             {
               "id": "repair",
               "label": "Repair worn gear",
+              "cost": 0
+            },
+            {
+              "id": "merc_warrior",
+              "label": "Hire a Warrior mercenary · holds the line",
+              "cost": 250,
+              "merc": "warrior",
+              "open": true
+            },
+            {
+              "id": "merc_mage",
+              "label": "Hire a Mage mercenary · casts from range",
+              "cost": 250,
+              "merc": "mage",
+              "open": true
+            },
+            {
+              "id": "merc_assassin",
+              "label": "Hire a Assassin mercenary · strikes fast",
+              "cost": 250,
+              "merc": "assassin",
+              "open": true
+            },
+            {
+              "id": "merc_priest",
+              "label": "Hire a Priest mercenary · heals the party",
+              "cost": 250,
+              "merc": "priest",
+              "open": true
+            },
+            {
+              "id": "merc_hunter",
+              "label": "Hire a Hunter mercenary · shoots from range",
+              "cost": 250,
+              "merc": "hunter",
+              "open": true
+            },
+            {
+              "id": "merc_dismiss",
+              "label": "Send my mercenaries away",
+              "cost": 0,
+              "merc": "dismiss"
+            }
+          ]
+        },
+        {
+          "id": "dungeon_stone_30",
+          "name": "The Meeting Stone",
+          "role": "Party summons",
+          "dialogue": "Use this stone to invite your party members to join you here.",
+          "x": 51,
+          "y": 83,
+          "color": "#8e87ad",
+          "art": "stone",
+          "offers": [
+            {
+              "id": "summon_party",
+              "label": "Summon party members",
               "cost": 0
             }
           ]
@@ -1502402,6 +1502082,14 @@
           "y": 79,
           "r": 0,
           "v": 0
+        },
+        {
+          "kind": "meetingstone",
+          "x": 51,
+          "y": 83,
+          "r": 0.55,
+          "v": 0,
+          "label": "Dungeon Meeting Stone"
         }
       ],
       "slimes": [
@@ -1502473,7 +1502161,7 @@
           "role": "Dungeon repairs",
           "x": 48,
           "y": 86,
-          "dialogue": "I can repair your gear here. Dungeon repairs cost four times the town price.",
+          "dialogue": "I can hire fighters for this run and repair your gear. Dungeon repairs cost four times the town price.",
           "color": "#b96e45",
           "look": {
             "skin": "#dca480",
@@ -1502484,6 +1502172,64 @@
             {
               "id": "repair",
               "label": "Repair worn gear",
+              "cost": 0
+            },
+            {
+              "id": "merc_warrior",
+              "label": "Hire a Warrior mercenary · holds the line",
+              "cost": 250,
+              "merc": "warrior",
+              "open": true
+            },
+            {
+              "id": "merc_mage",
+              "label": "Hire a Mage mercenary · casts from range",
+              "cost": 250,
+              "merc": "mage",
+              "open": true
+            },
+            {
+              "id": "merc_assassin",
+              "label": "Hire a Assassin mercenary · strikes fast",
+              "cost": 250,
+              "merc": "assassin",
+              "open": true
+            },
+            {
+              "id": "merc_priest",
+              "label": "Hire a Priest mercenary · heals the party",
+              "cost": 250,
+              "merc": "priest",
+              "open": true
+            },
+            {
+              "id": "merc_hunter",
+              "label": "Hire a Hunter mercenary · shoots from range",
+              "cost": 250,
+              "merc": "hunter",
+              "open": true
+            },
+            {
+              "id": "merc_dismiss",
+              "label": "Send my mercenaries away",
+              "cost": 0,
+              "merc": "dismiss"
+            }
+          ]
+        },
+        {
+          "id": "dungeon_stone_31",
+          "name": "The Meeting Stone",
+          "role": "Party summons",
+          "dialogue": "Use this stone to invite your party members to join you here.",
+          "x": 51,
+          "y": 83,
+          "color": "#8e87ad",
+          "art": "stone",
+          "offers": [
+            {
+              "id": "summon_party",
+              "label": "Summon party members",
               "cost": 0
             }
           ]
@@ -1505150,6 +1504896,14 @@
           "y": 79,
           "r": 0,
           "v": 0
+        },
+        {
+          "kind": "meetingstone",
+          "x": 51,
+          "y": 83,
+          "r": 0.55,
+          "v": 0,
+          "label": "Dungeon Meeting Stone"
         }
       ],
       "slimes": [
@@ -1505221,7 +1504975,7 @@
           "role": "Dungeon repairs",
           "x": 48,
           "y": 86,
-          "dialogue": "I can repair your gear here. Dungeon repairs cost four times the town price.",
+          "dialogue": "I can hire fighters for this run and repair your gear. Dungeon repairs cost four times the town price.",
           "color": "#b96e45",
           "look": {
             "skin": "#dca480",
@@ -1505232,6 +1504986,64 @@
             {
               "id": "repair",
               "label": "Repair worn gear",
+              "cost": 0
+            },
+            {
+              "id": "merc_warrior",
+              "label": "Hire a Warrior mercenary · holds the line",
+              "cost": 250,
+              "merc": "warrior",
+              "open": true
+            },
+            {
+              "id": "merc_mage",
+              "label": "Hire a Mage mercenary · casts from range",
+              "cost": 250,
+              "merc": "mage",
+              "open": true
+            },
+            {
+              "id": "merc_assassin",
+              "label": "Hire a Assassin mercenary · strikes fast",
+              "cost": 250,
+              "merc": "assassin",
+              "open": true
+            },
+            {
+              "id": "merc_priest",
+              "label": "Hire a Priest mercenary · heals the party",
+              "cost": 250,
+              "merc": "priest",
+              "open": true
+            },
+            {
+              "id": "merc_hunter",
+              "label": "Hire a Hunter mercenary · shoots from range",
+              "cost": 250,
+              "merc": "hunter",
+              "open": true
+            },
+            {
+              "id": "merc_dismiss",
+              "label": "Send my mercenaries away",
+              "cost": 0,
+              "merc": "dismiss"
+            }
+          ]
+        },
+        {
+          "id": "dungeon_stone_32",
+          "name": "The Meeting Stone",
+          "role": "Party summons",
+          "dialogue": "Use this stone to invite your party members to join you here.",
+          "x": 51,
+          "y": 83,
+          "color": "#8e87ad",
+          "art": "stone",
+          "offers": [
+            {
+              "id": "summon_party",
+              "label": "Summon party members",
               "cost": 0
             }
           ]
@@ -1507961,6 +1507773,14 @@
           "y": 78,
           "r": 0,
           "v": 0
+        },
+        {
+          "kind": "meetingstone",
+          "x": 51,
+          "y": 82,
+          "r": 0.55,
+          "v": 0,
+          "label": "Dungeon Meeting Stone"
         }
       ],
       "slimes": [
@@ -1508140,7 +1507960,7 @@
           "role": "Dungeon repairs",
           "x": 48,
           "y": 85,
-          "dialogue": "I can repair your gear here. Dungeon repairs cost four times the town price.",
+          "dialogue": "I can hire fighters for this run and repair your gear. Dungeon repairs cost four times the town price.",
           "color": "#b96e45",
           "look": {
             "skin": "#dca480",
@@ -1508151,6 +1507971,64 @@
             {
               "id": "repair",
               "label": "Repair worn gear",
+              "cost": 0
+            },
+            {
+              "id": "merc_warrior",
+              "label": "Hire a Warrior mercenary · holds the line",
+              "cost": 250,
+              "merc": "warrior",
+              "open": true
+            },
+            {
+              "id": "merc_mage",
+              "label": "Hire a Mage mercenary · casts from range",
+              "cost": 250,
+              "merc": "mage",
+              "open": true
+            },
+            {
+              "id": "merc_assassin",
+              "label": "Hire a Assassin mercenary · strikes fast",
+              "cost": 250,
+              "merc": "assassin",
+              "open": true
+            },
+            {
+              "id": "merc_priest",
+              "label": "Hire a Priest mercenary · heals the party",
+              "cost": 250,
+              "merc": "priest",
+              "open": true
+            },
+            {
+              "id": "merc_hunter",
+              "label": "Hire a Hunter mercenary · shoots from range",
+              "cost": 250,
+              "merc": "hunter",
+              "open": true
+            },
+            {
+              "id": "merc_dismiss",
+              "label": "Send my mercenaries away",
+              "cost": 0,
+              "merc": "dismiss"
+            }
+          ]
+        },
+        {
+          "id": "dungeon_stone_33",
+          "name": "The Meeting Stone",
+          "role": "Party summons",
+          "dialogue": "Use this stone to invite your party members to join you here.",
+          "x": 51,
+          "y": 82,
+          "color": "#8e87ad",
+          "art": "stone",
+          "offers": [
+            {
+              "id": "summon_party",
+              "label": "Summon party members",
               "cost": 0
             }
           ]
@@ -1511299,6 +1511177,14 @@
           "y": 78,
           "r": 0,
           "v": 0
+        },
+        {
+          "kind": "meetingstone",
+          "x": 51,
+          "y": 82,
+          "r": 0.55,
+          "v": 0,
+          "label": "Dungeon Meeting Stone"
         }
       ],
       "slimes": [
@@ -1511370,7 +1511256,7 @@
           "role": "Dungeon repairs",
           "x": 48,
           "y": 85,
-          "dialogue": "I can repair your gear here. Dungeon repairs cost four times the town price.",
+          "dialogue": "I can hire fighters for this run and repair your gear. Dungeon repairs cost four times the town price.",
           "color": "#b96e45",
           "look": {
             "skin": "#dca480",
@@ -1511381,6 +1511267,64 @@
             {
               "id": "repair",
               "label": "Repair worn gear",
+              "cost": 0
+            },
+            {
+              "id": "merc_warrior",
+              "label": "Hire a Warrior mercenary · holds the line",
+              "cost": 250,
+              "merc": "warrior",
+              "open": true
+            },
+            {
+              "id": "merc_mage",
+              "label": "Hire a Mage mercenary · casts from range",
+              "cost": 250,
+              "merc": "mage",
+              "open": true
+            },
+            {
+              "id": "merc_assassin",
+              "label": "Hire a Assassin mercenary · strikes fast",
+              "cost": 250,
+              "merc": "assassin",
+              "open": true
+            },
+            {
+              "id": "merc_priest",
+              "label": "Hire a Priest mercenary · heals the party",
+              "cost": 250,
+              "merc": "priest",
+              "open": true
+            },
+            {
+              "id": "merc_hunter",
+              "label": "Hire a Hunter mercenary · shoots from range",
+              "cost": 250,
+              "merc": "hunter",
+              "open": true
+            },
+            {
+              "id": "merc_dismiss",
+              "label": "Send my mercenaries away",
+              "cost": 0,
+              "merc": "dismiss"
+            }
+          ]
+        },
+        {
+          "id": "dungeon_stone_34",
+          "name": "The Meeting Stone",
+          "role": "Party summons",
+          "dialogue": "Use this stone to invite your party members to join you here.",
+          "x": 51,
+          "y": 82,
+          "color": "#8e87ad",
+          "art": "stone",
+          "offers": [
+            {
+              "id": "summon_party",
+              "label": "Summon party members",
               "cost": 0
             }
           ]
@@ -1514308,6 +1514252,14 @@
           "y": 78,
           "r": 0,
           "v": 0
+        },
+        {
+          "kind": "meetingstone",
+          "x": 51,
+          "y": 82,
+          "r": 0.55,
+          "v": 0,
+          "label": "Dungeon Meeting Stone"
         }
       ],
       "slimes": [
@@ -1514379,7 +1514331,7 @@
           "role": "Dungeon repairs",
           "x": 48,
           "y": 85,
-          "dialogue": "I can repair your gear here. Dungeon repairs cost four times the town price.",
+          "dialogue": "I can hire fighters for this run and repair your gear. Dungeon repairs cost four times the town price.",
           "color": "#b96e45",
           "look": {
             "skin": "#dca480",
@@ -1514390,6 +1514342,64 @@
             {
               "id": "repair",
               "label": "Repair worn gear",
+              "cost": 0
+            },
+            {
+              "id": "merc_warrior",
+              "label": "Hire a Warrior mercenary · holds the line",
+              "cost": 250,
+              "merc": "warrior",
+              "open": true
+            },
+            {
+              "id": "merc_mage",
+              "label": "Hire a Mage mercenary · casts from range",
+              "cost": 250,
+              "merc": "mage",
+              "open": true
+            },
+            {
+              "id": "merc_assassin",
+              "label": "Hire a Assassin mercenary · strikes fast",
+              "cost": 250,
+              "merc": "assassin",
+              "open": true
+            },
+            {
+              "id": "merc_priest",
+              "label": "Hire a Priest mercenary · heals the party",
+              "cost": 250,
+              "merc": "priest",
+              "open": true
+            },
+            {
+              "id": "merc_hunter",
+              "label": "Hire a Hunter mercenary · shoots from range",
+              "cost": 250,
+              "merc": "hunter",
+              "open": true
+            },
+            {
+              "id": "merc_dismiss",
+              "label": "Send my mercenaries away",
+              "cost": 0,
+              "merc": "dismiss"
+            }
+          ]
+        },
+        {
+          "id": "dungeon_stone_35",
+          "name": "The Meeting Stone",
+          "role": "Party summons",
+          "dialogue": "Use this stone to invite your party members to join you here.",
+          "x": 51,
+          "y": 82,
+          "color": "#8e87ad",
+          "art": "stone",
+          "offers": [
+            {
+              "id": "summon_party",
+              "label": "Summon party members",
               "cost": 0
             }
           ]
@@ -1517761,6 +1517771,14 @@
           "y": 78,
           "r": 0,
           "v": 0
+        },
+        {
+          "kind": "meetingstone",
+          "x": 51,
+          "y": 82,
+          "r": 0.55,
+          "v": 0,
+          "label": "Dungeon Meeting Stone"
         }
       ],
       "slimes": [
@@ -1517832,7 +1517850,7 @@
           "role": "Dungeon repairs",
           "x": 48,
           "y": 85,
-          "dialogue": "I can repair your gear here. Dungeon repairs cost four times the town price.",
+          "dialogue": "I can hire fighters for this run and repair your gear. Dungeon repairs cost four times the town price.",
           "color": "#b96e45",
           "look": {
             "skin": "#dca480",
@@ -1517843,6 +1517861,64 @@
             {
               "id": "repair",
               "label": "Repair worn gear",
+              "cost": 0
+            },
+            {
+              "id": "merc_warrior",
+              "label": "Hire a Warrior mercenary · holds the line",
+              "cost": 250,
+              "merc": "warrior",
+              "open": true
+            },
+            {
+              "id": "merc_mage",
+              "label": "Hire a Mage mercenary · casts from range",
+              "cost": 250,
+              "merc": "mage",
+              "open": true
+            },
+            {
+              "id": "merc_assassin",
+              "label": "Hire a Assassin mercenary · strikes fast",
+              "cost": 250,
+              "merc": "assassin",
+              "open": true
+            },
+            {
+              "id": "merc_priest",
+              "label": "Hire a Priest mercenary · heals the party",
+              "cost": 250,
+              "merc": "priest",
+              "open": true
+            },
+            {
+              "id": "merc_hunter",
+              "label": "Hire a Hunter mercenary · shoots from range",
+              "cost": 250,
+              "merc": "hunter",
+              "open": true
+            },
+            {
+              "id": "merc_dismiss",
+              "label": "Send my mercenaries away",
+              "cost": 0,
+              "merc": "dismiss"
+            }
+          ]
+        },
+        {
+          "id": "dungeon_stone_36",
+          "name": "The Meeting Stone",
+          "role": "Party summons",
+          "dialogue": "Use this stone to invite your party members to join you here.",
+          "x": 51,
+          "y": 82,
+          "color": "#8e87ad",
+          "art": "stone",
+          "offers": [
+            {
+              "id": "summon_party",
+              "label": "Summon party members",
               "cost": 0
             }
           ]
@@ -1520950,6 +1521026,14 @@
           "y": 78,
           "r": 0,
           "v": 0
+        },
+        {
+          "kind": "meetingstone",
+          "x": 51,
+          "y": 82,
+          "r": 0.55,
+          "v": 0,
+          "label": "Dungeon Meeting Stone"
         }
       ],
       "slimes": [
@@ -1521027,7 +1521111,7 @@
           "role": "Dungeon repairs",
           "x": 48,
           "y": 85,
-          "dialogue": "I can repair your gear here. Dungeon repairs cost four times the town price.",
+          "dialogue": "I can hire fighters for this run and repair your gear. Dungeon repairs cost four times the town price.",
           "color": "#b96e45",
           "look": {
             "skin": "#dca480",
@@ -1521038,6 +1521122,64 @@
             {
               "id": "repair",
               "label": "Repair worn gear",
+              "cost": 0
+            },
+            {
+              "id": "merc_warrior",
+              "label": "Hire a Warrior mercenary · holds the line",
+              "cost": 250,
+              "merc": "warrior",
+              "open": true
+            },
+            {
+              "id": "merc_mage",
+              "label": "Hire a Mage mercenary · casts from range",
+              "cost": 250,
+              "merc": "mage",
+              "open": true
+            },
+            {
+              "id": "merc_assassin",
+              "label": "Hire a Assassin mercenary · strikes fast",
+              "cost": 250,
+              "merc": "assassin",
+              "open": true
+            },
+            {
+              "id": "merc_priest",
+              "label": "Hire a Priest mercenary · heals the party",
+              "cost": 250,
+              "merc": "priest",
+              "open": true
+            },
+            {
+              "id": "merc_hunter",
+              "label": "Hire a Hunter mercenary · shoots from range",
+              "cost": 250,
+              "merc": "hunter",
+              "open": true
+            },
+            {
+              "id": "merc_dismiss",
+              "label": "Send my mercenaries away",
+              "cost": 0,
+              "merc": "dismiss"
+            }
+          ]
+        },
+        {
+          "id": "dungeon_stone_37",
+          "name": "The Meeting Stone",
+          "role": "Party summons",
+          "dialogue": "Use this stone to invite your party members to join you here.",
+          "x": 51,
+          "y": 82,
+          "color": "#8e87ad",
+          "art": "stone",
+          "offers": [
+            {
+              "id": "summon_party",
+              "label": "Summon party members",
               "cost": 0
             }
           ]
@@ -1524496,6 +1524638,14 @@
           "y": 78,
           "r": 0,
           "v": 0
+        },
+        {
+          "kind": "meetingstone",
+          "x": 51,
+          "y": 82,
+          "r": 0.55,
+          "v": 0,
+          "label": "Dungeon Meeting Stone"
         }
       ],
       "slimes": [
@@ -1524603,7 +1524753,7 @@
           "role": "Dungeon repairs",
           "x": 48,
           "y": 85,
-          "dialogue": "I can repair your gear here. Dungeon repairs cost four times the town price.",
+          "dialogue": "I can hire fighters for this run and repair your gear. Dungeon repairs cost four times the town price.",
           "color": "#b96e45",
           "look": {
             "skin": "#dca480",
@@ -1524614,6 +1524764,64 @@
             {
               "id": "repair",
               "label": "Repair worn gear",
+              "cost": 0
+            },
+            {
+              "id": "merc_warrior",
+              "label": "Hire a Warrior mercenary · holds the line",
+              "cost": 250,
+              "merc": "warrior",
+              "open": true
+            },
+            {
+              "id": "merc_mage",
+              "label": "Hire a Mage mercenary · casts from range",
+              "cost": 250,
+              "merc": "mage",
+              "open": true
+            },
+            {
+              "id": "merc_assassin",
+              "label": "Hire a Assassin mercenary · strikes fast",
+              "cost": 250,
+              "merc": "assassin",
+              "open": true
+            },
+            {
+              "id": "merc_priest",
+              "label": "Hire a Priest mercenary · heals the party",
+              "cost": 250,
+              "merc": "priest",
+              "open": true
+            },
+            {
+              "id": "merc_hunter",
+              "label": "Hire a Hunter mercenary · shoots from range",
+              "cost": 250,
+              "merc": "hunter",
+              "open": true
+            },
+            {
+              "id": "merc_dismiss",
+              "label": "Send my mercenaries away",
+              "cost": 0,
+              "merc": "dismiss"
+            }
+          ]
+        },
+        {
+          "id": "dungeon_stone_38",
+          "name": "The Meeting Stone",
+          "role": "Party summons",
+          "dialogue": "Use this stone to invite your party members to join you here.",
+          "x": 51,
+          "y": 82,
+          "color": "#8e87ad",
+          "art": "stone",
+          "offers": [
+            {
+              "id": "summon_party",
+              "label": "Summon party members",
               "cost": 0
             }
           ]
@@ -1527934,6 +1528142,14 @@
           "y": 78,
           "r": 0,
           "v": 0
+        },
+        {
+          "kind": "meetingstone",
+          "x": 51,
+          "y": 82,
+          "r": 0.55,
+          "v": 0,
+          "label": "Dungeon Meeting Stone"
         }
       ],
       "slimes": [
@@ -1528005,7 +1528221,7 @@
           "role": "Dungeon repairs",
           "x": 48,
           "y": 85,
-          "dialogue": "I can repair your gear here. Dungeon repairs cost four times the town price.",
+          "dialogue": "I can hire fighters for this run and repair your gear. Dungeon repairs cost four times the town price.",
           "color": "#b96e45",
           "look": {
             "skin": "#dca480",
@@ -1528016,6 +1528232,64 @@
             {
               "id": "repair",
               "label": "Repair worn gear",
+              "cost": 0
+            },
+            {
+              "id": "merc_warrior",
+              "label": "Hire a Warrior mercenary · holds the line",
+              "cost": 250,
+              "merc": "warrior",
+              "open": true
+            },
+            {
+              "id": "merc_mage",
+              "label": "Hire a Mage mercenary · casts from range",
+              "cost": 250,
+              "merc": "mage",
+              "open": true
+            },
+            {
+              "id": "merc_assassin",
+              "label": "Hire a Assassin mercenary · strikes fast",
+              "cost": 250,
+              "merc": "assassin",
+              "open": true
+            },
+            {
+              "id": "merc_priest",
+              "label": "Hire a Priest mercenary · heals the party",
+              "cost": 250,
+              "merc": "priest",
+              "open": true
+            },
+            {
+              "id": "merc_hunter",
+              "label": "Hire a Hunter mercenary · shoots from range",
+              "cost": 250,
+              "merc": "hunter",
+              "open": true
+            },
+            {
+              "id": "merc_dismiss",
+              "label": "Send my mercenaries away",
+              "cost": 0,
+              "merc": "dismiss"
+            }
+          ]
+        },
+        {
+          "id": "dungeon_stone_39",
+          "name": "The Meeting Stone",
+          "role": "Party summons",
+          "dialogue": "Use this stone to invite your party members to join you here.",
+          "x": 51,
+          "y": 82,
+          "color": "#8e87ad",
+          "art": "stone",
+          "offers": [
+            {
+              "id": "summon_party",
+              "label": "Summon party members",
               "cost": 0
             }
           ]
@@ -1531468,6 +1531742,14 @@
           "y": 44,
           "r": 0,
           "v": 0
+        },
+        {
+          "kind": "meetingstone",
+          "x": 53,
+          "y": 99,
+          "r": 0.55,
+          "v": 0,
+          "label": "Dungeon Meeting Stone"
         }
       ],
       "slimes": [
@@ -1531571,7 +1531853,7 @@
           "role": "Dungeon repairs",
           "x": 56,
           "y": 102,
-          "dialogue": "I can repair your gear here. Dungeon repairs cost four times the town price.",
+          "dialogue": "I can hire fighters for this run and repair your gear. Dungeon repairs cost four times the town price.",
           "color": "#b96e45",
           "look": {
             "skin": "#dca480",
@@ -1531582,6 +1531864,64 @@
             {
               "id": "repair",
               "label": "Repair worn gear",
+              "cost": 0
+            },
+            {
+              "id": "merc_warrior",
+              "label": "Hire a Warrior mercenary · holds the line",
+              "cost": 250,
+              "merc": "warrior",
+              "open": true
+            },
+            {
+              "id": "merc_mage",
+              "label": "Hire a Mage mercenary · casts from range",
+              "cost": 250,
+              "merc": "mage",
+              "open": true
+            },
+            {
+              "id": "merc_assassin",
+              "label": "Hire a Assassin mercenary · strikes fast",
+              "cost": 250,
+              "merc": "assassin",
+              "open": true
+            },
+            {
+              "id": "merc_priest",
+              "label": "Hire a Priest mercenary · heals the party",
+              "cost": 250,
+              "merc": "priest",
+              "open": true
+            },
+            {
+              "id": "merc_hunter",
+              "label": "Hire a Hunter mercenary · shoots from range",
+              "cost": 250,
+              "merc": "hunter",
+              "open": true
+            },
+            {
+              "id": "merc_dismiss",
+              "label": "Send my mercenaries away",
+              "cost": 0,
+              "merc": "dismiss"
+            }
+          ]
+        },
+        {
+          "id": "dungeon_stone_41",
+          "name": "The Meeting Stone",
+          "role": "Party summons",
+          "dialogue": "Use this stone to invite your party members to join you here.",
+          "x": 53,
+          "y": 99,
+          "color": "#8e87ad",
+          "art": "stone",
+          "offers": [
+            {
+              "id": "summon_party",
+              "label": "Summon party members",
               "cost": 0
             }
           ]
@@ -1531734,8 +1532074,8 @@
           "y": 99,
           "r": 1.2,
           "to": 6,
-          "tx": 154,
-          "ty": 188.5,
+          "tx": 144.5,
+          "ty": 175,
           "look": "nornroot"
         },
         {
@@ -1531745,8 +1532085,8 @@
           "y": 10,
           "r": 1.2,
           "to": 6,
-          "tx": 154,
-          "ty": 188.5,
+          "tx": 144.5,
+          "ty": 175,
           "look": "nornroot",
           "after_clear": true
         }
@@ -1535387,6 +1535727,14 @@
           "y": 9,
           "r": 0,
           "v": 0
+        },
+        {
+          "kind": "meetingstone",
+          "x": 53,
+          "y": 99,
+          "r": 0.55,
+          "v": 0,
+          "label": "Dungeon Meeting Stone"
         }
       ],
       "slimes": [
@@ -1535490,7 +1535838,7 @@
           "role": "Dungeon repairs",
           "x": 56,
           "y": 102,
-          "dialogue": "I can repair your gear here. Dungeon repairs cost four times the town price.",
+          "dialogue": "I can hire fighters for this run and repair your gear. Dungeon repairs cost four times the town price.",
           "color": "#b96e45",
           "look": {
             "skin": "#dca480",
@@ -1535501,6 +1535849,64 @@
             {
               "id": "repair",
               "label": "Repair worn gear",
+              "cost": 0
+            },
+            {
+              "id": "merc_warrior",
+              "label": "Hire a Warrior mercenary · holds the line",
+              "cost": 250,
+              "merc": "warrior",
+              "open": true
+            },
+            {
+              "id": "merc_mage",
+              "label": "Hire a Mage mercenary · casts from range",
+              "cost": 250,
+              "merc": "mage",
+              "open": true
+            },
+            {
+              "id": "merc_assassin",
+              "label": "Hire a Assassin mercenary · strikes fast",
+              "cost": 250,
+              "merc": "assassin",
+              "open": true
+            },
+            {
+              "id": "merc_priest",
+              "label": "Hire a Priest mercenary · heals the party",
+              "cost": 250,
+              "merc": "priest",
+              "open": true
+            },
+            {
+              "id": "merc_hunter",
+              "label": "Hire a Hunter mercenary · shoots from range",
+              "cost": 250,
+              "merc": "hunter",
+              "open": true
+            },
+            {
+              "id": "merc_dismiss",
+              "label": "Send my mercenaries away",
+              "cost": 0,
+              "merc": "dismiss"
+            }
+          ]
+        },
+        {
+          "id": "dungeon_stone_42",
+          "name": "The Meeting Stone",
+          "role": "Party summons",
+          "dialogue": "Use this stone to invite your party members to join you here.",
+          "x": 53,
+          "y": 99,
+          "color": "#8e87ad",
+          "art": "stone",
+          "offers": [
+            {
+              "id": "summon_party",
+              "label": "Summon party members",
               "cost": 0
             }
           ]
@@ -1541109,6 +1541515,14 @@
           "y": 22,
           "r": 0,
           "v": 0
+        },
+        {
+          "kind": "meetingstone",
+          "x": 61,
+          "y": 110,
+          "r": 0.55,
+          "v": 0,
+          "label": "Dungeon Meeting Stone"
         }
       ],
       "slimes": [
@@ -1541212,7 +1541626,7 @@
           "role": "Dungeon repairs",
           "x": 64,
           "y": 113,
-          "dialogue": "I can repair your gear here. Dungeon repairs cost four times the town price.",
+          "dialogue": "I can hire fighters for this run and repair your gear. Dungeon repairs cost four times the town price.",
           "color": "#b96e45",
           "look": {
             "skin": "#dca480",
@@ -1541223,6 +1541637,64 @@
             {
               "id": "repair",
               "label": "Repair worn gear",
+              "cost": 0
+            },
+            {
+              "id": "merc_warrior",
+              "label": "Hire a Warrior mercenary · holds the line",
+              "cost": 250,
+              "merc": "warrior",
+              "open": true
+            },
+            {
+              "id": "merc_mage",
+              "label": "Hire a Mage mercenary · casts from range",
+              "cost": 250,
+              "merc": "mage",
+              "open": true
+            },
+            {
+              "id": "merc_assassin",
+              "label": "Hire a Assassin mercenary · strikes fast",
+              "cost": 250,
+              "merc": "assassin",
+              "open": true
+            },
+            {
+              "id": "merc_priest",
+              "label": "Hire a Priest mercenary · heals the party",
+              "cost": 250,
+              "merc": "priest",
+              "open": true
+            },
+            {
+              "id": "merc_hunter",
+              "label": "Hire a Hunter mercenary · shoots from range",
+              "cost": 250,
+              "merc": "hunter",
+              "open": true
+            },
+            {
+              "id": "merc_dismiss",
+              "label": "Send my mercenaries away",
+              "cost": 0,
+              "merc": "dismiss"
+            }
+          ]
+        },
+        {
+          "id": "dungeon_stone_43",
+          "name": "The Meeting Stone",
+          "role": "Party summons",
+          "dialogue": "Use this stone to invite your party members to join you here.",
+          "x": 61,
+          "y": 110,
+          "color": "#8e87ad",
+          "art": "stone",
+          "offers": [
+            {
+              "id": "summon_party",
+              "label": "Summon party members",
               "cost": 0
             }
           ]
@@ -1551108,6 +1551580,14 @@
           "y": 58,
           "r": 0,
           "v": 0
+        },
+        {
+          "kind": "meetingstone",
+          "x": 77,
+          "y": 143,
+          "r": 0.55,
+          "v": 0,
+          "label": "Dungeon Meeting Stone"
         }
       ],
       "slimes": [
@@ -1551487,7 +1551967,7 @@
           "role": "Dungeon repairs",
           "x": 80,
           "y": 146,
-          "dialogue": "I can repair your gear here. Dungeon repairs cost four times the town price.",
+          "dialogue": "I can hire fighters for this run and repair your gear. Dungeon repairs cost four times the town price.",
           "color": "#b96e45",
           "look": {
             "skin": "#dca480",
@@ -1551498,6 +1551978,64 @@
             {
               "id": "repair",
               "label": "Repair worn gear",
+              "cost": 0
+            },
+            {
+              "id": "merc_warrior",
+              "label": "Hire a Warrior mercenary · holds the line",
+              "cost": 250,
+              "merc": "warrior",
+              "open": true
+            },
+            {
+              "id": "merc_mage",
+              "label": "Hire a Mage mercenary · casts from range",
+              "cost": 250,
+              "merc": "mage",
+              "open": true
+            },
+            {
+              "id": "merc_assassin",
+              "label": "Hire a Assassin mercenary · strikes fast",
+              "cost": 250,
+              "merc": "assassin",
+              "open": true
+            },
+            {
+              "id": "merc_priest",
+              "label": "Hire a Priest mercenary · heals the party",
+              "cost": 250,
+              "merc": "priest",
+              "open": true
+            },
+            {
+              "id": "merc_hunter",
+              "label": "Hire a Hunter mercenary · shoots from range",
+              "cost": 250,
+              "merc": "hunter",
+              "open": true
+            },
+            {
+              "id": "merc_dismiss",
+              "label": "Send my mercenaries away",
+              "cost": 0,
+              "merc": "dismiss"
+            }
+          ]
+        },
+        {
+          "id": "dungeon_stone_44",
+          "name": "The Meeting Stone",
+          "role": "Party summons",
+          "dialogue": "Use this stone to invite your party members to join you here.",
+          "x": 77,
+          "y": 143,
+          "color": "#8e87ad",
+          "art": "stone",
+          "offers": [
+            {
+              "id": "summon_party",
+              "label": "Summon party members",
               "cost": 0
             }
           ]
@@ -1608646,49 +1609184,7 @@
           "y": 84,
           "color": "#697184",
           "dialogue": "Chainmaw carries a broken link from the first chain. Bring companions and end its watch among the Broken Links.",
-          "offers": [
-            {
-              "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary · holds the line",
-              "cost": 250,
-              "merc": "warrior",
-              "open": true
-            },
-            {
-              "id": "merc_mage",
-              "label": "Hire a Mage mercenary · casts from range",
-              "cost": 250,
-              "merc": "mage",
-              "open": true
-            },
-            {
-              "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary · strikes fast",
-              "cost": 250,
-              "merc": "assassin",
-              "open": true
-            },
-            {
-              "id": "merc_priest",
-              "label": "Hire a Priest mercenary · heals the party",
-              "cost": 250,
-              "merc": "priest",
-              "open": true
-            },
-            {
-              "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary · shoots from range",
-              "cost": 250,
-              "merc": "hunter",
-              "open": true
-            },
-            {
-              "id": "merc_dismiss",
-              "label": "Send my mercenaries away",
-              "cost": 0,
-              "merc": "dismiss"
-            }
-          ],
+          "offers": [],
           "look": {
             "skin": "#c69a7b",
             "hair": "#533c39",
@@ -1608707,47 +1609203,6 @@
           "color": "#697184",
           "dialogue": "Yrsa feeds air into the mountain from the floor of the caldera. Silence the living bellows before the last chain cracks.",
           "offers": [
-            {
-              "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary · holds the line",
-              "cost": 250,
-              "merc": "warrior",
-              "open": true
-            },
-            {
-              "id": "merc_mage",
-              "label": "Hire a Mage mercenary · casts from range",
-              "cost": 250,
-              "merc": "mage",
-              "open": true
-            },
-            {
-              "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary · strikes fast",
-              "cost": 250,
-              "merc": "assassin",
-              "open": true
-            },
-            {
-              "id": "merc_priest",
-              "label": "Hire a Priest mercenary · heals the party",
-              "cost": 250,
-              "merc": "priest",
-              "open": true
-            },
-            {
-              "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary · shoots from range",
-              "cost": 250,
-              "merc": "hunter",
-              "open": true
-            },
-            {
-              "id": "merc_dismiss",
-              "label": "Send my mercenaries away",
-              "cost": 0,
-              "merc": "dismiss"
-            },
             {
               "id": "blacksmithing_workshop",
               "label": "Blacksmithing workshop",
@@ -1608800,48 +1609255,12 @@
           "x": 316,
           "y": 85,
           "color": "#697184",
-          "dialogue": "Gather here before the Nine-Chain Door. Outdoor companies still hold five fighters. Raid contracts are signed with Quartermaster Halla in the muster chamber beyond the door.",
+          "dialogue": "Use this stone to invite your party members to join you here.",
           "offers": [
             {
-              "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary · holds the line",
-              "cost": 250,
-              "merc": "warrior",
-              "open": true
-            },
-            {
-              "id": "merc_mage",
-              "label": "Hire a Mage mercenary · casts from range",
-              "cost": 250,
-              "merc": "mage",
-              "open": true
-            },
-            {
-              "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary · strikes fast",
-              "cost": 250,
-              "merc": "assassin",
-              "open": true
-            },
-            {
-              "id": "merc_priest",
-              "label": "Hire a Priest mercenary · heals the party",
-              "cost": 250,
-              "merc": "priest",
-              "open": true
-            },
-            {
-              "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary · shoots from range",
-              "cost": 250,
-              "merc": "hunter",
-              "open": true
-            },
-            {
-              "id": "merc_dismiss",
-              "label": "Send my mercenaries away",
-              "cost": 0,
-              "merc": "dismiss"
+              "id": "summon_party",
+              "label": "Summon party members",
+              "cost": 0
             }
           ],
           "look": {},
@@ -1645288,6 +1645707,14 @@
           "y": 47.0,
           "r": 0,
           "v": 9
+        },
+        {
+          "kind": "meetingstone",
+          "x": 27,
+          "y": 303,
+          "r": 0.55,
+          "v": 0,
+          "label": "Dungeon Meeting Stone"
         }
       ],
       "slimes": [
@@ -1645586,7 +1646013,35 @@
           "x": 36,
           "y": 303,
           "color": "#75d7d5",
+          "offers": [],
+          "look": {
+            "skin": "#c99b7a",
+            "hair": "#58414c",
+            "style": "braid",
+            "hat": "hood",
+            "hatColor": "#433344"
+          },
+          "dialogue": "Hire your missing fighters from the Repair Smith. Ten fighters must pass the inner gate together. If you fall, your fighters wake with you at the last rally mark."
+        },
+        {
+          "id": "dungeon_repair_46",
+          "name": "Repair Smith",
+          "role": "Dungeon repairs",
+          "x": 30,
+          "y": 306,
+          "dialogue": "I can hire fighters for this run and repair your gear. Dungeon repairs cost four times the town price.",
+          "color": "#b96e45",
+          "look": {
+            "skin": "#dca480",
+            "hair": "#694737",
+            "style": "bald"
+          },
           "offers": [
+            {
+              "id": "repair",
+              "label": "Repair worn gear",
+              "cost": 0
+            },
             {
               "id": "merc_warrior",
               "label": "Hire a Warrior mercenary · holds the line",
@@ -1645628,33 +1646083,21 @@
               "cost": 0,
               "merc": "dismiss"
             }
-          ],
-          "look": {
-            "skin": "#c99b7a",
-            "hair": "#58414c",
-            "style": "braid",
-            "hat": "hood",
-            "hatColor": "#433344"
-          },
-          "dialogue": "Hire your missing fighters here. Ten fighters must pass the inner gate together. Each contract costs the normal hire price. If you fall, your fighters wake with you at the last rally mark. Leaving the raid ends their contracts."
+          ]
         },
         {
-          "id": "dungeon_repair_46",
-          "name": "Repair Smith",
-          "role": "Dungeon repairs",
-          "x": 30,
-          "y": 306,
-          "dialogue": "I can repair your gear here. Dungeon repairs cost four times the town price.",
-          "color": "#b96e45",
-          "look": {
-            "skin": "#dca480",
-            "hair": "#694737",
-            "style": "bald"
-          },
+          "id": "dungeon_stone_46",
+          "name": "The Meeting Stone",
+          "role": "Party summons",
+          "dialogue": "Use this stone to invite your party members to join you here.",
+          "x": 27,
+          "y": 303,
+          "color": "#8e87ad",
+          "art": "stone",
           "offers": [
             {
-              "id": "repair",
-              "label": "Repair worn gear",
+              "id": "summon_party",
+              "label": "Summon party members",
               "cost": 0
             }
           ]

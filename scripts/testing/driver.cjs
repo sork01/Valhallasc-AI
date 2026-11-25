@@ -21,6 +21,8 @@ const socialSchema = z.discriminatedUnion('op', [
   z.object({ op: z.literal('friend_remove'), ...target }).strict(),
   z.object({ op: z.literal('party_invite'), ...target, name: z.string().max(40).optional() }).strict(),
   z.object({ op: z.literal('party_accept'), ...target }).strict(),
+  z.object({ op: z.literal('summon_accept'), id: z.string().max(64) }).strict(),
+  z.object({ op: z.literal('summon_decline'), id: z.string().max(64) }).strict(),
   z.object({ op: z.literal('party_decline'), ...target }).strict(),
   z.object({ op: z.literal('party_leave') }).strict(),
   z.object({ op: z.literal('party_kick'), ...target }).strict(),

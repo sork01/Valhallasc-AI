@@ -22,9 +22,9 @@ const call=async(name,args={})=>{const r=await client.callTool({name,arguments:a
  const interact=async offer=>{
   // Real NPC services reject another transaction within half a second.
   await page.waitForTimeout(650);
-  return page.evaluate(offer=>Online.send({type:'interact',npc:'cf_quartermaster',offer}),offer);
+  return page.evaluate(offer=>Online.send({type:'interact',npc:'dungeon_repair_46',offer}),offer);
  };
- await debug({op:'teleport',zone:46,x:35,y:303});
+ await debug({op:'teleport',zone:46,x:30,y:305});
  await page.waitForFunction(()=>Field.zone===46&&Field.hero.raidSupport?.others===0);
  check(await page.evaluate(base=>Field.hero.attack===base,base),'A solo hero gets no bonus');
  await debug({op:'set_gold',gold:2000000});

@@ -74,10 +74,11 @@
   }
   const questShape = party => JSON.stringify((party?.members || []).map(m => [m.id, m.quests || []]));
   function sectionTitle(text) { return el('h4', text, 'social-title'); }
+  const summonText = i => `${i.name} summoned you to ${i.destination}.`;
   function inviteRows(list) {
     return list.map(i => {
       const row = el('li', '', 'social-row invite'); row.dataset.invite = `${i.kind}:${i.id}`;
-      row.append(el('span', `${label(i)} wants to ${i.kind === 'friend' ? 'be your friend' : 'invite you to a party'}.`, 'social-who'),
+      row.append(el('span', i.kind === 'summon' ? summonText(i) : `${label(i)} wants to ${i.kind === 'friend' ? 'be your friend' : 'invite you to a party'}.`, 'social-who'),
         el('small', '', 'invite-left'),
         button('Accept', `accept:${i.kind}:${i.id}`, () => send({ op: `${i.kind}_accept`, id: i.id })),
         button('Decline', `decline:${i.kind}:${i.id}`, () => send({ op: `${i.kind}_decline`, id: i.id })));
@@ -105,7 +106,7 @@
     body.append(list);
   }
   function renderParty(body) {
-    const incoming = state.incoming.filter(i => i.kind === 'party');
+    const incoming = state.incoming.filter(i => i.kind === 'party' || i.kind === 'summon');
     if (incoming.length) { const invitations = el('ul', '', 'social-list'); invitations.append(...inviteRows(incoming)); body.append(sectionTitle('Invitations'), invitations); }
     const party = state.party;
     if (!party) {
@@ -193,7 +194,7 @@
     const box = $('social-invites');
     box.replaceChildren(...state.incoming.slice(0, 3).map(i => {
       const card = el('div', '', 'invite-card'); card.dataset.invite = `${i.kind}:${i.id}`;
-      card.append(el('p', `${i.name} (Lv ${i.level}) ${i.kind === 'friend' ? 'sent you a friend request' : 'invited you to a party'}`),
+      card.append(el('p', i.kind === 'summon' ? summonText(i) : `${i.name} (Lv ${i.level}) ${i.kind === 'friend' ? 'sent you a friend request' : 'invited you to a party'}`),
         el('small', '', 'invite-left'),
         button('Accept', `prompt-accept:${i.kind}:${i.id}`, () => send({ op: `${i.kind}_accept`, id: i.id }), 'btn primary'),
         button('Decline', `prompt-decline:${i.kind}:${i.id}`, () => send({ op: `${i.kind}_decline`, id: i.id }), 'btn ghost'));

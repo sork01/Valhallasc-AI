@@ -19,9 +19,9 @@ module.exports = (kit, map) => ({
     await w.advance(1800); await w.action(bot, { type: 'stop' });
     check(w.player(bot).y > 294, 'A lone player cannot enter the descent');
     await w.debug(bot, { op: 'set_gold', gold: 2000000 });
-    await kit.teleport(w, bot, { npc: 'cf_quartermaster' });
+    await kit.teleport(w, bot, { npc: 'dungeon_repair_46' });
     for (const cls of ['warrior', 'warrior', 'mage', 'mage', 'assassin', 'assassin', 'priest', 'priest', 'hunter'])
-      await kit.talkTo(w, bot, 'cf_quartermaster', 'merc_' + cls);
+      await kit.talkTo(w, bot, 'dungeon_repair_46', 'merc_' + cls);
     await w.waitFor(() => w.views.get(bot).players.length === 10, 10000, 'Nine real contracts');
     check(w.player(bot).gold === 965000, 'Nine contracts charge the normal level-99 price');
     check(w.player(bot).raidSupport?.others === 9, 'The ten-fighter strength bonus is active');

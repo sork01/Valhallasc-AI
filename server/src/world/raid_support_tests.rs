@@ -21,7 +21,9 @@ pub(super) fn crew(count: u64) -> (World, Vec<mpsc::Receiver<Value>>) {
 fn raid_support_counts_real_contracts_and_updates_on_copy_exit_and_disconnect() {
     let (mut w, _peers) = crew(1);
     assert_eq!(w.raid_support(1).others, 0);
-    place(&mut w, 1, ZONE, at(35., 303.));
+    let smith = w.maps[ZONE].npcs.iter().find(|n| n.id == "dungeon_repair_46").unwrap();
+    let point = at(smith.x, smith.y - 1.);
+    place(&mut w, 1, ZONE, point);
     w.players.get_mut(&1).unwrap().character.gold = 2_000_000;
     for (n, class) in [
         "mage", "assassin", "priest", "hunter", "warrior", "mage", "assassin", "priest", "hunter",
@@ -30,7 +32,7 @@ fn raid_support_counts_real_contracts_and_updates_on_copy_exit_and_disconnect() 
     .enumerate()
     {
         w.time += 1.;
-        w.interact(1, "cf_quartermaster", Some(&format!("merc_{class}")));
+        w.interact(1, "dungeon_repair_46", Some(&format!("merc_{class}")));
         assert_eq!(w.raid_support(1).others, n + 1);
         assert_eq!(
             w.raid_support(1).attack_multiplier(),

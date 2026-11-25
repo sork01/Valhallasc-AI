@@ -1,5 +1,17 @@
 [
   {
+    "version": "1.13.0",
+    "date": "2026-11-25",
+    "new": [
+      "Use Meeting Stones to summon party members. Every dungeon and raid has one near its entrance, and summoned players can accept once they meet the destination's level requirement."
+    ],
+    "changed": [
+      "Hire dungeon and raid mercenaries from the Repair Smith inside. Their contracts end when you leave or clear the instance.",
+      "Nornroot Barrow's entrance and guides now stand in a clearing off the main trail north of Skuldwatch."
+    ],
+    "removed": []
+  },
+  {
     "version": "1.12.8",
     "date": "2026-11-24",
     "new": [],

@@ -441,30 +441,19 @@ fn fight(
         c.attributes.accuracy = 20;
         c.add_item(&potion, 3);
     }
-    let stone = w.maps[9]
-        .npcs
-        .iter()
-        .find(|n| n.id == "nacre_stone")
-        .unwrap()
-        .clone();
-    place(
-        &mut w,
-        1,
-        9,
-        Point {
-            x: stone.x,
-            y: stone.y + 1.,
-        },
-    );
+    enter(&mut w, 1, zone);
+    let smith_id = format!("dungeon_repair_{zone}");
+    let smith = w.maps[zone].npcs.iter().find(|n| n.id == smith_id).unwrap();
+    let point = at(smith.x, smith.y - 1.);
+    place(&mut w, 1, zone, point);
     for class in classes {
         w.time += 0.6;
-        w.interact(1, "nacre_stone", Some(&format!("merc_{class}")));
+        w.interact(1, &smith_id, Some(&format!("merc_{class}")));
     }
     assert_eq!(
         w.players.values().filter(|p| p.merc.is_some()).count(),
         classes.len()
     );
-    enter(&mut w, 1, zone);
     for s in w.slimes.iter_mut().filter(|s| !ids.contains(&s.id)) {
         s.dead = true;
         s.respawn = 1e9;

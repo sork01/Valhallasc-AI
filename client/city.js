@@ -627,7 +627,7 @@
         b.disabled=packet.gold<cost;
         b.addEventListener('click',()=>{
           if(offer.id==='merge'||offer.id==='refine')show({kind:offer.id},'#npc-back');
-          else if(Online.send({type:'interact',npc:npc.id,offer:offer.id}))b.disabled=true;
+          else if(Online.send({type:'interact',npc:npc.id,offer:offer.id})&&offer.id!=='summon_party')b.disabled=true;
         });offers.push(b);
       }
     }else if(view.kind==='stat_reset'){

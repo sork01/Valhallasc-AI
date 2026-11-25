@@ -566,9 +566,8 @@ struct Player {
     merc: Option<String>,
     /// The particular group objective this fighter was hired for; Meeting Stone hires have no quest contract.
     merc_quest: Option<String>,
-    /// Set on a fighter hired by a raid contract: the zone of the raid door. The contract ends when the hirer is
-    /// neither there nor inside a raid.
-    merc_raid: Option<usize>,
+    /// The private copy in which an instance mercenary was hired.
+    merc_instance: Option<usize>,
     /// Set when the hirer falls: the world time this fighter drops dead for good. Until then it wanders, dazed.
     merc_doom: Option<f64>,
     merc_navigation: mercs::Navigation,
@@ -733,7 +732,7 @@ impl Player {
             visible_zone,
             merc: None,
             merc_quest: None,
-            merc_raid: None,
+            merc_instance: None,
             merc_doom: None,
             merc_navigation: mercs::Navigation::default(),
             ambient: None,
@@ -3534,6 +3533,10 @@ impl World {
         }
         if let Some(offer) = offer_id.and_then(|id| self.merc_offer(session, npc_id, id)) {
             return self.merc_interact(session, npc_id, &offer);
+        }
+        if offer_id == Some("summon_party") {
+            self.summon_party_at_stone(session, npc_id);
+            return;
         }
         if offer_id == Some("gauntlet") {
             return self.gauntlet_interact(session, npc_id);

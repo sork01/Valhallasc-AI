@@ -19,18 +19,21 @@ const PENDING_FRIEND_REQUESTS: usize = 10;
 enum InviteKind {
     Friend,
     Party,
+    Summon,
 }
 impl InviteKind {
     fn word(self) -> &'static str {
         match self {
             Self::Friend => "friend request",
             Self::Party => "party invite",
+            Self::Summon => "summon",
         }
     }
     fn tag(self) -> &'static str {
         match self {
             Self::Friend => "friend",
             Self::Party => "party",
+            Self::Summon => "summon",
         }
     }
 }
@@ -40,6 +43,7 @@ struct Invite {
     from: String,
     to: String,
     expires: f64,
+    summon: Option<(usize, Point)>,
 }
 /// Name, class and level are remembered so a member who is offline for a moment still has a row.
 #[derive(Clone, Debug)]
@@ -210,7 +214,7 @@ impl World {
                 (p.character.look.class, p.character.level)
             });
             json!({"kind":i.kind.tag(),"id":other,"name":self.name_of(other),"class":class,"level":level,
-                "left":(i.expires-self.time).max(0.)})
+                "left":(i.expires-self.time).max(0.),"destination":i.summon.map(|(zone, _)| self.zone_name(zone))})
         };
         let incoming: Vec<Value> = self
             .social
@@ -409,6 +413,8 @@ impl World {
             }
             SocialCommand::PartyAccept { id } => self.party_accept(&me, &id),
             SocialCommand::PartyDecline { id } => self.decline(InviteKind::Party, &me, &id),
+            SocialCommand::SummonAccept { id } => self.accept_stone_summon(session, &me, &id),
+            SocialCommand::SummonDecline { id } => self.decline(InviteKind::Summon, &me, &id),
             SocialCommand::PartyLeave => {
                 if self.party_index(&me).is_none() {
                     Err("You are not in a party.".to_owned())
@@ -464,7 +470,107 @@ impl World {
             from: from.to_owned(),
             to: to.to_owned(),
             expires: self.time + INVITE_LIFETIME,
+            summon: None,
         });
+    }
+
+    pub(super) fn summon_party_at_stone(&mut self, session: u64, npc_id: &str) {
+        let p = &self.players[&session];
+        let c = &p.character;
+        let id = c.id.clone();
+        let zone = c.zone;
+        let map = &self.maps[zone];
+        let stone = map.npcs.iter().find(|n| {
+            n.id == npc_id && n.offers.iter().any(|o| o.id == "summon_party")
+        });
+        let Some(stone) = stone.filter(|n| {
+            p.is_human() && !p.is_hidden() && c.hp > 0.
+                && c.point().distance(n.position_at(self.time)) <= 2.8
+        }) else {
+            self.tell(&id, "Walk closer to a Meeting Stone to summon your party.", false);
+            return;
+        };
+        if self.time - p.service_at < 0.5 {
+            self.tell(&id, "Please wait a moment before trying again.", false);
+            return;
+        }
+        // Use an open spot beside the stone, outside all portal activation discs.
+        let centre = stone.position_at(self.time);
+        let arrival = [(1.,0.), (0.,1.), (-1.,0.), (0.,-1.), (1.,1.), (-1.,1.), (1.,-1.), (-1.,-1.)]
+            .into_iter()
+            .map(|(x,y)| Point { x: centre.x + x * 1.8, y: centre.y + y * 1.8 })
+            .find(|&point| {
+                let mut clear = point;
+                map.collide(&mut clear, PLAYER_RADIUS);
+                clear.distance(point) < 1e-6 && map.portals.iter().all(|portal| {
+                    point.distance(Point { x: portal.x, y: portal.y }) > portal.r.max(2.8)
+                })
+            });
+        let Some(arrival) = arrival else {
+            self.tell(&id, "There is no room to arrive beside this Meeting Stone.", false);
+            return;
+        };
+        self.players.get_mut(&session).unwrap().service_at = self.time;
+        let others: Vec<_> = self.party_mates(&id).into_iter().filter(|other| {
+            *other != id && self.online(other).is_some_and(|p| p.is_human() && !p.is_hidden())
+                && self.invite_position(InviteKind::Summon, &id, other).is_none()
+        }).collect();
+        for other in &others {
+            self.social.invites.push(Invite {
+                kind: InviteKind::Summon,
+                from: id.clone(),
+                to: other.clone(),
+                expires: self.time + INVITE_LIFETIME,
+                summon: Some((zone, arrival)),
+            });
+            self.push_social(&[other]);
+        }
+        let notice = if others.is_empty() {
+            "No party members are available to summon."
+        } else {
+            "Summon invitations sent."
+        };
+        self.tell(&id, notice, !others.is_empty());
+    }
+
+    fn accept_stone_summon(&mut self, session: u64, me: &str, from: &str) -> Result<(), String> {
+        let Some(at) = self.invite_position(InviteKind::Summon, from, me) else {
+            return Err("That summon is no longer pending.".into());
+        };
+        let invite = self.social.invites.remove(at);
+        self.push_social(&[me]);
+        let (zone, arrival) = invite.summon.expect("a summon has a destination");
+        if invite.expires <= self.time || self.party_index(me).is_none()
+            || self.party_index(me) != self.party_index(from)
+            || !self.online(from).is_some_and(|p| p.character.zone == zone && !p.is_hidden())
+        {
+            return Err("That summon is no longer pending.".into());
+        }
+        let needed = self.maps[zone].min_level;
+        let p = &self.players[&session];
+        if p.character.level < needed {
+            return Err(format!("You must be level {needed} to accept this summon."));
+        }
+        if p.character.hp <= 0. || !p.is_human() || self.pvp_busy(me) || self.trade_index(me).is_some() {
+            return Err("You cannot accept a summon right now.".into());
+        }
+        let p = self.players.get_mut(&session).unwrap();
+        p.character.zone = zone;
+        p.character.x = arrival.x;
+        p.character.y = arrival.y;
+        p.character.spark_travel = None;
+        if !self.maps[zone].allows_mount(&p.character.mount) {
+            p.character.mounted = false;
+        }
+        p.stop();
+        p.target = None;
+        p.attack = 0.;
+        p.dash = 0.;
+        p.portal_at = self.time;
+        self.separate_enemies();
+        self.save();
+        self.tell(me, "You arrive at the Meeting Stone.", true);
+        Ok(())
     }
     fn decline(&mut self, kind: InviteKind, me: &str, from: &str) -> Result<(), String> {
         let Some(at) = self.invite_position(kind, from, me) else {
@@ -1580,31 +1686,16 @@ mod tests {
     fn a_raid_contract_hires_the_free_seats_and_ends_when_the_hirer_leaves_the_raid() {
         let mut w = world();
         let _hero = add(&mut w, 1, "Hirer");
-        let stone_zone = w
-            .maps
-            .iter()
-            .position(|m| m.npcs.iter().any(|n| n.id == "city_meetingstone"))
-            .expect("a Meeting Stone");
-        // A quartermaster: the Meeting Stone's offers as a raid contract.
-        let mut quartermaster = w.maps[stone_zone]
-            .npcs
-            .iter()
-            .find(|n| n.id == "city_meetingstone")
-            .unwrap()
-            .clone();
-        quartermaster.id = "test_quartermaster".into();
-        for o in &mut quartermaster.offers {
-            o.open = false;
-            o.raid = true;
-        }
-        let (qx, qy) = (quartermaster.x, quartermaster.y);
-        w.maps[stone_zone].npcs.push(quartermaster);
+        let raid_zone = 46;
+        let smith = w.maps[raid_zone].npcs.iter().find(|n| n.id == "dungeon_repair_46").unwrap();
+        let (x, y) = (smith.x, smith.y);
         {
             let c = &mut w.players.get_mut(&1).unwrap().character;
+            c.level = 99;
             c.gold = super::mercs::merc_price(c.level) * 12;
-            c.zone = stone_zone;
-            c.x = qx;
-            c.y = qy + 1.;
+            c.zone = raid_zone;
+            c.x = x;
+            c.y = y - 1.;
         }
         let classes = ["warrior", "mage", "priest", "hunter", "assassin"];
         let hired = |w: &World| w.players.values().filter(|p| p.merc.is_some()).count();
@@ -1612,7 +1703,7 @@ mod tests {
             w.time += 0.6;
             w.interact(
                 1,
-                "test_quartermaster",
+                "dungeon_repair_46",
                 Some(&format!("merc_{}", classes[n % 5])),
             );
         }
@@ -1626,16 +1717,9 @@ mod tests {
             "the contract made the group a raid"
         );
         assert_eq!(w.social.parties[0].members.len(), RAID_MAX);
-        // Anywhere but the door and the raid, the contract is over.
-        let elsewhere = (0..w.maps.len())
-            .find(|&z| z != stone_zone && !w.maps[z].raid)
-            .unwrap();
-        // Inside a raid they stay.
-        w.maps[elsewhere].raid = true;
-        w.players.get_mut(&1).unwrap().character.zone = elsewhere;
         w.update_mercenaries();
         assert_eq!(hired(&w), 9);
-        w.maps[elsewhere].raid = false;
+        w.players.get_mut(&1).unwrap().character.zone = 45;
         w.update_mercenaries();
         assert_eq!(hired(&w), 0, "outside the raid the fighters are let go");
         assert!(w.social.parties.is_empty());
