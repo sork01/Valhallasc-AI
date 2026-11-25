@@ -65741,7 +65741,7 @@
       "level": 25,
       "rewardXp": 960,
       "rewardGold": 75,
-      "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+      "description": "Use a Reedglass Rod or better to catch a Glass Eel from the Saltby pier. Bring it to the Fisher. Glass Eels already in your bags count.",
       "objectives": [
         {
           "kind": "bring",
@@ -65817,7 +65817,7 @@
       "level": 25,
       "rewardXp": 960,
       "rewardGold": 75,
-      "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+      "description": "Use a Reedglass Rod or better to catch a Glass Eel from the Saltby pier. Bring it to the Fisher. Glass Eels already in your bags count.",
       "objectives": [
         {
           "kind": "bring",
@@ -132979,7 +132979,7 @@
           "level": 5,
           "rewardXp": 80,
           "rewardGold": 15,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Platinum Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -132998,7 +132998,7 @@
           "level": 5,
           "rewardXp": 80,
           "rewardGold": 15,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Platinum Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -133017,7 +133017,7 @@
           "level": 45,
           "rewardXp": 2740,
           "rewardGold": 135,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Tempered Platinum Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -133036,7 +133036,7 @@
           "level": 5,
           "rewardXp": 80,
           "rewardGold": 15,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Platinum Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -209647,7 +209647,7 @@
           "level": 25,
           "rewardXp": 960,
           "rewardGold": 75,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Reedglass Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -294325,7 +294325,7 @@
           "level": 25,
           "rewardXp": 960,
           "rewardGold": 75,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Reedglass Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -441240,7 +441240,7 @@
           "level": 25,
           "rewardXp": 960,
           "rewardGold": 75,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Platinum Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -441259,7 +441259,7 @@
           "level": 25,
           "rewardXp": 960,
           "rewardGold": 75,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Platinum Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -441278,7 +441278,7 @@
           "level": 25,
           "rewardXp": 960,
           "rewardGold": 75,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Reedglass Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -441297,7 +441297,7 @@
           "level": 25,
           "rewardXp": 960,
           "rewardGold": 75,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Platinum Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -493996,7 +493996,7 @@
           "level": 45,
           "rewardXp": 2740,
           "rewardGold": 135,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Tempered Platinum Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -494015,7 +494015,7 @@
           "level": 45,
           "rewardXp": 2740,
           "rewardGold": 135,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Tempered Platinum Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -494034,7 +494034,7 @@
           "level": 45,
           "rewardXp": 2740,
           "rewardGold": 135,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Tempered Platinum Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -494053,7 +494053,7 @@
           "level": 45,
           "rewardXp": 2740,
           "rewardGold": 135,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Tempered Platinum Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -653263,7 +653263,7 @@
           "level": 45,
           "rewardXp": 2740,
           "rewardGold": 135,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Tempered Platinum Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -653282,7 +653282,7 @@
           "level": 45,
           "rewardXp": 2740,
           "rewardGold": 135,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Tempered Platinum Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -653301,7 +653301,7 @@
           "level": 45,
           "rewardXp": 2740,
           "rewardGold": 135,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Tempered Platinum Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -653320,7 +653320,7 @@
           "level": 45,
           "rewardXp": 2740,
           "rewardGold": 135,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Tempered Platinum Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -699890,7 +699890,7 @@
           "level": 50,
           "rewardXp": 3330,
           "rewardGold": 150,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Tempered Platinum Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -699909,7 +699909,7 @@
           "level": 50,
           "rewardXp": 3330,
           "rewardGold": 150,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Tempered Platinum Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -699928,7 +699928,7 @@
           "level": 50,
           "rewardXp": 3330,
           "rewardGold": 150,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Tempered Platinum Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -699947,7 +699947,7 @@
           "level": 50,
           "rewardXp": 3330,
           "rewardGold": 150,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Tempered Platinum Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -753608,7 +753608,7 @@
           "level": 55,
           "rewardXp": 3970,
           "rewardGold": 165,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Tempered Platinum Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -753627,7 +753627,7 @@
           "level": 55,
           "rewardXp": 3970,
           "rewardGold": 165,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Tempered Platinum Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -753646,7 +753646,7 @@
           "level": 55,
           "rewardXp": 3970,
           "rewardGold": 165,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Tempered Platinum Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -753665,7 +753665,7 @@
           "level": 55,
           "rewardXp": 3970,
           "rewardGold": 165,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Tempered Platinum Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -812777,7 +812777,7 @@
           "level": 60,
           "rewardXp": 4670,
           "rewardGold": 180,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Starcatch Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -812796,7 +812796,7 @@
           "level": 60,
           "rewardXp": 4670,
           "rewardGold": 180,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Starcatch Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -812815,7 +812815,7 @@
           "level": 60,
           "rewardXp": 4670,
           "rewardGold": 180,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Starcatch Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -812834,7 +812834,7 @@
           "level": 60,
           "rewardXp": 4670,
           "rewardGold": 180,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Starcatch Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -821626,7 +821626,7 @@
           "level": 60,
           "rewardXp": 4670,
           "rewardGold": 180,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Starcatch Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -821645,7 +821645,7 @@
           "level": 60,
           "rewardXp": 4670,
           "rewardGold": 180,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Starcatch Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -821664,7 +821664,7 @@
           "level": 60,
           "rewardXp": 4670,
           "rewardGold": 180,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Starcatch Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -821683,7 +821683,7 @@
           "level": 60,
           "rewardXp": 4670,
           "rewardGold": 180,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Starcatch Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -891839,7 +891839,7 @@
           "level": 40,
           "rewardXp": 2210,
           "rewardGold": 120,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Silverline Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -891858,7 +891858,7 @@
           "level": 40,
           "rewardXp": 2210,
           "rewardGold": 120,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Silverline Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -891877,7 +891877,7 @@
           "level": 40,
           "rewardXp": 2210,
           "rewardGold": 120,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Silverline Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -891896,7 +891896,7 @@
           "level": 40,
           "rewardXp": 2210,
           "rewardGold": 120,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Silverline Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -941080,7 +941080,7 @@
           "level": 40,
           "rewardXp": 2210,
           "rewardGold": 120,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Reedglass Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -941099,7 +941099,7 @@
           "level": 40,
           "rewardXp": 2210,
           "rewardGold": 120,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Reedglass Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -941118,7 +941118,7 @@
           "level": 40,
           "rewardXp": 2210,
           "rewardGold": 120,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Reedglass Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -941137,7 +941137,7 @@
           "level": 40,
           "rewardXp": 2210,
           "rewardGold": 120,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Reedglass Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -991090,7 +991090,7 @@
           "level": 80,
           "rewardXp": 8030,
           "rewardGold": 240,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Worldwire Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -991109,7 +991109,7 @@
           "level": 80,
           "rewardXp": 8030,
           "rewardGold": 240,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Worldwire Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -991128,7 +991128,7 @@
           "level": 80,
           "rewardXp": 8030,
           "rewardGold": 240,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Worldwire Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -991147,7 +991147,7 @@
           "level": 80,
           "rewardXp": 8030,
           "rewardGold": 240,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Worldwire Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -1060709,7 +1060709,7 @@
           "level": 70,
           "rewardXp": 6240,
           "rewardGold": 210,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Reedglass Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -1060728,7 +1060728,7 @@
           "level": 70,
           "rewardXp": 6240,
           "rewardGold": 210,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Reedglass Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -1060747,7 +1060747,7 @@
           "level": 70,
           "rewardXp": 6240,
           "rewardGold": 210,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Reedglass Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -1060766,7 +1060766,7 @@
           "level": 70,
           "rewardXp": 6240,
           "rewardGold": 210,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Reedglass Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -1109590,7 +1109590,7 @@
           "level": 85,
           "rewardXp": 9010,
           "rewardGold": 255,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Rootbraid Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -1109609,7 +1109609,7 @@
           "level": 85,
           "rewardXp": 9010,
           "rewardGold": 255,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Rootbraid Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -1109628,7 +1109628,7 @@
           "level": 85,
           "rewardXp": 9010,
           "rewardGold": 255,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Rootbraid Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -1109647,7 +1109647,7 @@
           "level": 85,
           "rewardXp": 9010,
           "rewardGold": 255,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Rootbraid Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -1145939,7 +1145939,7 @@
           "level": 85,
           "rewardXp": 9010,
           "rewardGold": 255,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Rootbraid Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -1145958,7 +1145958,7 @@
           "level": 85,
           "rewardXp": 9010,
           "rewardGold": 255,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Rootbraid Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -1145977,7 +1145977,7 @@
           "level": 85,
           "rewardXp": 9010,
           "rewardGold": 255,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Rootbraid Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -1145996,7 +1145996,7 @@
           "level": 85,
           "rewardXp": 9010,
           "rewardGold": 255,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Rootbraid Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -1214652,7 +1214652,7 @@
           "level": 80,
           "rewardXp": 8030,
           "rewardGold": 240,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Silverline Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -1214671,7 +1214671,7 @@
           "level": 80,
           "rewardXp": 8030,
           "rewardGold": 240,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Silverline Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -1214690,7 +1214690,7 @@
           "level": 80,
           "rewardXp": 8030,
           "rewardGold": 240,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Silverline Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -1214709,7 +1214709,7 @@
           "level": 80,
           "rewardXp": 8030,
           "rewardGold": 240,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Silverline Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -1256444,7 +1256444,7 @@
           "level": 90,
           "rewardXp": 10050,
           "rewardGold": 270,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Starcatch Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -1256463,7 +1256463,7 @@
           "level": 90,
           "rewardXp": 10050,
           "rewardGold": 270,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Starcatch Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -1256482,7 +1256482,7 @@
           "level": 90,
           "rewardXp": 10050,
           "rewardGold": 270,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Starcatch Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -1256501,7 +1256501,7 @@
           "level": 90,
           "rewardXp": 10050,
           "rewardGold": 270,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Starcatch Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -1304995,7 +1304995,7 @@
           "level": 90,
           "rewardXp": 10050,
           "rewardGold": 270,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Cairnsteel Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -1305014,7 +1305014,7 @@
           "level": 90,
           "rewardXp": 10050,
           "rewardGold": 270,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Cairnsteel Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -1305033,7 +1305033,7 @@
           "level": 90,
           "rewardXp": 10050,
           "rewardGold": 270,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Cairnsteel Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -1305052,7 +1305052,7 @@
           "level": 90,
           "rewardXp": 10050,
           "rewardGold": 270,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Cairnsteel Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -1456510,7 +1456510,7 @@
           "level": 95,
           "rewardXp": 11140,
           "rewardGold": 285,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Worldwire Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -1456529,7 +1456529,7 @@
           "level": 95,
           "rewardXp": 11140,
           "rewardGold": 285,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Worldwire Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -1456548,7 +1456548,7 @@
           "level": 95,
           "rewardXp": 11140,
           "rewardGold": 285,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Worldwire Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -1456567,7 +1456567,7 @@
           "level": 95,
           "rewardXp": 11140,
           "rewardGold": 285,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Worldwire Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -1610876,7 +1610876,7 @@
           "level": 95,
           "rewardXp": 11140,
           "rewardGold": 285,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Tempered Platinum Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -1610895,7 +1610895,7 @@
           "level": 95,
           "rewardXp": 11140,
           "rewardGold": 285,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Tempered Platinum Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -1610914,7 +1610914,7 @@
           "level": 95,
           "rewardXp": 11140,
           "rewardGold": 285,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Tempered Platinum Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",
@@ -1610933,7 +1610933,7 @@
           "level": 95,
           "rewardXp": 11140,
           "rewardGold": 285,
-          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "description": "Use a Tempered Platinum Rod or better to catch the fish for this quest in local waters. Bring them to the Fisher. Fish already in your bags count.",
           "objectives": [
             {
               "kind": "bring",

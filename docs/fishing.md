@@ -209,7 +209,7 @@ About 60 species, ~7 per habitat: 3 common, 2 uncommon, 1 rare, 1 legendary ("tr
 - **Cook:** the Fisher cooks fish into a dish: better health/resource recovery, the shared 30-second meal timer, and a ten-minute food bonus (table below). Raw never beats the vendor meal of its tier.
 - **Collection log:** `Character.fishing` (`#[serde(default)]`): totals, per species count and best weight, longest streak, legendary count. A window lists every species with a silhouette until caught, plus records.
 - **Achievements (FISH-META):** 13 achievements / 230 points: 1, 100 and 1000 successful catches; all eight habitat collections; first legendary; a 20 kg catch. Titles: "the Angler" at 1000 catches and "Lavacaster" for all eight lava species, including both zone-exclusive legendaries. Current feature catalog: 120 achievements / 2555 points / 12 titles / 12 mounts. See `docs/achievements.md`.
-- **Quests:** a Fisher in each hub near water gives 3 bring quests (common, uncommon, rare fish of the band) and one daily-style repeatable. Ordinary side quests, with `level` and `rewardXp` = levels.txt[level-1]/10.
+- **Quests:** a Fisher in each hub near water gives three bring quests for common, uncommon and rare fish and one daily-style repeatable. If the local water or requested fish requires an upgraded rod, the description names the stronger of those two requirements. Ordinary side quests use `rewardXp` = levels.txt[level-1]/10.
 
 ### Cooked-fish bonuses (owner progression follow-up, 2026-11-19)
 

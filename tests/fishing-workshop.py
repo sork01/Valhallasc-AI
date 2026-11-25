@@ -48,7 +48,8 @@ class Workshop(unittest.TestCase):
         levels=json.loads((ROOT/'world/levels.txt').read_text());levels.append(levels[-1]+2300)
         recipes=json.loads((ROOT/'world/fishing-workshop.txt').read_text());fish=json.loads((ROOT/'world/fish.txt').read_text())
         check=copy.deepcopy(world)
-        fishers.install(check,recipes,fish,levels)
+        rods=json.loads((ROOT/'world/rods.txt').read_text())
+        fishers.install(check,recipes,fish,levels,rods)
         for baseline, regenerated in zip([world, *world['zones']], [check, *check['zones']]):
             generated = lambda area, field: [row for row in area[field] if row['id'].startswith('fisher_')]
             for field in ('npcs', 'quests'):
@@ -69,6 +70,36 @@ class Workshop(unittest.TestCase):
                     self.assertEqual(q['rewardXp'],levels[q['level']-1]//10)
                     self.assertTrue(q['objectives'][0]['target'].startswith('fish_'))
         self.assertEqual(seen,set(fishing_spots.HABITATS))
+
+    def test_quest_text_names_the_minimum_rod_for_each_local_catch(self):
+        world = json.loads((ROOT/'world/map.txt').read_text())
+        client = json.loads((ROOT/'client/world.js').read_text().split('window.WORLD_MAP = ', 1)[1].strip().removesuffix(';'))
+        fish = {f['item']: f for f in json.loads((ROOT/'world/fish.txt').read_text())}
+        rods = json.loads((ROOT/'world/rods.txt').read_text())
+        names = {r['tier']: r['name'] for r in rods}
+        if os.environ.get('MUTATE') == 'quest-rod':
+            for catalogue in (world, client):
+                quest = next(q for q in catalogue['zones'][18]['quests'] if q['id'] == 'fisher_storm_0_3')
+                quest['description'] = quest['description'].replace('Silverline Rod', 'Reedglass Rod')
+        hints = 0
+        for zone, (area, shown) in enumerate(zip([world, *world['zones']], [client, *client['zones']])):
+            shown_by_id = {q['id']: q for q in shown['quests']}
+            for quest in (q for q in area['quests'] if q['id'].startswith('fisher_')):
+                species = fish[quest['objectives'][0]['target']]
+                water_tier = max(r['tier'] for r in rods if zone in r['zones'])
+                tier = max(species['min_tier'], water_tier)
+                with self.subTest(quest=quest['id']):
+                    description = quest['description']
+                    self.assertEqual(description, shown_by_id[quest['id']]['description'])
+                    mentioned = [name for name in names.values() if f'a {name} or better' in description]
+                    self.assertEqual(mentioned, [names[tier]] if tier > 1 else [])
+                    if zone == 0 and species['item'] == 'fish_glass_eel':
+                        self.assertIn('Reedglass Rod or better', description)
+                        self.assertIn('Saltby pier', description)
+                    if tier > 1:
+                        hints += 1
+        self.assertGreater(hints, 0)
+
     def test_recipes_have_no_progression_deadlock_and_dishes_are_meals(self):
         actual=json.loads((ROOT/'world/items.txt').read_text());items={i['id']:i for i in actual}
         original_items=json.loads(subprocess.check_output(['git','show','acd1bdc7:world/items.txt'],cwd=ROOT))

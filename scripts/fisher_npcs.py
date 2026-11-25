@@ -49,12 +49,24 @@ def location(area, reach, zone, anchor):
     return next((p for p in candidates if safe(area,reach,*p)), None)
 
 
-def install(world, recipes, fish, levels):
+def quest_description(zone, fish, rod):
+    if zone == 0 and fish['item'] == 'fish_glass_eel':
+        return (f"Use a {rod['name']} or better to catch a Glass Eel from the Saltby pier. "
+                "Bring it to the Fisher. Glass Eels already in your bags count.")
+    if rod['tier'] > 1:
+        return (f"Use a {rod['name']} or better to catch the fish for this quest in local waters. "
+                "Bring them to the Fisher. Fish already in your bags count.")
+    return 'Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.'
+
+
+def install(world, recipes, fish, levels, rods):
+    rod_by_tier = {r['tier']: r for r in rods}
     for area in [world,*world['zones']]:
         area['npcs'] = [n for n in area.get('npcs',[]) if not n['id'].startswith('fisher_')]
         area['quests'] = [q for q in area.get('quests',[]) if not q['id'].startswith('fisher_')]
     for zone, habitat in HABITATS.items():
         area = [world,*world['zones']][zone]
+        water_tier = max(r['tier'] for r in rods if zone in r['zones'])
         reach = walkable(area)
         anchors = ['Alderhaven','Saltby'] if zone == 0 else [area['city']['name']]
         for slot, anchor in enumerate(anchors):
@@ -81,7 +93,8 @@ def install(world, recipes, fish, levels):
                             45 if rarity=='rare' and habitat=='Lava' else 1)
                 qid = f'{key}_{stage}'
                 title = ('Fresh Fish for ' if stage==1 else 'A Finer Catch for ' if stage==2 else 'A Trophy for ' if stage==3 else 'The Daily Creel at ') + anchor
-                description = 'Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.'
+                rod = rod_by_tier[max(water_tier, f['min_tier'])]
+                description = quest_description(zone, f, rod)
                 area['quests'].append(dict(id=qid,title=title,npc=key,requires=previous if stage<4 else f'{key}_1',
                     repeatable=stage==4,level=level,rewardXp=levels[level-1]//10,rewardGold=max(5,level*3),
                     description=description,objectives=[dict(kind='bring',target=f['item'],count=count,what=f['name'])]))
@@ -100,7 +113,8 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--check',action='store_true');args=parser.parse_args()
     path=ROOT/'world/map.txt';world=json.loads(path.read_text())
     levels=json.loads((ROOT/'world/levels.txt').read_text());levels.append(levels[-1]+2300)
-    install(world,json.loads((ROOT/'world/fishing-workshop.txt').read_text()),json.loads((ROOT/'world/fish.txt').read_text()),levels)
+    install(world,json.loads((ROOT/'world/fishing-workshop.txt').read_text()),json.loads((ROOT/'world/fish.txt').read_text()),
+            levels,json.loads((ROOT/'world/rods.txt').read_text()))
     text=json.dumps(world,ensure_ascii=False,indent=2)+'\n'
     if args.check:
         if path.read_text()!=text:raise SystemExit('Fisher overlay is stale')

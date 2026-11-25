@@ -1,5 +1,14 @@
 [
   {
+    "version": "1.13.3",
+    "date": "2026-11-25",
+    "new": [],
+    "changed": [
+      "Fishing quests name the rod you need to catch the requested fish in local waters. Greenmeadow's Glass Eel quests point you to the Saltby pier."
+    ],
+    "removed": []
+  },
+  {
     "version": "1.13.2",
     "date": "2026-11-25",
     "new": [],
