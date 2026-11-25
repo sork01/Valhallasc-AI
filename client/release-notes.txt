@@ -1,5 +1,16 @@
 [
   {
+    "version": "1.13.9",
+    "date": "2026-11-25",
+    "new": [],
+    "changed": [
+      "Dropped bags go into your inventory, even with all four expansion slots occupied. Fit one from inventory or choose which bag to replace. The replaced bag goes back into inventory.",
+      "Tooltips mark Enchanting recipes, Blacksmithing blueprints and Alchemy formulas you have already learned.",
+      "You can have up to 20 active quests. Turn in or abandon one to make room when your quest log is full."
+    ],
+    "removed": []
+  },
+  {
     "version": "1.13.8",
     "date": "2026-11-25",
     "new": [],

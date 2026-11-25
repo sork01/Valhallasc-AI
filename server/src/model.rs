@@ -1217,6 +1217,11 @@ impl Character {
             self.hp = self.hp.min(self.max_hp());
         }
     }
+
+    pub(crate) fn quest_slots_left(&self) -> usize {
+        const ACTIVE_QUEST_LIMIT: usize = 20;
+        ACTIVE_QUEST_LIMIT.saturating_sub(self.quests.iter().filter(|quest| !quest.claimed).count())
+    }
 }
 
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
@@ -1408,7 +1413,11 @@ pub fn sync_visits(character: &mut Character, maps: &[Map]) -> Vec<String> {
 /// just arrived. Cheap enough for every tick: it only walks the quest list.
 pub fn sync_progression(character: &mut Character, maps: &[Map]) -> Vec<String> {
     let mut arrived = Vec::new();
+    let room = character.quest_slots_left();
     for quest in maps.iter().flat_map(|m| &m.quests) {
+        if arrived.len() == room {
+            break;
+        }
         if quest
             .auto_level
             .is_some_and(|level| character.level >= level)
@@ -1559,6 +1568,8 @@ pub enum ClientMessage {
     },
     UseItem {
         item: String,
+        #[serde(default)]
+        bag_slot: Option<usize>,
     },
     Mount {
         mounted: bool,

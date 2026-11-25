@@ -11,6 +11,7 @@ const OWN_ONLY: &[&str] = &[
     "fishingLog",
     "gathering",
     "professions",
+    "learnedRecipes",
     "quests",
     "questGoldPercent",
     "npcDiscountPercent",

@@ -3,7 +3,7 @@ use super::wyrd_tests::{join, world};
 use super::*;
 
 #[test]
-fn owner_fixes_unfittable_bag_stays_put_solo_and_party_with_full_inventory() {
+fn owner_fixes_bag_drop_stays_put_solo_and_party_with_full_inventory() {
     for party in [false, true] {
         let mut w = world();
         let _a = join(&mut w, 1, Class::Warrior);
@@ -50,15 +50,18 @@ fn owner_fixes_unfittable_bag_stays_put_solo_and_party_with_full_inventory() {
         );
         assert_eq!(w.players[&1].character.bags.len(), 4);
         if party {
-            w.players.get_mut(&2).unwrap().character.bags.pop();
+            let c = &mut w.players.get_mut(&2).unwrap().character;
+            let material = c.inventory[0].item.clone();
+            assert!(c.consume_item(&material, 1));
             for _ in 0..10 {
                 w.update_drops();
             }
             assert!(
                 w.drops.is_empty(),
-                "party member with a free bag slot can take it"
+                "party member with a free inventory cell can take it"
             );
             assert_eq!(w.players[&2].character.bags.len(), 4);
+            assert_eq!(w.players[&2].character.quantity("linen_satchel"), 1);
         }
     }
 }

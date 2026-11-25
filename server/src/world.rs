@@ -781,6 +781,11 @@ impl Player {
                 "enchanting": {"skill": c.enchanting.proficiency.skill, "maxSkill": cap},
                 "alchemy": {"skill": c.alchemy.proficiency.skill, "maxSkill": crate::alchemy::MAX_SKILL},
             });
+            view["learnedRecipes"] = json!({
+                "enchanting": c.enchanting.recipes,
+                "blacksmithing": c.blacksmithing.recipes,
+                "alchemy": c.alchemy.recipes,
+            });
         }
         view["daze"] = json!(self.daze);
         view["danceT"] = json!(self.dance);
@@ -3256,8 +3261,12 @@ impl World {
             ClientMessage::Skill { id, fx, fy } if fx.is_finite() && fy.is_finite() => {
                 self.use_skill(session, &id, normalize(fx, fy));
             }
-            ClientMessage::UseItem { item } => {
-                self.use_item(session, &item);
+            ClientMessage::UseItem { item: id, bag_slot } => {
+                if bag_slot.is_some() || item(&id).is_some_and(|i| i.kind == "bag") {
+                    self.equip_inventory_bag(session, &id, bag_slot);
+                } else {
+                    self.use_item(session, &id);
+                }
             }
             ClientMessage::OpenChest { id } => {
                 self.open_chest(session, id);
@@ -3777,6 +3786,9 @@ impl World {
                         } else {
                             (notice, levels, quest_changed) =
                                 quest_action_with_choice(&mut p.character, quest, action, choice);
+                            if notice == QUEST_LOG_FULL {
+                                let _ = p.peer.try_send(json!({"type":"error","text":notice}));
+                            }
                             if action == "claim" && quest_changed {
                                 for (name, count) in quest_drops::discard_excess_quest_items(&mut p.character, quest, &self.maps) {
                                     let _ = p.peer.try_send(json!({"type":"system","text":format!("Discarded {count} × {name}.")}));
@@ -7023,7 +7035,7 @@ impl World {
                 // Refused loot must stay at its world position, before the magnet
                 // can attach it to a fighter's feet. Recheck room without taking a turn.
                 if !self.drop_has_room(i, session) {
-                    self.refused_drop_notice(i, session);
+                    self.refused_drop_notice(session);
                     continue;
                 }
                 let dir = point.direction(at);
@@ -7189,6 +7201,8 @@ fn walk_with_actors(
     }
 }
 
+const QUEST_LOG_FULL: &str = "Your questlog is full";
+
 // Only called after the NPC's range, living-player and cooldown checks.
 fn quest_action(character: &mut Character, quest: &Quest, action: &str) -> (String, u32, bool) {
     // Internal quest helpers (including private test shortcuts) choose the first legal class
@@ -7239,6 +7253,9 @@ fn quest_action_with_choice(
         "accept" => {
             if prior.is_some_and(|i| !character.quests[i].claimed || !quest.repeatable) {
                 return refused("You have already taken this quest.");
+            }
+            if character.quest_slots_left() == 0 {
+                return refused(QUEST_LOG_FULL);
             }
             let progress = QuestProgress {
                 id: quest.id.clone(),
@@ -7373,6 +7390,9 @@ mod tests {
         player.character.blacksmithing.proficiency.skill = 387;
         player.character.enchanting.proficiency.skill = 300;
         player.character.alchemy.proficiency.skill = 527;
+        player.character.enchanting.recipes.insert(crate::enchanting::Enchant::DoubleTap);
+        player.character.blacksmithing.recipes.insert("smith_gear_meadowguard_gloves".into());
+        player.character.alchemy.recipes.insert("alchemy_trailwind_potion".into());
 
         let mut other = json!({"players": [player.snapshot()]});
         let mut owner = other.clone();
@@ -7384,8 +7404,14 @@ mod tests {
             "enchanting": {"skill": 300, "maxSkill": 600},
             "alchemy": {"skill": 527, "maxSkill": 600},
         }));
+        assert_eq!(owner["players"][0]["learnedRecipes"], json!({
+            "enchanting": ["double_tap"],
+            "blacksmithing": ["smith_gear_meadowguard_gloves"],
+            "alchemy": ["alchemy_trailwind_potion"],
+        }));
         crate::visibility::filter_view(&mut other, "another player");
         assert!(other["players"][0].get("professions").is_none());
+        assert!(other["players"][0].get("learnedRecipes").is_none());
     }
 
     /// Open Greenmeadow ground: outside every camp and city, 8+ units from any scenery, 13+ from any enemy spawn.

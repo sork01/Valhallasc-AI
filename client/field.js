@@ -1755,6 +1755,7 @@
     window.Rebirth?.update(own);
     window.Achievements?.update(own);
     hero.professions = own.professions;
+    hero.learnedRecipes = own.learnedRecipes;
     window.CharacterPane?.updateProfessions?.(own.professions);
     window.Inventory?.update(own.inventory || [], own.equippedLook || own.look, own.equipment || {}, own.bags || [], own.gearInstances || [], own.setCounts || {}, own.transmogs || {});
     window.Quests?.setBells(own.bells || []);
@@ -1908,7 +1909,7 @@
     if (event.kind === 'miss' || event.kind === 'dodge') floater(event.x, event.y, event.kind === 'miss' ? 'Miss' : 'Dodge', '#c9c9bd', false, 'miss');
     if (event.kind === 'itemPickup') {
       const item = WORLD_ITEMS.find(i => i.id === event.item), rarity = event.rarity || item?.rarity;
-      floater(event.x, event.y, item?.kind === 'bag' ? `${item.name} · +${item.bagSlots} slots` : `+${event.quantity} ${event.name}`, item?.kind === 'bag' ? bagColor(item) : '#64b5ff', false, 'pickup');
+      floater(event.x, event.y, `+${event.quantity} ${event.name}`, item?.kind === 'bag' ? bagColor(item) : '#64b5ff', false, 'pickup');
       if (event.actor === Online.id) {
         say('pickup'); say('rarePickup', event);
         const tier = { uncommon: 1, rare: 2, epic: 3, legendary: 4, hierloom: 5 }[rarity] || 0;
@@ -5899,9 +5900,9 @@
     },
     get canAct() { return running && !paused && Online.connected && !hero.dead; },
     // The server checks ownership, health, the meal and the potion cooldown; this only sends the request.
-    useItem(id) {
+    useItem(id, bagSlot) {
       if (!running || !Online.connected || hero.dead) return false;
-      return Online.send({ type: 'use_item', item: id });
+      return Online.send({ type: 'use_item', item: id, bag_slot: bagSlot });
     },
     floatHero(text, color = '#ffe066') { if (running && !hero.dead) floater(hero.x, hero.y, text, color, false, 'banner', 118); },
     error(text) { if (running) window.WorldFeedback?.error(text); },

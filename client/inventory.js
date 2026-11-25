@@ -44,6 +44,20 @@
   const equippedCount = i => !i ? 0 : Object.values(gearSlots).filter(id => id === i.id).length + Number(legacyPiece(i.kind, look)?.id === i.id);
   const bagQuantity = id => Math.max(0, quantity(id) - equippedCount(definition(id)));
   const professionKind = i => ({mining_pick:'Mining pick', smith_blueprint:'Blacksmithing blueprint', alchemy_formula:'Alchemy formula'})[i.kind];
+  function recipeKnown(i) {
+    const learned = Field.hero?.learnedRecipes;
+    if (!learned) return false;
+    if (i.kind === 'enchant_recipe') return window.Enchanting?.recipeKnown?.(i, learned.enchanting);
+    if (i.kind === 'smith_blueprint') {
+      const recipe = window.BLACKSMITHING_DATA?.recipes.find(row => row.plan === i.id);
+      return learned.blacksmithing?.includes(recipe?.item);
+    }
+    if (i.kind === 'alchemy_formula') {
+      const recipe = window.ALCHEMY_DATA?.recipes.find(row => row.formula === i.id);
+      return learned.alchemy?.includes(recipe?.item);
+    }
+    return false;
+  }
   const licence = i => i?.kind === 'mount_licence';
   const spare = s => licence(definition(s.item)) ? 0 : bagQuantity(s.item);
   const consumable = i => i && ['food', 'potion', 'fish', 'alchemy_flask'].includes(i.kind);
@@ -81,11 +95,18 @@
     }
   }
   const useItem = i => (consumable(i) || licence(i)) && canEquip() && bagQuantity(i.id) > 0 && Field.useItem(i.id);
+  const equipBag = (i, slot) => canEquip() && !tooLow(i) && bagQuantity(i.id) > 0 && Field.useItem(i.id, slot);
   // The server wears the first loose copy of an item: name the one in the chosen cell first (ordered messages, so it lands before the equip).
   const preferCopy = key => { const id = key == null ? null : cellCopyId(key); if (id != null && canEquip()) Online.send({ type: 'prefer_copy', copy: id }); };
   const activate = (i, key) => {
     if (window.Enchanting?.selectingDisenchant?.()) return;
     if (window.Enchanting?.isScroll(i)) return window.Enchanting.open(i.id);
+    if (i.kind === 'bag') {
+      if (bags.length < 4) return equipBag(i);
+      selected = key;
+      renderDetails();
+      return;
+    }
     return consumable(i) || licence(i) ? useItem(i) : equip(i, undefined, key);
   };
   const num = n => Number(n.toFixed(1));
@@ -288,6 +309,7 @@
     if (appearance) t.append(node('p', appearance, 'transmog-note'));
     const scroll = window.Enchanting?.isScroll(i);
     if (!compare) window.Enchanting?.tooltip(t, i, (where || slot || cellCopy) ? copy : undefined);
+    if (recipeKnown(i)) t.append(node('p', 'Already learned', 'item-restriction'));
     if (i.kind === 'rod') t.append(...rodDetails(i).map(text => node('p', text)));
     else if (consumable(i)) t.append(node('p', effect(i)));
     else if (licence(i)) t.append(node('p', `Grants the ${i.mount} mount · bound to you, cannot be traded or sold · needs level ${i.requiredLevel}`));
@@ -321,7 +343,7 @@
       if(i.source!=='orange_pool'&&copies.length>3)t.append(node('small',`and ${copies.length-3} more copies`));
     }
     const choosingDisenchant = !slot && !where && window.Enchanting?.selectingDisenchant?.();
-    if (!choosingDisenchant && !roll) t.append(node('small', where ? where.hint : scroll ? 'Open Enchanting from your bags' : licence(i) ? 'Right-click or double-click to use' : consumable(i) ? `Right-click or double-click to use · ${keyOf('quickFood', false)} / ${keyOf('quickPotion', false)} on the quick slots` : slot ? 'Right-click to unequip · Drag into a bag' : compatible(i) ? 'Right-click to equip · Drag onto a gear slot' : questItem(i) ? 'Quest item · hand it in for its quest' : i.kind === 'material' ? 'Sell to Linden or Bram in Alderhaven' : 'Keep or sell to a merchant'));
+    if (!choosingDisenchant && !roll) t.append(node('small', where ? where.hint : scroll ? 'Open Enchanting from your bags' : licence(i) ? 'Right-click or double-click to use' : consumable(i) ? `Right-click or double-click to use · ${keyOf('quickFood', false)} / ${keyOf('quickPotion', false)} on the quick slots` : slot ? 'Right-click to unequip · Drag into a bag' : compatible(i) ? 'Right-click to equip · Drag onto a gear slot' : questItem(i) ? 'Quest item · hand it in for its quest' : i.kind === 'bag' ? 'Select to fit or replace a bag' : i.kind === 'material' ? 'Sell to Linden or Bram in Alderhaven' : 'Keep or sell to a merchant'));
     t.hidden = false;
     const r = anchor.getBoundingClientRect(), tr = t.getBoundingClientRect();
     t.style.left = Math.max(8, Math.min(innerWidth - tr.width - 8, r.right + 10)) + 'px';
@@ -416,6 +438,8 @@
         const b = button(i.kind === 'accessory' ? `Equip · ${label}` : 'Equip', () => equip(i, slot, selected), 'item-action'); b.dataset.action = 'equip'; b.disabled = !canEquip() || tooLow(i) || !bagQuantity(i.id); container.append(b);
       }
       if (levelOf(i) > 1) container.append(node('p', levelNote(i), tooLow(i) ? 'item-restriction' : 'bag-empty-note'));
+    } else if (i.kind === 'bag') {
+      renderBagActions(container, i);
     } else if (i.kind === 'rod') {
       container.append(...rodDetails(i).map(text => node('p', text)));
     } else if (i.kind === 'mining_pick') {
@@ -436,6 +460,34 @@
       container.append(node('p', effect(i), 'bag-empty-note'));
     } else if (i.class && i.class !== look?.class) container.append(node('p', `Requires ${i.class}`, 'item-restriction'));
     else container.append(node('p', 'Sell materials to Linden or Bram in Alderhaven.', 'bag-empty-note'));
+  }
+  function renderBagActions(container, i) {
+    container.append(node('p', `${i.bagSlots} extra slots · Requires level ${levelOf(i)}`, tooLow(i) ? 'item-restriction' : ''));
+    const disabled = !canEquip() || tooLow(i);
+    if (bags.length < 4) {
+      const fit = button('Fit Bag', () => equipBag(i), 'item-action');
+      fit.dataset.action = 'fit-bag';
+      fit.disabled = disabled;
+      container.append(fit);
+    }
+    if (!bags.some(id => id !== i.id)) return;
+    const pick = node('select', '', 'item-action');
+    pick.setAttribute('aria-label', 'Choose a bag to replace');
+    const placeholder = node('option', 'Choose a bag to replace');
+    placeholder.value = '';
+    pick.append(placeholder);
+    bags.forEach((id, slot) => {
+      if (id === i.id) return;
+      const option = node('option', `${slot + 1} · ${definition(id)?.name || id}`);
+      option.value = String(slot);
+      pick.append(option);
+    });
+    const replace = button('Replace Bag', () => { if (pick.value !== '') equipBag(i, Number(pick.value)); }, 'item-action');
+    replace.dataset.action = 'replace-bag';
+    pick.disabled = disabled;
+    replace.disabled = true;
+    pick.addEventListener('change', () => { replace.disabled = disabled || pick.value === ''; });
+    container.append(pick, replace);
   }
   function render(container) {
     if (!container) return;
@@ -470,7 +522,7 @@
     if ($('bag-tabs')) {
       $('bag-tabs').replaceChildren(...Array.from({ length: 5 }, (_, index) => {
         const bag = pages[index], used = bag ? layout.slice(bag.start, bag.start + bag.size).filter(Boolean).length : 0;
-        const b = button('', () => { if (!bag) { $('bag-details').replaceChildren(node('b', 'Empty bag slot', 'item-name'), node('p', 'Buy a six-slot Linen Satchel for 5 silver from Linden in Alderhaven.', 'bag-empty-note')); return; } activeBag = index; search = ''; $('bag-search').value = ''; render(container); }, 'bag-tab');
+        const b = button('', () => { if (!bag) { $('bag-details').replaceChildren(node('b', 'Empty bag slot', 'item-name'), node('p', 'Fit a bag from your inventory to use this slot.', 'bag-empty-note')); return; } activeBag = index; search = ''; $('bag-search').value = ''; render(container); }, 'bag-tab');
         b.innerHTML = icon(null, 'bag'); b.append(node('span', bag ? `${used}/${bag.size}` : '+')); b.dataset.bag = index; b.dataset.locked = String(!bag);
         b.setAttribute('aria-label', bag ? `${bag.name}, ${used} of ${bag.size} slots` : `Empty expansion bag slot ${index}`); b.setAttribute('aria-pressed', String(index === activeBag));
         if(bag)b.title=`${bag.name} · ${bag.size} slots`;

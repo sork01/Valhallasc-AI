@@ -279,6 +279,7 @@
   }
   window.Enchanting = {
     open, close, tooltip, drawFields, selectingDisenchant, renderDisenchant, name: id => byId.has(id) ? tr(byId.get(id).name) : '', isScroll: item => !!rowForItem(item),
+    recipeKnown: (item, learned) => item.kind === 'enchant_recipe' && learned?.includes(rowForItem(item)?.id),
     onPacket(answer) {
       pending = false;
       clearTimeout(requestAt);

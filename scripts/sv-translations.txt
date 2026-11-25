@@ -14963,5 +14963,16 @@
   "Use this stone to invite your party members to join you here.": "Använd stenen för att bjuda in dina gruppmedlemmar hit.",
   "Walk closer to a Meeting Stone to summon your party.": "Gå närmare en mötessten för att kalla hit gruppen.",
   "You arrive at the Meeting Stone.": "Du kommer fram till mötesstenen.",
-  "You cannot accept a summon right now.": "Du kan inte tacka ja till en kallelse just nu."
+  "You cannot accept a summon right now.": "Du kan inte tacka ja till en kallelse just nu.",
+  "Fit Bag": "Sätt i väska",
+  "Replace Bag": "Byt väska",
+  "Choose a bag to replace": "Välj en väska att byta ut",
+  "Choose an expansion bag to replace.": "Välj en extraväska att byta ut.",
+  "Unknown expansion bag slot.": "Okänd plats för extraväska.",
+  "That bag is already fitted in this slot.": "En likadan väska sitter redan på den platsen.",
+  "Make room in your inventory before replacing that bag.": "Gör plats i packningen innan du byter den väskan.",
+  "Already learned": "Redan inlärt",
+  "Your questlog is full": "Din uppdragslogg är full",
+  "Select to fit or replace a bag": "Välj för att sätta i eller byta ut en väska",
+  "Fit a bag from your inventory to use this slot.": "Sätt i en väska från packningen för att använda platsen."
 }
