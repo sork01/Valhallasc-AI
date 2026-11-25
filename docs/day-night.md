@@ -12,7 +12,7 @@ resync on each one. All zones share the clock.
 | 05:00–06:59 | Dawn | Blue night fades into warm sunrise. |
 | 07:00–17:59 | Day | Clear daytime, bright around noon. |
 | 18:00–19:59 | Dusk | Orange sunset fades into blue night. |
-| 20:00–04:59 | Night | Stars, lamps and a readable blue tint. |
+| 20:00–04:59 | Night | Lamps and a blue tint. |
 
 No sun or moon disc crosses the screen (removed 2026-11-16: it was hard to read); the time of day is the world clock under the minimap.
 

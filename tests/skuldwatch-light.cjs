@@ -10,10 +10,11 @@ const { zones } = JSON.parse(fs.readFileSync(path.join(__dirname, '../world/map.
 const wyrdwood = zones.find(zone => zone.name === 'Wyrdwood');
 const beacon = wyrdwood.objects.find(object => object.kind === 'beacon' && object.great);
 const lamp = wyrdwood.objects.find(object => object.kind === 'lamp');
-const cutRadii = [], glowWidths = [];
+const cutRadii = [], glowWidths = [], specks = [];
 const drawing = {
   createRadialGradient: () => ({ addColorStop() {} }),
-  clearRect() {}, fillRect() {}, beginPath() {}, fill() {}, save() {}, restore() {},
+  clearRect() {}, beginPath() {}, fill() {}, save() {}, restore() {},
+  fillRect(x, y, width, height) { if (width <= 2 && height <= 2) specks.push([x, y]); },
   arc(x, y, radius) { cutRadii.push(radius); },
   drawImage(sprite, x, y, width) {
     if (this.globalCompositeOperation === 'lighter') glowWidths.push(width ?? sprite.width);
@@ -49,10 +50,16 @@ DayNight.setZone(wyrdwood);
 DayNight.sync({ hour: 0, hoursPerSecond: 0 });
 DayNight.tick(1.2);
 DayNight.draw(drawing, 1200, 900, lights, () => [500, 450]);
+assert.equal(specks.length, 0, 'Wyrdwood night lighting draws no fixed dots over the field');
 assert.deepEqual(cutRadii, [160, 60], 'the great beacon cuts a wider pool in the half-scale night veil');
 assert.deepEqual(glowWidths, [480, 128], 'the beacon casts a wider glow than a lamp');
 
+DayNight.setZone(zones.find(zone => zone.name === 'Skaldholm'));
+DayNight.draw(drawing, 1200, 900, [], () => [500, 450]);
+assert.equal(specks.length, 0, 'Skaldholm night lighting draws no fixed dots over the city');
+
+DayNight.setZone(wyrdwood);
 DayNight.sync({ hour: 12, hoursPerSecond: 0 });
 DayNight.draw(drawing, 1200, 900, lights, () => [500, 450]);
 assert.equal(glowWidths.length, 2, 'the added night glow fades out by midday');
-console.log('Skuldwatch’s beacon lights a wider area at night.');
+console.log('Skuldwatch beacon lighting and the night-sky overlay passed.');

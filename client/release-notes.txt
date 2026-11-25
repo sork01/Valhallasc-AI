@@ -1,5 +1,14 @@
 [
   {
+    "version": "1.13.8",
+    "date": "2026-11-25",
+    "new": [],
+    "changed": [
+      "Removed the white dots that appeared across the top of the view at night."
+    ],
+    "removed": []
+  },
+  {
     "version": "1.13.7",
     "date": "2026-11-25",
     "new": [],

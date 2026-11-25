@@ -153,14 +153,6 @@
       }
       g.drawImage(veil, 0, 0, width, height);
     }
-    if (n > .3) {
-      const alpha = n * outdoorBlend * .75;
-      g.fillStyle = `rgba(234,246,255,${alpha})`;
-      for (let i = 0; i < 28; i++) {
-        const x = (i * 619 + 127) % width, y = (i * 137 + 19) % Math.max(1, height * .25);
-        g.fillRect(x, y, i % 5 === 0 ? 2 : 1, i % 5 === 0 ? 2 : 1);
-      }
-    }
     // A zone's own night glow (fades in over its lower part; weight k when two zones mix).
     const nightGlow = (theme, k) => {
       if (n <= .2 || k < .01) return;
