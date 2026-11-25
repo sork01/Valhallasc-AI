@@ -32,14 +32,14 @@ const debug = (page, command) => page.evaluate(c => Online.send({ type: 'debug',
   await debug(page, { op: 'set_time', hour: 19, freeze: true });
   await page.waitForFunction(() => Field.zone === 9 && Math.abs(DayNight.nightMix - .5) < .01 && valhalla.activeNightMusic === valhalla.nacreNightMusic && valhalla.nacreNightMusic.running, null, { timeout: 10000 });
   await page.waitForFunction(() => valhalla.nacreNightMusic.loaded, null, { timeout: 30000 });
-  assert.ok(Math.abs((await page.evaluate(() => valhalla.nacreNightMusic.duration)) - 64) < .25);
+  assert.ok(Math.abs((await page.evaluate(() => valhalla.nacreNightMusic.duration)) - 117.073) < .25);
   assert.equal(await page.evaluate(() => valhalla.nightMusic.running), false);
 
   await debug(page, { op: 'set_time', hour: 0, freeze: true });
   await debug(page, { op: 'teleport', zone: 13, x: 64, y: 116 });
   await page.waitForFunction(() => Field.zone === 13 && DayNight.nightMix === 1 && valhalla.astralNightMusic.running && !valhalla.nacreNightMusic.running && valhalla.activeNightMusic === valhalla.astralNightMusic, null, { timeout: 10000 });
   await page.waitForFunction(() => valhalla.astralNightMusic.loaded, null, { timeout: 30000 });
-  assert.ok(Math.abs((await page.evaluate(() => valhalla.astralNightMusic.duration)) - 100) < .25);
+  assert.ok(Math.abs((await page.evaluate(() => valhalla.astralNightMusic.duration)) - 117.073) < .25);
   await page.keyboard.press('n');
   await page.waitForFunction(() => valhalla.astralNightMusic.output.gain.value < .01, null, { timeout: 10000 });
   await page.keyboard.press('n');
@@ -47,8 +47,8 @@ const debug = (page, command) => page.evaluate(c => Online.send({ type: 'debug',
 
   await debug(page, { op: 'teleport', zone: 14, x: 64, y: 116 });
   await page.waitForFunction(() => Field.zone === 14 && valhalla.activeNightMusic === valhalla.prismNightMusic && valhalla.prismNightMusic.running && !valhalla.astralNightMusic.running, null, { timeout: 10000 });
-  await debug(page, { op: 'teleport', zone: 8, x: 80, y: 160 });
-  await page.waitForFunction(() => Field.zone === 8 && DayNight.nightMix === 0 && !valhalla.nacreNightMusic.running && !valhalla.astralNightMusic.running, null, { timeout: 10000 });
+  await debug(page, { op: 'teleport', zone: 5, x: 36, y: 52 });
+  await page.waitForFunction(() => Field.zone === 5 && DayNight.nightMix === 0 && !valhalla.nacreNightMusic.running && !valhalla.astralNightMusic.running, null, { timeout: 10000 });
   await debug(page, { op: 'teleport', zone: 13, x: 64, y: 116 });
   await debug(page, { op: 'set_time', hour: 6, freeze: true });
   await page.waitForFunction(() => Field.zone === 13 && Math.abs(DayNight.nightMix - .5) < .01 && valhalla.astralNightMusic.running, null, { timeout: 10000 });

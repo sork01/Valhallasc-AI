@@ -1,3 +1,3 @@
 'use strict';
-/* Spores Beneath the Stars: Moonspore Canopy's night remix. */
+// Moonspore at Midnight.
 window.createMoonsporeNightMusic = ctx => window.createLoopMusic(ctx, 'assets/music_moonspore_night.mp3');

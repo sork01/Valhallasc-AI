@@ -32,14 +32,14 @@ const debug = (page, command) => page.evaluate(c => Online.send({ type: 'debug',
   await debug(page, { op: 'set_time', hour: 19, freeze: true });
   await page.waitForFunction(() => Field.zone === 6 && Math.abs(DayNight.nightMix - .5) < .01 && valhalla.activeNightMusic === valhalla.wyrdNightMusic && valhalla.wyrdNightMusic.running, null, { timeout: 10000 });
   await page.waitForFunction(() => valhalla.wyrdNightMusic.loaded, null, { timeout: 30000 });
-  assert.ok(Math.abs((await page.evaluate(() => valhalla.wyrdNightMusic.duration)) - 70.244) < .25);
+  assert.ok(Math.abs((await page.evaluate(() => valhalla.wyrdNightMusic.duration)) - 117.073) < .25);
   assert.equal(await page.evaluate(() => valhalla.nightMusic.running), false);
 
   await debug(page, { op: 'set_time', hour: 0, freeze: true });
   await debug(page, { op: 'teleport', zone: 7, x: 80, y: 144 });
   await page.waitForFunction(() => Field.zone === 7 && DayNight.nightMix === 1 && valhalla.skyNightMusic.running && !valhalla.wyrdNightMusic.running && valhalla.activeNightMusic === valhalla.skyNightMusic, null, { timeout: 10000 });
   await page.waitForFunction(() => valhalla.skyNightMusic.loaded, null, { timeout: 30000 });
-  assert.ok(Math.abs((await page.evaluate(() => valhalla.skyNightMusic.duration)) - 101.053) < .25);
+  assert.ok(Math.abs((await page.evaluate(() => valhalla.skyNightMusic.duration)) - 116.54) < .25);
   await page.keyboard.press('n');
   await page.waitForFunction(() => valhalla.skyNightMusic.output.gain.value < .01, null, { timeout: 10000 });
   await page.keyboard.press('n');

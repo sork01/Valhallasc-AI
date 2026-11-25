@@ -10,6 +10,7 @@
   const hour = () => (clock.hour + (performance.now() - clock.at) / 1000 * clock.speed) % 24;
   const phase = h => h < 5 || h >= 20 ? 'Night' : h < 7 ? 'Dawn' : h < 18 ? 'Day' : 'Dusk';
   const night = h => h < 5 ? 1 : h < 7 ? (7 - h) / 2 : h < 18 ? 0 : h < 20 ? (h - 18) / 2 : 1;
+  const getNightMix = (allowIndoor = false) => clock.synced && (allowIndoor || isOutdoor(zone)) ? night(hour()) : 0;
   const warm = h => Math.max(0, 1 - Math.abs(h - 6) / 1.5, 1 - Math.abs(h - 18.5) / 1.5);
   // [shadow veil RGB, dusk/dawn warmth RGB, cool moonlight multiply RGB]
   const palette = theme => {
@@ -183,6 +184,6 @@
     g.restore();
   }
   window.DayNight = { sync, setZone, tick, draw, isOutdoor, get hour() { return hour(); }, get outdoorBlend() { return outdoorBlend; },
-    get nightMix() { return clock.synced && isOutdoor(zone) ? night(hour()) : 0; },
+    getNightMix, get nightMix() { return getNightMix(); },
     get shadowOffset() { return isOutdoor(zone) && hour() >= 7 && hour() <= 18 ? (12 - hour()) * 1.4 : 0; } };
 })();

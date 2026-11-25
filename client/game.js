@@ -188,9 +188,9 @@
   // Browsers only let audio start after a tap or key press, so the score begins on the first one
   // (on the title screen that is the tap that awakens the horn) and then plays on every screen.
   let music = null, fmusic = null, cmusic = null, rmusic = null, gmusic = null, smusic = null, vmusic = null, wmusic = null, kmusic = null, dmusic = null, nmusic = null, amusic = null, pmusic = null, omusic = null, mmusic = null, hmusic = null, tmusic = null, qmusic = null, jmusic = null, whmusic = null, lmusic = null, fwMusic = null, cairnMusic = null, yearMusic = null, cathedralMusic = [], eyeMusic = null, elderMusic = null, pavilionMusic = null, rainMusic = null, seedMusic = null, sunkenMusic = null, thunderMusic = null, bloomMusic = null, solarMusic = null, amberMusic = null, solsticeMusic = null, nornrootMusic = null, skybridgeMusic = null, blackhourMusic = null, longshipMusic = null, emberwakeMusic = null, emberwakeNightMusic = null, musicZone = 0;
-  let nightMusic = null, meadowNightMusic = null, cragsNightMusic = null, rimeNightMusic = null, fenNightMusic = null, cityNightMusic = null, wyrdNightMusic = null, skyNightMusic = null, nacreNightMusic = null, astralNightMusic = null, prismNightMusic = null, moonsporeNightMusic = null, asterionNightMusic = null, stormglassNightMusic = null, sunwardNightMusic = null, ribbonwildNightMusic = null, tanglecrownNightMusic = null, veyrrootNightMusic = null, lapisNightMusic = null, frostwakeNightMusic = null, cairnNightMusic = null, yearwheelNightMusic = null, activeNightMusic = null, stormglassMusic = null, activeScore = null, lastNightMix = -1;
+  let nightMusic = null, meadowNightMusic = null, cragsNightMusic = null, rimeNightMusic = null, fenNightMusic = null, cityNightMusic = null, wyrdNightMusic = null, skyNightMusic = null, deepNightMusic = null, nacreNightMusic = null, astralNightMusic = null, prismNightMusic = null, orreryNightMusic = null, moonsporeNightMusic = null, asterionNightMusic = null, stormglassNightMusic = null, sunwardNightMusic = null, ribbonwildNightMusic = null, tanglecrownNightMusic = null, veyrrootNightMusic = null, lapisNightMusic = null, frostwakeNightMusic = null, cairnNightMusic = null, yearwheelNightMusic = null, activeNightMusic = null, stormglassMusic = null, activeScore = null, lastNightMix = -1;
   let raidMusic = null, eldmarrMusic = null, raidFinalFight = false, cutsceneScore = null;
-  const nightScores = new Map(); // completed outdoor remixes; other zones use nightMusic
+  const nightScores = new Map(); // zones with an explicit night score, including the Deep and Orrery
   function ensureMusic() {
     const c = audio(); if (!c || !window.createMusic) return;
     ensureWeatherSound();
@@ -203,9 +203,11 @@
     if (!cityNightMusic && window.createCityNightMusic) { cityNightMusic = window.createCityNightMusic(c); nightScores.set(4, cityNightMusic); }
     if (!wyrdNightMusic && window.createWyrdNightMusic) { wyrdNightMusic = window.createWyrdNightMusic(c); nightScores.set(6, wyrdNightMusic); }
     if (!skyNightMusic && window.createSkyNightMusic) { skyNightMusic = window.createSkyNightMusic(c); nightScores.set(7, skyNightMusic); }
+    if (!deepNightMusic && window.createDeepNightMusic) { deepNightMusic = window.createDeepNightMusic(c); nightScores.set(8, deepNightMusic); }
     if (!nacreNightMusic && window.createNacreNightMusic) { nacreNightMusic = window.createNacreNightMusic(c); nightScores.set(9, nacreNightMusic); }
     if (!astralNightMusic && window.createAstralNightMusic) { astralNightMusic = window.createAstralNightMusic(c); nightScores.set(13, astralNightMusic); }
     if (!prismNightMusic && window.createPrismNightMusic) { prismNightMusic = window.createPrismNightMusic(c); nightScores.set(14, prismNightMusic); }
+    if (!orreryNightMusic && window.createOrreryNightMusic) { orreryNightMusic = window.createOrreryNightMusic(c); nightScores.set(15, orreryNightMusic); }
     if (!moonsporeNightMusic && window.createMoonsporeNightMusic) { moonsporeNightMusic = window.createMoonsporeNightMusic(c); nightScores.set(16, moonsporeNightMusic); }
     if (!asterionNightMusic && window.createAsterionNightMusic) { asterionNightMusic = window.createAsterionNightMusic(c); nightScores.set(17, asterionNightMusic); }
     if (!stormglassNightMusic && window.createStormglassNightMusic) { stormglassNightMusic = window.createStormglassNightMusic(c); nightScores.set(19, stormglassNightMusic); }
@@ -278,9 +280,10 @@
     applyMusicLevel(3);
     syncNightMusic(3);
   }
+  function musicNightMix() { return scene === 'game' ? (window.DayNight?.getNightMix(nightScores.has(musicZone)) || 0) : 0; }
   function syncNightMusic(secs = 1.2) {
     if (!ac || ac.state !== 'running' || !activeNightMusic) return;
-    const mix = scene === 'game' ? (window.DayNight?.nightMix || 0) : 0;
+    const mix = musicNightMix();
     if (mix > .001 && !activeNightMusic.running) activeNightMusic.start();
     if (mix <= .001 && activeNightMusic.running) activeNightMusic.stop();
     if (Math.abs(mix - lastNightMix) < .005) return;
@@ -293,7 +296,7 @@
   function applyMusicLevel(secs = 1.5) {
     if (cutsceneScore) cutsceneScore.setLevel(save.sound ? .55 * taper(save.musicVol) : 0, secs);
     if (music) music.setLevel(save.sound && !cutsceneScore ? (scene === 'splash' ? 1 : .55) * taper(save.musicVol) : 0, secs);
-    const volume = save.sound && !cutsceneScore ? taper(save.musicVol) : 0, mix = scene === 'game' ? (window.DayNight?.nightMix || 0) : 0;
+    const volume = save.sound && !cutsceneScore ? taper(save.musicVol) : 0, mix = musicNightMix();
     for (const m of [fmusic, cmusic, rmusic, gmusic, smusic, vmusic, wmusic, kmusic, dmusic, nmusic, amusic, pmusic, omusic, mmusic, hmusic, stormglassMusic, tmusic, qmusic, jmusic, whmusic, lmusic, fwMusic, cairnMusic, yearMusic, eyeMusic, elderMusic, pavilionMusic, rainMusic, seedMusic, sunkenMusic, thunderMusic, bloomMusic, solarMusic, amberMusic, solsticeMusic, nornrootMusic, skybridgeMusic, blackhourMusic, longshipMusic, emberwakeMusic, raidMusic, eldmarrMusic, ...cathedralMusic]) if (m) m.setLevel(volume * (m === activeScore ? 1 - mix : 1), secs);
     for (const m of [nightMusic, ...nightScores.values()]) if (m) m.setLevel(m === activeNightMusic ? volume * mix : 0, secs);
   }
@@ -447,9 +450,11 @@
   Object.defineProperty(window.valhalla, 'cityNightMusic', { get: () => cityNightMusic });
   Object.defineProperty(window.valhalla, 'wyrdNightMusic', { get: () => wyrdNightMusic });
   Object.defineProperty(window.valhalla, 'skyNightMusic', { get: () => skyNightMusic });
+  Object.defineProperty(window.valhalla, 'deepNightMusic', { get: () => deepNightMusic });
   Object.defineProperty(window.valhalla, 'nacreNightMusic', { get: () => nacreNightMusic });
   Object.defineProperty(window.valhalla, 'astralNightMusic', { get: () => astralNightMusic });
   Object.defineProperty(window.valhalla, 'prismNightMusic', { get: () => prismNightMusic });
+  Object.defineProperty(window.valhalla, 'orreryNightMusic', { get: () => orreryNightMusic });
   Object.defineProperty(window.valhalla, 'moonsporeNightMusic', { get: () => moonsporeNightMusic });
   Object.defineProperty(window.valhalla, 'asterionNightMusic', { get: () => asterionNightMusic });
   Object.defineProperty(window.valhalla, 'stormglassNightMusic', { get: () => stormglassNightMusic });

@@ -8,7 +8,7 @@ const { StdioClientTransport, getDefaultEnvironment } = require('@modelcontextpr
 const root = path.resolve(__dirname, '..');
 const client = new Client({ name: 'valhallasc-next-four-night-music', version: '1.0.0' });
 const songs = [
-  { zone: 16, x: 16, y: 112, key: 'moonsporeNightMusic', day: 'mmusic', seconds: 32 * 3 * 60 / 82 },
+  { zone: 16, x: 16, y: 112, key: 'moonsporeNightMusic', day: 'mmusic', seconds: 117.073 },
   { zone: 17, x: 90, y: 162, key: 'asterionNightMusic', day: 'hmusic', seconds: 32 * 4 * 60 / 92 },
   { zone: 19, x: 13, y: 105, key: 'stormglassNightMusic', day: 'stormglassMusic', seconds: 32 * 4 * 60 / 88 },
   { zone: 20, x: 13, y: 106, key: 'sunwardNightMusic', day: 'tmusic', seconds: 32 * 4 * 60 / 90 },

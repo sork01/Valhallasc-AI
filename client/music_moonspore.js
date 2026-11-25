@@ -1,2 +1,2 @@
-/* Lanterns in the Canopy — The Moonspore Canopy. dybase2 project 84f85129e73403dd. */
+// Lanterns in the Canopy.
 window.createMoonsporeMusic = ctx => window.createLoopMusic(ctx, 'assets/music_moonspore.mp3');

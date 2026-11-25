@@ -1,3 +1,3 @@
 'use strict';
-/* Stars Beneath the Ice: Rimeveil Glacier's night remix. */
+// Rimeveil at Midnight.
 window.createRimeNightMusic = ctx => window.createLoopMusic(ctx, 'assets/music_rime_night.mp3');

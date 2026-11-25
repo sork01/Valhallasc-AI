@@ -1,5 +1,16 @@
 [
   {
+    "version": "1.14.1",
+    "date": "2026-11-25",
+    "new": [
+      "Rán’s Deep and the Obsidian Orrery now have their own nighttime themes."
+    ],
+    "changed": [
+      "Updated the soundtrack for Greenmeadow, Emberfall Crags, Rimeveil Glacier, Gloamfen, Skaldholm, the Undervault, Wyrdwood, Bifrost Reach, Rán’s Deep, Nacrehold, Astralhollow, the Obsidian Orrery, the Moonspore Canopy, and Emberwake Caldera."
+    ],
+    "removed": []
+  },
+  {
     "version": "1.14.0",
     "date": "2026-11-25",
     "new": [

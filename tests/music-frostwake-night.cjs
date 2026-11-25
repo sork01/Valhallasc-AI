@@ -50,8 +50,8 @@ const debug = (page, command) => page.evaluate(c => Online.send({ type: 'debug',
   await page.keyboard.press('n');
   await page.waitForFunction(() => Math.abs(valhalla.frostwakeNightMusic.output.gain.value - .64) < .03, null, { timeout: 10000 });
 
-  await debug(page, { op: 'teleport', zone: 8, x: 80, y: 160 });
-  await page.waitForFunction(() => Field.zone === 8 && DayNight.nightMix === 0 && valhalla.activeNightMusic === valhalla.nightMusic && !valhalla.nightMusic.running && !valhalla.frostwakeNightMusic.running, null, { timeout: 15000 });
+  await debug(page, { op: 'teleport', zone: 5, x: 36, y: 52 });
+  await page.waitForFunction(() => Field.zone === 5 && DayNight.nightMix === 0 && valhalla.activeNightMusic === valhalla.nightMusic && !valhalla.nightMusic.running && !valhalla.frostwakeNightMusic.running, null, { timeout: 15000 });
   await debug(page, { op: 'teleport', zone: 24, x: 48, y: 80 });
   await page.waitForFunction(() => Field.zone === 24 && DayNight.nightMix === 0 && !valhalla.nightMusic.running, null, { timeout: 15000 });
   await debug(page, { op: 'teleport', zone: 26, x: 14, y: 128 });

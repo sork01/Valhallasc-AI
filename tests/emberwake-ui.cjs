@@ -62,7 +62,7 @@ const call=async(name,args={})=>{const r=await client.callTool({name,arguments:a
   await debug({op:'set_time',hour:12,freeze:true});
   await debug({op:'set_weather',kind:'clear'});
   await page.waitForFunction(()=>valhalla.emberwakeMusic?.loaded&&valhalla.emberwakeNightMusic?.loaded,null,{timeout:60000});
-  assert.ok(await page.evaluate(()=>Math.abs(valhalla.emberwakeMusic.duration-32*4*60/110)<.05),'Day loop decodes');
+  assert.ok(await page.evaluate(()=>Math.abs(valhalla.emberwakeMusic.duration-96)<.05),'Day loop decodes');
   assert.ok(await page.evaluate(()=>Math.abs(valhalla.emberwakeNightMusic.duration-80)<.05),'Night loop decodes');
   assert.equal(await page.evaluate(()=>Field.zoneTheme),'emberwake');
   assert.ok(await page.locator('#world-weather').textContent().then(t=>!t.includes('Indoors')),'The caldera has outdoor weather');

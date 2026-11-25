@@ -1,5 +1,5 @@
 // Real browser and private Rust server: Astralhollow's two gates, arrival view,
-// loaded art, world-map entry and decoded original score.
+// loaded art, world-map entry and decoded zone score.
 const assert = require('node:assert/strict');
 const path = require('node:path');
 const { chromium, STUB } = require('./lib/playwright.cjs');
@@ -29,7 +29,7 @@ async function call(name, args = {}) {
   await page.locator('#go').click({ timeout: 60000 });
   await page.waitForFunction(() => Online.connected && !!Field.warriorSprites, null, { timeout: 60000 });
   const music = await page.evaluate(async () => { const bytes=await fetch('assets/music_astral.mp3').then(r => r.arrayBuffer());const size=bytes.byteLength;const c=new AudioContext();const b=await c.decodeAudioData(bytes);await c.close();return { seconds:b.duration, bytes:size }; });
-  check(music.seconds > 88 && music.seconds < 90 && music.bytes > 1000000, `The browser decodes the full original score (${JSON.stringify(music)})`);
+  check(Math.abs(music.seconds - 122.222) < .25 && music.bytes > 1000000, `The browser decodes the full zone score (${JSON.stringify(music)})`);
 
   const debug = command => page.evaluate(command => Online.send({ type:'debug',ref:17,command }), command);
   await debug({ op:'teleport',zone:9,x:230,y:44 });
