@@ -13,6 +13,7 @@ fn pool(w: &mut World, zone: usize, kind: &str, rod: &str) {
     p.character.level = 99;
     p.character.inventory.clear();
     p.character.fishing = Default::default();
+    p.character.fishing.proficiency.skill = water_skill_requirement(zone).unwrap();
     p.character.add_item(rod, 1);
     p.face = Point { x: 1., y: 0. };
     p.fishing = Session::default();
@@ -118,6 +119,7 @@ fn fishing_lava_all_real_shores_cast_without_moving_or_crossing_lava() {
             let p = w.players.get_mut(&1).unwrap();
             p.character.zone = zone;
             p.character.level = if zone == 1 { 5 } else { 45 };
+            p.character.fishing.proficiency.skill = water_skill_requirement(zone).unwrap();
             p.character.inventory.clear();
             p.character.add_item(
                 if zone == 1 {

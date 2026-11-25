@@ -44,6 +44,7 @@ fn racial_tidekin_shortens_the_wait_for_water_bites_only() {
             let p = w.players.get_mut(&1).unwrap();
             (p.character.zone, p.character.x, p.character.y) = (1, 50., 50.);
             p.character.level = 5;
+            p.character.fishing.proficiency.skill = 30;
             p.character.add_item("rod_emberline_rod", 1);
         }
         let mut wait = Vec::new();
@@ -189,6 +190,7 @@ fn fishing_lava_shore_requires_matching_rod_and_direction() {
     p.character.x = 50.;
     p.character.y = 50.;
     p.character.level = 5;
+    p.character.fishing.proficiency.skill = 30;
     w.fish_press(1, 10., false);
     assert!(w.players[&1].fishing.line.is_none());
     let p = w.players.get_mut(&1).unwrap();

@@ -1,5 +1,14 @@
 [
   {
+    "version": "1.13.2",
+    "date": "2026-11-25",
+    "new": [],
+    "changed": [
+      "Fishing waters open when you reach their minimum Fishing skill. A blocked cast tells you where to train next. Earlier waters stay open for catches."
+    ],
+    "removed": []
+  },
+  {
     "version": "1.13.1",
     "date": "2026-11-25",
     "new": [],

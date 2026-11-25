@@ -1,8 +1,11 @@
 // Real recipe/cast/food packets against a private database. No browser or catch grind.
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const {TestWorld}=require('../scripts/testing/driver.cjs');
+const {seedFishingSkill}=require('../scripts/testing/fishing-fixture.cjs');
 const root=path.resolve(__dirname,'..'),load=n=>JSON.parse(fs.readFileSync(path.join(root,'world',n)));
-const world=load('map.txt'),rods=load('rods.txt'),recipes=load('fishing-workshop.txt').filter(r=>r.id.startsWith('rod:'));
+const world=load('map.txt'),rods=load('rods.txt');
+const recipes=load('fishing-workshop.txt').filter(recipe=>recipe.id.startsWith('rod:'));
+const finalRod=recipes.at(-1).item;
 const w=new TestWorld(),bot='RodProgress';w.startLevel=99;w.levelSpread=0;
 const rodStacks=()=>w.player(bot).inventory.filter(s=>rods.some(r=>r.item===s.item));
 async function talk(zone,offer){
@@ -29,14 +32,25 @@ async function shore(zone){
   const reply=await talk(r.zones[0],r.id);assert(reply.inventory.some(s=>s.item===r.item&&s.quantity===1),reply.notice);
   await w.waitFor(()=>rodStacks().some(s=>s.item===r.item));assert.equal(rodStacks().length,1,'only the upgraded rod remains');
  }
+ await seedFishingSkill(w,bot,59);
+ await shore(2);
+ const refused=w.events.length;
+ await w.action(bot,{type:'fish'});
+ await w.waitFor(()=>w.events.slice(refused).some(e=>e.bot===bot&&e.text==='You need Fishing skill 60 to fish here. Fish in Emberfall Crags to reach skill 60.'),10000,'Rimeveil refuses skill 59');
+ assert(!w.player(bot).fishing);
+ await seedFishingSkill(w,bot,60);
+ await shore(2);
+ await w.action(bot,{type:'fish'});
+ await w.waitFor(()=>w.player(bot).fishing,5000,'Rimeveil opens at 60');
+ await seedFishingSkill(w,bot,270);
  for(const zone of [0,1,45,28]){
-  await shore(zone);await w.action(bot,{type:'fish'});await w.waitFor(()=>w.player(bot).fishing,5000,`Worldwire casts in zone ${zone}`);
+  await shore(zone);await w.action(bot,{type:'fish'});await w.waitFor(()=>w.player(bot).fishing,5000,`The final rod casts in zone ${zone}`);
   assert.equal(w.player(bot).fishing.lava,zone===1||zone===45);await w.action(bot,{type:'fish'});await w.waitFor(()=>!w.player(bot).fishing);
  }
- await w.debug(bot,{op:'take_item',item:'rod_worldwire_rod',quantity:1});await w.debug(bot,{op:'give_item',item:'rod_twig_rod',quantity:1});
+ await w.debug(bot,{op:'take_item',item:finalRod,quantity:1});await w.debug(bot,{op:'give_item',item:'rod_twig_rod',quantity:1});
  await shore(28);const start=w.events.length;await w.action(bot,{type:'fish'});
  await w.waitFor(()=>w.events.slice(start).some(e=>e.bot===bot&&e.text==='This water requires Worldwire Rod (level 80).'));
- await w.debug(bot,{op:'take_item',item:'rod_twig_rod',quantity:1});await w.debug(bot,{op:'give_item',item:'rod_worldwire_rod',quantity:1});
+ await w.debug(bot,{op:'take_item',item:'rod_twig_rod',quantity:1});await w.debug(bot,{op:'give_item',item:finalRod,quantity:1});
  await w.debug(bot,{op:'give_item',item:'dish_shore_grill',quantity:1});await w.debug(bot,{op:'give_item',item:'dish_cold_feast',quantity:1});
  await w.action(bot,{type:'use_item',item:'dish_shore_grill'});await w.waitFor(()=>w.player(bot).buffs.some(b=>b.id==='meal:dish_shore_grill'));
  let p=w.player(bot),b=p.buffs.find(b=>b.id==='meal:dish_shore_grill');assert.equal(b.kind,'haste');assert.equal(b.amount,undefined,'buff magnitude stays private; Rust gameplay checks verify its effect');assert.equal(b.time,600);assert(p.mealCd>0);
@@ -44,5 +58,5 @@ async function shore(zone){
  assert.equal(p.inventory.find(s=>s.item==='dish_cold_feast').quantity,1,'shared meal timer prevents consuming a second dish');assert.equal(p.buffs.filter(b=>b.id.startsWith('meal:')).length,1);
  const inventory=JSON.stringify(p.inventory);await w.disconnect(bot);await w.connect({bot,class:'warrior',gender:'male'});
  assert.equal(JSON.stringify(w.player(bot).inventory),inventory);assert(w.player(bot).mealCd>0,'saved meal cooldown survives relog');assert.equal(rodStacks().length,1);
- console.log('Private progression probe: seven upgrades consume their predecessors, one rod casts in ordinary water/both lava areas/Yearwheel, named gate, real food bonus/shared timer and saved inventory pass.');
+ console.log('Private progression probe passed: Rimeveil refuses skill 59 and opens at 60, rod upgrades, water and lava casts, food cooldown, and saved inventory.');
 })().catch(e=>{console.error(e);process.exitCode=1;}).finally(async()=>{await w.stop();});

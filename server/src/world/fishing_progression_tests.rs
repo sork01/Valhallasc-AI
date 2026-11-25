@@ -17,6 +17,7 @@ fn at_pool(w: &mut World, zone: usize, rod: &str) {
     p.character.x = 50.;
     p.character.y = 50.;
     p.character.level = 99;
+    p.character.fishing.proficiency.skill = water_skill_requirement(zone).unwrap();
     p.character.inventory.clear();
     p.character.add_item(rod, 1);
     p.face = Point { x: 1., y: 0. };

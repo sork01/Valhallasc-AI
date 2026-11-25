@@ -1,5 +1,6 @@
 //! Fishing inputs carry no position, catch or timestamp. The world owns each line.
 use super::*;
+use crate::profession::{SKILL_BAND, band_cap};
 use serde::Deserialize;
 use std::{sync::LazyLock, time::Instant};
 
@@ -46,13 +47,20 @@ static SKILL_WATERS: LazyLock<
 });
 
 fn water_skill_cap(zone: usize, skill: u16) -> u16 {
-    use crate::profession::{MAX_SKILL, SKILL_BAND, band_cap};
+    use crate::profession::MAX_SKILL;
     let band = usize::from(skill / SKILL_BAND);
     if skill < MAX_SKILL && SKILL_WATERS[band].contains(&zone) {
         band_cap(skill)
     } else {
         0
     }
+}
+
+fn water_skill_requirement(zone: usize) -> Option<u16> {
+    SKILL_WATERS
+        .iter()
+        .position(|zones| zones.contains(&zone))
+        .map(|band| (band as u16 * SKILL_BAND).max(1))
 }
 
 pub(super) struct RichSpot {
@@ -412,6 +420,17 @@ impl World {
         } else {
             "Stand near the shore and face the water or lava."
         })?;
+        let minimum = water_skill_requirement(c.zone).ok_or("There are no fish here.")?;
+        let skill = c.fishing.proficiency.skill.max(1);
+        if skill < minimum {
+            let training = SKILL_WATERS[usize::from(skill / SKILL_BAND)]
+                .iter()
+                .map(|&zone| self.zone_name(zone))
+                .collect::<Vec<_>>()
+                .join(" / ");
+            let cap = band_cap(skill);
+            return Err(format!("You need Fishing skill {minimum} to fish here. Fish in {training} to reach skill {cap}."));
+        }
         let rich_point = self
             .rich_fishing
             .get(&c.zone)
@@ -929,6 +948,20 @@ mod data_tests {
             p.character.level = levels[index];
             p.character.x = at.x;
             p.character.y = at.y;
+            if index != 0 {
+                let minimum = cap - SKILL_BAND;
+                p.character.fishing.proficiency.skill = minimum - 1;
+                let previous = w.zone_name(route[index - 1]);
+                let expected = format!("You need Fishing skill {minimum} to fish here. Fish in {previous} to reach skill {minimum}.");
+                let error = w.fishing_line(1, 20., false).err().unwrap();
+                assert!(error.starts_with(&format!("You need Fishing skill {minimum} to fish here.")));
+                if SKILL_WATERS[index - 1].len() == 1 {
+                    assert_eq!(error, expected);
+                }
+                w.players.get_mut(&1).unwrap().character.fishing.proficiency.skill = minimum;
+                assert!(w.fishing_line(1, 20., false).is_ok(), "opens at {minimum}");
+            }
+            let p = w.players.get_mut(&1).unwrap();
             p.character.fishing.proficiency.skill = cap - 1;
             let line = w.fishing_line(1, 20., false).unwrap();
             w.rng = 1;
@@ -940,6 +973,7 @@ mod data_tests {
             assert_eq!(reply["skillUp"], cap, "catch in zone {zone}");
             if matches!(cap, 30 | 300 | MAX_SKILL) {
                 // A real catch still awards fish at the zone's skill cap.
+                let line = w.fishing_line(1, 22., false).unwrap();
                 w.rng = 1;
                 w.profession_rng = 0;
                 w.land_fish(1, line, 22.);
@@ -1101,6 +1135,7 @@ mod data_tests {
         p.character.x = 50.;
         p.character.y = 50.;
         p.character.level = 99;
+        p.character.fishing.proficiency.skill = 30;
         assert_eq!(w.fishing_line(1, 20., false).unwrap().tier, 10);
         w.players.get_mut(&1).unwrap().character.level = 5;
         assert_eq!(w.fishing_line(1, 20., false).unwrap().tier, 2);

@@ -4,7 +4,7 @@ On phones and tablets, **Go fishing** is available in fishing zones. Keep a rod 
 
 ## Fishing skill (1.12.0)
 
-Fish in the current training waters to raise skill. Move to the next band at every 30 points. The fishing log and catch card point to the current waters. All legal catches still award fish and collection progress wherever you fish.
+Each fishing area opens when you reach its training band's starting skill. A cast at an advanced shore tells you the skill required and where to train next. The fishing log and catch card also point to the current training waters. Earlier waters stay open for fish and collection progress after you outgrow their skill band.
 
 | Skill points earned | Training waters | Minimum rod level along the main route |
 | --- | --- | ---: |
@@ -12,7 +12,7 @@ Fish in the current training waters to raise skill. Move to the next band at eve
 | 31–60 | Emberfall Crags | 5 |
 | 61–90 | Rimeveil Glacier | 1 |
 | 91–120 | Gloamfen | 1 |
-| 121–150 | Wyrdwood | 10 |
+| 121–150 | Wyrdwood | 5 |
 | 151–180 | Sunward Vale | 25 |
 | 181–210 | The Tanglecrown | 25 |
 | 211–240 | The Stormglass Flats | 40 |
