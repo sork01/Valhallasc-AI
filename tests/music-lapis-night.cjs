@@ -1,3 +1,4 @@
+const soundtrack = require('./lib/soundtrack.cjs');
 // Focused private-world playback check for the Lapis Erg's night remix.
 const assert = require('node:assert/strict');
 const path = require('node:path');
@@ -8,7 +9,7 @@ const { StdioClientTransport, getDefaultEnvironment } = require('@modelcontextpr
 const root = path.resolve(__dirname, '..');
 const client = new Client({ name: 'valhallasc-lapis-night-music', version: '1.0.0' });
 const songs = [
-  { zone: 25, x: 14, y: 128, key: 'lapisNightMusic', day: 'lmusic', seconds: 32 * 4 * 60 / 86 },
+  { zone: 25, x: 14, y: 128, key: 'lapisNightMusic', day: 'lmusic', seconds: soundtrack('lapis_night') },
 ];
 let browser, started = false;
 async function call(name, args = {}) {

@@ -1,3 +1,4 @@
+const soundtrack = require('./lib/soundtrack.cjs');
 // Focused private-world playback check for the Frostwake Shelf's night remix.
 const assert = require('node:assert/strict');
 const path = require('node:path');
@@ -8,7 +9,7 @@ const { StdioClientTransport, getDefaultEnvironment } = require('@modelcontextpr
 const root = path.resolve(__dirname, '..');
 const client = new Client({ name: 'valhallasc-frostwake-night-music', version: '1.0.0' });
 const songs = [
-  { zone: 26, x: 14, y: 128, key: 'frostwakeNightMusic', day: 'fwMusic', seconds: 32 * 4 * 60 / 84 },
+  { zone: 26, x: 14, y: 128, key: 'frostwakeNightMusic', day: 'fwMusic', seconds: soundtrack('frostwake_night') },
 ];
 let browser, started = false;
 async function call(name, args = {}) {

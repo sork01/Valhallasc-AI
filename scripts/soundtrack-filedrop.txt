@@ -1,0 +1,1371 @@
+{
+  "version": "1.15.4",
+  "source": "Sork FileDrop",
+  "preserved": {
+    "music_asterion_night.mp3": "9fd6fbc2de45ffae032f277f3fdc10304347f2b6f7579fdac098009228851413",
+    "music_eldmarr.mp3": "29e6ff8a2047ecb086fdbb14f45fa361c0e10d00423309f605c946280f4e2cc7",
+    "music_asterion.mp3": "d19a781ff2a2f141ef79fc5d88f80ff4a0a10b83423c46f1f507ad90211239c9",
+    "music_night.mp3": "8b35cb591f1d6a7749715b7b45407e4fc9f4c34011e8194dee6264dc4d8583bf"
+  },
+  "tracks": [
+    {
+      "slot": "meadow",
+      "zones": [
+        0
+      ],
+      "source": "Greenmeadow_Wander_KMMO_Field_Remix_proj_mww8f4he.mp3",
+      "source_sha256": "100ae0a8d8e49e64b6a59cdb21c39e6b545f4b703405a804b603340655e97386",
+      "title": "Greenmeadow Wander (KMMO Field Remix)",
+      "project_id": "proj_mww8f4he",
+      "already_installed": true,
+      "game_sha256": "dcf3d53a66a9dd3750a254294ddf1ca5a613cd618d962f9e262a1b15e5c00ac0",
+      "seconds": 79.565215,
+      "mono_rms_db": -24.0289,
+      "peak_db": -5.3256,
+      "seam_delta": 0.001726
+    },
+    {
+      "slot": "meadow_night",
+      "zones": [
+        0
+      ],
+      "source": "Greenmeadow_at_Midnight_Chillhop_Remix_proj_mww9k07e.mp3",
+      "source_sha256": "033bd6ef2f6e815e9408482201047d70210b5bf6030a974f4e66574c2ff476dc",
+      "title": "Greenmeadow at Midnight (Chillhop Remix)",
+      "project_id": "proj_mww9k07e",
+      "already_installed": true,
+      "game_sha256": "2e93af47fd38bb3f4d506dfb8538ead1ebe3d132ed0e794830bfcfb68597bed2",
+      "seconds": 117.073175,
+      "mono_rms_db": -23.9851,
+      "peak_db": -6.0865,
+      "seam_delta": 0.001001
+    },
+    {
+      "slot": "crags",
+      "zones": [
+        1
+      ],
+      "source": "Ashfall_Run_Volcanic_KMMO_Remix_proj_mww8w5vu.mp3",
+      "source_sha256": "5b588d7beaf8acbb4c228c317cab5048edb5968b6d4388d5d14bebc7f481df77",
+      "title": "Ashfall Run (Volcanic KMMO Remix)",
+      "project_id": "proj_mww8w5vu",
+      "already_installed": true,
+      "game_sha256": "8bf787198c724d43004e7e996209cffb3ef93f3717a99393d30a85fb5a137ef7",
+      "seconds": 80.0,
+      "mono_rms_db": -23.9963,
+      "peak_db": -7.2318,
+      "seam_delta": 0.000317
+    },
+    {
+      "slot": "crags_night",
+      "zones": [
+        1
+      ],
+      "source": "Ashfall_at_Midnight_Chillhop_Remix_proj_mwwa0vcc.mp3",
+      "source_sha256": "14588e4012b81c4fee3fd12963e9bb95ae7d07c84ab62a8f6a990ab820cb3232",
+      "title": "Ashfall at Midnight (Chillhop Remix)",
+      "project_id": "proj_mwwa0vcc",
+      "already_installed": true,
+      "game_sha256": "4c3946b27764561eb95e47f7613bdd8772ae68665e9fc55001c107420b913a21",
+      "seconds": 114.285714,
+      "mono_rms_db": -23.9989,
+      "peak_db": -6.1025,
+      "seam_delta": 0.002084
+    },
+    {
+      "slot": "rime",
+      "zones": [
+        2
+      ],
+      "source": "Rimeveil_Spiral_Glacial_KMMO_Theme_proj_mwwalvo3.mp3",
+      "source_sha256": "f96475eb873914014d11a86554025b39ac9dd2315a1bc0eee4820b5049e3d15d",
+      "title": "Rimeveil Spiral (Glacial KMMO Theme)",
+      "project_id": "proj_mwwalvo3",
+      "already_installed": true,
+      "game_sha256": "bce66f666f0d4e4f86f5de1b54e98cb1a2a3e50444e57bd351c7a4eeb28917d0",
+      "seconds": 99.66102,
+      "mono_rms_db": -24.019,
+      "peak_db": -5.3833,
+      "seam_delta": 0.000307
+    },
+    {
+      "slot": "rime_night",
+      "zones": [
+        2
+      ],
+      "source": "Rimeveil_at_Midnight_Chillhop_Remix_proj_mwwan3dl.mp3",
+      "source_sha256": "bddf9635088340c1df7dbb87afd1f0480364a1774baff7ebf11c2581ed0b9a71",
+      "title": "Rimeveil at Midnight (Chillhop Remix)",
+      "project_id": "proj_mwwan3dl",
+      "already_installed": true,
+      "game_sha256": "e9f2a2bab47d39a262f620465fad858bf894c7539d268811989f32f5ed3becf7",
+      "seconds": 117.073175,
+      "mono_rms_db": -23.9885,
+      "peak_db": -6.5236,
+      "seam_delta": 0.001028
+    },
+    {
+      "slot": "fen",
+      "zones": [
+        3
+      ],
+      "source": "Gloamfen_Lanternmere_Mystical_KMMO_Theme_proj_mwwbdl1o.mp3",
+      "source_sha256": "f80f711159c9243501801ae753242137a8782e7cefa190b4e42f7ec61fd44cc6",
+      "title": "Gloamfen Lanternmere (Mystical KMMO Theme)",
+      "project_id": "proj_mwwbdl1o",
+      "already_installed": true,
+      "game_sha256": "b44c18a73f5d6bbcdedbd8762a73bb3ee598b51c71c28fe8fbd96523aed1fb42",
+      "seconds": 83.076916,
+      "mono_rms_db": -24.0079,
+      "peak_db": -5.8704,
+      "seam_delta": 0.000423
+    },
+    {
+      "slot": "fen_night",
+      "zones": [
+        3
+      ],
+      "source": "Gloamfen_at_Midnight_Chillhop_Remix_proj_mwwbey70.mp3",
+      "source_sha256": "9f3194395a8880a6919ed48cfeaae0bc1bb4130c59dc380608ba1f3212332c50",
+      "title": "Gloamfen at Midnight (Chillhop Remix)",
+      "project_id": "proj_mwwbey70",
+      "already_installed": true,
+      "game_sha256": "eb2a2be2d4d110e37b7a06603c248cc56a2731e6504378cc2950fd67d7487b47",
+      "seconds": 119.01,
+      "mono_rms_db": -23.985,
+      "peak_db": -5.5827,
+      "seam_delta": 0.001802
+    },
+    {
+      "slot": "city",
+      "zones": [
+        4
+      ],
+      "source": "Skaldholm_Square_Nordic_Town_KMMO_Theme_proj_mwwcc50p.mp3",
+      "source_sha256": "97ca5b686ad6e9e1dbba7c3e4da1ccccbf0e0f8ccb9733bc7a1fa70cdc16081d",
+      "title": "Skaldholm Square (Nordic Town KMMO Theme)",
+      "project_id": "proj_mwwcc50p",
+      "already_installed": true,
+      "game_sha256": "649b18d5d216a2c2ed557f9283d2981b2e9d3ee96aa68c1da616a49b6d0b5700",
+      "seconds": 110.769229,
+      "mono_rms_db": -23.9834,
+      "peak_db": -5.936,
+      "seam_delta": 0.000482
+    },
+    {
+      "slot": "city_night",
+      "zones": [
+        4
+      ],
+      "source": "Skaldholm_at_Midnight_Chillhop_Remix_proj_mwwcjkao.mp3",
+      "source_sha256": "6b5bd6b84329600f4256439b5a08cf24a818afc784d51f9c7a1448d17dbd84fd",
+      "title": "Skaldholm at Midnight (Chillhop Remix)",
+      "project_id": "proj_mwwcjkao",
+      "already_installed": true,
+      "game_sha256": "9b58a086d523a57051a32b60e6b1ac70a60660f73b38b4997888bab725198b22",
+      "seconds": 117.073175,
+      "mono_rms_db": -24.0012,
+      "peak_db": -6.0814,
+      "seam_delta": 0.002718
+    },
+    {
+      "slot": "vault",
+      "zones": [
+        5
+      ],
+      "source": "Undervault_-_Beneath_the_Stone_Crypt_KMMO_Theme_proj_mwwdakfy.mp3",
+      "source_sha256": "7b147c9f87bb6a18a302d7d991bb7eaf97bf0501397f653718cf3d1dd1bc3a1b",
+      "title": "Undervault - Beneath the Stone (Crypt KMMO Theme)",
+      "project_id": "proj_mwwdakfy",
+      "already_installed": true,
+      "game_sha256": "9851a01e31e081852897dcd57144a904ce44608cf41295ad5381df016b4f4e43",
+      "seconds": 147.692313,
+      "mono_rms_db": -24.0021,
+      "peak_db": -5.0506,
+      "seam_delta": 0.000443
+    },
+    {
+      "slot": "wyrd",
+      "zones": [
+        6
+      ],
+      "source": "Wyrdwood_Wanderings_Enchanted_Forest_KMMO_Theme_proj_mwwe2im0.mp3",
+      "source_sha256": "04617b8e4fb093399826afebf9485401a9afd1012ab6742891b18de9a1577c42",
+      "title": "Wyrdwood Wanderings (Enchanted Forest KMMO Theme)",
+      "project_id": "proj_mwwe2im0",
+      "already_installed": true,
+      "game_sha256": "c7b3438bbc41a1b93ac4fefc5bc8a3327a9b2b5350365e0f969d9d8a25968496",
+      "seconds": 90.0,
+      "mono_rms_db": -24.0066,
+      "peak_db": -5.0163,
+      "seam_delta": 0.001974
+    },
+    {
+      "slot": "wyrd_night",
+      "zones": [
+        6
+      ],
+      "source": "Wyrdwood_at_Midnight_Chillhop_Remix_proj_mwwe3u1c.mp3",
+      "source_sha256": "fbec69a59bdafb21e99dbc2fe7eb6213a1cb478df20284c0f5483108425f6e73",
+      "title": "Wyrdwood at Midnight (Chillhop Remix)",
+      "project_id": "proj_mwwe3u1c",
+      "already_installed": true,
+      "game_sha256": "cad2939754c2cd0b607319b7c0f639b4ca55514c457b64dd54c01417d521fbcf",
+      "seconds": 117.073175,
+      "mono_rms_db": -23.9834,
+      "peak_db": -4.8916,
+      "seam_delta": 0.000567
+    },
+    {
+      "slot": "sky",
+      "zones": [
+        7
+      ],
+      "source": "Bifrost_Reach_-_Above_the_Storm_Celestial_KMMO_Theme_proj_mwweu7pn.mp3",
+      "source_sha256": "b9f6651ab909c2c2ad41a491325cda69eda6436d092efd1e6b282dc7220233fe",
+      "title": "Bifrost Reach - Above the Storm (Celestial KMMO Theme)",
+      "project_id": "proj_mwweu7pn",
+      "already_installed": true,
+      "game_sha256": "b1086029768b5af092a4e7eb39b8046c22c43241e75617884ae470e0c94dc665",
+      "seconds": 109.16,
+      "mono_rms_db": -24.0025,
+      "peak_db": -5.4927,
+      "seam_delta": 0.000109
+    },
+    {
+      "slot": "sky_night",
+      "zones": [
+        7
+      ],
+      "source": "Bifrost_at_Midnight_Chillhop_Remix_proj_mwwf1sha.mp3",
+      "source_sha256": "2a67e2ad578ada3e452c079b31ebe45cca39240418e0a511460431b814e51675",
+      "title": "Bifrost at Midnight (Chillhop Remix)",
+      "project_id": "proj_mwwf1sha",
+      "already_installed": true,
+      "game_sha256": "a63f735f8c6a1fc8f44c191795a33675c5c99125a5fe64b065ec341f18a4dc03",
+      "seconds": 116.54,
+      "mono_rms_db": -23.9809,
+      "peak_db": -5.6859,
+      "seam_delta": 0.000138
+    },
+    {
+      "slot": "deep",
+      "zones": [
+        8
+      ],
+      "source": "Rans_Deep_-_Lullaby_of_the_Deep_Abyssal_KMMO_Theme_proj_mwwgbcjc.mp3",
+      "source_sha256": "e3f597215a715df995e28d2640bae6ca6904d5da0623f97350960a42fa2424ca",
+      "title": "Rans Deep - Lullaby of the Deep (Abyssal KMMO Theme)",
+      "project_id": "proj_mwwgbcjc",
+      "already_installed": true,
+      "game_sha256": "c0842d0ae0a534d82ec417d7e2ff32546e1b157c7d580fc47d68f6c27d807d93",
+      "seconds": 121.59,
+      "mono_rms_db": -23.9821,
+      "peak_db": -4.1009,
+      "seam_delta": 0.000282
+    },
+    {
+      "slot": "deep_night",
+      "zones": [
+        8
+      ],
+      "source": "Rans_Deep_at_Midnight_Chillhop_Remix_proj_mwwgckxh.mp3",
+      "source_sha256": "6d43165ec1b1c9d5b42ef448ccd1890637b4b82ae2f61d337f557583f4fd8cb0",
+      "title": "Rans Deep at Midnight (Chillhop Remix)",
+      "project_id": "proj_mwwgckxh",
+      "already_installed": true,
+      "game_sha256": "4274d9de7a43da8e553777aa2653d93cfc1911fb4af5993510d0fbc5fb3b8920",
+      "seconds": 119.29,
+      "mono_rms_db": -23.989,
+      "peak_db": -5.7121,
+      "seam_delta": 0.000894
+    },
+    {
+      "slot": "nacre",
+      "zones": [
+        9
+      ],
+      "source": "Nacrehold_-_Waterglass_Lullaby_Underwater_Pearl_KMMO_Theme_proj_mwwh3xwb.mp3",
+      "source_sha256": "2f67ab2f8f496304ecb8ee31054fbdd332ca4fb7d82120341960f80ca86930d7",
+      "title": "Nacrehold - Waterglass Lullaby (Underwater Pearl KMMO Theme)",
+      "project_id": "proj_mwwh3xwb",
+      "already_installed": true,
+      "game_sha256": "33ab7a8c3245ea4b5d4e9988ab0cd0f5c90ee9a1222169bdbe3e5aa80bbdff85",
+      "seconds": 120.0,
+      "mono_rms_db": -24.0462,
+      "peak_db": -3.7315,
+      "seam_delta": 0.000637
+    },
+    {
+      "slot": "nacre_night",
+      "zones": [
+        9
+      ],
+      "source": "Nacrehold_at_Midnight_Chillhop_Remix_proj_mwwj327j.mp3",
+      "source_sha256": "60d8c81ed2b072dca95f20d60e7070723a0a46e2a15171b18551ce0b341c954e",
+      "title": "Nacrehold at Midnight (Chillhop Remix)",
+      "project_id": "proj_mwwj327j",
+      "already_installed": true,
+      "game_sha256": "129f9b7f386b2ce11da816ef90f5ca85c71e7fb2b6e722ad8125c7f547335caf",
+      "seconds": 117.073175,
+      "mono_rms_db": -23.9771,
+      "peak_db": -5.8099,
+      "seam_delta": 0.001819
+    },
+    {
+      "slot": "cathedral_cloister",
+      "zones": [
+        10
+      ],
+      "source": "The_Drowned_Cathedral_-_Flooded_Cloister_Stillwater_Vespers_Liturgical_3_4_KMMO_Theme_proj_mwxdtt8y.mp3",
+      "source_sha256": "8e1d057b08e6be54637875f1bc633bd77572c12c65f74b58a5b73a2078677441",
+      "title": "The Drowned Cathedral - Flooded Cloister: Stillwater Vespers (Liturgical 3/4 KMMO Theme)",
+      "project_id": "proj_mwxdtt8y",
+      "already_installed": false,
+      "seconds": 130.909093,
+      "mono_rms_db": -24.0159,
+      "peak_db": -4.561,
+      "seam_delta": 0.004963,
+      "game_sha256": "221b650886b664fe8a3bdbbeca5ed916b8a92b68a5dfd51ab2b77869977a24ea",
+      "bpm": 66,
+      "meter": "3/4",
+      "bars": 48,
+      "loop_seconds": 130.909093,
+      "source_seconds": 130.909093,
+      "tail_seconds": 0.0
+    },
+    {
+      "slot": "cathedral_reliquary",
+      "zones": [
+        11
+      ],
+      "source": "The_Drowned_Cathedral_-_Coral_Reliquary_Pearls_Behind_Glass_Crystalline_6_8_KMMO_Theme_proj_mwxe5fdv.mp3",
+      "source_sha256": "95029af852959c3613290d310be9b58e031087d1dc33c51baa5be6cb87d565be",
+      "title": "The Drowned Cathedral - Coral Reliquary: Pearls Behind Glass (Crystalline 6/8 KMMO Theme)",
+      "project_id": "proj_mwxe5fdv",
+      "already_installed": false,
+      "seconds": 102.857143,
+      "mono_rms_db": -24.0117,
+      "peak_db": -4.7837,
+      "seam_delta": 0.009344,
+      "game_sha256": "1966e885cf7ddd65893031c6b63f5ed0c4884ed8508a37b0e214d9e2341c31af",
+      "bpm": 84,
+      "meter": "6/8",
+      "bars": 48,
+      "loop_seconds": 102.857143,
+      "source_seconds": 102.857143,
+      "tail_seconds": 0.0
+    },
+    {
+      "slot": "cathedral_nave",
+      "zones": [
+        12
+      ],
+      "source": "The_Drowned_Cathedral_-_Grand_Nave_Heart_of_the_Drowned_Tide_Gothic_Cathedral_4_4_KMMO_Theme_proj_mwxefmbg.mp3",
+      "source_sha256": "6ffc5ce422d3924ec98079d6cbbbd64f862b03bd71d4034ba3fcf3e06952efbc",
+      "title": "The Drowned Cathedral - Grand Nave: Heart of the Drowned Tide (Gothic Cathedral 4/4 KMMO Theme)",
+      "project_id": "proj_mwxefmbg",
+      "already_installed": false,
+      "seconds": 135.384626,
+      "mono_rms_db": -23.9696,
+      "peak_db": -5.6932,
+      "seam_delta": 0.003006,
+      "game_sha256": "1de5eae2d124beb587e187bd9baa6b615445f005f0a9a240af0766bff1a03bc0",
+      "bpm": 78,
+      "meter": "4/4",
+      "bars": 44,
+      "loop_seconds": 135.384626,
+      "source_seconds": 135.384626,
+      "tail_seconds": 0.0
+    },
+    {
+      "slot": "astral",
+      "zones": [
+        13
+      ],
+      "source": "Astralhollow_-_The_Falling_Garden_Celestial_5_4_KMMO_Theme_proj_mwwjnh0v.mp3",
+      "source_sha256": "c456782976d262eaf94e628ed310a80b1246c930a760dad4dac8d9d1c7ec4659",
+      "title": "Astralhollow - The Falling Garden (Celestial 5/4 KMMO Theme)",
+      "project_id": "proj_mwwjnh0v",
+      "already_installed": true,
+      "game_sha256": "9d43e92308b6d249999215ece9ddba6a9ef49df2f7d1cf7eebc51c5fe1dd8508",
+      "seconds": 122.222222,
+      "mono_rms_db": -24.0566,
+      "peak_db": -4.7907,
+      "seam_delta": 0.001297
+    },
+    {
+      "slot": "astral_night",
+      "zones": [
+        13
+      ],
+      "source": "Astralhollow_at_Midnight_Chillhop_Remix_proj_mwwjwobz.mp3",
+      "source_sha256": "12941632ce7312d3db4834a636a9f37b1777cfd1caa6de1b14c2bd4fbd78c5ac",
+      "title": "Astralhollow at Midnight (Chillhop Remix)",
+      "project_id": "proj_mwwjwobz",
+      "already_installed": true,
+      "game_sha256": "9c04f001b927adccc4e5dd3e247a9ebf21145a6bb02eeb61fe549b6786777cc4",
+      "seconds": 117.073175,
+      "mono_rms_db": -24.0133,
+      "peak_db": -6.1468,
+      "seam_delta": 0.001846
+    },
+    {
+      "slot": "prism",
+      "zones": [
+        14
+      ],
+      "source": "Prismwaste_-_Saltglass_Mirage_Desert_Crystal_KMMO_Theme_proj_mwx2awke.mp3",
+      "source_sha256": "cb9a850b3862e7ff3f0577c1327d804f9c1f1cbc8ef42c6f1f1602617dd9b47d",
+      "title": "Prismwaste - Saltglass Mirage (Desert Crystal KMMO Theme)",
+      "project_id": "proj_mwx2awke",
+      "already_installed": false,
+      "seconds": 110.769229,
+      "mono_rms_db": -24.022,
+      "peak_db": -5.7239,
+      "seam_delta": 0.008697,
+      "game_sha256": "38a9baf0f6595c86b23a761bef09a8e0100fc57d6e5f87ecc0832511dad35e16",
+      "bpm": 104,
+      "meter": "4/4",
+      "bars": 48,
+      "loop_seconds": 110.769229,
+      "source_seconds": 110.769229,
+      "tail_seconds": 0
+    },
+    {
+      "slot": "prism_night",
+      "zones": [
+        14
+      ],
+      "source": "Prismwaste_at_Midnight_Chillhop_Remix_proj_mwx2jied.mp3",
+      "source_sha256": "9c185568e3dc37d7abbbf9dce35425f408f3ce007bcc264fcc360c6a89279da6",
+      "title": "Prismwaste at Midnight (Chillhop Remix)",
+      "project_id": "proj_mwx2jied",
+      "already_installed": false,
+      "seconds": 117.073175,
+      "mono_rms_db": -23.9847,
+      "peak_db": -6.0776,
+      "seam_delta": 0.030067,
+      "game_sha256": "3175e0a649b226c22ff6977d89cd4e928b6589ef2c850d7582da5af240c86fcc",
+      "bpm": 82,
+      "meter": "4/4",
+      "bars": 40,
+      "loop_seconds": 117.073175,
+      "source_seconds": 117.073175,
+      "tail_seconds": 0.0
+    },
+    {
+      "slot": "orrery",
+      "zones": [
+        15
+      ],
+      "source": "Orrery_-_The_Unwound_Hour_Clockwork_3_4_KMMO_Theme_proj_mwwkk7rq.mp3",
+      "source_sha256": "3fedcf7a8514833ec12f9bf7119129be525b1e73dfa4082e48378163417ab300",
+      "title": "Orrery - The Unwound Hour (Clockwork 3/4 KMMO Theme)",
+      "project_id": "proj_mwwkk7rq",
+      "already_installed": true,
+      "game_sha256": "e7f3465c66aca05afbb3c331213b1a3a03b313c33c307da1a8e082633f91f14b",
+      "seconds": 101.739138,
+      "mono_rms_db": -24.0282,
+      "peak_db": -4.4889,
+      "seam_delta": 0.001017
+    },
+    {
+      "slot": "orrery_night",
+      "zones": [
+        15
+      ],
+      "source": "Orrery_at_Midnight_Chillhop_Remix_proj_mwwks1f1.mp3",
+      "source_sha256": "fa8f433fd3333ed8bb23f0a71e9ac66e295139fe5041b756d2499ffa1993dd0f",
+      "title": "Orrery at Midnight (Chillhop Remix)",
+      "project_id": "proj_mwwks1f1",
+      "already_installed": true,
+      "game_sha256": "912082aa703de1bf5752e1b61f8ddb670fee964600a0976362566809517382d7",
+      "seconds": 117.073175,
+      "mono_rms_db": -24.009,
+      "peak_db": -6.0283,
+      "seam_delta": 0.00185
+    },
+    {
+      "slot": "moonspore",
+      "zones": [
+        16
+      ],
+      "source": "Moonspore_Canopy_-_Lanterns_in_the_Canopy_Bioluminescent_KMMO_Theme_proj_mwwfm40w.mp3",
+      "source_sha256": "44008da1880604874b2c9bd86f5d9e4198c73896c64afb6d2fd8e03ce5483cf5",
+      "title": "Moonspore Canopy - Lanterns in the Canopy (Bioluminescent KMMO Theme)",
+      "project_id": "proj_mwwfm40w",
+      "already_installed": true,
+      "game_sha256": "4547d2f467462468b42a2b22bd8d68532dbe341d0032f957a37b313f40b097ea",
+      "seconds": 86.4,
+      "mono_rms_db": -24.0153,
+      "peak_db": -5.0747,
+      "seam_delta": 0.001411
+    },
+    {
+      "slot": "moonspore_night",
+      "zones": [
+        16
+      ],
+      "source": "Moonspore_at_Midnight_Chillhop_Remix_proj_mwwfrukg.mp3",
+      "source_sha256": "1bdb951ad4b43debddcac5d527eca09c72779739d5ab95d0d280a3548972d1ae",
+      "title": "Moonspore at Midnight (Chillhop Remix)",
+      "project_id": "proj_mwwfrukg",
+      "already_installed": true,
+      "game_sha256": "e5aa6e5c14b6ff2d06dacb80a11539cae43975c8503a6bf3cbb9869ee0a8721e",
+      "seconds": 117.073175,
+      "mono_rms_db": -23.9943,
+      "peak_db": -5.4619,
+      "seam_delta": 0.000277
+    },
+    {
+      "slot": "moonwell",
+      "zones": [
+        18
+      ],
+      "source": "The_Moonwell_-_A_Bell_for_Your_Reflection_Nocturnal_Water-Garden_6_8_KMMO_Theme_proj_mwxfd44d.mp3",
+      "source_sha256": "aac29220149c43806dd8eab593d00e0c2037297fb7713a33bcf56f6cef80c5b7",
+      "title": "The Moonwell - A Bell for Your Reflection (Nocturnal Water-Garden 6/8 KMMO Theme)",
+      "project_id": "proj_mwxfd44d",
+      "already_installed": false,
+      "bpm": 82,
+      "meter": "6/8",
+      "bars": 48,
+      "loop_seconds": 105.36585,
+      "source_seconds": 107.560975,
+      "tail_seconds": 2.195125,
+      "seconds": 105.36585,
+      "mono_rms_db": -24.0167,
+      "peak_db": -5.0922,
+      "seam_delta": 0.004551,
+      "game_sha256": "28dcdaf4d359930abe295b351f75d3824d915d380938bd561ddbefa4e6c09622"
+    },
+    {
+      "slot": "stormglass",
+      "zones": [
+        19
+      ],
+      "source": "Stormglass_Shore_-_Where_the_Breakers_Sing_Coastal_KMMO_Theme_proj_mwwm54ij.mp3",
+      "source_sha256": "41954cf04ed7969b55d1ffce4b4d3c48aa95bba4fd93bafe96f77be3e2b90fe8",
+      "title": "Stormglass Shore - Where the Breakers Sing (Coastal KMMO Theme)",
+      "project_id": "proj_mwwm54ij",
+      "already_installed": false,
+      "seconds": 110.769229,
+      "mono_rms_db": -24.0314,
+      "peak_db": -4.6844,
+      "seam_delta": 0.013054,
+      "game_sha256": "7e96fdd77d292e1ecdc757824783feb578f7884ffac92b7b2917917e874cb10f",
+      "bpm": 104,
+      "meter": "4/4",
+      "bars": 48,
+      "loop_seconds": 110.769229,
+      "source_seconds": 110.769229,
+      "tail_seconds": 0
+    },
+    {
+      "slot": "stormglass_night",
+      "zones": [
+        19
+      ],
+      "source": "Stormglass_at_Midnight_Chillhop_Remix_proj_mwwmclsc.mp3",
+      "source_sha256": "2a53b6aa6710dd073615977e0b8fe404c136fa14c23e27f467074ddc5bf51a5f",
+      "title": "Stormglass at Midnight (Chillhop Remix)",
+      "project_id": "proj_mwwmclsc",
+      "already_installed": false,
+      "seconds": 117.073175,
+      "mono_rms_db": -24.0093,
+      "peak_db": -5.8902,
+      "seam_delta": 0.005221,
+      "game_sha256": "e72fcd237bed7513403d98fff0d0282d0df24f934e7411fc6d224b6aa8442674",
+      "bpm": 82,
+      "meter": "4/4",
+      "bars": 40,
+      "loop_seconds": 117.073175,
+      "source_seconds": 117.073175,
+      "tail_seconds": 0.0
+    },
+    {
+      "slot": "sunward",
+      "zones": [
+        20
+      ],
+      "source": "Sunward_Vale_-_Along_the_Millstream_Pastoral_KMMO_Theme_proj_mwx78rnx.mp3",
+      "source_sha256": "ea4b6c429324450eeff86c001649500c4810f243bfb7577d6c621c7c1bd42c12",
+      "title": "Sunward Vale - Along the Millstream (Pastoral KMMO Theme)",
+      "project_id": "proj_mwx78rnx",
+      "already_installed": false,
+      "seconds": 110.769229,
+      "mono_rms_db": -23.9858,
+      "peak_db": -4.3986,
+      "seam_delta": 0.00395,
+      "game_sha256": "6cd8c25a780736e7e5ae85e02881176c17fd2d5d3596526ef26f57ba3d1757e2",
+      "bpm": 104,
+      "meter": "4/4",
+      "bars": 48,
+      "loop_seconds": 110.769229,
+      "source_seconds": 110.769229,
+      "tail_seconds": 0
+    },
+    {
+      "slot": "sunward_night",
+      "zones": [
+        20
+      ],
+      "source": "Sunward_Vale_at_Midnight_Chillhop_Remix_proj_mwx7hpty.mp3",
+      "source_sha256": "6279033143961396258204933bf9c8ba38f423809018c128337597530913bae2",
+      "title": "Sunward Vale at Midnight (Chillhop Remix)",
+      "project_id": "proj_mwx7hpty",
+      "already_installed": false,
+      "seconds": 117.073175,
+      "mono_rms_db": -23.9823,
+      "peak_db": -4.3924,
+      "seam_delta": 0.005404,
+      "game_sha256": "bc25ce1ec6618e88c2999469d40efd996a7c21f76cbf5fd0c10ac3a95e79dac8",
+      "bpm": 82,
+      "meter": "4/4",
+      "bars": 40,
+      "loop_seconds": 117.073175,
+      "source_seconds": 117.073175,
+      "tail_seconds": 0.0
+    },
+    {
+      "slot": "ribbonwild",
+      "zones": [
+        21
+      ],
+      "source": "Ribbonwild_-_March_of_Many_Colors_Festival_KMMO_Theme_proj_mwx7yrrb.mp3",
+      "source_sha256": "3000a445c91aec60126c970794ceb4389dbe535ffb2714f7ce6717cdb2b953c0",
+      "title": "Ribbonwild - March of Many Colors (Festival KMMO Theme)",
+      "project_id": "proj_mwx7yrrb",
+      "already_installed": false,
+      "seconds": 96.0,
+      "mono_rms_db": -24.037,
+      "peak_db": -5.1252,
+      "seam_delta": 0.002596,
+      "game_sha256": "7a1277f4e20a7c1a5bed12a11132605464fb864f5f40b5f77124f423cd1b40c5",
+      "bpm": 120,
+      "meter": "4/4",
+      "bars": 48,
+      "loop_seconds": 96.0,
+      "source_seconds": 96.0,
+      "tail_seconds": 0
+    },
+    {
+      "slot": "ribbonwild_night",
+      "zones": [
+        21
+      ],
+      "source": "Ribbonwild_at_Midnight_-_Lanterns_After_the_Parade_Chillhop_Remix_proj_mwx861pa.mp3",
+      "source_sha256": "b0fb6f5b996df85bec460cbadc7b6046abc061e99c4b28efb8aa34a4359f00eb",
+      "title": "Ribbonwild at Midnight - Lanterns After the Parade (Chillhop Remix)",
+      "project_id": "proj_mwx861pa",
+      "already_installed": false,
+      "seconds": 117.073175,
+      "mono_rms_db": -23.9922,
+      "peak_db": -5.02,
+      "seam_delta": 0.010005,
+      "game_sha256": "d87800f431b0a29b0d48bf5b77f4b0041ce0e0f0d4881a9be2745ab52a6830d2",
+      "bpm": 82,
+      "meter": "4/4",
+      "bars": 40,
+      "loop_seconds": 117.073175,
+      "source_seconds": 117.073175,
+      "tail_seconds": 0.0
+    },
+    {
+      "slot": "tanglecrown",
+      "zones": [
+        22
+      ],
+      "source": "Tanglecrown_-_Beneath_the_Rain_Crown_Jungle_Canopy_KMMO_Theme_proj_mwx8oees.mp3",
+      "source_sha256": "ffcdd191daed43b28805a1d94f96ffb1ab6287b28933fc7bbbb5253e310b9804",
+      "title": "Tanglecrown - Beneath the Rain Crown (Jungle Canopy KMMO Theme)",
+      "project_id": "proj_mwx8oees",
+      "already_installed": false,
+      "seconds": 110.769229,
+      "mono_rms_db": -23.9837,
+      "peak_db": -5.9213,
+      "seam_delta": 0.004189,
+      "game_sha256": "d3dcf1daffa5a9c832aabcfe38900cfc15c284a2169d33a6aba734d91e9eb9bb",
+      "bpm": 104,
+      "meter": "4/4",
+      "bars": 48,
+      "loop_seconds": 110.769229,
+      "source_seconds": 110.769229,
+      "tail_seconds": 0
+    },
+    {
+      "slot": "tanglecrown_night",
+      "zones": [
+        22
+      ],
+      "source": "Tanglecrown_at_Midnight_-_Rain_on_the_Banyan_Leaves_Chillhop_Remix_proj_mwx8w57j.mp3",
+      "source_sha256": "369b5257e42f3dbe79070ce764e56e357a72765deb924e005a9e4dd2854bf236",
+      "title": "Tanglecrown at Midnight - Rain on the Banyan Leaves (Chillhop Remix)",
+      "project_id": "proj_mwx8w57j",
+      "already_installed": false,
+      "seconds": 117.073175,
+      "mono_rms_db": -24.0103,
+      "peak_db": -5.4396,
+      "seam_delta": 0.016424,
+      "game_sha256": "9b8fc4ef8d1014b9d36b2a2b4599c7e347236ebad13e2ebe4f88ae0e25a91f67",
+      "bpm": 82,
+      "meter": "4/4",
+      "bars": 40,
+      "loop_seconds": 117.073175,
+      "source_seconds": 117.073175,
+      "tail_seconds": 0.0
+    },
+    {
+      "slot": "worldheart",
+      "zones": [
+        23,
+        24
+      ],
+      "source": "Veyrroot_-_Rooms_in_the_Canopy_Arboreal_KMMO_Theme_proj_mwx9hp92.mp3",
+      "source_sha256": "766724f39a6571fb373dc044599e468bcbaa453a54742a1deede3b9066161ccd",
+      "title": "Veyrroot - Rooms in the Canopy (Arboreal KMMO Theme)",
+      "project_id": "proj_mwx9hp92",
+      "already_installed": false,
+      "seconds": 115.2,
+      "mono_rms_db": -24.0326,
+      "peak_db": -5.3963,
+      "seam_delta": 0.00909,
+      "game_sha256": "1a98603f55d67179bcf12307939d9f54bec1e24039724c3bf3d6bfefaadabf08",
+      "bpm": 100,
+      "meter": "4/4",
+      "bars": 48,
+      "loop_seconds": 115.2,
+      "source_seconds": 115.2,
+      "tail_seconds": 0
+    },
+    {
+      "slot": "veyrroot_night",
+      "zones": [
+        23
+      ],
+      "source": "Veyrroot_at_Midnight_-_When_the_Branches_Sleep_Chillhop_Remix_proj_mwx9v20b.mp3",
+      "source_sha256": "240aa3968b6deda2ac5bf74cf19516c5f3be7c40f13ef429c063381be1f8b560",
+      "title": "Veyrroot at Midnight - When the Branches Sleep (Chillhop Remix)",
+      "project_id": "proj_mwx9v20b",
+      "already_installed": false,
+      "seconds": 117.073175,
+      "mono_rms_db": -24.0068,
+      "peak_db": -5.6897,
+      "seam_delta": 0.0221,
+      "game_sha256": "125b4d2f5978a54175ef9f301b91fc457239668943e53cc595c8b7dbc2d3a665",
+      "bpm": 82,
+      "meter": "4/4",
+      "bars": 40,
+      "loop_seconds": 117.073175,
+      "source_seconds": 117.073175,
+      "tail_seconds": 0.0
+    },
+    {
+      "slot": "lapis",
+      "zones": [
+        25
+      ],
+      "source": "Lapis_Erg_-_Wells_of_Blue_Glass_Desert_Oasis_KMMO_Theme_proj_mwxap2tl.mp3",
+      "source_sha256": "6def1e67850c58887093a692d334a5da66d0215d76ac90b8a41c5c8821604b85",
+      "title": "Lapis Erg - Wells of Blue Glass (Desert Oasis KMMO Theme)",
+      "project_id": "proj_mwxap2tl",
+      "already_installed": false,
+      "seconds": 117.55102,
+      "mono_rms_db": -24.0108,
+      "peak_db": -5.4364,
+      "seam_delta": 0.014875,
+      "game_sha256": "0706e51e8b418815f3a77e4e79bc3af634e091e666cc9c8415d480e75f0915e5",
+      "bpm": 98,
+      "meter": "4/4",
+      "bars": 48,
+      "loop_seconds": 117.55102,
+      "source_seconds": 117.55102,
+      "tail_seconds": 0
+    },
+    {
+      "slot": "lapis_night",
+      "zones": [
+        25
+      ],
+      "source": "Lapis_Erg_at_Midnight_-_Caravan_Under_the_Stars_Chillhop_Remix_proj_mwxb2buj.mp3",
+      "source_sha256": "811b492dcc3e6663017ab920327ee1f4407c10a1ce423a195b3197d5c2f0cbac",
+      "title": "Lapis Erg at Midnight - Caravan Under the Stars (Chillhop Remix)",
+      "project_id": "proj_mwxb2buj",
+      "already_installed": false,
+      "seconds": 117.073175,
+      "mono_rms_db": -24.0179,
+      "peak_db": -5.5988,
+      "seam_delta": 0.007331,
+      "game_sha256": "df596503131bc0b52e40a45714d3bc447cacc1fe20eee34603b20a90b9b0dd65",
+      "bpm": 82,
+      "meter": "4/4",
+      "bars": 40,
+      "loop_seconds": 117.073175,
+      "source_seconds": 117.073175,
+      "tail_seconds": 0.0
+    },
+    {
+      "slot": "frostwake",
+      "zones": [
+        26
+      ],
+      "source": "Frostwake_Shelf_-_Lanterns_in_the_Blue_Ice_Glacial_KMMO_Theme_proj_mwx58gcu.mp3",
+      "source_sha256": "0053721bcacf952cef4e5e4cae859b8033db68e86dbc023d39571e770bdd5a27",
+      "title": "Frostwake Shelf - Lanterns in the Blue Ice (Glacial KMMO Theme)",
+      "project_id": "proj_mwx58gcu",
+      "already_installed": false,
+      "seconds": 120.0,
+      "mono_rms_db": -24.0036,
+      "peak_db": -5.3563,
+      "seam_delta": 0.008062,
+      "game_sha256": "1448946bb9e03f47fe3f2679c2e91c8665bbb90f0a64501f6f2c943dda222804",
+      "bpm": 96,
+      "meter": "4/4",
+      "bars": 48,
+      "loop_seconds": 120.0,
+      "source_seconds": 120.0,
+      "tail_seconds": 0
+    },
+    {
+      "slot": "frostwake_night",
+      "zones": [
+        26
+      ],
+      "source": "Frostwake_at_Midnight_Chillhop_Remix_proj_mwx5jaln.mp3",
+      "source_sha256": "f3d6bf72ac69b286b361396a3240fa39cdfcd6bf3f27454d585d56031803720c",
+      "title": "Frostwake at Midnight (Chillhop Remix)",
+      "project_id": "proj_mwx5jaln",
+      "already_installed": false,
+      "seconds": 117.073175,
+      "mono_rms_db": -23.9774,
+      "peak_db": -6.012,
+      "seam_delta": 0.014968,
+      "game_sha256": "43293ecc9cf7736c90b28e50d92f3bdeb3b560b4786d793ade74e342af664dc2",
+      "bpm": 82,
+      "meter": "4/4",
+      "bars": 40,
+      "loop_seconds": 117.073175,
+      "source_seconds": 117.073175,
+      "tail_seconds": 0.0
+    },
+    {
+      "slot": "cairn",
+      "zones": [
+        27
+      ],
+      "source": "Cairnspine_Shelf_-_The_High_Pass_Rings_Alpine_KMMO_Theme_proj_mwx3pmb9.mp3",
+      "source_sha256": "f17b56019cb548010bce0f096fbdcc024f78078fc2fbab9ee138d5555c556612",
+      "title": "Cairnspine Shelf - The High Pass Rings (Alpine KMMO Theme)",
+      "project_id": "proj_mwx3pmb9",
+      "already_installed": false,
+      "seconds": 106.666667,
+      "mono_rms_db": -23.9961,
+      "peak_db": -5.3508,
+      "seam_delta": 0.005214,
+      "game_sha256": "adea06baf3cc07f9ec683b4b2943066baa9349259dfa3d2a8e697e0ab6c58842",
+      "bpm": 108,
+      "meter": "4/4",
+      "bars": 48,
+      "loop_seconds": 106.666667,
+      "source_seconds": 106.666667,
+      "tail_seconds": 0.0
+    },
+    {
+      "slot": "cairn_night",
+      "zones": [
+        27
+      ],
+      "source": "Cairnspine_at_Midnight_Chillhop_Remix_proj_mwx3xgo9.mp3",
+      "source_sha256": "579afa5b42538638b0ab5c4f06c75889214e612d99189c2af48ac9becd13d068",
+      "title": "Cairnspine at Midnight (Chillhop Remix)",
+      "project_id": "proj_mwx3xgo9",
+      "already_installed": false,
+      "seconds": 117.073175,
+      "mono_rms_db": -24.0093,
+      "peak_db": -6.0838,
+      "seam_delta": 0.019969,
+      "game_sha256": "80eee80d111770281fffe9fa2c622f59997ae0cc9e6c25399b842903bc3b310f",
+      "bpm": 82,
+      "meter": "4/4",
+      "bars": 40,
+      "loop_seconds": 117.073175,
+      "source_seconds": 117.073175,
+      "tail_seconds": 0.0
+    },
+    {
+      "slot": "yearwheel",
+      "zones": [
+        28
+      ],
+      "source": "Valhalla_Yearwheel_-_The_Turning_Sky_Four-Season_KMMO_Theme_proj_mwxc12h8.mp3",
+      "source_sha256": "a4ce687709de429df82d224681dc42ec1def4b680b479a05d335a8a799aaaf4b",
+      "title": "Valhalla Yearwheel - The Turning Sky (Four-Season KMMO Theme)",
+      "project_id": "proj_mwxc12h8",
+      "already_installed": false,
+      "seconds": 102.857143,
+      "mono_rms_db": -23.9919,
+      "peak_db": -5.9694,
+      "seam_delta": 0.013472,
+      "game_sha256": "2fb691cc050a920e354821192a84017552ce138f5470790f6f61054b8a82a37e",
+      "bpm": 112,
+      "meter": "4/4",
+      "bars": 48,
+      "loop_seconds": 102.857143,
+      "source_seconds": 102.857143,
+      "tail_seconds": 0.0
+    },
+    {
+      "slot": "yearwheel_night",
+      "zones": [
+        28
+      ],
+      "source": "Yearwheel_at_Midnight_-_Turning_Sky_Nocturne_Chillhop_Remix_proj_mwxc94u2.mp3",
+      "source_sha256": "f00c5bed9e1ccb38c2065400e6f892641c96714cf125b4257b3be754653e041a",
+      "title": "Yearwheel at Midnight - Turning Sky Nocturne (Chillhop Remix)",
+      "project_id": "proj_mwxc94u2",
+      "already_installed": false,
+      "seconds": 117.073175,
+      "mono_rms_db": -23.9843,
+      "peak_db": -5.9809,
+      "seam_delta": 0.01158,
+      "game_sha256": "273768d27e9fb9ea6fd243b51b4d8b075306ebca0cf3480d41e7d9e649ba0199",
+      "bpm": 82,
+      "meter": "4/4",
+      "bars": 40,
+      "loop_seconds": 117.073175,
+      "source_seconds": 117.073175,
+      "tail_seconds": 0.0
+    },
+    {
+      "slot": "eye_below",
+      "zones": [
+        29
+      ],
+      "source": "The_Eye_Below_-_The_Iris_Under_Stone_Abyssal_Deepglass_4_4_KMMO_Theme_proj_mwxfo2r0.mp3",
+      "source_sha256": "d40d95b643166aec96ba3a615513394afbb405f766d2d8a021897e1f723e5566",
+      "title": "The Eye Below - The Iris Under Stone (Abyssal Deepglass 4/4 KMMO Theme)",
+      "project_id": "proj_mwxfo2r0",
+      "already_installed": false,
+      "bpm": 72,
+      "meter": "4/4",
+      "bars": 44,
+      "loop_seconds": 146.666667,
+      "source_seconds": 150.0,
+      "tail_seconds": 3.333333,
+      "seconds": 146.666667,
+      "mono_rms_db": -24.0082,
+      "peak_db": -5.0131,
+      "seam_delta": 0.006432,
+      "game_sha256": "7d5d45d2ea87b365be5c5b32eec676051a189a1407f39e0fdba011f836cb1184"
+    },
+    {
+      "slot": "elder_hollow",
+      "zones": [
+        30
+      ],
+      "source": "The_Elder_Hollow_-_The_Roots_Remember_Spring_Ancient_Root-Sanctuary_4_4_KMMO_Theme_proj_mwxisjbe.mp3",
+      "source_sha256": "1151400f973296fbcfd36288362c0749fcd66deae3bd76039c2e900beae81a06",
+      "title": "The Elder Hollow - The Roots Remember Spring (Ancient Root-Sanctuary 4/4 KMMO Theme)",
+      "project_id": "proj_mwxisjbe",
+      "already_installed": false,
+      "bpm": 84,
+      "meter": "4/4",
+      "bars": 48,
+      "loop_seconds": 137.142857,
+      "source_seconds": 140.0,
+      "tail_seconds": 2.857143,
+      "seconds": 137.142857,
+      "mono_rms_db": -24.0274,
+      "peak_db": -4.3112,
+      "seam_delta": 0.008619,
+      "game_sha256": "716111800f4bffb80f2e7f4e7a71dfa91aad8f09e9999b0aac713f788446e883"
+    },
+    {
+      "slot": "pavilion",
+      "zones": [
+        31
+      ],
+      "source": "The_Thousandfold_Pavilion_-_A_Thousand_Painted_Doors_Masquerade_4_4_KMMO_Theme_proj_mwxj467z.mp3",
+      "source_sha256": "e5890004de0545f0ce79d46b82abbc211a0ce8d828f6de20cebce0f672dd6402",
+      "title": "The Thousandfold Pavilion - A Thousand Painted Doors (Masquerade 4/4 KMMO Theme)",
+      "project_id": "proj_mwxj467z",
+      "already_installed": false,
+      "bpm": 112,
+      "meter": "4/4",
+      "bars": 48,
+      "loop_seconds": 102.857143,
+      "source_seconds": 105.0,
+      "tail_seconds": 2.142857,
+      "seconds": 102.857143,
+      "mono_rms_db": -24.0014,
+      "peak_db": -5.0365,
+      "seam_delta": 0.004748,
+      "game_sha256": "d2e939fddb8a343993d59c44583ad90a2b71204215864f40bbe45f9a4ae58907"
+    },
+    {
+      "slot": "rain_crown",
+      "zones": [
+        32
+      ],
+      "source": "Temple_of_the_Rain_Crown_-_The_Jade_Monsoon_Monsoon_Sanctuary_4_4_KMMO_Theme_proj_mwxki9l9.mp3",
+      "source_sha256": "a4fefa37d8590e2e58e3203b05e4f1570524fc3bb3cef570fb50108a237a9244",
+      "title": "Temple of the Rain Crown - The Jade Monsoon (Monsoon Sanctuary 4/4 KMMO Theme)",
+      "project_id": "proj_mwxki9l9",
+      "already_installed": false,
+      "bpm": 76,
+      "meter": "4/4",
+      "bars": 48,
+      "loop_seconds": 151.578957,
+      "source_seconds": 154.736848,
+      "tail_seconds": 3.157891,
+      "seconds": 151.578957,
+      "mono_rms_db": -24.0181,
+      "peak_db": -4.6654,
+      "seam_delta": 0.003012,
+      "game_sha256": "35812684d5da9a0f5964635b3a92f9ab49bfe5d1df6fb64ab0ffccbffd8ebf66"
+    },
+    {
+      "slot": "seed_vault",
+      "zones": [
+        33
+      ],
+      "source": "The_Seed_Vault_-_The_First_Heartbeat_Ancient_Worldseed_4_4_KMMO_Theme_proj_mwxjsknd.mp3",
+      "source_sha256": "864a74e833963f9315f1dcbb9853c6134a52714968a8fe81a6a272a2958a3dbe",
+      "title": "The Seed Vault - The First Heartbeat (Ancient Worldseed 4/4 KMMO Theme)",
+      "project_id": "proj_mwxjsknd",
+      "already_installed": false,
+      "bpm": 84,
+      "meter": "4/4",
+      "bars": 48,
+      "loop_seconds": 137.142857,
+      "source_seconds": 140.0,
+      "tail_seconds": 2.857143,
+      "seconds": 137.142857,
+      "mono_rms_db": -24.041,
+      "peak_db": -4.3641,
+      "seam_delta": 0.003964,
+      "game_sha256": "8e039af4c067a0529eb590ae9b380508d867894db14a032a2d1948d7d397281c"
+    },
+    {
+      "slot": "sunken_astrolabe",
+      "zones": [
+        34
+      ],
+      "source": "The_Sunken_Astrolabe_-_Meridian_of_Dust_Celestial_Clockwork_4_4_KMMO_Theme_proj_mwxmnk04.mp3",
+      "source_sha256": "4ffbba3ed80646f860b7b91e9b40537563ddb1cfe239ec2c9c15da72600e9876",
+      "title": "The Sunken Astrolabe - Meridian of Dust (Celestial Clockwork 4/4 KMMO Theme)",
+      "project_id": "proj_mwxmnk04",
+      "already_installed": false,
+      "bpm": 96,
+      "meter": "4/4",
+      "bars": 48,
+      "loop_seconds": 120.0,
+      "source_seconds": 122.5,
+      "tail_seconds": 2.5,
+      "seconds": 120.0,
+      "mono_rms_db": -24.0331,
+      "peak_db": -4.6256,
+      "seam_delta": 0.004277,
+      "game_sha256": "b4d81a70f576490c7a97ffdeec6256aafe6e26e5a96b7d61ec96d2dcde51ad0a"
+    },
+    {
+      "slot": "thunderheart_gate",
+      "zones": [
+        35
+      ],
+      "source": "The_Thunderheart_Gate_-_Storm_in_the_Stone_Storm-Rock_Dungeon_4_4_KMMO_Theme_proj_mwxmw3tf.mp3",
+      "source_sha256": "a01b5437b3499fb811432e3a365fb2f81077824fb60e0a393d5bb77f7f4410bb",
+      "title": "The Thunderheart Gate - Storm in the Stone (Storm-Rock Dungeon 4/4 KMMO Theme)",
+      "project_id": "proj_mwxmw3tf",
+      "already_installed": false,
+      "bpm": 132,
+      "meter": "4/4",
+      "bars": 48,
+      "loop_seconds": 87.272721,
+      "source_seconds": 89.090907,
+      "tail_seconds": 1.818186,
+      "seconds": 87.272721,
+      "mono_rms_db": -23.9949,
+      "peak_db": -6.3565,
+      "seam_delta": 0.004873,
+      "game_sha256": "5e9d6cd8ed1c66f1d56b44a54e149e3cbe9b8a9f070547d57e3cbe3bbd8951b4"
+    },
+    {
+      "slot": "blooming_labyrinth",
+      "zones": [
+        36
+      ],
+      "source": "The_Blooming_Labyrinth_-_Petals_Beyond_the_Door_Glasspetal_Garden_4_4_KMMO_Theme_proj_mwxndziq.mp3",
+      "source_sha256": "d479af3104ec931f876756ea3a088e998c95be639a8f64f9d537bd907d3140a4",
+      "title": "The Blooming Labyrinth - Petals Beyond the Door (Glasspetal Garden 4/4 KMMO Theme)",
+      "project_id": "proj_mwxndziq",
+      "already_installed": false,
+      "bpm": 84,
+      "meter": "4/4",
+      "bars": 48,
+      "loop_seconds": 137.142857,
+      "source_seconds": 140.0,
+      "tail_seconds": 2.857143,
+      "seconds": 137.142857,
+      "mono_rms_db": -24.028,
+      "peak_db": -3.2385,
+      "seam_delta": 0.0015,
+      "game_sha256": "e371e89288c5e7d8589806d112ff8251be219713039adeccf00d23802e52d01b"
+    },
+    {
+      "slot": "solar_crucible",
+      "zones": [
+        37
+      ],
+      "source": "The_Solar_Crucible_-_The_Furnace_of_Noon_Radiant_Forge_4_4_KMMO_Theme_proj_mwxnwavn.mp3",
+      "source_sha256": "e7b0f7a4fec82f3d4a3cd3b03e2928dd3a5a5abf80f07056eabf9583d4dbbd6d",
+      "title": "The Solar Crucible - The Furnace of Noon (Radiant Forge 4/4 KMMO Theme)",
+      "project_id": "proj_mwxnwavn",
+      "already_installed": false,
+      "bpm": 112,
+      "meter": "4/4",
+      "bars": 48,
+      "loop_seconds": 102.857143,
+      "source_seconds": 105.0,
+      "tail_seconds": 2.142857,
+      "seconds": 102.857143,
+      "mono_rms_db": -24.0419,
+      "peak_db": -4.2235,
+      "seam_delta": 0.008896,
+      "game_sha256": "a20a0c7875b272bce4d521e7953e524f5ef86d8204f756eccf57f321b05553ff"
+    },
+    {
+      "slot": "amber_archive",
+      "zones": [
+        38
+      ],
+      "source": "The_Amber_Archive_-_The_Book_of_Falling_Leaves_Autumn_Library_4_4_KMMO_Theme_proj_mwxonumv.mp3",
+      "source_sha256": "fcb05e4fae67e0b4983ee900674230114b0658e0ecb9e7f081516ba7d5b5687d",
+      "title": "The Amber Archive - The Book of Falling Leaves (Autumn Library 4/4 KMMO Theme)",
+      "project_id": "proj_mwxonumv",
+      "already_installed": false,
+      "bpm": 90,
+      "meter": "4/4",
+      "bars": 48,
+      "loop_seconds": 128.0,
+      "source_seconds": 130.666667,
+      "tail_seconds": 2.666667,
+      "seconds": 128.0,
+      "mono_rms_db": -24.0376,
+      "peak_db": -3.8077,
+      "seam_delta": 0.004497,
+      "game_sha256": "fe11cf9cac5d9fc4e4b2444c2cb405d848a5691ac44821434d960808e5a07e64"
+    },
+    {
+      "slot": "silent_solstice",
+      "zones": [
+        39
+      ],
+      "source": "The_Silent_Solstice_-_The_Longest_Night_Arctic_Nocturne_4_4_KMMO_Theme_proj_mwxp6c4r.mp3",
+      "source_sha256": "f9621494247bca894e69a35a1a5d4afbce17a7ebf744a06fd0a7e877b06bd1f5",
+      "title": "The Silent Solstice - The Longest Night (Arctic Nocturne 4/4 KMMO Theme)",
+      "project_id": "proj_mwxp6c4r",
+      "already_installed": false,
+      "bpm": 72,
+      "meter": "4/4",
+      "bars": 48,
+      "loop_seconds": 160.0,
+      "source_seconds": 163.333333,
+      "tail_seconds": 3.333333,
+      "seconds": 160.0,
+      "mono_rms_db": -23.9994,
+      "peak_db": -4.1947,
+      "seam_delta": 0.003567,
+      "game_sha256": "1fef92ef2d8696adefbb33c6217e0bf2cf3eba66244cbf254343e9e57a2ecbca"
+    },
+    {
+      "slot": "nornroot",
+      "zones": [
+        41
+      ],
+      "source": "Nornroot_Barrow_-_Threads_Without_a_King_Ancient_5_4_KMMO_Theme_proj_mwxcq9rj.mp3",
+      "source_sha256": "8ea163dc0917403cc5923ae5926f35f95ed60c1aec4f743bee3dde87de205e42",
+      "title": "Nornroot Barrow - Threads Without a King (Ancient 5/4 KMMO Theme)",
+      "project_id": "proj_mwxcq9rj",
+      "already_installed": false,
+      "bpm": 88,
+      "meter": "5/4",
+      "bars": 44,
+      "loop_seconds": 150.0,
+      "source_seconds": 153.409093,
+      "tail_seconds": 3.409093,
+      "seconds": 150.0,
+      "mono_rms_db": -24.009,
+      "peak_db": -4.8454,
+      "seam_delta": 0.004357,
+      "game_sha256": "e78f47b1298ed00062cb3dab7597339da91444487440a77a3df1000ed52383e7"
+    },
+    {
+      "slot": "skybridge",
+      "zones": [
+        42
+      ],
+      "source": "The_Shattered_Span_-_Seven_Broken_Arches_Celestial_3_4_KMMO_Theme_proj_mwxd17ly.mp3",
+      "source_sha256": "f263968e48344915263c9a317d3613d88a93d5e8399e7cc614bb4745dc3570ef",
+      "title": "The Shattered Span - Seven Broken Arches (Celestial 3/4 KMMO Theme)",
+      "project_id": "proj_mwxd17ly",
+      "already_installed": false,
+      "bpm": 96,
+      "meter": "3/4",
+      "bars": 48,
+      "loop_seconds": 90.0,
+      "source_seconds": 91.875011,
+      "tail_seconds": 1.875011,
+      "seconds": 90.0,
+      "mono_rms_db": -23.9819,
+      "peak_db": -5.7683,
+      "seam_delta": 0.004611,
+      "game_sha256": "787ecab1bf75951f15d4fa2c5ffd18e342267c24faa4f1636b90a76b904cc7f0"
+    },
+    {
+      "slot": "longship",
+      "zones": [
+        43
+      ],
+      "source": "The_Drowned_Longship_-_Below_the_Last_Sail_Nautical_6_8_KMMO_Theme_proj_mwxdl6z0.mp3",
+      "source_sha256": "3c31b1afd3fd22d30e6d768f4f974e43f2435a95bcf4032183e74b784afcc38b",
+      "title": "The Drowned Longship - Below the Last Sail (Nautical 6/8 KMMO Theme)",
+      "project_id": "proj_mwxdl6z0",
+      "already_installed": false,
+      "seconds": 110.769229,
+      "mono_rms_db": -24.0077,
+      "peak_db": -5.4835,
+      "seam_delta": 0.002743,
+      "game_sha256": "d97cbffabf270bca89b2305a8df0791fce0691a605f5b870a8c5d02943bc5944",
+      "bpm": 78,
+      "meter": "6/8",
+      "bars": 48,
+      "loop_seconds": 110.769229,
+      "source_seconds": 110.769229,
+      "tail_seconds": 0
+    },
+    {
+      "slot": "blackhour",
+      "zones": [
+        44
+      ],
+      "source": "The_Black_Hour_Foundry_-_The_Shift_That_Never_Ends_Industrial_Synth-Rock_4_4_KMMO_Theme_proj_mwxoyms3.mp3",
+      "source_sha256": "07a1e38512a0c171cfe43408191b120f1ca4147a17ebc6a6648eb65d25c66361",
+      "title": "The Black Hour Foundry - The Shift That Never Ends (Industrial Synth-Rock 4/4 KMMO Theme)",
+      "project_id": "proj_mwxoyms3",
+      "already_installed": false,
+      "bpm": 132,
+      "meter": "4/4",
+      "bars": 48,
+      "loop_seconds": 87.272721,
+      "source_seconds": 89.090907,
+      "tail_seconds": 1.818186,
+      "seconds": 87.272721,
+      "mono_rms_db": -23.9814,
+      "peak_db": -6.187,
+      "seam_delta": 0.007153,
+      "game_sha256": "eb5e3989f5534bd405f433e989dac79340be6ac76af066651eacbeb86cda3eed"
+    },
+    {
+      "slot": "emberwake",
+      "zones": [
+        45
+      ],
+      "source": "Emberwake_-_Heat_Beneath_the_Stones_Volcanic_Caldera_KMMO_Theme_proj_mwwlastw.mp3",
+      "source_sha256": "2c1e07fa6e1af68f0dfb28013ce0d8ea3289ab7c7f1ea64104793ced4dcbe5d7",
+      "title": "Emberwake - Heat Beneath the Stones (Volcanic Caldera KMMO Theme)",
+      "project_id": "proj_mwwlastw",
+      "already_installed": true,
+      "game_sha256": "5d7e9302c118987f5441d26be12ae0c22288c339c625164998b9cbe0b97c6bdf",
+      "seconds": 96.0,
+      "mono_rms_db": -23.9803,
+      "peak_db": -6.6669,
+      "seam_delta": 0.001059
+    },
+    {
+      "slot": "emberwake_night",
+      "zones": [
+        45
+      ],
+      "source": "Emberwake_at_Midnight_Chillhop_Remix_proj_mwwljela.mp3",
+      "source_sha256": "d126e8cf238fb6aef7d7c040899b6c4bbfecb365445fe1b36cac300f6d6cd082",
+      "title": "Emberwake at Midnight (Chillhop Remix)",
+      "project_id": "proj_mwwljela",
+      "already_installed": false,
+      "seconds": 117.073175,
+      "mono_rms_db": -24.0157,
+      "peak_db": -5.6861,
+      "seam_delta": 0.008737,
+      "game_sha256": "100a4a8244d16a316ef3fd7a6b459dfb64c8475ad07a689a56154ab1a0852f16",
+      "bpm": 82,
+      "meter": "4/4",
+      "bars": 40,
+      "loop_seconds": 117.073175,
+      "source_seconds": 117.073175,
+      "tail_seconds": 0.0
+    },
+    {
+      "slot": "title",
+      "zones": [],
+      "source": "Valhalla_Intro_-_Snowbound_Hearth_Nordic_Title_Theme_proj_mwx5wrf9.mp3",
+      "source_sha256": "9eacab89cc7db94405d728f52b8e38d978192799af1ea520f6c40c00d8dd6a95",
+      "title": "Valhalla Intro - Snowbound Hearth (Nordic Title Theme)",
+      "project_id": "proj_mwx5wrf9",
+      "already_installed": false,
+      "seconds": 133.333333,
+      "mono_rms_db": -24.0219,
+      "peak_db": -4.1528,
+      "seam_delta": 0.012021,
+      "game_sha256": "b4330589ce919987fac15a26d96dbb3ab8ce4dfb51adcf261ae3949f95bd7d43",
+      "bpm": 72,
+      "meter": "4/4",
+      "bars": 40,
+      "loop_seconds": 133.333333,
+      "source_seconds": 133.333333,
+      "tail_seconds": 0
+    },
+    {
+      "slot": "intro",
+      "zones": [],
+      "source": "Veyrheim_-_Beyond_the_Nine_Chains_Nordic_Orchestral_Theme_proj_mwx6pemk.mp3",
+      "source_sha256": "8b0d42d7628da529e3d4f7e7578190a85307e236a38a7d072e1a540a0dc3d176",
+      "title": "Veyrheim - Beyond the Nine Chains (Nordic Orchestral Theme)",
+      "project_id": "proj_mwx6pemk",
+      "already_installed": false,
+      "seconds": 120.0,
+      "mono_rms_db": -23.9844,
+      "peak_db": -5.0687,
+      "seam_delta": 0.010983,
+      "game_sha256": "49bfaf38e1620deb91c22e48fc6fcc25f6b9ef75cc9575eb88216c99947a77ea",
+      "bpm": 96,
+      "meter": "4/4",
+      "bars": 48,
+      "loop_seconds": 120.0,
+      "source_seconds": 120.0,
+      "tail_seconds": 0
+    },
+    {
+      "slot": "chained_forge",
+      "zones": [
+        46
+      ],
+      "source": "The_Chained_Forge_-_Nine_Chains_Below_Industrial_Metal-Synth_4_4_KMMO_Theme_proj_mwxpi2pr.mp3",
+      "source_sha256": "1e57abc256deff57b3e3af3eb63d95fb5fa0cd2a563a134816b744003153dbc4",
+      "title": "The Chained Forge - Nine Chains Below (Industrial Metal-Synth 4/4 KMMO Theme)",
+      "project_id": "proj_mwxpi2pr",
+      "already_installed": false,
+      "bpm": 152,
+      "meter": "4/4",
+      "bars": 48,
+      "loop_seconds": 75.789478,
+      "source_seconds": 77.368413,
+      "tail_seconds": 1.578934,
+      "seconds": 75.789478,
+      "mono_rms_db": -23.9905,
+      "peak_db": -6.6899,
+      "seam_delta": 0.00272,
+      "game_sha256": "11e437e0a2115d12edba3869910ff406cab2c0cebb0fe5f9d51d750951daa868"
+    }
+  ]
+}

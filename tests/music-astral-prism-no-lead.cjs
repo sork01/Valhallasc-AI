@@ -1,3 +1,4 @@
+const soundtrack = require('./lib/soundtrack.cjs');
 // Focused private-world playback check after removing the Astralhollow and Prismwaste night leads.
 const assert = require('node:assert/strict');
 const path = require('node:path');
@@ -29,7 +30,7 @@ const debug = (page, command) => page.evaluate(c => Online.send({ type: 'debug',
 
   for (const song of [
     { zone: 13, x: 64, y: 116, key: 'astralNightMusic', day: 'amusic', seconds: 117.073 },
-    { zone: 14, x: 64, y: 116, key: 'prismNightMusic', day: 'pmusic', seconds: 32 * 4 * 60 / 84 },
+    { zone: 14, x: 64, y: 116, key: 'prismNightMusic', day: 'pmusic', seconds: soundtrack('prism_night') },
   ]) {
     await debug(page, { op: 'set_time', hour: 12, freeze: true });
     await debug(page, { op: 'teleport', zone: song.zone, x: song.x, y: song.y });

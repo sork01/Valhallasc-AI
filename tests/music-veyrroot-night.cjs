@@ -1,3 +1,4 @@
+const soundtrack = require('./lib/soundtrack.cjs');
 // Focused private-world playback check for Veyrroot Canopy’s night remix.
 const assert = require('node:assert/strict');
 const path = require('node:path');
@@ -8,7 +9,7 @@ const { StdioClientTransport, getDefaultEnvironment } = require('@modelcontextpr
 const root = path.resolve(__dirname, '..');
 const client = new Client({ name: 'valhallasc-veyrroot-night-music', version: '1.0.0' });
 const songs = [
-  { zone: 23, x: 15, y: 95, key: 'veyrrootNightMusic', day: 'whmusic', seconds: 32 * 4 * 60 / 84 },
+  { zone: 23, x: 15, y: 95, key: 'veyrrootNightMusic', day: 'whmusic', seconds: soundtrack('veyrroot_night') },
 ];
 let browser, started = false;
 async function call(name, args = {}) {

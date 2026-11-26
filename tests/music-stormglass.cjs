@@ -1,3 +1,4 @@
+const soundtrack = require('./lib/soundtrack.cjs');
 // Focused private-world check for Stormglass Shore's own daytime score.
 const assert = require('node:assert/strict');
 const path = require('node:path');
@@ -32,7 +33,7 @@ const debug = (page, command) => page.evaluate(c => Online.send({ type: 'debug',
   await page.waitForFunction(() => Field.zone === 19 && valhalla.stormglassMusic?.running && !valhalla.vmusic?.running, null, { timeout: 10000 });
   await page.waitForFunction(() => valhalla.stormglassMusic.loaded, null, { timeout: 30000 });
   const duration = await page.evaluate(() => valhalla.stormglassMusic.duration);
-  assert.ok(Math.abs(duration - 80) < 1, `Stormglass MP3 duration ${duration}`);
+  assert.ok(Math.abs(duration - soundtrack('stormglass')) < 1, `Stormglass MP3 duration ${duration}`);
   await debug(page, { op: 'set_time', hour: 0, freeze: true });
   await page.waitForFunction(() => DayNight.nightMix === 1 && valhalla.activeNightMusic === valhalla.stormglassNightMusic && valhalla.stormglassNightMusic?.running, null, { timeout: 10000 });
   assert.equal(await page.evaluate(() => valhalla.stormglassMusic.running), true, 'day score stays available for the dawn crossfade');

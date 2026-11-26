@@ -2,6 +2,49 @@
 
 Read this before creating, remixing, repairing, or rendering any Valhallasc song. The editable dybase2 project is the musical source of truth. Work on the active project named in the task or wiki; check its actual tempo, meter, notes, instruments, and arrangement before editing. Do not substitute an older draft or treat a rendered MP3 as an editable source.
 
+## Installed FileDrop soundtrack (1.15.4)
+
+The owner supplied a remade AudioMaker soundtrack through Sork's FileDrop and
+authorized its installation, including the Chained Forge raid theme in a
+follow-up. `scripts/soundtrack-filedrop.txt` pins 69 supplied MP3s, their original
+names, source hashes, destinations, installed hashes, loop lengths and levels.
+Twenty-six earlier imports were retained byte-for-byte; 43 remaining recordings
+were installed. No replacement FileDrop source exists for Asterion's day/night
+scores, the generic night fallback, or Eldmarr's final encounter score; those four
+recordings retain their original hashes. Older dybase2 briefs below describe
+historical compositions, not the source of the newly supplied performances.
+
+The existing recordings keep their current gain treatment. New recordings keep
+the supplied performance at its original speed, with a cyclic 25 Hz high-pass,
+matching endpoints over 3 ms, and decoded mono RMS near -24 dB at 128 kbps.
+Sixteen supplied dungeon/raid recordings have a one-bar natural reverb tail;
+that tail is tapered and folded into the beginning at the pinned musical bar
+boundary before encoding. The other exports already have their loop tail
+folded. Source files in FileDrop and editable projects are not modified.
+`scripts/import_filedrop_soundtrack.py --apply` reproduces/resumes the conversion
+from pinned sources; its default checks provenance without writing assets.
+
+The Moonwell (zone 18) now has `music_moonwell.js` and its own player, including
+shared channel volume, ducking, mute, master routing and sequential fades.
+Moonspore keeps its own theme. Updated asset URLs have a release query so a
+browser's old MP3 cache cannot keep an earlier recording playing. The story
+cutscene still lasts 62 seconds with its existing narration; its new 120-second
+recording follows that scene clock and stops when the scene ends. Title music
+is the separate remade Snowbound Hearth recording. The Yearwheel now uses the
+supplied Turning Sky and Turning Sky Nocturne pair.
+
+Focused checks are `tests/soundtrack-filedrop.py` (source/asset hashes, codec,
+levels, durations, endpoint continuity and correlation with beginning/middle/end
+sections away from the folded tail), `tests/soundtrack-routing.cjs` (all supplied
+zone mappings, cache versions, the raid/final split and Moonwell volume/mute),
+and the bounded `tests/soundtrack-filedrop-ui.cjs` (real title, Moonwell, daytime,
+night, dungeon and raid playback). `MUTATE=moonwell` on the routing test must
+fail. Recording-duration assertions in older affected tests now read the pinned
+manifest rather than retired bar/tempo assumptions; the intro's finite-score
+ending test seeks near the new recording's end. Existing transition and bounded
+intro-music tests check fades, mute, narration and finite playback. Automated
+signal and playback checks do not constitute an auditory review of the songs.
+
 ## Musical identity
 
 - Give each new zone its own recognizable style. Build a clear motif, a complementary answer, section changes, and an ending that resolves naturally. Keep the game loop musically seamless.
@@ -60,3 +103,16 @@ The Greenmeadow night repair established the Dexed flute choice. The Emberfall C
 ## Day and night transitions
 
 Day and night scores play separately. At the midpoint of dusk or dawn, the current score fades completely to silence over 1.2 seconds; the next score then fades in over 2.5 seconds. The transition follows the audio clock, including background suspension, and uses the latest destination after rapid travel. Volume, mute, and fanfare ducking retain their existing controls. Zone and title changes use the same sequence.
+
+1.15.4 validation: all 69 source/installed hashes, 128 kbps stereo encoding,
+levels, loop lengths and waveform similarity passed in
+`test-results/soundtrack-import/audio-validation.json`. The reference waveform
+uses an independent FFmpeg 25 Hz high-pass before correlation: comparing raw
+bass-heavy source audio to filtered audio falsely rejected Thunderheart because
+of the expected filter phase shift. No assertion threshold was weakened.
+The 68 supplied recording/zone mappings and Moonwell volume/mute checks passed;
+restoring Moonspore's route for zone 18 failed its intended assertion. Bounded
+real playback passed 13 checks (`test-results/driver-U3FB88`), and the bounded
+finite intro-score suite passed 17 (`test-results/driver-UjrmOb`). Transition,
+release-note, Swedish, syntax and whitespace gates passed. Source arrangements
+and narration/cutscene timing were retained; no balance or full-world suite ran.

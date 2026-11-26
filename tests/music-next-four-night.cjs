@@ -1,3 +1,4 @@
+const soundtrack = require('./lib/soundtrack.cjs');
 // Focused private-world playback check for four new outdoor night remixes.
 const assert = require('node:assert/strict');
 const path = require('node:path');
@@ -10,8 +11,8 @@ const client = new Client({ name: 'valhallasc-next-four-night-music', version: '
 const songs = [
   { zone: 16, x: 16, y: 112, key: 'moonsporeNightMusic', day: 'mmusic', seconds: 117.073 },
   { zone: 17, x: 90, y: 162, key: 'asterionNightMusic', day: 'hmusic', seconds: 32 * 4 * 60 / 92 },
-  { zone: 19, x: 13, y: 105, key: 'stormglassNightMusic', day: 'stormglassMusic', seconds: 32 * 4 * 60 / 88 },
-  { zone: 20, x: 13, y: 106, key: 'sunwardNightMusic', day: 'tmusic', seconds: 32 * 4 * 60 / 90 },
+  { zone: 19, x: 13, y: 105, key: 'stormglassNightMusic', day: 'stormglassMusic', seconds: soundtrack('stormglass_night') },
+  { zone: 20, x: 13, y: 106, key: 'sunwardNightMusic', day: 'tmusic', seconds: soundtrack('sunward_night') },
 ];
 let browser, started = false;
 async function call(name, args = {}) {

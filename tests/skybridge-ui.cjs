@@ -1,3 +1,4 @@
+const soundtrack = require('./lib/soundtrack.cjs');
 // One new dungeon only: real client travel, readable art, sign, music and controls.
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -67,7 +68,7 @@ const call = async (name, args = {}) => {
 
   // Background music
   await page.waitForFunction(() => valhalla.skybridgeMusic?.running && valhalla.skybridgeMusic.loaded, null, { timeout: 30000 });
-  assert.ok(await page.evaluate(() => Math.abs(valhalla.skybridgeMusic.duration - 24 * 3 * 60 / 96) < .05), 'The new 3/4 music decodes at the correct loop length (45s)');
+  assert.ok(await page.evaluate(seconds => Math.abs(valhalla.skybridgeMusic.duration - seconds) < .05, soundtrack('skybridge')), 'The new 3/4 music decodes at the replacement recording length');
   assert.ok(await page.evaluate(() => DayNight.nightMix < .01), 'Dungeon keeps indoor light and its own score');
   assert.ok(await page.evaluate(() => WORLD_MAP.zones[41].name === 'The Shattered Span' && WORLD_MAP.zones[6].portals.some(p => p.to === 42)), 'Correct Bifrost Reach entrance and stable zone ID');
 

@@ -1,3 +1,3 @@
 'use strict';
-/* Four Horizons After Dark: the Yearwheel night remix. */
-window.createYearwheelNightMusic = ctx => window.createLoopMusic(ctx, 'assets/music_yearwheel_night.mp3');
+/* Turning Sky Nocturne: the remade Yearwheel night score. */
+window.createYearwheelNightMusic = ctx => window.createLoopMusic(ctx, 'assets/music_yearwheel_night.mp3?v=saga-1.15.4');

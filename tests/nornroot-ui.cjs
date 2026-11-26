@@ -1,3 +1,4 @@
+const soundtrack = require('./lib/soundtrack.cjs');
 // One new dungeon only: real client travel, readable art, sign, music and controls.
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
@@ -77,7 +78,7 @@ const call=async(name,args={})=>{const r=await client.callTool({name,arguments:a
   await page.waitForFunction(()=>Field.zone===41,null,{timeout:15000});
   await page.evaluate(()=>Online.send({type:'stop'}));
   await page.waitForFunction(()=>valhalla.nornrootMusic?.running&&valhalla.nornrootMusic.loaded,null,{timeout:30000});
-  assert.ok(await page.evaluate(()=>Math.abs(valhalla.nornrootMusic.duration-24*5*60/88)<.05),'The new 5/4 music decodes at the correct loop length');
+  assert.ok(await page.evaluate(seconds=>Math.abs(valhalla.nornrootMusic.duration-seconds)<.05, soundtrack('nornroot')),'The new 5/4 music decodes at the replacement recording length');
   assert.ok(await page.evaluate(()=>DayNight.nightMix<.01),'Dungeon keeps indoor light and its own score');
   assert.ok(await page.evaluate(()=>WORLD_MAP.zones[40].name==='Nornroot Barrow'&&WORLD_MAP.zones[5].portals.some(p=>p.to===41)),'Correct Wyrdwood entrance and stable zone ID');
   if(!STUB)assert.equal(await page.evaluate(async()=>{

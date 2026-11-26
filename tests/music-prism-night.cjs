@@ -1,3 +1,4 @@
+const soundtrack = require('./lib/soundtrack.cjs');
 // Focused private-world playback check for the Prismwaste night remix.
 const assert = require('node:assert/strict');
 const path = require('node:path');
@@ -32,7 +33,7 @@ const debug = (page, command) => page.evaluate(c => Online.send({ type: 'debug',
   await debug(page, { op: 'set_time', hour: 19, freeze: true });
   await page.waitForFunction(() => Field.zone === 14 && Math.abs(DayNight.nightMix - .5) < .01 && valhalla.activeNightMusic === valhalla.prismNightMusic && valhalla.prismNightMusic.running, null, { timeout: 10000 });
   await page.waitForFunction(() => valhalla.prismNightMusic.loaded, null, { timeout: 30000 });
-  assert.ok(Math.abs((await page.evaluate(() => valhalla.prismNightMusic.duration)) - 91.429) < .25);
+  assert.ok(Math.abs((await page.evaluate(() => valhalla.prismNightMusic.duration)) - soundtrack('prism_night')) < .25);
   assert.equal(await page.evaluate(() => valhalla.nightMusic.running), false);
 
   await debug(page, { op: 'set_time', hour: 0, freeze: true });

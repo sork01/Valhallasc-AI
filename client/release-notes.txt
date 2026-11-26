@@ -1,5 +1,16 @@
 [
   {
+    "version": "1.15.4",
+    "date": "2026-11-26",
+    "new": [
+      "The Moonwell now has its own soundtrack."
+    ],
+    "changed": [
+      "The remaining remade music now plays across the world, at night, in dungeons and the Chained Forge raid, and on the title and story screens."
+    ],
+    "removed": []
+  },
+  {
     "version": "1.15.3",
     "date": "2026-11-26",
     "new": [],
