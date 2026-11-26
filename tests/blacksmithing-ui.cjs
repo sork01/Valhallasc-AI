@@ -14,6 +14,7 @@ const w = new TestWorld();
 w.startLevel = 4;
 w.levelSpread = 0;
 const touch = process.env.TOUCH === '1';
+const miningAudio = process.env.MINING_AUDIO === '1';
 const gear = 'smith_gear_tin_banded_gloves';
 let browser;
 
@@ -49,7 +50,39 @@ let browser;
       if (packet?.type === 'mine') miningRequests.push(packet.id);
     });
   });
-  await page.addInitScript(lang => localStorage.setItem('valhallasc.save.v1', JSON.stringify({lang,sound:false})), touch ? 'sv' : 'en');
+  await page.addInitScript(({lang, miningAudio}) => {
+    localStorage.setItem('valhallasc.save.v1', JSON.stringify({lang,sound:miningAudio,musicVol:0}));
+    if (!miningAudio) return;
+    window.strikePlayback = [];
+    const samples = new WeakSet(), buffers = new WeakSet();
+    const fetchAsset = window.fetch;
+    window.fetch = async (input, options) => {
+      const response = await fetchAsset(input, options);
+      if (!String(input).endsWith('/sfx_smith_strike.mp3')) return response;
+      const bytes = response.arrayBuffer.bind(response);
+      response.arrayBuffer = async () => {
+        const sample = await bytes();
+        samples.add(sample);
+        return sample;
+      };
+      return response;
+    };
+    const decode = AudioContext.prototype.decodeAudioData;
+    AudioContext.prototype.decodeAudioData = function (sample, ...callbacks) {
+      const result = decode.call(this, sample, ...callbacks);
+      if (!samples.has(sample)) return result;
+      return result.then(buffer => {
+        buffers.add(buffer);
+        window.strikeDecodedAt = performance.now();
+        return buffer;
+      });
+    };
+    const start = AudioBufferSourceNode.prototype.start;
+    AudioBufferSourceNode.prototype.start = function (...args) {
+      if (buffers.has(this.buffer)) window.strikePlayback.push({at:performance.now(), state:this.context.state});
+      return start.apply(this, args);
+    };
+  }, {lang:touch ? 'sv' : 'en', miningAudio});
   await page.goto(w.url);
   for (const id of ['start','login-guest','cls-warrior']) await page.locator('#'+id).click();
   await page.locator('#name').fill(touch ? 'Touchminer' : 'Desktopminer');
@@ -104,6 +137,14 @@ let browser;
     };
   },vein.id);
   await page.waitForFunction(() => Boolean(window.smithVeinTest));
+  if (miningAudio) await page.evaluate(() => {
+    const mining = Blacksmithing.mining;
+    window.mineTimes = {};
+    Blacksmithing.mining = packet => {
+      window.mineTimes[packet.state] = performance.now();
+      mining(packet);
+    };
+  });
   await page.waitForTimeout(600); // let camera movement settle before taking the hitbox coordinates
   const target = await page.evaluate(() => {
     const {x,y,width,height} = window.smithVeinTest;
@@ -134,6 +175,20 @@ let browser;
     throw error;
   }
   assert.match(await page.locator('#mining-status').textContent(),touch ? /Bröt [12] × Tennmalm/ : /Mined [12] × Tin Ore/);
+  if (miningAudio) {
+    const {strikePlayback, mineTimes, strikeDecodedAt} = await page.evaluate(() => ({strikePlayback, mineTimes, strikeDecodedAt}));
+    assert.ok(strikeDecodedAt < mineTimes.started, 'the first pull has its sound decoded before mining starts');
+    assert.equal(strikePlayback.length, 3, 'the mining sample plays three times during the pull');
+    for (const [i, {at, state}] of strikePlayback.entries()) {
+      const offset = at - mineTimes.started;
+      assert.equal(state, 'running', 'the sample plays through the live audio mixer');
+      assert.ok(Math.abs(offset - (300 + i * 600)) < 220 && at < mineTimes.done,
+        `strike ${i + 1} plays near contact before the reward (${Math.round(offset)} ms)`);
+    }
+    assert.deepEqual(errors,[]);
+    console.log('Mining audio: all three pickaxe clangs played through Web Audio during a real mining pull.');
+    return;
+  }
   await page.screenshot({path:path.join(w.runDir,touch ? 'blacksmithing-touch-mining.png' : 'blacksmithing-desktop-mining.png')});
 
   await warp(smith);

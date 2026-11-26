@@ -25,11 +25,12 @@ class Node {
 
 const sent = [], cues = [], errors = [], calls = [];
 const status = new Node('div'), panel = new Node('div');
+let now = 300;
 const context = vm.createContext({
   document:{documentElement:{},body:{nodeType:0},getElementById:() => status, createElement:tag => new Node(tag)},
   Node:{TEXT_NODE:3,ELEMENT_NODE:1}, MutationObserver:class {observe() {}},
   localStorage:{getItem:() => '{"lang":"sv"}'},
-  performance:{now:() => 300}, Image:class { naturalWidth = 300; },
+  performance:{now:() => now}, Image:class { naturalWidth = 300; },
   setTimeout:() => 1, clearTimeout() {},
   Online:{send:payload => { sent.push(JSON.parse(JSON.stringify(payload))); return true; }, log:() => {}},
   Field:{error:text => errors.push(text)},
@@ -69,6 +70,10 @@ if (process.env.MUTATE === 'expert-pick-hint') {
   moduleText = moduleText.replace(line, '');
 }
 if (process.env.MUTATE === 'expert-plan-source') moduleText = moduleText.replace('recipe.dropZone != null', 'false');
+if (process.env.MUTATE === 'no-strike-cue') {
+  assert(moduleText.includes("sound?.('strike');"));
+  moduleText = moduleText.replace("sound?.('strike');", '');
+}
 vm.runInContext(moduleText,context,{filename:'blacksmithing.js'});
 
 const Blacksmithing = context.Blacksmithing;
@@ -145,7 +150,8 @@ const masterPlan = row('smith_gear_equinox_crown_ring');
 assert(masterPlan.children[1].children.some(n => n.textContent.includes('600')));
 assert.equal(masterPlan.children.at(-1).textContent,'Slutbossar kan tappa ritningen.');
 
-const vein = {id:11,tier:0,x:100,y:60}, actor = {mining:11,x:90,y:60};
+const vein = {id:11,tier:0,x:100,y:60}, actor = {id:'self',mining:11,x:90,y:60};
+context.Online.id = actor.id;
 Blacksmithing.sync({miningVeins:[vein],players:[actor]},actor,cue => cues.push(cue));
 answer({ok:true,npc:'smith',text:'You forged equipment.',skill:2,recipes:[recipe],inventory:[],gold:10,output:recipe});
 const project = (x,y) => [x,y];
@@ -157,18 +163,35 @@ Blacksmithing.start(vein);
 assert.deepEqual(sent.at(-1),{type:'mine',id:11});
 Blacksmithing.mining({state:'started',vein:11,duration:1.8});
 assert.equal(status.hidden,false);
-const canvas = {drawImage:(...args) => calls.push(args),fillRect(){},save(){},restore(){},translate(){},rotate(){}};
+let pickAngle;
+const canvas = {drawImage:(...args) => calls.push(args),fillRect(){},save(){},restore(){},translate(){},rotate(value){pickAngle = value;}};
 Blacksmithing.drawVein(canvas,vein,vein.x,vein.y);
 Blacksmithing.drawMiners(canvas,project,250,100,false);
 assert.equal(calls.length,2,'vein and pick draw using packed assets');
 assert.deepEqual(calls[0].slice(-4),[54,-29,92,92],'ore doubles in both dimensions around the same ground anchor');
 assert.deepEqual(calls[1].slice(-2),[31,31],'the mining pick retains its original size');
+const startedAt = now;
+const advanceMining = elapsed => { now = startedAt + elapsed; Blacksmithing.updateMining(); };
+for (const [i, impact] of [300, 900, 1500].entries()) {
+  advanceMining(impact - 1);
+  assert.equal(cues.length, 1 + i, 'the clang waits for pick contact');
+  advanceMining(impact);
+  Blacksmithing.drawMiners(canvas,project,250,100,false);
+  assert.equal(pickAngle, 1.15, 'the pick extends toward the vein at the impact');
+  advanceMining(impact + 1);
+  assert.equal(cues.length, 2 + i, 'each visible strike emits exactly one clang');
+}
 Blacksmithing.mining({state:'done',vein:11,item:'smith_ore_tin',quantity:2,skill:2,skillUp:true});
 assert.equal(status.textContent,'Bröt 2 × Tennmalm · Smide 2');
-assert.deepEqual(cues,['forge','strike']);
+assert.deepEqual(cues,['forge','strike','strike','strike'], 'the reward adds no extra clang');
 Blacksmithing.mining({state:'done',item:'smith_ore_stormsilver',quantity:2,skill:300,requiredPick:'smith_pick_6'});
 assert.match(status.textContent,/Bröt 2 × Stormsilvermalm · Använd Moonsporehacka/);
+advanceMining(2000);
+Blacksmithing.mining({state:'started',vein:11,duration:1.8});
+advanceMining(2300);
 Blacksmithing.mining({state:'error',text:'Mining interrupted.'});
+advanceMining(3500);
+assert.equal(cues.length,5,'interrupting a pull stops its remaining clangs');
 assert.deepEqual(errors,['Mining interrupted.']);
 Blacksmithing.reset();
 assert.equal(Blacksmithing.pick(95,45,project),undefined);

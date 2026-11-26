@@ -7,6 +7,7 @@
   const zoneName = id => tr(id === 0 ? WORLD_MAP.name : WORLD_MAP.zones[id - 1].name);
   const pickHint = id => format('Use {0} or better to gain mining skill.', itemName(id));
   const status = document.getElementById('mining-status');
+  const MINING_STRIKES = 3;
   let veins = [], miners = [], nearestVein = null, ownMining = false, active = null, sound = null, noticeTimer = 0;
   let workshop = null, pending = false, section = 'staple';
 
@@ -196,11 +197,10 @@
   }
   function mining(packet) {
     if (packet.state === 'started') {
-      active = {vein:packet.vein, start:performance.now(), duration:packet.duration};
+      active = {vein:packet.vein, start:performance.now(), duration:packet.duration, strikes:0};
       showStatus(tr('Mining…'), false);
     } else if (packet.state === 'done') {
       active = null;
-      sound?.('strike');
       const ore = format('Mined {0} × {1}', packet.quantity, itemName(packet.item));
       const reward = packet.skillUp ? format('{0} · Blacksmithing {1}', ore, packet.skill) : ore;
       showStatus(packet.requiredPick ? [reward, pickHint(packet.requiredPick)].join(' · ') : reward);
@@ -209,6 +209,17 @@
       if (status) status.hidden = true;
       Field.error(packet.text);
     }
+  }
+  function strikeProgress(now) {
+    return (now - active.start) * MINING_STRIKES / (1000 * active.duration);
+  }
+  function updateMining() {
+    if (!active) return;
+    const progress = strikeProgress(performance.now());
+    const strikes = Math.floor(progress + .5);
+    if (progress >= MINING_STRIKES || strikes <= active.strikes) return;
+    active.strikes = strikes;
+    sound?.('strike');
   }
   const VEIN_SIZE = 92, VEIN_BASE = 3;
   function pick(mx, my, project) {
@@ -241,6 +252,7 @@
     }
   }
   function drawMiners(g, project, width, height, reduced) {
+    const now = performance.now();
     for (const actor of miners) {
       const vein = veins.find(v => v.id === actor.mining);
       if (!vein) continue;
@@ -249,7 +261,12 @@
       const [tx] = project(vein.x, vein.y), side = tx < sx ? -1 : 1;
       g.save();
       g.translate(sx + side*13, sy - 28);
-      g.rotate(side * (reduced ? .15 : .25 + Math.sin(performance.now()/120)*.9));
+      let swing = Math.sin(now / 120);
+      if (active?.vein === vein.id && actor.id === Online.id) {
+        // The pick reaches the vein halfway through each swing cycle.
+        swing = -Math.cos(Math.min(MINING_STRIKES, strikeProgress(now)) * Math.PI * 2);
+      }
+      g.rotate(side * (reduced ? .15 : .25 + swing * .9));
       sprite(g, 'smith_pick_1', 0, 12, 31);
       g.restore();
     }
@@ -261,7 +278,7 @@
     if (status) status.hidden = true;
     close();
   }
-  window.Blacksmithing = {render, close, onPacket, sync, mining, pick, start, drawVein, drawMiners, reset,
+  window.Blacksmithing = {render, close, onPacket, sync, mining, updateMining, pick, start, drawVein, drawMiners, reset,
     get veins() { return veins; },
     get nearbyVein() { return nearestVein; },
     get isMining() { return !!active || ownMining; },

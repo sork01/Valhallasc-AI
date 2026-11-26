@@ -996,17 +996,24 @@
   }
   // FISHING-SOUND-END
   const professionCueBuffers = {};
+  function loadProfessionCue(c, key) {
+    return professionCueBuffers[key] ||= fetch(`assets/sfx_${key}.mp3`).then(r => {
+      if (!r.ok) throw Error('profession_audio');
+      return r.arrayBuffer();
+    }).then(b => c.decodeAudioData(b)).catch(() => { delete professionCueBuffers[key]; return null; });
+  }
+  function primeMiningSound() {
+    const c = save.sound && audio();
+    if (c) loadProfessionCue(c, 'smith_strike');
+  }
   function professionSound(profession, cue) {
     if (!save.sound) return;
     const c = audio(); if (!c) return;
     const requested = performance.now();
     const key = profession + '_' + cue;
-    const buffer = professionCueBuffers[key] ||= fetch(`assets/sfx_${key}.mp3`).then(r => {
-      if (!r.ok) throw Error('profession_audio');
-      return r.arrayBuffer();
-    }).then(b => c.decodeAudioData(b)).catch(() => { delete professionCueBuffers[key]; return null; });
-    buffer.then(b => {
-      if (!b || !save.sound || scene !== 'game' || performance.now() - requested > 1200) return;
+    const maxDelay = key === 'smith_strike' ? 220 : 1200;
+    loadProfessionCue(c, key).then(b => {
+      if (!b || !save.sound || scene !== 'game' || performance.now() - requested > maxDelay) return;
       const source = c.createBufferSource();
       source.buffer = b; source.connect(sfxOut(c)); source.start();
     });
@@ -1228,6 +1235,7 @@
     rarePickupTimer = setTimeout(() => { rarePickupBox.hidden = true; rarePickupBox.classList.remove('show'); }, rarity === 'legendary' ? 4800 : 3200);
   }
   function enterGame() {
+    primeMiningSound();
     if (save.sound && save.combatSounds === 'recorded') { const c = audio(); if (c) window.RecordedCombat?.prime(c); }
     const c = save.char || cfg, p = $('hud-portrait');
     if (modular(c)) {
@@ -1602,6 +1610,7 @@
       if ('sound' in patch) save.sound = !!patch.sound;
       if ('combatSounds' in patch && ['recorded', 'synthesized'].includes(patch.combatSounds)) { save.combatSounds = patch.combatSounds; window.RecordedCombat?.stop(); }
       if (!save.sound) { window.RecordedCombat?.stop(); stopNarration(); }
+      if (patch.sound && scene === 'game') primeMiningSound();
       if (save.sound && save.combatSounds === 'recorded') { const c = audio(); if (c) window.RecordedCombat?.prime(c); }
       if ('touchSkills' in patch) save.touchSkills = patch.touchSkills && typeof patch.touchSkills === 'object' ? patch.touchSkills : {};
       if ('questArrow' in patch) save.questArrow = !!patch.questArrow;

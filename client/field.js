@@ -3285,6 +3285,7 @@
     tAll += dt;
     window.Skillbar?.update();
     if (Online.connected) {
+      window.Blacksmithing?.updateMining();
       inputT -= dt;
       if (inputT <= 0) {
         const [dx, dy] = paused || hero.sparkTravel ? [0, 0] : keyboardDirection();
