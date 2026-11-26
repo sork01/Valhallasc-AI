@@ -2,7 +2,7 @@
 (() => {
   // ---------- tiny persistent state ----------
   const KEY = 'valhallasc.save.v1';
-  const defaults = { lang: /^ko/i.test(navigator.language || '') ? 'ko' : /^sv/i.test(navigator.language || '') ? 'sv' : 'en', sound: true, musicVol: 1, sfxVol: 1, night: 1, weather: 1, weatherAudio: .7, lowGraphics: false, touchGraphicsSuggested: false, ui: {}, uiScale: .8, winScale: {}, panelSize: {}, char: null, draft: null };
+  const defaults = { lang: /^ko/i.test(navigator.language || '') ? 'ko' : /^sv/i.test(navigator.language || '') ? 'sv' : 'en', sound: true, musicVol: .35, sfxVol: 1, night: 1, weather: 1, weatherAudio: .7, lowGraphics: false, touchGraphicsSuggested: false, ui: {}, uiScale: .8, winScale: {}, panelSize: {}, char: null, draft: null };
   let save = { ...defaults };
   try { Object.assign(save, JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) { /* private mode */ }
   save.combatSounds = save.combatSounds === 'recorded' ? 'recorded' : 'synthesized';

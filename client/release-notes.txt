@@ -1,5 +1,14 @@
 [
   {
+    "version": "1.14.5",
+    "date": "2026-11-26",
+    "new": [],
+    "changed": [
+      "Music volume now defaults to 35%."
+    ],
+    "removed": []
+  },
+  {
     "version": "1.14.4",
     "date": "2026-11-26",
     "new": [],

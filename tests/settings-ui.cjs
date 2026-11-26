@@ -8,6 +8,7 @@ const { Client } = require('@modelcontextprotocol/sdk/client/index.js');
 const { StdioClientTransport, getDefaultEnvironment } = require('@modelcontextprotocol/sdk/client/stdio.js');
 const root = path.resolve(__dirname, '..');
 const client = new Client({ name: 'valhallasc-settings-ui', version: '1.0.0' });
+const musicDefaultOnly = process.env.SETTINGS_MUSIC_DEFAULT === '1';
 let browser, started = false, checks = 0;
 const check = (value, message) => { assert.ok(value, message); checks++; };
 async function call(name, args = {}) {
@@ -19,7 +20,9 @@ const stored = page => page.evaluate(k => JSON.parse(localStorage.getItem(k) || 
 const rect = (page, selector) => page.locator(selector).evaluate(n => { const r = n.getBoundingClientRect(); return { l: r.left, t: r.top, r: r.right, b: r.bottom, w: r.width, h: r.height }; });
 const stageRect = page => rect(page, '#stage');
 (async () => {
-  await client.connect(new StdioClientTransport({ command: process.execPath, args: [path.join(root, 'scripts/test-mcp.cjs')], cwd: root, stderr: 'pipe', env: { ...getDefaultEnvironment() } }));
+  const env = getDefaultEnvironment();
+  for (const key of ['NODE_PATH', 'VALHALLA_BINARY']) if (process.env[key]) env[key] = process.env[key];
+  await client.connect(new StdioClientTransport({ command: process.execPath, args: [path.join(root, 'scripts/test-mcp.cjs')], cwd: root, stderr: 'pipe', env }));
   const world = await call('start_world'); started = true;
   browser = await chromium.launch({ headless: true });
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
@@ -27,12 +30,34 @@ const stageRect = page => rect(page, '#stage');
   // MUTATE=taper serves game.js with a linear music slider instead of the squared taper: the run must fail.
   if (process.env.MUTATE === 'taper') await page.route('**/game.js', async r => { const res = await r.fetch(); await r.fulfill({ response: res, body: (await res.text()).replace('const taper = v => v * v;', 'const taper = v => v;') }); });
   // Record what is wired straight into the speakers: the music players' outputs and exactly one effects bus.
-  await page.addInitScript(() => {
+  await page.addInitScript(onlyDefault => {
     window.__dest = new Set(); const connect = AudioNode.prototype.connect;
     AudioNode.prototype.connect = function (to, ...rest) { if (to instanceof AudioDestinationNode) window.__dest.add(this); return connect.call(this, to, ...rest); };
-    if (!sessionStorage.getItem('seeded')) { sessionStorage.setItem('seeded', '1'); localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: true, char: null, draft: null })); }
-  });
-  await page.goto(world.url); await page.locator('#start').click(); await playGuest(page);
+    if (!onlyDefault && !sessionStorage.getItem('seeded')) { sessionStorage.setItem('seeded', '1'); localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: true, char: null, draft: null })); }
+  }, musicDefaultOnly);
+  await page.goto(world.url);
+  if (musicDefaultOnly) {
+    const music = page.locator('#set-music');
+    const showSettings = () => page.evaluate(() => Settings.show());
+    await showSettings();
+    check(await music.inputValue() === '35', 'Music defaults to 35% on a fresh device');
+    check(await page.locator('#set-music-out').textContent() === '35%', 'Settings displays the default percentage');
+    check(await page.locator('#set-sfx').inputValue() === '100', 'Sound effects default to 100%');
+    for (const percent of [0, 65, 100]) {
+      await music.evaluate((input, value) => {
+        input.value = String(value);
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+      }, percent);
+      check((await stored(page)).musicVol === percent / 100, `The slider saves ${percent}%`);
+      await page.reload();
+      await showSettings();
+      check(await music.inputValue() === String(percent), `The saved ${percent}% overrides the default on reload`);
+    }
+    check(errors.length === 0, `No page errors: ${errors.join('; ')}`);
+    console.log(`${checks} music default and saved-volume checks passed`);
+    return;
+  }
+  await page.locator('#start').click(); await playGuest(page);
   await page.locator('#cls-mage').click(); await page.locator('#name').fill('Tuner'); await page.locator('#go').click({ timeout: 60000 });
   await page.waitForFunction(() => Online.connected && !!Field.mageSprites && !!valhalla.fmusic?.running, null, { timeout: 60000 });
   await page.evaluate(() => {
@@ -50,7 +75,7 @@ const stageRect = page => rect(page, '#stage');
   check(await page.locator('#p-settings').isVisible(), 'The World Menu has a Settings button');
   await page.locator('#p-settings').click();
   check(await page.locator('#settings-panel').isVisible() && await page.locator('#pause').isHidden(), 'Settings replaces the World Menu');
-  check(await page.locator('#set-music').inputValue() === '100' && await page.locator('#set-sfx').inputValue() === '100', 'Both sliders start at 100%, the loudness the game always had');
+  check(await page.locator('#set-music').inputValue() === '35' && await page.locator('#set-sfx').inputValue() === '100', 'Music starts at 35% and effects start at 100%');
   check(await page.evaluate(() => document.activeElement.id) === 'set-music', 'Focus lands on the first slider');
 
   // --- volumes ---
