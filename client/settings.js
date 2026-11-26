@@ -25,7 +25,7 @@
   const WINDOWS = [
     ['connection-overlay', '.connection-panel', 'World connection', '50% 50%', false],
     ['whats-new', '.news-panel', "What's new", '50% 50%', true],
-    ['pause', '.pause-panel', 'World Menu', '50% 50%', false], ['settings-panel', '.settings-panel', 'Settings', '50% 50%', false], ['keys-panel', '.keys-panel', 'Keyboard', '50% 50%', false],
+    ['pause', '.pause-panel', 'World Menu', '50% 50%', false], ['settings-panel', '.settings-panel', 'Settings', '50% 50%', false],
     ['quest-journal', '.quest-panel', 'Quest journal', '50% 50%', true], ['npc-dialogue', '.gossip-window', 'Conversation', '50% 50%', true],
     ['worldmap', '.wm-panel', 'World map', '50% 50%', true], ['social-panel', '.social-panel', 'Social', '50% 50%', true],
     ['activity-panel', '.activity-window', 'Activity log', '50% 50%', true],
@@ -346,25 +346,28 @@
   }
 
   // ---------- the volume panel ----------
-  const music = $('set-music'), sfx = $('set-sfx'), sound = $('set-sound'), night = $('set-night'), weather = $('set-weather'), weatherAudio = $('set-weather-audio'), language = $('set-language'), size = $('set-uiscale');
+  const master = $('set-master'), music = $('set-music'), sfx = $('set-sfx'), sound = $('set-sound'), night = $('set-night'), weather = $('set-weather'), weatherAudio = $('set-weather-audio'), language = $('set-language'), size = $('set-uiscale');
   function syncPanel() {
     language.value = window.Prefs.lang;
     $('set-low-graphics').checked = window.Prefs.lowGraphics;
     $('set-quest-arrow').checked = window.Prefs.questArrow;
     $('set-track-ore').checked = window.Prefs.trackOre;
     $('set-track-flowers').checked = window.Prefs.trackFlowers;
+    master.value = Math.round(window.Prefs.master * 100);
     music.value = Math.round(window.Prefs.music * 100); sfx.value = Math.round(window.Prefs.sfx * 100); sound.checked = window.Prefs.sound;
     $('set-combat-sounds').value = window.Prefs.combatSounds;
     night.value = Math.round(window.Prefs.night * 100); $('set-night-out').textContent = night.value + '%';
     weather.value = Math.round(window.Prefs.weather * 100); $('set-weather-out').textContent = weather.value + '%';
     weatherAudio.value = Math.round(window.Prefs.weatherAudio * 100); $('set-weather-audio-out').textContent = weatherAudio.value + '%';
     size.value = Math.round(uiScale() * 100); $('set-uiscale-out').textContent = size.value + '%';
+    $('set-master-out').textContent = master.value + '%';
     $('set-music-out').textContent = music.value + '%'; $('set-sfx-out').textContent = sfx.value + '%';
   }
   $('set-track-ore').addEventListener('change', () => window.Prefs.set({ trackOre: $('set-track-ore').checked }));
   $('set-track-flowers').addEventListener('change', () => window.Prefs.set({ trackFlowers: $('set-track-flowers').checked }));
   $('set-quest-arrow').addEventListener('change', () => window.Prefs.set({ questArrow: $('set-quest-arrow').checked }));
   $('set-low-graphics').addEventListener('change', () => window.Prefs.set({ lowGraphics: $('set-low-graphics').checked }));
+  master.addEventListener('input', () => window.Prefs.set({ masterVol: master.value / 100 }));
   music.addEventListener('input', () => window.Prefs.set({ musicVol: music.value / 100 }));
   language.addEventListener('change', () => window.Prefs.set({ lang: language.value }));
   sfx.addEventListener('input', () => window.Prefs.set({ sfxVol: sfx.value / 100 }));
@@ -384,14 +387,40 @@
   });
   addEventListener('prefs-change', () => { if (!panel.hidden) syncPanel(); });
 
+  const settingsTabs = [...panel.querySelectorAll('.settings-tab')];
+  const settingsContent = panel.querySelector('.settings-content');
+  function selectSettingsTab(tab) {
+    endCapture();
+    for (const button of settingsTabs) {
+      const selected = button === tab;
+      button.setAttribute('aria-selected', String(selected));
+      button.tabIndex = selected ? 0 : -1;
+      $(button.getAttribute('aria-controls')).hidden = !selected;
+    }
+    settingsContent.scrollTop = 0;
+    if (tab.id === 'set-keys') { say(''); renderKeys(); }
+  }
+  for (const [index, tab] of settingsTabs.entries()) {
+    tab.addEventListener('click', () => selectSettingsTab(tab));
+    tab.addEventListener('keydown', event => {
+      const next = { ArrowLeft: index - 1, ArrowRight: index + 1, Home: 0, End: settingsTabs.length - 1 }[event.key];
+      if (next === undefined) return;
+      event.preventDefault();
+      const target = settingsTabs[(next + settingsTabs.length) % settingsTabs.length];
+      selectSettingsTab(target);
+      target.focus();
+    });
+  }
   function show() {
-    $('pause').hidden = true; panel.hidden = false; syncPanel(); music.focus({ preventScroll: true });
+    $('pause').hidden = true; panel.hidden = false;
+    selectSettingsTab(settingsTabs[0]); syncPanel();
+    master.focus({ preventScroll: true });
   }
   // toMenu: go back to the World Menu; false: just shut everything (the caller is closing the menus itself).
   function close(toMenu = true) {
     if (editing && !previewing) stopEdit(false);
-    if (!keysPanel.hidden) { closeKeys(false); if (toMenu) { $('pause').hidden = false; $('p-settings').focus({ preventScroll: true }); } return; }
     if (panel.hidden) return;
+    endCapture();
     panel.hidden = true;
     if (toMenu) { $('pause').hidden = false; $('p-settings').focus({ preventScroll: true }); }
   }
@@ -436,16 +465,8 @@
       renderKeys(id, slot);
     });
   }
-  function showKeys() { panel.hidden = true; keysPanel.hidden = false; say(''); renderKeys(); $('keys-back').focus({ preventScroll: true }); }
-  function closeKeys(toSettings = true) {
-    endCapture(); if (keysPanel.hidden) return;
-    keysPanel.hidden = true;
-    if (toSettings) { panel.hidden = false; syncPanel(); $('set-keys').focus({ preventScroll: true }); }
-  }
-  $('set-keys').addEventListener('click', showKeys);
-  $('keys-back').addEventListener('click', () => closeKeys());
   $('keys-reset-all').addEventListener('click', () => { endCapture(); Keys.resetAll(); say(''); renderKeys(); });
-  addEventListener('keymap-change', () => { if (!keysPanel.hidden && !cancelCapture) renderKeys(); });
+  addEventListener('keymap-change', () => { if (!panel.hidden && !keysPanel.hidden && !cancelCapture) renderKeys(); });
 
   // ---------- Edit UI ----------
   function syncHandle(id) {
@@ -527,10 +548,10 @@
 
   // While editing the game must not see any key; Esc finishes and arrows move the focused handle.
   addEventListener('keydown', e => {
-    if (Keys.capturing || (!editing && panel.hidden && keysPanel.hidden)) return;
+    if (Keys.capturing || (!editing && panel.hidden)) return;
     if (e.key === 'Escape') {
       e.preventDefault(); e.stopImmediatePropagation();
-      if (editing) stopEdit(); else if (!keysPanel.hidden) closeKeys(); else close();
+      if (editing) stopEdit(); else close();
       return;
     }
     if (!editing) return;
@@ -552,7 +573,7 @@
   // Use the normal close actions so focus, server cancellation and borrowed bags
   // are restored just as they are by each window's own Close button.
   const outsideClose = {
-    'whats-new': 'news-close', pause: 'p-resume', 'settings-panel': 'set-back', 'keys-panel': 'keys-back',
+    'whats-new': 'news-close', pause: 'p-resume', 'settings-panel': 'set-back',
     'quest-journal': 'quest-close', 'npc-dialogue': 'npc-x', worldmap: 'wm-close',
     'social-panel': 'social-close', 'inspect-panel': 'inspect-close', 'rebirth-dialog': 'rebirth-cancel', 'recommended-dialog': 'recommended-cancel',
     'mail-panel': 'mail-close', 'bank-panel': 'bank-close', 'skills-panel': 'skills-close', equipment: 'equipment-close',

@@ -172,7 +172,7 @@ async function run() {
 
       // Reset / Replay tutorial from Settings
       await page.keyboard.press('Escape');
-      await page.locator('#p-settings').click();
+      await page.locator('#p-settings').click(); await page.locator('#set-tab-general').click();
       await page.locator('#set-reset-tutorial').click();
       await page.waitForSelector('#tutorial-layer[data-step="first_quest"]:not([hidden])', { timeout: 10000 });
       check(await page.evaluate(() => Tutorial.state().done.length === 0), 'Reset / Replay tutorial clears completed steps');

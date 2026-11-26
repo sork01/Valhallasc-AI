@@ -79,6 +79,7 @@ let browser;
 
   await page.locator('#touch-actions [data-action="menu"]').tap();
   await page.locator('#p-settings').tap();
+  await page.locator('#set-tab-general').tap();
   const summary = page.locator('#set-profession-guide summary');
   assert.equal(await summary.textContent(),'Yrkesguide');
   await summary.tap();

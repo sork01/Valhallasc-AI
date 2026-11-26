@@ -18,7 +18,7 @@ async function call(name,args={}){const reply=await client.callTool({name,argume
   await page.goto(world.url);await page.locator('#start').click();await page.locator('#login-guest').click();
   await page.locator('#name').fill('Spraktestare');await page.locator('#go').click({timeout:60000});
   await page.waitForFunction(()=>Online.connected,null,{timeout:60000});
-  await page.keyboard.press('Escape');await page.locator('#p-settings').click();
+  await page.keyboard.press('Escape');await page.locator('#p-settings').click(); await page.locator('#set-tab-general').click();
   check(await page.locator('#set-language').inputValue()==='en','English is the starting language');
   await page.locator('#set-language').selectOption('sv');
   await page.waitForFunction(()=>document.documentElement.lang==='sv' && !!window.Locale && !!window.Prefs,null,{timeout:30000});
@@ -34,7 +34,7 @@ async function call(name,args={}){const reply=await client.callTool({name,argume
   check(await page.evaluate(()=>Locale.translate('You and Wren are now friends.'))==='Du och Wren är nu vänner.','dynamic server notice keeps the player name');
   await page.locator('#start').click();await page.locator('#login-guest').click();
   await page.waitForFunction(()=>Online.connected,null,{timeout:60000});
-  await page.keyboard.press('Escape');await page.locator('#p-settings').click();
+  await page.keyboard.press('Escape');await page.locator('#p-settings').click(); await page.locator('#set-tab-general').click();
   check(await page.locator('#set-language').inputValue()==='sv','language selector restores Swedish');
   check(await page.locator('#settings-title').textContent()==='Inställningar','settings menu is Swedish');
   await page.locator('#set-language').selectOption('en');

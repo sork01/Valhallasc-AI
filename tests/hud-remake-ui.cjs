@@ -90,7 +90,7 @@ const errors = [];
   await page.waitForFunction(want => document.getElementById('network-status').textContent === want, online(1), { timeout: 10000 });
 
   // --- the layout migrates: Edit UI saves only the pieces that exist ---
-  await page.keyboard.press('Escape'); await page.locator('#p-settings').click(); await page.locator('#set-edit-ui').click();
+  await page.keyboard.press('Escape'); await page.locator('#p-settings').click(); await page.locator('#set-tab-interface').click(); await page.locator('#set-edit-ui').click();
   // The pieces that exist are offered; the removed ones and the food and potion bar (part of the skillbar) are not.
   const handleIds = await page.locator('.layout-handle').evaluateAll(ns => ns.map(n => n.dataset.id));
   check(['frame', 'map', 'bags', 'skillbar', 'chat'].every(id => handleIds.includes(id)) && !['character', 'hint', 'quickuse'].some(id => handleIds.includes(id)), `Edit UI offers the live pieces and not the removed ones: ${handleIds.join(', ')}`);
@@ -138,7 +138,7 @@ const errors = [];
     await lay.screenshot({ path: path.join(world.artifacts, `hud-layout-${label.replace('%', '')}.png`) });
   };
   await arrange('80%');
-  await lay.keyboard.press('Escape'); await lay.locator('#p-settings').click(); await lay.locator('#set-uiscale').fill('100'); await lay.locator('#set-back').click(); await lay.locator('#p-resume').click();
+  await lay.keyboard.press('Escape'); await lay.locator('#p-settings').click(); await lay.locator('#set-tab-interface').click(); await lay.locator('#set-uiscale').fill('100'); await lay.locator('#set-back').click(); await lay.locator('#p-resume').click();
   await arrange('100%');
 
   // --- phone width ---

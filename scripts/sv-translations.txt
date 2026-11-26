@@ -1,4 +1,12 @@
 {
+  "General": "Allmänt",
+  "Interface": "Gränssnitt",
+  "Keybinds": "Tangenter",
+  "Master volume": "Huvudvolym",
+  "Quest arrow": "Uppdragspil",
+  "Settings categories": "Inställningskategorier",
+  "Sound": "Ljud",
+  "Video": "Bild",
   "Moonspore Mining Pick": "Moonsporehacka",
   "Sunward Mining Pick": "Sunwardhacka",
   "Tanglecrown Mining Pick": "Tanglecrownhacka",

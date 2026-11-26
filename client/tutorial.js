@@ -153,7 +153,7 @@ window.Tutorial = (() => {
   }
 
   function isAnyBlockingModalOpen(allowedId) {
-    const blockers = ['pause', 'settings-panel', 'keys-panel', 'whats-new', 'worldmap',
+    const blockers = ['pause', 'settings-panel', 'whats-new', 'worldmap',
       'social-panel', 'inspect-panel', 'trade-panel', 'trade-request', 'rebirth-dialog',
       'recommended-dialog', 'sell-warning', 'mail-panel', 'bank-panel', 'activity-panel',
       'quest-journal', 'equipment', 'skills-panel', 'npc-dialogue', 'connection-overlay',

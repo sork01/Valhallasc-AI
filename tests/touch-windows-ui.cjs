@@ -51,7 +51,10 @@ const suite = {
     }
     await page.evaluate(() => Keys.invoke('menu')); await audit('#pause .pause-panel', 'menu'); await clear();
     await page.evaluate(() => { Field.setPaused(true); Settings.show(); }); await audit('#settings-panel .settings-panel', 'settings');
-    await page.locator('#set-keys').click(); await audit('#keys-panel .keys-panel', 'keyboard'); await clear();
+    for (const [tab, name] of [['#set-tab-video', 'video'], ['#set-keys', 'keybinds'], ['#set-tab-interface', 'interface'], ['#set-tab-general', 'general']]) {
+      await page.locator(tab).click(); await audit('#settings-panel .settings-panel', `settings-${name}`);
+    }
+    await clear();
     await page.evaluate(() => Skillbar.show()); await audit('#skills-panel .skills-panel', 'skills'); await clear();
     await page.evaluate(() => Quests.show()); await audit('#quest-journal .quest-panel', 'quests'); await clear();
     await debug(page, { op: 'explore_all' }); await page.waitForFunction(() => Object.values(Field.explored || {}).filter(Boolean).length > 20);

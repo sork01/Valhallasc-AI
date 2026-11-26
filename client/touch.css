@@ -311,18 +311,13 @@ html, body { overscroll-behavior: none; }
     width: calc(48px / var(--window-k, .8));
     height: calc(52px / var(--window-k, .8));
   }
-  #stage #keys-panel > .keys-panel {
-    display: flex;
-    flex-direction: column;
+  #stage #settings-panel > .settings-panel {
     width: min(calc(92cqw / var(--window-k, .8)), 820px);
     height: calc(var(--touch-stage-h, 94dvh) / var(--window-k, .8));
     overflow: hidden;
   }
-  #stage #keys-panel #keys-list {
-    flex: 1 1 0;
-    min-height: 0;
-    max-height: none;
-    overflow-y: auto;
+  #stage #settings-panel .key-row {
+    grid-template-columns: minmax(0, 1fr) repeat(3, minmax(var(--touch-target), 13%));
   }
   #stage #social-panel > .social-panel {
     width: min(calc(90cqw / var(--window-k, .8)), 780px);

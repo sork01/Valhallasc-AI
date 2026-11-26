@@ -2,12 +2,12 @@
 (() => {
   // ---------- tiny persistent state ----------
   const KEY = 'valhallasc.save.v1';
-  const defaults = { lang: /^ko/i.test(navigator.language || '') ? 'ko' : /^sv/i.test(navigator.language || '') ? 'sv' : 'en', sound: true, musicVol: .35, sfxVol: 1, night: 1, weather: 1, weatherAudio: .7, lowGraphics: false, touchGraphicsSuggested: false, ui: {}, uiScale: .8, winScale: {}, panelSize: {}, char: null, draft: null };
+  const defaults = { lang: /^ko/i.test(navigator.language || '') ? 'ko' : /^sv/i.test(navigator.language || '') ? 'sv' : 'en', sound: true, masterVol: 1, musicVol: .35, sfxVol: 1, night: 1, weather: 1, weatherAudio: .7, lowGraphics: false, touchGraphicsSuggested: false, ui: {}, uiScale: .8, winScale: {}, panelSize: {}, char: null, draft: null };
   let save = { ...defaults };
   try { Object.assign(save, JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) { /* private mode */ }
   save.combatSounds = save.combatSounds === 'recorded' ? 'recorded' : 'synthesized';
   const vol = v => Number.isFinite(+v) ? Math.max(0, Math.min(1, +v)) : 1;
-  save.musicVol = vol(save.musicVol); save.sfxVol = vol(save.sfxVol); save.night = vol(save.night); save.weather = vol(save.weather); save.weatherAudio = vol(save.weatherAudio);
+  save.masterVol = vol(save.masterVol); save.musicVol = vol(save.musicVol); save.sfxVol = vol(save.sfxVol); save.night = vol(save.night); save.weather = vol(save.weather); save.weatherAudio = vol(save.weatherAudio);
   // Sork's own arrangement (2026-10-21) is what a player gets until they move something (uiSet / panelSizeSet): offsets in cqw from the stylesheet positions, sizes in cqw.
   const DEFAULT_UI = { map: { x: 1.4, y: -1.4 }, travel: { x: 1.33, y: -2.26 }, bags: { x: 1.37, y: 0.49 }, social: { x: 1.42, y: 0.66 }, chat: { x: -1.28, y: 0.53 }, frame: { x: -1.4, y: -1.4 }, party: { x: 61.04, y: 17.53 }, buffs: { x: -1.24, y: -2.79 }, quests: { x: -1.4, y: -2.48 }, dps: { x: 22, y: 0 } };
   const DEFAULT_PANEL_SIZE = { quests: { w: 19.61, h: 31.28 }, chat: { w: 34.2, h: 7.95 } };
@@ -120,9 +120,17 @@
   }
 
   // ---------- audio (recorded combat and the original synthesized effects) ----------
-  let ac = null;
+  let ac = null, masterGain = null;
   function audio() {
-    if (!ac) { const A = window.AudioContext || window.webkitAudioContext; if (A) ac = new A(); }
+    if (!ac) {
+      const Audio = window.AudioContext || window.webkitAudioContext;
+      if (!Audio) return null;
+      ac = new Audio();
+      masterGain = ac.createGain();
+      masterGain.gain.value = taper(save.masterVol);
+      masterGain.connect(ac.destination);
+      window.setLoopMusicOutput?.(ac, masterGain);
+    }
     if (ac && ac.state === 'suspended') ac.resume();
     return ac;
   }
@@ -132,7 +140,7 @@
   const taper = v => v * v;
   let sfxGain = null;
   function sfxOut(c) {
-    if (!sfxGain || sfxGain.context !== c) { sfxGain = c.createGain(); sfxGain.connect(c.destination); }
+    if (!sfxGain || sfxGain.context !== c) { sfxGain = c.createGain(); sfxGain.connect(masterGain); }
     sfxGain.gain.value = save.sound ? taper(save.sfxVol) : 0;
     return sfxGain;
   }
@@ -1188,7 +1196,7 @@
     if (url) {
       const c = audio();
       if (c && window.createCutsceneMusic) {
-        cutsceneScore = window.createCutsceneMusic(c, url, () => window.Cutscene?.state?.el || 0);
+        cutsceneScore = window.createCutsceneMusic(c, url, () => window.Cutscene?.state?.el || 0, masterGain);
         cutsceneScore.start();
       }
     }
@@ -1581,6 +1589,7 @@
   // Preferences shared with settings.js (volumes and the HUD layout); it never touches localStorage itself.
   window.Prefs = {
     get lang() { return save.lang; },
+    get master() { return save.masterVol; },
     get music() { return save.musicVol; }, get sfx() { return save.sfxVol; }, get sound() { return save.sound; },
     get combatSounds() { return save.combatSounds; },
     get touchSkills() { return save.touchSkills && typeof save.touchSkills === 'object' ? save.touchSkills : {}; },
@@ -1604,6 +1613,10 @@
     set(patch) {
       if ('lang' in patch && ['en', 'sv', 'ko'].includes(patch.lang) && patch.lang !== save.lang) {
         save.lang = patch.lang; persist(); location.reload(); return;
+      }
+      if ('masterVol' in patch) {
+        save.masterVol = vol(patch.masterVol);
+        if (masterGain) masterGain.gain.value = taper(save.masterVol);
       }
       if ('musicVol' in patch) save.musicVol = vol(patch.musicVol);
       if ('sfxVol' in patch) save.sfxVol = vol(patch.sfxVol);

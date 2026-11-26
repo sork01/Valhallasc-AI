@@ -8,9 +8,10 @@
   const price = row => Math.min(4294967295, Math.floor((row.base * row.quantity * (100 + (data?.goldPercent || 0)) + 50) / 100));
   const rarity = row => row.rarity || row.gear?.[0]?.rarity || Inventory.definition(row.item)?.rarity;
   const minedOres = new Set((window.BLACKSMITHING_DATA?.tiers || []).map(tier => tier.ore));
+  const gatheredFlowers = new Set((window.ALCHEMY_DATA?.flowers || []).map(flower => flower.item));
   function isJunk(row) {
     const item = Inventory.definition(row.item);
-    return row.rarity === 'common' && !item?.starter && !minedOres.has(row.item)
+    return row.rarity === 'common' && !item?.starter && !minedOres.has(row.item) && !gatheredFlowers.has(row.item)
       && !window.Quests?.needsMaterial(row.item) && (!!row.gear || item?.kind === 'material');
   }
   let npc = null, container = null, data = null, basket = new Map(), tab = 'merchant', page = 0, packet = null, pending = false, pendingKind = '', timer = 0, snapshotKey = '', warning = null, zone = null, lastNotice = '';

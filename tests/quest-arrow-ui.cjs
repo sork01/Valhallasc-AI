@@ -84,7 +84,8 @@ const check = (ok, label) => { assert.ok(ok, label); console.log(`${++checks}: $
   });
   check((await arrow()).records.length === 0, 'Tracking alone does not draw an arrow while the setting is off');
   await page.evaluate(() => { Field.setPaused(true); Settings.show(); });
-  if (touch) check(await page.locator('#set-quest-arrow').evaluate(n => n.parentElement.textContent.trim() === 'Pil' && n.parentElement.title === 'Peka mot det spårade uppdragets mål.'), 'Arrow setting and help have Swedish text');
+  await page.locator('#set-tab-interface').click();
+  if (touch) check(await page.locator('#set-quest-arrow').evaluate(n => n.parentElement.textContent.trim() === 'Uppdragspil' && n.parentElement.title === 'Peka mot det spårade uppdragets mål.'), 'Arrow setting and help have Swedish text');
   check(!(await page.locator('#set-quest-arrow').isChecked()), 'Settings shows Arrow unchecked by default');
   await page.locator('#set-quest-arrow').check();
   check(await page.evaluate(() => Prefs.questArrow && JSON.parse(localStorage.getItem('valhallasc.save.v1')).questArrow === true), 'Arrow setting persists the checked choice');

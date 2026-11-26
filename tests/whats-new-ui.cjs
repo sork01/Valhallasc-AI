@@ -73,7 +73,7 @@ async function newPage() {
   await page.locator('#start').click(); await playGuest(page);
   await page.locator('#cls-mage').click(); await page.locator('#name').fill('Newsreader'); await page.locator('#go').click({ timeout: 60000 });
   await page.waitForFunction(() => Online.connected && !!Field.mageSprites, null, { timeout: 60000 });
-  await page.keyboard.press('Escape'); await page.locator('#p-settings').click();
+  await page.keyboard.press('Escape'); await page.locator('#p-settings').click(); await page.locator('#set-tab-general').click();
   await page.locator('#set-whats-new').click(); await waitOpen(page);
   check(await page.locator('#news-label').textContent() === "What's new", 'Settings reopens the latest notes instead of the welcome');
   check(await page.evaluate(() => [...document.querySelectorAll('.panel-grip, .win-grip:not([data-window="whats-new"])')].every(el => getComputedStyle(el).visibility === 'hidden')), 'Other windows and HUD grips stay behind the notes');

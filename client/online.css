@@ -618,9 +618,23 @@
 #settings-panel { z-index: 40; grid-template: minmax(0, 1fr) / minmax(0, 1fr); }
 .world-clock { margin: .15cqw 0 .2cqw; color: #fff0ba; font: bold max(12px, .9cqw) 'Jua', sans-serif; text-align: center; text-shadow: 0 1px 4px #07152c; }
 .world-weather { margin: 0 0 .2cqw; color: #d9edff; font: bold max(11px, .8cqw) 'Jua', sans-serif; text-align: center; text-shadow: 0 1px 4px #07152c; }
-.settings-panel { text-align: left; min-width: 34cqw; }
-.settings-panel h3 { text-align: center; }
-.setting-row { display: grid; grid-template-columns: 11cqw 1fr 4cqw; align-items: center; gap: 1cqw; font-size: clamp(13px, 1.5cqw, 24px); }
+.settings-panel {
+  width: min(62cqw, 850px); height: min(46cqw, 570px); max-width: 96%; max-height: 92%;
+  min-width: 0; min-height: 0; overflow: hidden; text-align: left;
+  padding: clamp(12px, 1.7cqw, 24px); gap: clamp(8px, 1cqw, 16px);
+}
+.settings-panel h3 { margin: 0; text-align: center; flex: none; }
+.settings-tabs { display: flex; flex-wrap: wrap; gap: 4px; padding: 4px; border: 1px solid #bca16a54; border-radius: 8px; background: #0c162c; flex: none; }
+.settings-tab {
+  flex: 1 1 auto; padding: .45em .65em; border: 1px solid transparent; border-radius: 5px;
+  background: transparent; color: #d8e1ef; font: inherit; font-size: clamp(13px, 1.25cqw, 19px); cursor: pointer;
+}
+.settings-tab:hover { background: #23314b; color: #fff4df; }
+.settings-tab[aria-selected="true"] { border-color: #bca16a; background: #323247; color: #ffe6a8; }
+.settings-content { flex: 1 1 0; min-height: 0; padding: 4px 8px; overflow: auto; overscroll-behavior: contain; }
+.settings-section { display: grid; align-content: start; gap: clamp(7px, .85cqw, 13px); min-width: 0; }
+.settings-section > .btn, #set-back { justify-self: start; align-self: flex-start; width: fit-content; }
+.setting-row { display: grid; grid-template-columns: minmax(7em, 1fr) minmax(0, 1.4fr) max-content; align-items: center; gap: .65em; font-size: clamp(13px, 1.4cqw, 22px); }
 .setting-row output { text-align: right; color: var(--gold); font-variant-numeric: tabular-nums; }
 .setting-row input[type="range"] { width: 100%; min-width: 0; accent-color: var(--gold); cursor: pointer; }
 .setting-row select { grid-column: 2 / 4; width: 100%; padding: .3cqw; color: #fff; background: #18253e; border: 1px solid #bca16a; border-radius: .4cqw; font: inherit; }
@@ -1027,13 +1041,11 @@
 .panel-grip:hover, .panel-grip:focus-visible, .panel-grip.dragging { opacity: 1; }
 .panel-grip:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
 @media (pointer: coarse) { .panel-grip { width: 34px; height: 34px; opacity: .7; } }
-/* Keyboard screen (UI-KEYMAP): one row per action, two key boxes and a reset; the list scrolls inside the panel. */
-#keys-panel { z-index: 40; }
-.keys-panel { width: 46cqw; max-height: 94%; min-height: 0; }
-.keys-panel .keys-message { min-height: 1.3em; color: var(--gold); }
-.keys-list { display: grid; gap: .35cqw; overflow-y: auto; min-height: 0; padding-right: .6cqw; }
+/* One row per action, with two key slots and a reset. */
+.settings-panel .keys-message { min-height: 1.3em; color: var(--gold); }
+.keys-list { display: grid; gap: .35cqw; min-width: 0; }
 .keys-list h4 { margin: .8cqw 0 .1cqw; font-family: var(--display); font-weight: 400; font-size: clamp(13px, 1.6cqw, 26px); color: var(--gold); }
-.key-row { display: grid; grid-template-columns: 1fr 8cqw 8cqw 5.5cqw; align-items: center; gap: .6cqw; font-size: clamp(12px, 1.35cqw, 22px); }
+.key-row { display: grid; grid-template-columns: minmax(0, 1fr) repeat(2, minmax(3em, 8cqw)) minmax(3em, 5.5cqw); align-items: center; gap: .6cqw; font-size: clamp(12px, 1.35cqw, 22px); }
 .key-cell, .key-reset { min-width: 0; padding: .3cqw .5cqw; color: #fff; background: #18253e; border: 1px solid #bca16a; border-radius: .4cqw; font: inherit; cursor: pointer; }
 .key-cell.capturing { color: #18253e; background: #ffdc87; }
 .key-reset { color: #dfc9a0; border-color: #6c5d3d; }

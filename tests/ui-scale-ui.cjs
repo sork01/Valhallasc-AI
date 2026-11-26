@@ -34,12 +34,12 @@ const near = (a, b, tol = 1.5) => Math.abs(a - b) <= tol;
   // --- the global slider ---
   const anchored = { skillbar: 'cx b', bags: 'r b', quests: 'l', frame: 'l t', map: 'r t' };
   const base = {}; for (const id of Object.keys(anchored)) base[id] = await rect(page, `[data-ui="${id}"]`);
-  await page.keyboard.press('Escape'); await page.locator('#p-settings').click();
+  await page.keyboard.press('Escape'); await page.locator('#p-settings').click(); await page.locator('#set-tab-interface').click();
   check(await page.locator('#set-uiscale').inputValue() === '80', 'UI size starts at 80%');
   check((await stored(page)).uiScaleSet !== true, 'The default is not stored as a choice');
   await page.locator('#set-uiscale').fill('100'); await page.locator('#set-back').click(); await page.locator('#p-resume').click();
   for (const id of Object.keys(anchored)) base[id] = await rect(page, `[data-ui="${id}"]`); // the checks below measure from 100%
-  await page.keyboard.press('Escape'); await page.locator('#p-settings').click();
+  await page.keyboard.press('Escape'); await page.locator('#p-settings').click(); await page.locator('#set-tab-interface').click();
   await page.locator('#set-uiscale').fill('150');
   check(await page.locator('#set-uiscale-out').textContent() === '150%', 'The slider shows its percentage');
   check((await stored(page)).uiScale === 1.5, 'The size is saved on this device');
@@ -55,7 +55,7 @@ const near = (a, b, tol = 1.5) => Math.abs(a - b) <= tol;
   await page.screenshot({ path: path.join(world.artifacts, 'ui-size-150.png') });
 
   // --- Edit UI still lines up at another size ---
-  await page.keyboard.press('Escape'); await page.locator('#p-settings').click(); await page.locator('#set-edit-ui').click();
+  await page.keyboard.press('Escape'); await page.locator('#p-settings').click(); await page.locator('#set-tab-interface').click(); await page.locator('#set-edit-ui').click();
   for (const id of ['skillbar', 'chat', 'bags']) { const h = await rect(page, `.layout-handle[data-id="${id}"]`), e = await rect(page, `[data-ui="${id}"]`); check(near(h.l, e.l) && near(h.t, e.t) && near(h.w, e.w) && near(h.h, e.h), `The ${id} handle covers the scaled piece`); }
   check(await page.locator('.win-grip:visible').count() === 0, 'No window is open, so no window grips while editing the layout');
   await page.locator('#layout-done').click(); await page.locator('#set-back').click(); await page.locator('#p-resume').click();
@@ -167,7 +167,7 @@ const near = (a, b, tol = 1.5) => Math.abs(a - b) <= tol;
   await page.keyboard.press('Escape');
 
   // --- reset window sizes from Settings ---
-  await page.keyboard.press('Escape'); await page.locator('#p-settings').click();
+  await page.keyboard.press('Escape'); await page.locator('#p-settings').click(); await page.locator('#set-tab-interface').click();
   await page.locator('#set-win-reset').click();
   check(Object.keys((await stored(page)).winScale || {}).length === 0, 'Reset window sizes clears every stored factor');
   check(Object.keys((await stored(page)).panelSize || {}).length === 0 && Math.abs((await tracker()).w - trackerSized.w) > 2, 'And the tracker and chat sizes (back to the default arrangement)');

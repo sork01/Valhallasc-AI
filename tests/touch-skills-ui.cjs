@@ -7,7 +7,7 @@ const suite = {
     const page = await player('TouchSkills'); await safeSpot(page);
     check(await page.evaluate(() => !('obsolete' in Settings.layout)), 'old unknown layout keys are discarded');
     check(await page.evaluate(() => TouchControls.assignments().join(',') === 'twinbolt,arcaneward,fireball,barrage'), 'old preferences load class defaults');
-    await page.locator('#touch-actions [data-action="menu"]').click(); await page.locator('#p-settings').click(); await page.locator('#set-edit-ui').click();
+    await page.locator('#touch-actions [data-action="menu"]').click(); await page.locator('#p-settings').click(); await page.locator('#set-tab-interface').click(); await page.locator('#set-edit-ui').click();
     check(await page.locator('#touch-skill-editor').isVisible(), 'Edit UI exposes touch assignments');
     await page.locator('#touch-skill-editor select[data-arc="0"]').selectOption('arcaneward');
     check(await page.evaluate(() => Prefs.touchSkills.mage[0] === 'arcaneward'), 'assignment is stored');
@@ -48,7 +48,7 @@ const suite = {
     }
     const swedish = await player('TouchSvenska', { lang: 'sv' });
     check(await swedish.locator('#touch-actions [data-action="menu"]').textContent() === 'Meny', 'touch actions have Swedish labels');
-    await swedish.locator('#touch-actions [data-action="menu"]').click(); await swedish.locator('#p-settings').click();
+    await swedish.locator('#touch-actions [data-action="menu"]').click(); await swedish.locator('#p-settings').click(); await swedish.locator('#set-tab-video').click();
     check(await swedish.locator('label:has(#set-low-graphics)').textContent().then(s => s.includes('Låg grafik')), 'Low graphics is translated by hand');
     await swedish.context().close();
   },

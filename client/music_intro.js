@@ -2,8 +2,8 @@
 // A finite score follows the cutscene clock, including late downloads and tab resumes.
 // Each run owns its nodes so a cancelled download can never revive a skipped intro.
 (() => {
-  window.createCutsceneMusic = (ctx, url, elapsed) => {
-    const output = ctx.createGain(); output.gain.value = 0; output.connect(ctx.destination);
+  window.createCutsceneMusic = (ctx, url, elapsed, destination = ctx.destination) => {
+    const output = ctx.createGain(); output.gain.value = 0; output.connect(destination);
     let buffer = null, voice = null, running = false, serial = 0, level = 0;
     const loading = fetch(url).then(r => {
       if (!r.ok) throw Error('Cutscene score unavailable');

@@ -46,7 +46,7 @@
     <svg id="logo" class="logo" viewBox="0 0 1000 440" role="img" aria-label="Valhalla Rumble, 발할라 럼블"></svg>
 
     <p class="cta"><span class="cta-en">[ Touch to Awaken the Horn ]</span><span class="cta-ko" lang="ko">터치하여 시작</span></p>
-    <p class="version">1.14.5</p>
+    <p class="version">1.14.6</p>
 
     <button class="start" id="start" type="button" aria-label="Touch to awaken the horn"></button>
   </section>
@@ -542,42 +542,54 @@
     <div class="pause" id="settings-panel" hidden>
       <section class="panel pause-panel settings-panel" role="dialog" aria-modal="true" aria-labelledby="settings-title">
         <h3 id="settings-title">Settings</h3>
-        <label class="setting-row" for="set-language"><span>Language</span><select id="set-language"><option value="en">English</option><option value="sv">Svenska</option><option value="ko">한국어</option></select></label>
-        <label class="setting-row" for="set-uiscale"><span>UI size</span><input id="set-uiscale" type="range" min="60" max="150" step="5"><output id="set-uiscale-out" for="set-uiscale"></output></label>
-        <label class="setting-row" for="set-music"><span>Music</span><input id="set-music" type="range" min="0" max="100" step="1"><output id="set-music-out" for="set-music"></output></label>
-        <label class="setting-row" for="set-sfx"><span>Sound effects</span><input id="set-sfx" type="range" min="0" max="100" step="1"><output id="set-sfx-out" for="set-sfx"></output></label>
-        <label class="setting-row" for="set-combat-sounds"><span>Combat sounds</span><select id="set-combat-sounds"><option value="recorded">Recorded</option><option value="synthesized">Synthesized</option></select></label>
-        <label class="setting-row" for="set-night"><span>Night darkening</span><input id="set-night" type="range" min="0" max="100" step="1"><output id="set-night-out" for="set-night"></output></label>
-        <label class="setting-row" for="set-weather"><span>Weather effects</span><input id="set-weather" type="range" min="0" max="100" step="1"><output id="set-weather-out" for="set-weather"></output></label>
-        <label class="setting-row" for="set-weather-audio"><span>Weather sound</span><input id="set-weather-audio" type="range" min="0" max="100" step="1"><output id="set-weather-audio-out" for="set-weather-audio"></output></label>
-        <label class="setting-row" for="set-track-ore"><span>Track ore veins on the minimap</span><input id="set-track-ore" type="checkbox" checked></label>
-        <label class="setting-row" for="set-track-flowers"><span>Track flower patches on the minimap</span><input id="set-track-flowers" type="checkbox" checked></label>
-        <label class="setting-check" id="set-sound-row"><input id="set-sound" type="checkbox"> Sound on <kbd>M / N</kbd></label>
-        <label class="setting-check"><input id="set-low-graphics" type="checkbox"> Low graphics</label>
-        <label class="setting-check"><input id="dps-toggle" type="checkbox" checked> DPS meter</label>
-        <label class="setting-check" title="Point toward the tracked quest objective."><input id="set-quest-arrow" type="checkbox"> Arrow</label>
-        <button class="btn ghost" id="set-fullscreen" type="button" hidden>Fullscreen</button>
-        <button class="btn ghost" id="set-keys" type="button">Keyboard</button>
-        <p class="world-menu-note">Keyboard lets you choose which key does what.</p>
-        <button class="btn ghost" id="set-whats-new" type="button" lang="en" translate="no">What's new</button>
-        <button class="btn ghost" id="set-replay-intro" type="button">Replay intro</button>
-        <button class="btn ghost" id="set-reset-tutorial" type="button">Reset / Replay tutorial</button>
-        <details id="set-profession-guide"><summary class="btn ghost">Profession guide</summary><dl id="profession-guide-list"></dl></details>
-        <button class="btn ghost" id="set-edit-ui" type="button">Edit UI</button>
-        <p class="world-menu-note">Edit UI lets you drag the skillbar, quest tracker, chat and the other panels where you want them.</p>
-        <button class="btn ghost" id="set-win-reset" type="button">Reset window sizes</button>
-        <p class="world-menu-note">UI size scales the whole interface. Drag the corner grip of a window to resize it; double-click the grip to reset it.</p>
+        <div class="settings-tabs" role="tablist" aria-label="Settings categories">
+          <button class="settings-tab" id="set-tab-sound" type="button" role="tab" aria-controls="set-section-sound" aria-selected="true">Sound</button>
+          <button class="settings-tab" id="set-tab-video" type="button" role="tab" aria-controls="set-section-video" aria-selected="false" tabindex="-1">Video</button>
+          <button class="settings-tab" id="set-keys" type="button" role="tab" aria-controls="keys-panel" aria-selected="false" tabindex="-1">Keybinds</button>
+          <button class="settings-tab" id="set-tab-interface" type="button" role="tab" aria-controls="set-section-interface" aria-selected="false" tabindex="-1">Interface</button>
+          <button class="settings-tab" id="set-tab-general" type="button" role="tab" aria-controls="set-section-general" aria-selected="false" tabindex="-1">General</button>
+        </div>
+        <div class="settings-content">
+          <div class="settings-section" id="set-section-sound" role="tabpanel" aria-labelledby="set-tab-sound">
+            <label class="setting-row" for="set-master"><span>Master volume</span><input id="set-master" type="range" min="0" max="100" step="1"><output id="set-master-out" for="set-master"></output></label>
+            <label class="setting-row" for="set-music"><span>Music</span><input id="set-music" type="range" min="0" max="100" step="1"><output id="set-music-out" for="set-music"></output></label>
+            <label class="setting-row" for="set-sfx"><span>Sound effects</span><input id="set-sfx" type="range" min="0" max="100" step="1"><output id="set-sfx-out" for="set-sfx"></output></label>
+            <label class="setting-row" for="set-weather-audio"><span>Weather sound</span><input id="set-weather-audio" type="range" min="0" max="100" step="1"><output id="set-weather-audio-out" for="set-weather-audio"></output></label>
+            <label class="setting-row" for="set-combat-sounds"><span>Combat sounds</span><select id="set-combat-sounds"><option value="recorded">Recorded</option><option value="synthesized">Synthesized</option></select></label>
+            <label class="setting-check" id="set-sound-row"><input id="set-sound" type="checkbox"> Sound on <kbd>M / N</kbd></label>
+          </div>
+          <div class="settings-section" id="set-section-video" role="tabpanel" aria-labelledby="set-tab-video" hidden>
+            <label class="setting-check"><input id="set-low-graphics" type="checkbox"> Low graphics</label>
+            <label class="setting-row" for="set-night"><span>Night darkening</span><input id="set-night" type="range" min="0" max="100" step="1"><output id="set-night-out" for="set-night"></output></label>
+            <label class="setting-row" for="set-weather"><span>Weather effects</span><input id="set-weather" type="range" min="0" max="100" step="1"><output id="set-weather-out" for="set-weather"></output></label>
+            <button class="btn ghost" id="set-fullscreen" type="button" hidden>Fullscreen</button>
+          </div>
+          <div class="settings-section" id="keys-panel" role="tabpanel" aria-labelledby="set-keys" hidden>
+            <p class="world-menu-note">Click a key box, then press the new key. Backspace clears the box and Esc cancels. A key that another action uses is moved to this one.</p>
+            <p class="world-menu-note keys-message" id="keys-message" role="status" aria-live="polite"></p>
+            <div class="keys-list" id="keys-list"></div>
+            <button class="btn ghost" id="keys-reset-all" type="button">Reset all keys</button>
+          </div>
+          <div class="settings-section" id="set-section-interface" role="tabpanel" aria-labelledby="set-tab-interface" hidden>
+            <label class="setting-row" for="set-uiscale"><span>UI size</span><input id="set-uiscale" type="range" min="60" max="150" step="5"><output id="set-uiscale-out" for="set-uiscale"></output></label>
+            <label class="setting-check"><input id="dps-toggle" type="checkbox" checked> DPS meter</label>
+            <label class="setting-check" title="Point toward the tracked quest objective."><input id="set-quest-arrow" type="checkbox"> Quest arrow</label>
+            <label class="setting-check"><input id="set-track-ore" type="checkbox" checked> Track ore veins on the minimap</label>
+            <label class="setting-check"><input id="set-track-flowers" type="checkbox" checked> Track flower patches on the minimap</label>
+            <button class="btn ghost" id="set-edit-ui" type="button">Edit UI</button>
+            <p class="world-menu-note">Edit UI lets you drag the skillbar, quest tracker, chat and the other panels where you want them.</p>
+            <button class="btn ghost" id="set-win-reset" type="button">Reset window sizes</button>
+            <p class="world-menu-note">UI size scales the whole interface. Drag the corner grip of a window to resize it; double-click the grip to reset it.</p>
+          </div>
+          <div class="settings-section" id="set-section-general" role="tabpanel" aria-labelledby="set-tab-general" hidden>
+            <label class="setting-row" for="set-language"><span>Language</span><select id="set-language"><option value="en">English</option><option value="sv">Svenska</option><option value="ko">한국어</option></select></label>
+            <button class="btn ghost" id="set-whats-new" type="button" lang="en" translate="no">What's new</button>
+            <button class="btn ghost" id="set-replay-intro" type="button">Replay intro</button>
+            <button class="btn ghost" id="set-reset-tutorial" type="button">Reset / Replay tutorial</button>
+            <details id="set-profession-guide"><summary class="btn ghost">Profession guide</summary><dl id="profession-guide-list"></dl></details>
+          </div>
+        </div>
         <button class="btn primary" id="set-back" type="button">Back to menu</button>
-      </section>
-    </div>
-    <div class="pause" id="keys-panel" hidden>
-      <section class="panel pause-panel settings-panel keys-panel" role="dialog" aria-modal="true" aria-labelledby="keys-title">
-        <h3 id="keys-title">Keyboard</h3>
-        <p class="world-menu-note">Click a key box, then press the new key. Backspace clears the box and Esc cancels. A key that another action uses is moved to this one.</p>
-        <p class="world-menu-note keys-message" id="keys-message" role="status" aria-live="polite"></p>
-        <div class="keys-list" id="keys-list"></div>
-        <button class="btn ghost" id="keys-reset-all" type="button">Reset all keys</button>
-        <button class="btn primary" id="keys-back" type="button">Back to settings</button>
       </section>
     </div>
     <div id="fishing-panel" class="pause" hidden>

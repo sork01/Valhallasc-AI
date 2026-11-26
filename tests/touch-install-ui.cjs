@@ -16,7 +16,7 @@ const suite = {
     }
     check(await page.locator('link[rel=apple-touch-icon]').count() === 1, 'Apple home screen icon is linked');
     check(await page.evaluate(() => getComputedStyle(document.body).overscrollBehavior === 'none' && getComputedStyle(document.querySelector('#fieldcv')).touchAction === 'none'), 'game surface blocks pull-to-refresh and canvas pinches');
-    await page.locator('#touch-actions [data-action="menu"]').click(); await page.locator('#p-settings').click();
+    await page.locator('#touch-actions [data-action="menu"]').click(); await page.locator('#p-settings').click(); await page.locator('#set-tab-video').click();
     if (await page.evaluate(() => document.fullscreenEnabled)) {
       check(await page.locator('#set-fullscreen').isVisible(), 'supported fullscreen button is available');
       await page.locator('#set-fullscreen').click({ timeout: 7000 }).catch(async e => {

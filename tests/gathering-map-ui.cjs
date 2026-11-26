@@ -156,6 +156,7 @@ let browser;
   assert.doesNotMatch(await system.textContent(), /Du får \d+ × Ängsguld\./, 'the picked flower gets one receipt');
   await page.screenshot({path:world.runDir+'/gathering-flower-phone.png'});
   await page.evaluate(() => Settings.show());
+  await page.locator('#set-tab-interface').tap();
   const oreSetting = page.locator('#set-track-ore'), flowerSetting = page.locator('#set-track-flowers');
   assert(await oreSetting.isChecked() && await flowerSetting.isChecked());
   await oreSetting.uncheck();

@@ -3,12 +3,15 @@ const { playGuest } = require('./lib/guest.cjs');
 // the checks drive the real menu, real sliders and real pointer drags, and read back stage geometry and storage.
 const assert = require('node:assert/strict');
 const path = require('node:path');
+const fs = require('node:fs');
 const { chromium, STUB } = require('./lib/playwright.cjs');
 const { Client } = require('@modelcontextprotocol/sdk/client/index.js');
 const { StdioClientTransport, getDefaultEnvironment } = require('@modelcontextprotocol/sdk/client/stdio.js');
 const root = path.resolve(__dirname, '..');
 const client = new Client({ name: 'valhallasc-settings-ui', version: '1.0.0' });
 const musicDefaultOnly = process.env.SETTINGS_MUSIC_DEFAULT === '1';
+const categoriesOnly = process.env.SETTINGS_CATEGORIES === '1';
+const touch = process.env.TOUCH === '1';
 let browser, started = false, checks = 0;
 const check = (value, message) => { assert.ok(value, message); checks++; };
 async function call(name, args = {}) {
@@ -25,17 +28,92 @@ const stageRect = page => rect(page, '#stage');
   await client.connect(new StdioClientTransport({ command: process.execPath, args: [path.join(root, 'scripts/test-mcp.cjs')], cwd: root, stderr: 'pipe', env }));
   const world = await call('start_world'); started = true;
   browser = await chromium.launch({ headless: true });
-  const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
-  const errors = []; page.on('pageerror', e => errors.push(e.message));
+  const page = await browser.newPage({
+    viewport: touch ? { width: 740, height: 320 } : { width: 1440, height: 900 },
+    isMobile: touch, hasTouch: touch, reducedMotion: 'reduce',
+  });
+  const errors = []; page.on('pageerror', e => errors.push(e.stack || e.message));
   // MUTATE=taper serves game.js with a linear music slider instead of the squared taper: the run must fail.
   if (process.env.MUTATE === 'taper') await page.route('**/game.js', async r => { const res = await r.fetch(); await r.fulfill({ response: res, body: (await res.text()).replace('const taper = v => v * v;', 'const taper = v => v;') }); });
-  // Record what is wired straight into the speakers: the music players' outputs and exactly one effects bus.
+  if (process.env.MUTATE === 'master-music') {
+    const source = fs.readFileSync(path.join(root, 'client/music_player.js'), 'utf8');
+    const body = source.replace('outputs.get(ctx) || ctx.destination', 'ctx.destination');
+    assert.notEqual(body, source, 'the music mutation applied');
+    await page.route('**/music_player.js', r => r.fulfill({ contentType: 'text/javascript', body }));
+  }
+  // Record the shared mixer and its inputs.
   await page.addInitScript(onlyDefault => {
-    window.__dest = new Set(); const connect = AudioNode.prototype.connect;
-    AudioNode.prototype.connect = function (to, ...rest) { if (to instanceof AudioDestinationNode) window.__dest.add(this); return connect.call(this, to, ...rest); };
+    window.__dest = new Set(); window.__inputs = new Map();
+    const connect = AudioNode.prototype.connect;
+    AudioNode.prototype.connect = function (to, ...rest) {
+      if (to instanceof AudioDestinationNode) window.__dest.add(this);
+      if (to instanceof AudioNode) {
+        if (!window.__inputs.has(to)) window.__inputs.set(to, new Set());
+        window.__inputs.get(to).add(this);
+      }
+      return connect.call(this, to, ...rest);
+    };
     if (!onlyDefault && !sessionStorage.getItem('seeded')) { sessionStorage.setItem('seeded', '1'); localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: true, char: null, draft: null })); }
-  }, musicDefaultOnly);
+  }, musicDefaultOnly || categoriesOnly);
   await page.goto(world.url);
+  if (categoriesOnly) {
+    const show = () => page.evaluate(() => {
+      document.getElementById('scene-splash').hidden = true;
+      document.getElementById('scene-game').hidden = false;
+      document.getElementById('p-settings').click();
+    });
+    const master = page.locator('#set-master');
+    const tabs = page.locator('.settings-tab');
+    await show();
+    if (touch && await page.locator('#low-gfx-dismiss').isVisible()) await page.locator('#low-gfx-dismiss').tap();
+    check(await tabs.count() === 5, 'Settings has five categories');
+    check(await master.isVisible() && await master.inputValue() === '100', 'Sound opens with Master volume at 100%');
+    check(await page.locator('#set-music').inputValue() === '35', 'The Music default is 35%');
+    check(await page.locator('[role=tabpanel]:visible').count() === 1, 'Only the selected panel is visible');
+    const audio = await page.evaluate(() => {
+      Prefs.preview();
+      CutsceneAudio.setScore('assets/music_intro.mp3');
+      const output = [...__dest][0], inputs = __inputs.get(output);
+      const result = {
+        count: __dest.size,
+        music: inputs?.has(valhalla.music.output) && inputs?.has(valhalla.fmusic.output),
+        score: inputs?.has(CutsceneAudio.score.output),
+        effects: inputs?.has(__combatAudioTest.bus()),
+      };
+      CutsceneAudio.setScore(null);
+      return result;
+    });
+    check(audio.count === 1 && audio.music && audio.score && audio.effects, 'Looping music, cutscenes and effects share one master output');
+    await master.fill('50');
+    check(await page.locator('#set-master-out').textContent() === '50%', 'Master Volume displays its value');
+    check(await page.evaluate(() => [...__dest][0].gain.value === .25), 'Master volume scales the shared gain');
+    await master.fill('0');
+    check(await page.evaluate(() => [...__dest][0].gain.value === 0 && Prefs.music === .35 && Prefs.sfx === 1), 'Master zero silences the shared output without changing the channel levels');
+    await master.fill('65');
+    await page.locator('#set-tab-sound').press('ArrowRight');
+    check(await page.locator('#set-tab-video').getAttribute('aria-selected') === 'true' && await page.locator('#set-night').isVisible(), 'Arrow keys select the next category');
+    await page.locator('#set-keys').click();
+    check(await page.locator('#key-attack-0').isVisible(), 'The Keybinds tab contains the editor');
+    await page.locator('#key-attack-0').click();
+    await page.keyboard.press('Escape');
+    check(await page.locator('#keys-panel').isVisible(), 'Escape cancels a binding capture in place');
+    await page.locator('#set-tab-interface').click();
+    check(await page.locator('#set-edit-ui').isVisible() && await page.locator('#set-track-flowers').isVisible(), 'Interface contains layout and minimap controls');
+    await page.locator('#set-tab-general').click();
+    check(await page.locator('#set-language').isVisible() && await page.locator('#set-profession-guide').isVisible(), 'General contains language and guides');
+    await page.reload();
+    await show();
+    check(await master.inputValue() === '65' && (await stored(page)).masterVol === .65, 'Master volume persists after reload');
+    check(await page.evaluate(() => Math.abs([...__dest][0].gain.value - .65 ** 2) < 1e-6), 'The saved master value is applied when the audio context is created');
+    if (touch) {
+      const dimensions = await master.boundingBox();
+      check(dimensions.height >= 43.8 && dimensions.y >= 0 && dimensions.y + dimensions.height <= 320, 'The Master slider is reachable on a short touch screen');
+    }
+    check(errors.length === 0, `No page errors: ${errors.join('; ')}`);
+    await page.screenshot({ path: path.join(world.artifacts, touch ? 'settings-touch.png' : 'settings-desktop.png') });
+    console.log(`${checks} settings category and master-volume checks passed. ${world.artifacts}`);
+    return;
+  }
   if (musicDefaultOnly) {
     const music = page.locator('#set-music');
     const showSettings = () => page.evaluate(() => Settings.show());
@@ -76,7 +154,7 @@ const stageRect = page => rect(page, '#stage');
   await page.locator('#p-settings').click();
   check(await page.locator('#settings-panel').isVisible() && await page.locator('#pause').isHidden(), 'Settings replaces the World Menu');
   check(await page.locator('#set-music').inputValue() === '35' && await page.locator('#set-sfx').inputValue() === '100', 'Music starts at 35% and effects start at 100%');
-  check(await page.evaluate(() => document.activeElement.id) === 'set-music', 'Focus lands on the first slider');
+  check(await page.evaluate(() => document.activeElement.id) === 'set-master', 'Focus lands on the first slider');
 
   // --- volumes ---
   await page.locator('#set-music').fill('50');
@@ -84,7 +162,7 @@ const stageRect = page => rect(page, '#stage');
   check(await page.evaluate(() => Math.abs(levels.at(-1) - .25) < 1e-9), 'Music level follows a squared taper (50% slider = 0.25 gain)');
   check((await stored(page)).musicVol === .5, 'The music level is saved on this device');
   await page.waitForTimeout(2500); // the music slider ramps its levels over 1.5 s; read the gains once they settle
-  await page.evaluate(() => { window.__gains0 = new Map([...__dest].filter(n => n.gain).map(n => [n, n.gain.value])); });
+  await page.evaluate(() => { window.__gains0 = new Map([...__inputs.get([...__dest][0])].filter(n => n.gain).map(n => [n, n.gain.value])); });
   await page.locator('#set-sfx').fill('50');
   await page.evaluate(() => Prefs.preview());
   const changedBus = await page.evaluate(() => [...__gains0].filter(([n, v]) => n.gain.value !== v).map(([n]) => ({ gain: n.gain.value })));
@@ -118,7 +196,7 @@ const stageRect = page => rect(page, '#stage');
   const before = {}; for (const id of ids) before[id] = await rect(page, `[data-ui="${id}"]`);
   check(ids.length === 11, 'Eleven movable pieces (the DPS meter joined them in Beta 1.55.2)');
   await page.keyboard.press('Escape'); await page.locator('#p-settings').click();
-  await page.locator('#set-edit-ui').click();
+  await page.locator('#set-tab-interface').click(); await page.locator('#set-edit-ui').click();
   check(await page.locator('#layout-bar').isVisible() && await page.locator('#settings-panel').isHidden(), 'Edit UI hides the panel and shows its toolbar');
   const handles = await page.locator('.layout-handle').evaluateAll(list => list.map(n => ({ id: n.dataset.id, w: n.getBoundingClientRect().width, h: n.getBoundingClientRect().height, hidden: n.hidden })));
   check(ids.every(id => handles.some(h => h.id === id && !h.hidden && h.w > 10 && h.h > 10)), `Every piece, even the empty party frame and tracker, gets a visible handle: ${JSON.stringify(handles.filter(h => h.hidden || h.w <= 10))}`);
@@ -185,7 +263,7 @@ const stageRect = page => rect(page, '#stage');
   await page.waitForTimeout(200);
 
   // --- reset ---
-  await page.keyboard.press('Escape'); await page.locator('#p-settings').click(); await page.locator('#set-edit-ui').click();
+  await page.keyboard.press('Escape'); await page.locator('#p-settings').click(); await page.locator('#set-tab-interface').click(); await page.locator('#set-edit-ui').click();
   await page.locator('#layout-reset').click();
   for (const id of ['skillbar', 'chat', 'quests']) { const r = await rect(page, `[data-ui="${id}"]`); check(Math.abs(r.l - before[id].l) < 1.5 && Math.abs(r.t - before[id].t) < 1.5, `Reset puts ${id} back on its default spot`); }
   check(Object.keys((await stored(page)).ui || {}).length === 0, 'Reset clears the stored layout');

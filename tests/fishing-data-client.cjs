@@ -13,6 +13,7 @@ function fixture() {
     replaceChildren(...children){this.children=[];this.append(...children);}
     addEventListener(name,fn){this.events[name]=fn;}
     setAttribute(k,v){this.attributes[k]=v;}
+    removeAttribute(k){delete this.attributes[k];}
     getBoundingClientRect(){return {x:0,y:0,top:0,right:10,width:200,height:100};}
     contains(){return false;}
     querySelectorAll(){return [];}
@@ -29,10 +30,15 @@ function fixture() {
     Online:{connected:true,send:()=>true},Field:{hero:{level:99,maxHp:10000,mealCd:17,potionCd:3},useItem(id){this.used=id;},equipSlot(){throw Error('fish or rod equipped');}},
     Money:{text:n=>`${n} copper`},innerWidth:1600,innerHeight:900,dispatchEvent(){},Event:class{},setTimeout:()=>0,clearTimeout(){}};
   ctx.window=ctx;vm.createContext(ctx);
+  vm.runInContext(fs.readFileSync(path.join(root,'client/alchemy-data.js'),'utf8'),ctx);
   let inventory=fs.readFileSync(path.join(root,'client/inventory.js'),'utf8');
   if(process.env.MUTATE==='compatible')inventory=execFileSync('git',['show','af607ebd:client/inventory.js'],{cwd:root,encoding:'utf8'});
   vm.runInContext(inventory,ctx);
   let shop=fs.readFileSync(path.join(root,'client/shop.js'),'utf8');
+  if(process.env.MUTATE==='flowers') {
+    assert(shop.includes('!gatheredFlowers.has(row.item)'));
+    shop=shop.replace('!gatheredFlowers.has(row.item)','true');
+  }
   if(process.env.MUTATE==='junk')shop=shop.replace("Inventory.definition(row.item)?.kind === 'material'","['material','fish'].includes(Inventory.definition(row.item)?.kind)");
   if(process.env.MUTATE==='warning')shop=shop.replace("(Inventory.definition(row.item)?.kind === 'fish' && row.rarity === 'rare')","false");
   // Expose closures only inside this fixture, to execute the real selection/confirmation paths.
@@ -69,6 +75,10 @@ ctx.Field.used=null;
 cells.find(n=>n.dataset.item===rod.id).children[0].events.dblclick();
 assert.equal(ctx.Field.used,null,'rod stays in the bag');
 const row=i=>({item:i.id,rarity:i.rarity,quantity:1,base:i.sell});
+for (const { item: id } of ctx.ALCHEMY_DATA.flowers) {
+  const flower = ctx.WORLD_ITEMS.find(i => i.id === id);
+  assert.equal(ctx.fishingTest.isJunk(row(flower)), false, `${id} stays in the bags after Sell all junk`);
+}
 assert.equal(ctx.fishingTest.isJunk(row(fish)),false,'common fish are never sold by Sell all junk');
 assert.equal(ctx.fishingTest.isJunk(row(rod)),false);
 const junk=ctx.WORLD_ITEMS.find(i=>i.fishing?.loot==='junk');
