@@ -1,5 +1,16 @@
 [
   {
+    "version": "1.15.2",
+    "date": "2026-11-26",
+    "new": [
+      "Quest objective progress appears in yellow near the top-center of the screen."
+    ],
+    "changed": [
+      "The quest tracker groups quests by zone, with your current zone and its dungeons first. Updated quests rise to the top of their group."
+    ],
+    "removed": []
+  },
+  {
     "version": "1.15.1",
     "date": "2026-11-26",
     "new": [],

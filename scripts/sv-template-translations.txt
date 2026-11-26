@@ -541,5 +541,6 @@
   "{0} skill increased to {1}.": "Din färdighet i {0:t} har höjts till {1}.",
   "You mine {0} × {1}.": "Du bryter {0} × {1:t}.",
   "You pick {0} × {1}.": "Du plockar {0} × {1:t}.",
-  "Loot roll started for {0}.": "Tärningskast för {0:t} har börjat."
+  "Loot roll started for {0}.": "Tärningskast för {0:t} har börjat.",
+  "{0} {1}/{2}{3} (Quest)": "{0:t} {1}/{2}{3} (Uppdrag)"
 }

@@ -20,7 +20,7 @@
     ['skillbar', 'Skillbar', '#skillbar', '0 100%'], ['chat', 'Chat', '#chat', '0 100%'],
   ];
   // Scaled with the UI but not movable.
-  const EXTRA = [['#low-gfx-suggestion', '50% 0'], ['#loot-rolls', '0 0'], ['#social-invites', '0 0'], ['#pvp-duel-warning', '0 0'], ['#gauntlet-banner', '0 0'], ['#rare-pickup', '0 0'], ['#announce', '50% 0'], ['#toast', '0 100%']];
+  const EXTRA = [['#low-gfx-suggestion', '50% 0'], ['#loot-rolls', '0 0'], ['#social-invites', '0 0'], ['#pvp-duel-warning', '0 0'], ['#gauntlet-banner', '0 0'], ['#rare-pickup', '0 0'], ['#announce', '50% 0'], ['#quest-progress', '50% 0'], ['#toast', '0 100%']];
   // [overlay id, window selector or null for the overlay itself, name, origin, resizable]
   const WINDOWS = [
     ['connection-overlay', '.connection-panel', 'World connection', '50% 50%', false],

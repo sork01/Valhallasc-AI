@@ -1,13 +1,16 @@
-/* World announcements appear about 25% down; short errors use a separate higher stack.
+/* World announcements appear about 25% down; quest progress uses yellow text at 20%.
+   Short errors use a separate higher stack.
    The server decides what is important and sends {type:'announce', kind, text}; online.js hands the packet here and also writes the line to the chat log.
    Messages stack newest at the bottom. Errors use five plain red lines that fade over two seconds.
    API: Announce.show(text, kind). Other kinds retain their ordinary announcement presentation. */
 (() => {
   const MAX = 3, ERRORS = 5, ERROR_LIFE = 2000, HOLD = 5200, FADE = 700;
-  const KINDS = ['treasure', 'boss', 'quest', 'info', 'error'];
+  const KINDS = ['treasure', 'boss', 'quest', 'info', 'error', 'quest-progress'];
   function show(text, kind) {
     const error = kind === 'error';
-    const box = document.getElementById(error ? 'error-messages' : 'announce');
+    const questProgress = kind === 'quest-progress';
+    if (questProgress && window.Prefs?.floatingText?.notices === false) return;
+    const box = document.getElementById(error ? 'error-messages' : questProgress ? 'quest-progress' : 'announce');
     if (!box || typeof text !== 'string' || !text) return;
     const line = document.createElement('p');
     line.className = 'announce-line';
@@ -16,7 +19,10 @@
     box.append(line);
     while (box.children.length > (error ? ERRORS : MAX)) box.firstElementChild.remove();
     if (error) setTimeout(() => line.remove(), ERROR_LIFE);
-    else setTimeout(() => { line.classList.add('out'); setTimeout(() => line.remove(), FADE); }, HOLD);
+    else setTimeout(() => { line.classList.add('out'); setTimeout(() => line.remove(), FADE); }, questProgress ? 2500 : HOLD);
   }
-  window.Announce = { show, clearErrors() { document.getElementById('error-messages')?.replaceChildren(); } };
+  window.Announce = { show,
+    clearErrors() { document.getElementById('error-messages')?.replaceChildren(); },
+    clearQuestProgress() { document.getElementById('quest-progress')?.replaceChildren(); },
+  };
 })();

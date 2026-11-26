@@ -9,7 +9,17 @@
   })));
   let heroLevel = 1, progress = [], bells = [], signature = '', tracked = null, previousFocus = null, collapsed = false;
   let abandoned = [], initialized = false, xpCurve = null;
+  const recentProgress = new Map();
+  const questItems = new Map((window.WORLD_ITEMS || []).map(item => [item.id, item]));
+  let progressOrder = 0;
   const guidance = QuestGuidance.create(areas, window.QUEST_SOURCES || {});
+  // Dungeon quests are often offered outside their entrance. Group them by the
+  // objective's dungeon rather than the province storing their quest definition.
+  const trackerZones = new Map(definitions.map(q => {
+    const targets = new Set(q.objectives.flatMap(o => guidance.pool(q, o).map(p => p.zone)));
+    const destination = targets.size === 1 ? [...targets][0] : q.zone;
+    return [q.id, areas[destination]?.copies ? destination : q.zone];
+  }));
   let groupKey = '', groupList = [];
   const closedGroups = new Set();
   let abandonConfirm = null, journalSelection = null;
@@ -234,8 +244,15 @@
   }
   function render() {
     const active = definitions.filter(q => ['ready', 'active'].includes(status(q)));
-    // The tracker lists quests by level (lowest first); equal levels keep the catalogue order. Each title shows its level like the journal does.
-    active.sort((a, b) => (a.level || 0) - (b.level || 0) || definitions.indexOf(a) - definitions.indexOf(b));
+    const zone = window.Field?.zone || 0;
+    const localDungeons = new Set(active.filter(q => q.zone === zone).map(q => trackerZones.get(q.id)));
+    const zoneRank = z => z === zone ? 0 : localDungeons.has(z) ? 1 : 2;
+    // Current province, its dungeon errands, then other zones. Recent progress
+    // takes priority within each group; untouched quests retain level order.
+    active.sort((a, b) => {
+      const az = trackerZones.get(a.id), bz = trackerZones.get(b.id);
+      return zoneRank(az) - zoneRank(bz) || az - bz || (recentProgress.get(b.id) || 0) - (recentProgress.get(a.id) || 0) || (a.level || 0) - (b.level || 0) || definitions.indexOf(a) - definitions.indexOf(b);
+    });
     const tracker = $('quest-tracker');
     const header = element('div', '', 'tracker-heading');
     const journal = button(`Quests (${active.length}) · ${window.Keys ? Keys.label('quests', false) : 'Q'}`, show); journal.className = 'tracker-journal';
@@ -243,7 +260,14 @@
     toggle.setAttribute('aria-label', collapsed ? 'Expand quest tracker' : 'Collapse quest tracker'); toggle.setAttribute('aria-expanded', String(!collapsed));
     header.append(journal, toggle); tracker.replaceChildren(header);
     const list = element('div', '', 'tracker-list'); list.hidden = collapsed;
+    let section = null, sectionZone = null;
     for (const quest of active) {
+      const questZone = trackerZones.get(quest.id);
+      if (questZone !== sectionZone) {
+        sectionZone = questZone; section = element('section', '', 'tracker-zone'); section.dataset.zone = String(questZone);
+        section.append(element('h3', areas[questZone].name, 'tracker-zone-title'));
+        list.append(section);
+      }
       const row = element('div', '', 'tracker-quest'); row.dataset.quest = quest.id;
       row.dataset.status = status(quest);
       row.dataset.tracked = String(tracked === quest.id); row.setAttribute('role', 'group'); row.setAttribute('aria-label', quest.title);
@@ -273,7 +297,7 @@
       });
       const party = mates(quest);
       if (party.length) { const line = element('small', `Party: ${party.map(m => m.name).join(', ')}`, 'tracker-objective tracker-party'); line.dataset.partyQuest = String(party.length); row.append(line); }
-      list.append(row);
+      section.append(row);
     }
     if (!active.length) {
       const next = definitions.find(q => q.zone === (window.Field?.zone || 0) && status(q) === 'available') || definitions.find(q => status(q) === 'available');
@@ -503,9 +527,25 @@
       if (out) return { state: ringing ? 'ringing' : 'waiting', left: ringing ? ringing.left : 0, burn: place.burn, ...out };
       return done ? { state: 'done', burn: place.burn } : { state: 'none' };
     },
-    reset() { initialized = false; groupKey = ''; groupList = []; progress = []; abandoned = []; journalSelection = null; closedGroups.clear(); abandonConfirm = null; signature = ''; tracked = null; bells = []; clearGuidance(); close(false); render(); },
+    reset() { initialized = false; recentProgress.clear(); progressOrder = 0; window.Announce?.clearQuestProgress?.(); groupKey = ''; groupList = []; progress = []; abandoned = []; journalSelection = null; closedGroups.clear(); abandonConfirm = null; signature = ''; tracked = null; bells = []; clearGuidance(); close(false); render(); },
     update(next, dismissed = abandoned) {
       const key = `${Field.zone}:` + JSON.stringify([next, dismissed]); if (key === signature) return;
+      const batch = ++progressOrder;
+      for (const id of recentProgress.keys()) if (!next.some(p => p.id === id && !p.claimed)) recentProgress.delete(id);
+      if (initialized) for (const p of next) {
+        const q = byId.get(p.id), before = progress.find(old => old.id === p.id);
+        // Accepting a quest, logging in, and starting a repeatable run establish a quiet baseline.
+        if (!q || p.claimed || !before || before.claimed) continue;
+        if ((p.completions || 0) !== (before.completions || 0)) { recentProgress.delete(p.id); continue; }
+        q.objectives.forEach((o, i) => {
+          const count = Math.min(p.counts[i] || 0, o.count), previous = Math.min(before.counts[i] || 0, o.count);
+          if (count !== previous) recentProgress.set(q.id, batch);
+          if (count <= previous) return;
+          const item = o.kind === 'bring' && questItems.get(o.target);
+          const label = (item && (questItems.get(item.questMaterial) || item).name) || o.label;
+          window.Announce?.show(`${label} ${count}/${o.count}${unit(o)} (Quest)`, 'quest-progress');
+        });
+      }
       if (initialized) for (const p of next) {
         const q = byId.get(p.id), before = progress.find(old => old.id === p.id);
         if (!q || q.handoffTo || p.claimed || !q.objectives.every((o, i) => (p.counts[i] || 0) >= o.count)) continue;

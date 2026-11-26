@@ -164,3 +164,51 @@ The release executable also passed a private probe with ambient adventurers:
 31 snapshots in 3,007 ms, every tick gap exactly two, automatic hub discovery
 announced once, and Old Tusker's base health 1,000. No public test character was
 created. Rollback steps and verification receipts are stored with the backup.
+
+## Tracker zones and progress (1.15.2)
+
+The left tracker groups quests under zone headings. The current zone comes
+first, followed by its dungeon errands, then the remaining zones in world
+order. Dungeon errands use the single dungeon containing their objective
+sources, even when their giver and definition live outside its entrance. This
+keeps The Shattered Span separate from ordinary Bifrost Reach quests. Group
+membership remains stable when objectives finish and the quest is ready for
+hand-in. Moving zones recomputes the current-zone priority.
+
+Within each group, the most recently changed objective counts come first,
+including a quest that just became ready to hand in. Untouched quests keep
+ascending level and catalogue order. This supersedes the earlier tracker
+ordering rules; journal ordering and manually selected navigation stay as they
+were. Updates arriving together share priority and use the same stable fallback.
+
+Increased objective counts also show plain yellow text centered 20% down the
+game stage, for example `Slime Gel 1/4 (Quest)`. Collection objectives use their
+base material's name; other objectives use their authored label and hold/chime
+units. The separate stack keeps at most three lines, holds them for 2.5 seconds,
+then fades over 0.7 seconds. It ignores clicks and follows the saved Other
+floating notices preference. Tracker recency works even when these notices are
+hidden. Ordinary completion banners and their chime remain independent.
+
+Login and quest acceptance establish quiet baselines. Identical snapshots,
+excess materials past an objective's required count, claimed quests and
+repeatable-run resets do not announce gains. Count decreases can reorder a
+quest but do not produce a gain notice. Character reset clears recency and
+visible progress text.
+
+Focused checks: `node tests/quest-progress.cjs` covers lifecycle and ordering;
+`MUTATE=recent` and `MUTATE=notice` must fail. The bounded
+`tests/quest-tracker-order-ui.cjs` covers real material gains, the Bifrost / Span /
+Rán's Deep grouping, zone travel, completion, notice styling/position/expiry,
+saved preference filtering and reset. Use `TOUCH=1` for the short phone view and
+`MUTATE=dungeon` to prove the external-giver dungeon assertion.
+
+Validation on 2026-11-26: lifecycle, actual dungeon-source classification and
+Swedish progress checks passed; disabling recency, notices or dungeon grouping
+each failed its intended assertion. The bounded desktop and 844 × 390 touch
+runs each passed 21 checks. Reviewed screenshots are in
+`test-results/driver-G02RbD` (desktop) and `test-results/driver-e9wVQ5`
+(touch, including a 15 px minimum visible progress font). The collection fixture
+uses one real material grant; prerequisite quest completion is skipped only in
+the disposable test world. Existing untouched level-order assertions remain
+valid before any progress occurs; the former global order is now scoped to
+each zone. Floating Text filtering, release-note and Swedish gates passed.
