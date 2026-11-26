@@ -84,7 +84,11 @@ fn mana_trickles_in_combat_including_enemy_aggro_without_damage_and_returns_quic
     s.target = Some(1);
     s.state = "chase".into();
     w.players.get_mut(&1).unwrap().combat_left = 0.;
-    // An enemy chasing the mage is combat even with no damage dealt: still the trickle.
+    // A visible enemy chasing the mage is combat even with no damage dealt.
+    // The old fixture left the enemy at its unrelated world spawn, possibly behind cover.
+    w.maps[0].objects.clear();
+    w.slimes[0].x = 277.; w.slimes[0].y = 226.;
+    w.slimes[0].zone = 0;
     assert!((gain(&mut w) - 0.075).abs() < 1e-9);
     assert_eq!(w.players[&1].combat_left, 5.);
     w.slimes[0].dead = true;

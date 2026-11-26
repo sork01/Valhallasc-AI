@@ -805,3 +805,32 @@ fn blacksmithing_bulk_smelting_and_forging_fit_bags_and_save_every_copy() {
         assert_eq!(saved.quantity(id), before.quantity(id) - quantity * 2);
     }
 }
+
+#[test]
+fn blacksmithing_deep_wall_aggro_expires_and_allows_a_real_mining_pull() {
+    let (mut w, _, _receivers) = smiths();
+    super::super::wyrd_tests::calm(&mut w);
+    train(&mut w, 1);
+    let (monster, hero) = super::super::aggro_level_tests::deep_wall_pair(&w);
+    player_at(&mut w, 1, 8, hero);
+    let c = &mut w.players.get_mut(&1).unwrap().character;
+    c.blacksmithing.proficiency.skill = 600;
+    c.add_item(&CATALOG.picks.last().unwrap().item, 1);
+    w.slimes[0] = Slime::with_level(0, &SlimeSpawn {
+        ambush: None, kind: "moray".into(), zone: 8, x: monster.x, y: monster.y,
+    }, 35);
+    w.slimes[0].target = Some(1);
+    w.slimes[0].state = "chase".into();
+    w.players.get_mut(&1).unwrap().combat_left = 5.;
+    let vein = Vein { id: 99123, point: hero, tier: 3, pulls: 3 };
+    w.mining_veins.insert(8, vec![vein]);
+    w.start_mining(1, vein.id);
+    assert!(w.players[&1].mining.is_none(), "recent combat still blocks mining");
+    for _ in 0..102 { w.update_resource(1); }
+    assert_eq!(w.players[&1].combat_left, 0.);
+    w.start_mining(1, vein.id);
+    assert!(w.players[&1].mining.is_some(), "covered enemy no longer locks mining");
+    w.time += DURATION;
+    w.update_mining(1);
+    assert_eq!(w.mining_veins[&8][0].pulls, 2, "one real pull completed");
+}

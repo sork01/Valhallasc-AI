@@ -19,6 +19,7 @@ impl World {
                     && s.zone == p.character.zone
                     && s.target == Some(session)
                     && matches!(s.state.as_str(), "chase" | "windup" | "lunge")
+                    && self.maps[s.zone].line_clear(s.point(), p.character.point(), 0.05)
             });
         let p = self.players.get_mut(&session).unwrap();
         p.combat_left = if engaged {

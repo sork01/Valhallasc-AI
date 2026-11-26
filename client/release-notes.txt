@@ -1,5 +1,12 @@
 [
   {
+    "version": "1.15.1",
+    "date": "2026-11-26",
+    "new": [],
+    "changed": ["Monsters need a clear view to spot you or keep you in combat. Enemies behind walls no longer block mining indefinitely."],
+    "removed": []
+  },
+  {
     "version": "1.15.0",
     "date": "2026-11-26",
     "new": ["Choose which floating text you see in Settings: damage, healing, loot, experience, profession gains, combat status, skills, and more."],

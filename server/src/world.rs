@@ -6331,8 +6331,9 @@ impl World {
                     },
                 )
             })
-            .filter(|(_, _, d, reach)| {
-                *d < *reach || (hunting && (was_chasing || s.target.is_some()))
+            .filter(|(_, point, d, reach)| {
+                (*d < *reach || (hunting && (was_chasing || s.target.is_some())))
+                    && map.line_clear(s.point(), *point, 0.05)
             })
             .map(|(id, point, d, _)| (id, point, d))
             .min_by(|a, b| a.2.total_cmp(&b.2));
@@ -6428,9 +6429,10 @@ impl World {
                         ENEMY_WINDUP_REACH + s.r + if slam > 0. { 0.9 } else { 0. },
                         |r| r.range,
                     );
-                    let visible = dungeon.is_none()
-                        || d > attack_reach
-                        || pursuit::clear_line(map, s.point(), point, s.r);
+                    let visible = map.line_clear(s.point(), point, 0.05)
+                        && (dungeon.is_none()
+                            || d > attack_reach
+                            || pursuit::clear_line(map, s.point(), point, s.r));
                     let shoots = ranged.as_ref().is_some_and(|r| {
                         visible && d > Slime::melee_inside(&s.kind) + s.r && d < r.range * 3.
                     });
