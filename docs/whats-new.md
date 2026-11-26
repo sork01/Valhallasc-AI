@@ -18,6 +18,39 @@ and title layout at desktop and short phone sizes; `MUTATE=brand` must fail the
 visible-logo assertion. This text change keeps the existing logo artwork and
 requires only a client release.
 
+## Download-page changelog (2026-11-26)
+
+The public `https://gunning.se/download/` page uses **Valhalla Saga** and reads
+the live `/Valhalla/release-notes.txt` for its expandable game changelog. The
+static page lives at `/home/serveperry/webserver/www/download/`, outside this
+repository. Its `changelog.js` fetches notes only when the outer panel opens,
+with `cache: 'no-store'`, then displays every version in source order as a
+separate expandable entry. Keep the newest release first in the shared notes;
+there is no second changelog to update at release time.
+
+Notes render as text, with only nonempty New/Changed/Removed sections. The page
+offers retry and a plain notes link if loading fails, plus that link without
+JavaScript. Changing the download-page branding does not rebuild the existing
+Windows/Android installers; retain their published filenames and checksums.
+Cache-stamp the page's CSS/JS references when those files change. A download-page
+edit needs no game version bump or restart.
+
+`download/tests/page.cjs` checks the actual public page in desktop and phone
+contexts, all current note text, keyboard expansion, layout, a single lazy
+fetch, failed-load retry, a simulated future release, and literal HTML-looking
+notes. Run it with this repository's bounded runner:
+
+```sh
+PLAYWRIGHT_BROWSERS_PATH=/home/serveperry/.cache/ms-playwright \
+  bash scripts/test-touch-bounded.sh \
+  /home/serveperry/webserver/www/download/tests/page.cjs
+```
+
+`MUTATE=notes` must fail the complete-history assertion. Initial validation
+covered all 238 updates; public HTML/CSS/JS matched disk and installer links and
+checksum text stayed intact. Backups, screenshots and receipt live under
+`/media/raid/valhallasc-data/backups/download-saga-20261126/`.
+
 ## Updating the notes
 
 Every game version bump must update `client/index.html`, `scripts/sv-keep.txt` and `client/release-notes.txt` in the same change, followed by `python3 scripts/build_swedish.py`. Put the newest entry first, with its full displayed version, date, and `new`, `changed`, `removed` arrays. Use everyday English. Omit empty sections when rendering; keep all three arrays in the file. Every removal explains why. Describe balance changes as nearest whole percentages, never decimal factors or programming terms.
