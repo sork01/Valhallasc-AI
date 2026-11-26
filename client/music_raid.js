@@ -1,4 +1,4 @@
 'use strict';
-// RAID-MUSIC: editable dybase2 projects and export recipe are in docs/raid-music.md.
+// Remade Forge and Eldmarr recordings; provenance and loop lengths are pinned in scripts/soundtrack-filedrop.txt.
 window.createRaidMusic = ctx => createLoopMusic(ctx, 'assets/music_chained_forge.mp3?v=saga-1.15.4');
-window.createEldmarrMusic = ctx => createLoopMusic(ctx, 'assets/music_eldmarr.mp3');
+window.createEldmarrMusic = ctx => createLoopMusic(ctx, 'assets/music_eldmarr.mp3?v=saga-1.15.6');

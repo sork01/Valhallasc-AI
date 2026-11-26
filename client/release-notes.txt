@@ -1,5 +1,14 @@
 [
   {
+    "version": "1.15.6",
+    "date": "2026-11-26",
+    "new": [],
+    "changed": [
+      "The final remade tracks are here: Asterion by day and night, Eldmarr, and the shared nighttime theme."
+    ],
+    "removed": []
+  },
+  {
     "version": "1.15.5",
     "date": "2026-11-26",
     "new": [],

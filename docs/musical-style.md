@@ -2,17 +2,53 @@
 
 Read this before creating, remixing, repairing, or rendering any Valhallasc song. The editable dybase2 project is the musical source of truth. Work on the active project named in the task or wiki; check its actual tempo, meter, notes, instruments, and arrangement before editing. Do not substitute an older draft or treat a rendered MP3 as an editable source.
 
-## Installed FileDrop soundtrack (1.15.4)
+## Final FileDrop replacements (1.15.6)
+
+The owner supplied the final four missing recordings: Asterion daytime
+(Seven Rings of Light), Asterion nighttime (The Eighth Quiet Ring), Eldmarr
+(The Table He Was Promised), and the shared outdoor fallback (Lanterns After
+Sundown). All **73 game music assets now have supplied remakes**, pinned to their
+FileDrop source and installed hashes in `scripts/soundtrack-filedrop.txt`.
+The 69 earlier installed remakes retain their exact bytes. The preserved-original
+list is empty. The new four URLs use `?v=saga-1.15.6`; earlier release cache
+versions are retained for unchanged recordings.
+
+The established importer and level treatment are reused. Asterion's day/night
+loops are 105 seconds and about 117.143 seconds; the shared night loop is about
+136.667 seconds. Eldmarr's 73.5-second export includes a 1.5-second reverb bar,
+folded into its 72-second musical loop. The performance, pitch and speed stay
+unchanged. Editable projects and original FileDrop files are not modified.
+
+`tests/soundtrack-filedrop.py --slots asterion,asterion_night,eldmarr,night`
+checks all 73 source/output hashes and decodes only the four changed recordings
+for codec, levels, duration, seam and source-performance correlation. The routing
+check covers both Asterion modes, the final-encounter branch and shared fallback;
+cache assertions use each recording's release. `MUTATE=asterion` routes the
+production wrapper to another recording and must fail. `MISSING_ONLY=1` with
+the bounded soundtrack UI check covers Asterion dusk/dawn and actual Web Audio
+output, saved volume and mute/unmute for Eldmarr and the shared fallback.
+Older Asterion/Eldmarr duration fixtures now read the pinned replacement lengths.
+This client-only release keeps the live 1.15.5 dungeon executable in place.
+
+Validation passed for all 73 pinned source/output hashes and the four changed
+recordings' codec, levels, loop lengths, seams and source correlation. The routing
+check passed 71 zone mappings plus the shared fallback and raid/final split;
+restoring the wrong Asterion wrapper failed its intended assertion. The bounded
+missing-tracks playback check passed 12 assertions in
+`test-results/driver-G8qChN/final-songs-playback.json`. Release notes, Swedish,
+changed JavaScript/Python syntax and whitespace gates passed.
+
+## Initial FileDrop soundtrack rollout (1.15.4)
 
 The owner supplied a remade AudioMaker soundtrack through Sork's FileDrop and
 authorized its installation, including the Chained Forge raid theme in a
 follow-up. `scripts/soundtrack-filedrop.txt` pins 69 supplied MP3s, their original
 names, source hashes, destinations, installed hashes, loop lengths and levels.
 Twenty-six earlier imports were retained byte-for-byte; 43 remaining recordings
-were installed. No replacement FileDrop source exists for Asterion's day/night
-scores, the generic night fallback, or Eldmarr's final encounter score; those four
-recordings retain their original hashes. Older dybase2 briefs below describe
-historical compositions, not the source of the newly supplied performances.
+were installed. At that release, Asterion's day/night scores, the generic night
+fallback, and Eldmarr had no supplied replacement; 1.15.6 above completes them.
+Older dybase2 briefs below describe historical compositions, not the source of
+the newly supplied performances.
 
 The existing recordings keep their current gain treatment. New recordings keep
 the supplied performance at its original speed, with a cyclic 25 Hz high-pass,

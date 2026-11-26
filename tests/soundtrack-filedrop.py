@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Check the actual installed recordings against pinned FileDrop provenance."""
+import argparse
 import hashlib
 import json
 import subprocess
@@ -15,15 +16,23 @@ from import_filedrop_soundtrack import decode, measure
 manifest = json.loads((ROOT / 'scripts/soundtrack-filedrop.txt').read_text())
 assets = ROOT / 'client/assets'
 drop = Path('/home/serveperry/webserver/www/filedrop/data/Sork/files')
-assert len(manifest['tracks']) == 69
+assert len(manifest['tracks']) == 73
 assert sum(t['already_installed'] for t in manifest['tracks']) == 26
-assert len({t['slot'] for t in manifest['tracks']}) == 69
+assert len({t['slot'] for t in manifest['tracks']}) == 73
+parser = argparse.ArgumentParser()
+parser.add_argument('--slots', help='Decode only the selected comma-separated slots; always verify all asset/source hashes')
+args = parser.parse_args()
+selected = set(args.slots.split(',')) if args.slots else None
+if selected:
+    assert selected <= {t['slot'] for t in manifest['tracks']}
 report = []
 for track in manifest['tracks']:
     target = assets / ('music_' + track['slot'] + '.mp3')
     source = drop / track['source']
     assert hashlib.sha256(target.read_bytes()).hexdigest() == track['game_sha256'], target
     assert hashlib.sha256(source.read_bytes()).hexdigest() == track['source_sha256'], source
+    if selected is not None and track['slot'] not in selected:
+        continue
     info = json.loads(subprocess.check_output(['ffprobe', '-v', 'quiet', '-show_streams', '-of', 'json', str(target)]))['streams'][0]
     assert info['codec_name'] == 'mp3' and info['channels'] == 2 and int(info['bit_rate']) == 128000, target
     audio = decode(target)
@@ -51,8 +60,9 @@ for track in manifest['tracks']:
     print('Verified ' + track['slot'], flush=True)
 for name, expected in manifest['preserved'].items():
     assert hashlib.sha256((assets / name).read_bytes()).hexdigest() == expected, name + ' must stay untouched'
-assert set(manifest['preserved']) >= {'music_eldmarr.mp3', 'music_asterion.mp3', 'music_asterion_night.mp3'}
-output = ROOT / 'test-results/soundtrack-import/audio-validation.json'
+assert not manifest['preserved'], 'All four previously missing recordings now have replacements'
+assert {p.name for p in assets.glob('music*.mp3')} == {'music_' + t['slot'] + '.mp3' for t in manifest['tracks']}, 'Every game music asset has a pinned FileDrop source'
+output = ROOT / ('test-results/soundtrack-import/audio-validation-selected.json' if selected else 'test-results/soundtrack-import/audio-validation.json')
 output.parent.mkdir(parents=True, exist_ok=True)
 output.write_text(json.dumps(dict(tracks=report, auditory_review=False, preserved=manifest['preserved']), indent=2) + '\n')
-print('PASS soundtrack-filedrop: 69 recordings, 43 source performances retained at their musical loop lengths, codec/levels/duration/seams and 4 preserved assets')
+print(f'PASS soundtrack-filedrop: all 73 source/output hashes; {len(report)} decoded recordings pass codec/level/duration/seam and source-performance checks; no original music remains')

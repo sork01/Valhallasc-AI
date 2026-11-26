@@ -1,12 +1,7 @@
 {
-  "version": "1.15.4",
+  "version": "1.15.6",
   "source": "Sork FileDrop",
-  "preserved": {
-    "music_asterion_night.mp3": "9fd6fbc2de45ffae032f277f3fdc10304347f2b6f7579fdac098009228851413",
-    "music_eldmarr.mp3": "29e6ff8a2047ecb086fdbb14f45fa361c0e10d00423309f605c946280f4e2cc7",
-    "music_asterion.mp3": "d19a781ff2a2f141ef79fc5d88f80ff4a0a10b83423c46f1f507ad90211239c9",
-    "music_night.mp3": "8b35cb591f1d6a7749715b7b45407e4fc9f4c34011e8194dee6264dc4d8583bf"
-  },
+  "preserved": {},
   "tracks": [
     {
       "slot": "meadow",
@@ -1366,6 +1361,96 @@
       "peak_db": -6.6899,
       "seam_delta": 0.00272,
       "game_sha256": "11e437e0a2115d12edba3869910ff406cab2c0cebb0fe5f9d51d750951daa868"
+    },
+    {
+      "slot": "asterion",
+      "zones": [
+        17
+      ],
+      "source": "Asterion_-_Seven_Rings_of_Light_Celestial_Capital_4_4_KMMO_Theme_proj_mwxtnibn.mp3",
+      "source_sha256": "c78cdb05ec3f5fc875a254ec639ee7bc30554919fe32284effe8a5585c56286e",
+      "title": "Asterion - Seven Rings of Light (Celestial Capital 4/4 KMMO Theme)",
+      "project_id": "proj_mwxtnibn",
+      "already_installed": false,
+      "asset_version": "1.15.6",
+      "bpm": 112,
+      "meter": "4/4",
+      "bars": 49,
+      "loop_seconds": 105.0,
+      "source_seconds": 105.0,
+      "tail_seconds": 0,
+      "seconds": 105.0,
+      "mono_rms_db": -24.0584,
+      "peak_db": -4.5281,
+      "seam_delta": 0.004686,
+      "game_sha256": "abd8bf8e670b8bf7cae9adde280871d8ad74fc6875da5f49cff0d4ca7c80db4a"
+    },
+    {
+      "slot": "asterion_night",
+      "zones": [
+        17
+      ],
+      "source": "Asterion_at_Midnight_-_The_Eighth_Quiet_Ring_Chillhop_Remix_proj_mwxty8ga.mp3",
+      "source_sha256": "343b2be889e329cb2208a0c1c302bc74e73a9da37b9ceeb6c77b7c525c4da98b",
+      "title": "Asterion at Midnight - The Eighth Quiet Ring (Chillhop Remix)",
+      "project_id": "proj_mwxty8ga",
+      "already_installed": false,
+      "asset_version": "1.15.6",
+      "bpm": 84,
+      "meter": "4/4",
+      "bars": 41,
+      "loop_seconds": 117.142857,
+      "source_seconds": 117.142857,
+      "tail_seconds": 0,
+      "seconds": 117.142857,
+      "mono_rms_db": -23.9877,
+      "peak_db": -4.375,
+      "seam_delta": 0.004794,
+      "game_sha256": "fa6a379818e943ce1de907df829ca8d61b2fa05c60c49063d92f18bb6ed706d5"
+    },
+    {
+      "slot": "eldmarr",
+      "zones": [
+        46
+      ],
+      "source": "Eldmarr_-_The_Table_He_Was_Promised_Industrial_Boss_4_4_KMMO_Theme_proj_mwxuemnq.mp3",
+      "source_sha256": "a46e745c62d015941667b24ae3c96b08110cd892cdf6e4dc20e1e37d1f4eeb19",
+      "title": "Eldmarr - The Table He Was Promised (Industrial Boss 4/4 KMMO Theme)",
+      "project_id": "proj_mwxuemnq",
+      "already_installed": false,
+      "asset_version": "1.15.6",
+      "bpm": 160,
+      "meter": "4/4",
+      "bars": 48,
+      "loop_seconds": 72.0,
+      "source_seconds": 73.5,
+      "tail_seconds": 1.5,
+      "seconds": 72.0,
+      "mono_rms_db": -23.9802,
+      "peak_db": -6.1272,
+      "seam_delta": 0.0017,
+      "game_sha256": "8152b5c84b9f43446e76e4da4b62065fd64dcb69ff31a76ffa0db1b81829bef9"
+    },
+    {
+      "slot": "night",
+      "zones": [],
+      "source": "Valhalla_Night_-_Lanterns_After_Sundown_Shared_Outdoor_Nocturne_4_4_KMMO_Theme_proj_mwxumljy.mp3",
+      "source_sha256": "715cf48c0d4328885764bed288a938404a6f051cffdaba1917aaf41178ab89f7",
+      "title": "Valhalla Night - Lanterns After Sundown (Shared Outdoor Nocturne 4/4 KMMO Theme)",
+      "project_id": "proj_mwxumljy",
+      "already_installed": false,
+      "asset_version": "1.15.6",
+      "bpm": 72,
+      "meter": "4/4",
+      "bars": 41,
+      "loop_seconds": 136.666667,
+      "source_seconds": 136.666667,
+      "tail_seconds": 0,
+      "seconds": 136.666667,
+      "mono_rms_db": -24.0486,
+      "peak_db": -3.6242,
+      "seam_delta": 0.000797,
+      "game_sha256": "37deaf9cd3d4c7fec94cc28ba8a38c48cb1d6b68e34aab801437f6d287427216"
     }
   ]
 }

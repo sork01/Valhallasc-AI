@@ -111,7 +111,7 @@ const call = async (name, args = {}) => {
   fixture = 'warden'; await page.waitForFunction(() => BossMech.active); await selected(false);
   check(await page.evaluate(() => !valhalla.eldmarrMusic.running), 'An ordinary Warden fight keeps the dungeon score');
   fixture = 'engaged'; await selected(true);
-  check(await page.evaluate(() => Math.abs(valhalla.eldmarrMusic.duration - 96) < .04), 'Eldmarr loop decodes at 160 BPM / 64 bars');
+  check(await page.evaluate(seconds => Math.abs(valhalla.eldmarrMusic.duration - seconds) < .04, soundtrack('eldmarr')), 'Remade Eldmarr loop decodes at its pinned musical length');
   check(await audible('eldmarrMusic') > .0001, 'Final-boss score produces actual audio');
   fixture = 'fallen'; await page.waitForFunction(() => !!Field.hero.fallen); await selected(true);
   check(await page.evaluate(() => valhalla.eldmarrMusic.running), 'A fallen fighter keeps hearing the ongoing boss fight');
