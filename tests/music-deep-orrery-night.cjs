@@ -49,7 +49,7 @@ const songs = [
     await page.locator('#login-guest').click();
     await page.locator('#name').fill(song.name + ' Listener');
     await page.locator('#go').click({ timeout: 60000 });
-    await page.waitForFunction(() => Online.connected && valhalla.fmusic?.running, null, { timeout: 60000 });
+    await page.waitForFunction(() => Online.connected && valhalla.fmusic, null, { timeout: 60000 });
     await debug(page, { op: 'set_time', hour: 12, freeze: true });
     await debug(page, { op: 'teleport', zone: song.zone, x: song.x, y: song.y });
     await page.waitForFunction(({ zone, day, night }) => Field.zone === zone &&
@@ -57,11 +57,11 @@ const songs = [
       valhalla[day].running && valhalla[day].output.gain.value > .9, song, { timeout: 15000 });
     await debug(page, { op: 'set_time', hour: 19, freeze: true });
     await page.waitForFunction(({ day, night }) => valhalla[night].running &&
-      Math.abs(valhalla[day].output.gain.value - .5) < .05 &&
-      Math.abs(valhalla[night].output.gain.value - .5) < .05, song, { timeout: 15000 });
+      !valhalla[day].running &&
+      valhalla[night].output.gain.value > .9, song, { timeout: 15000 });
     await debug(page, { op: 'set_time', hour: 22, freeze: true });
     await page.waitForFunction(({ day, night }) => valhalla[night].loaded &&
-      valhalla[night].output.gain.value > .9 && valhalla[day].output.gain.value < .1, song, { timeout: 15000 });
+      valhalla[night].output.gain.value > .9 && !valhalla[day].running, song, { timeout: 15000 });
     const { duration, indoorLight } = await page.evaluate(night => ({
       duration: valhalla[night].duration,
       indoorLight: DayNight.nightMix === 0,
@@ -72,7 +72,7 @@ const songs = [
     await page.waitForFunction(({ day, night }) => !valhalla[night].running &&
       valhalla[day].output.gain.value > .9, song, { timeout: 15000 });
     assert.deepEqual(errors, []);
-    console.log(`${song.name}: day and night playback, dusk crossfade, dawn return, indoor lighting`);
+    console.log(`${song.name}: day and night playback, dusk sequential fade, dawn return, indoor lighting`);
     await browser.close();
     browser = null;
   }

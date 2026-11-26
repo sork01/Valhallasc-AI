@@ -60,5 +60,16 @@
       get duration() { return buffer ? buffer.duration : 0; },
     };
   }
+  // Use audio time so suspending a background tab cannot skip the outgoing fade.
+  window.createMusicTransition = ctx => {
+    let current = null, quietAt = 0;
+    return next => {
+      const now = ctx.currentTime;
+      if (current && current !== next) {
+        current.stop(); current = null; quietAt = now + FADE_OUT;
+      }
+      if (!current && next && now >= quietAt) { current = next; current.start(); }
+    };
+  };
   window.createLoopMusic = createLoopMusic;
 })();

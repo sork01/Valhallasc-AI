@@ -31,7 +31,7 @@ const debug = (page, command) => page.evaluate(c => Online.send({ type: 'debug',
   await page.addInitScript(() => localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: true, musicVol: .8 })));
   await page.goto(world.url); await page.locator('#start').click(); await page.locator('#login-guest').click();
   await page.locator('#name').fill('NightWander'); await page.locator('#go').click({ timeout: 60000 });
-  await page.waitForFunction(() => Online.connected && Field.zone === 0 && !!valhalla.fmusic?.running, null, { timeout: 60000 });
+  await page.waitForFunction(() => Online.connected && Field.zone === 0 && !!valhalla.fmusic, null, { timeout: 60000 });
 
   await debug(page, { op: 'set_time', hour: 12, freeze: true });
   await page.waitForFunction(() => DayNight.nightMix === 0 && !valhalla.meadowNightMusic.running, null, { timeout: 10000 });
@@ -57,8 +57,8 @@ const debug = (page, command) => page.evaluate(c => Online.send({ type: 'debug',
   assert.ok(Math.abs(decoded.seconds - loopSeconds) < .025, `Decoded loop length: ${decoded.seconds}`);
   assert.ok(Math.abs(decoded.rms + 24) < .2, `Decoded mono RMS: ${decoded.rms}`);
   assert.ok(decoded.peak < .95, `Decoded peak: ${decoded.peak}`);
-  await page.waitForFunction(() => Math.abs(valhalla.meadowNightMusic.output.gain.value - .32) < .025 &&
-    Math.abs(valhalla.fmusic.output.gain.value - .32) < .025, null, { timeout: 10000 });
+  await page.waitForFunction(() => Math.abs(valhalla.meadowNightMusic.output.gain.value - .64) < .025 &&
+    !valhalla.fmusic.running, null, { timeout: 10000 });
   await debug(page, { op: 'set_time', hour: 0, freeze: true });
   await page.waitForFunction(() => DayNight.nightMix === 1 && valhalla.meadowNightMusic.running, null, { timeout: 10000 });
   await page.waitForFunction(() => Math.abs(valhalla.meadowNightMusic.output.gain.value - .64) < .025, null, { timeout: 10000 });
@@ -76,11 +76,11 @@ const debug = (page, command) => page.evaluate(c => Online.send({ type: 'debug',
   await page.waitForFunction(() => Field.zone === 0 && valhalla.activeNightMusic === valhalla.meadowNightMusic && valhalla.meadowNightMusic.running && !valhalla.nightMusic.running, null, { timeout: 10000 });
   await debug(page, { op: 'set_time', hour: 6, freeze: true });
   await page.waitForFunction(() => Math.abs(DayNight.nightMix - .5) < .01 &&
-    Math.abs(valhalla.meadowNightMusic.output.gain.value - .32) < .025, null, { timeout: 10000 });
+    Math.abs(valhalla.meadowNightMusic.output.gain.value - .64) < .025, null, { timeout: 10000 });
   await debug(page, { op: 'set_time', hour: 7, freeze: true });
   await page.waitForFunction(() => DayNight.nightMix === 0 && !valhalla.meadowNightMusic.running, null, { timeout: 10000 });
   assert.deepEqual(errors, [], 'no browser errors');
-  console.log(JSON.stringify({ ...decoded, checks: 'New soundtrack loop decode, -24 dB mono RMS, dusk/dawn crossfades, saved volume, mute, travel and shared indoor fallback' }));
+  console.log(JSON.stringify({ ...decoded, checks: 'New soundtrack loop decode, -24 dB mono RMS, dusk/dawn sequential fades, saved volume, mute, travel and shared indoor fallback' }));
 })().catch(error => { console.error(error); process.exitCode = 1; }).finally(async () => {
   await browser?.close();
   if (started) await call('stop_world').catch(() => {});
