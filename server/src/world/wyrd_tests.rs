@@ -520,7 +520,7 @@ fn every_wyrdwood_monster_has_its_own_stats_attacks_materials_and_rewards() {
         );
         assert!(w.drops.iter().all(|d| d.zone == WYRD));
     }
-    // how each one fights: the crow shoots two feathers and backs away, the weaver three thread bolts, the troll pounds the ground
+    // The crow shoots two feathers, the weaver shoots three thread bolts, and the troll pounds the ground.
     let crow = Slime::ranged("crow").unwrap();
     assert_eq!((crow.shots, crow.range), (2, 11.));
     let weaver = Slime::ranged("weaver").unwrap();

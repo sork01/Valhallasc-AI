@@ -6443,12 +6443,13 @@ impl World {
                         } else if d > r.range * 0.85 {
                             goal = Some(point);
                         } else if d < r.range * 0.35
+                            && s.hp < s.max_hp * 0.2
                             && matches!(
                                 s.kind.as_str(),
                                 "archer" | "acolyte" | "crow" | "skyray"
                             )
                         {
-                            // Too close for comfort: back away from the hero while the shot recovers.
+                            // A badly hurt ranged mob backs away while the shot recovers.
                             let away = point.direction(s.point());
                             goal = Some(Point {
                                 x: s.x + away.x * 3.,
@@ -13757,6 +13758,50 @@ mod tests {
             assert_eq!(w.slimes[0].state, state, "offset {extra:+}");
         }
     }
+    #[test]
+    fn ranged_mobs_retreat_during_recovery_only_below_twenty_percent() {
+        let mut w = world();
+        let _rx = join(&mut w, 1, Class::Warrior);
+        off_pier(&mut w, 1);
+        let spawn_x = OPEN_GROUND.x + 2.5;
+        let spawn_y = OPEN_GROUND.y;
+        for kind in ["archer", "acolyte", "crow", "skyray", "weaver"] {
+            let spawn = SlimeSpawn {
+                ambush: None,
+                kind: kind.into(),
+                zone: 0,
+                x: spawn_x,
+                y: spawn_y,
+            };
+            for (health, cooldown, retreats, state) in [
+                (1., 10., false, "chase"),
+                (0.201, 10., false, "chase"),
+                (0.2, 10., false, "chase"),
+                (0.199, 10., kind != "weaver", "chase"),
+                (0.199, 0., false, "windup"),
+            ] {
+                let mut enemy = Slime::new(0, &spawn);
+                enemy.hp = enemy.max_hp * health;
+                enemy.atk_cd = cooldown;
+                enemy.state = "chase".into();
+                enemy.target = Some(1);
+                w.slimes[0] = enemy;
+
+                w.update_slime(0);
+
+                let enemy = &w.slimes[0];
+                assert_eq!(enemy.state, state, "{kind} at {health:.3} health");
+                if retreats {
+                    assert!(enemy.x > spawn_x, "{kind} should retreat below 20% health");
+                } else {
+                    assert_eq!(enemy.x, spawn_x, "{kind} at {health} should hold position");
+                }
+                assert_eq!(enemy.y, spawn_y);
+                assert_eq!(enemy.target, Some(1));
+            }
+        }
+    }
+
     /// ENEMY-CHASE-CLOSE-RANGE: open-world enemies keep chasing past `HOME_LEASH_RANGE` while the target is close,
     /// and return home only once the target leaves close range.
     #[test]

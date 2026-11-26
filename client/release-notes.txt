@@ -1,5 +1,14 @@
 [
   {
+    "version": "1.14.4",
+    "date": "2026-11-26",
+    "new": [],
+    "changed": [
+      "Ranged enemies that back away from nearby attackers now do so only below 20% health."
+    ],
+    "removed": []
+  },
+  {
     "version": "1.14.3",
     "date": "2026-11-26",
     "new": [],
