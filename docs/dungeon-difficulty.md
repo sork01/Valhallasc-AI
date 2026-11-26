@@ -41,3 +41,12 @@ the same test executable with the pre-change power table failed both new tests,
 confirming the assertions detect missing health/damage scaling. The optimized
 release and private executable comparison are recorded in the staged deployment
 receipt; the public game requires fresh restart approval before activation.
+
+Released after the owner's explicit “restart and deploy” approval on 2026-11-26
+as client and executable `667091cb` / client label `1.15.5`. The running binary
+matches the frozen candidate; PID `908531`, all eight serialized character saves,
+SQLite, public/legacy/bridge health and the restart journal were verified.
+Receipt: `/home/serveperry/webserver/www/Valhalla/dungeon-difficulty-release-receipt.json`.
+Backups are under `/media/raid/valhallasc-data/backups/valhalla-dungeon-double-20261126T173855Z-ifp8b6p9/`.
+Client rollback is `1.15.4-fa58aa8b`; executable rollback uses
+`previous-before-approved-restart` there and needs fresh restart approval.
