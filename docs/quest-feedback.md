@@ -212,3 +212,12 @@ uses one real material grant; prerequisite quest completion is skipped only in
 the disposable test world. Existing untouched level-order assertions remain
 valid before any progress occurs; the former global order is now scoped to
 each zone. Floating Text filtering, release-note and Swedish gates passed.
+
+Released as client `1.15.2-93236a32` on 2026-11-26 from the pushed branch
+`feat/quest-progress-tracker`. All seven changed public files match source;
+public, legacy and bridge health passed. Production PID `703777` and the
+`9a67092d` executable remained in place. Receipt:
+`/home/serveperry/webserver/www/Valhalla/quest-progress-release-receipt.json`.
+Client rollback uses `bash scripts/release_client.sh --rollback 1.15.1-9a67092d`.
+The full finish record is wiki
+`10_projects:valhallasc_quest_tracker_progress_zones_20261126`.
