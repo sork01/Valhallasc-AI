@@ -596,6 +596,7 @@ fn every_drop_roll_goes_through_the_multiplier() {
     let primitives = [
         "roll_bag(",
         "roll_orange_boosted(",
+        "roll_monster_orange_boosted(",
         "roll_equipment(",
         "equipment_of_rarity(",
         "outdoor_elite_drop_chance(",
@@ -658,6 +659,7 @@ fn every_drop_roll_goes_through_the_multiplier() {
             for primitive in [
                 "roll_bag(",
                 "roll_orange_boosted(",
+                "roll_monster_orange_boosted(",
                 "roll_equipment(",
                 "mount_licence_drop(",
             ] {

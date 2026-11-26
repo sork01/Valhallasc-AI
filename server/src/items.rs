@@ -1,4 +1,4 @@
-use crate::model::{Attributes, Character, Class, GM_NAME};
+use crate::model::{Attributes, Character, Class, GM_NAME, MAX_LEVEL};
 use serde::{Deserialize, Serialize};
 use std::sync::LazyLock;
 
@@ -12,7 +12,7 @@ mod orange;
 pub mod raid_rewards;
 #[cfg(test)]
 pub use orange::roll_orange;
-pub use orange::roll_orange_boosted;
+pub use orange::{roll_monster_orange_boosted, roll_orange_boosted};
 
 pub const EXTRA_SLOTS: [&str; 8] = [
     "headgear",
@@ -1020,7 +1020,8 @@ pub fn roll_equipment(kind: &str, level: u32, chance: f64, choice: f64) -> Optio
     monster_equipment_of_rarity(rarity, level, choice)
 }
 pub fn monster_equipment_of_rarity(rarity: &str, level: u32, choice: f64) -> Option<&'static Item> {
-    let maximum = max_drop_level(level);
+    // An enemy's level spread can go past the last player gear tier.
+    let maximum = max_drop_level(level.min(MAX_LEVEL));
     // Include the preceding gear step and keep the next step available.
     let minimum = maximum.saturating_sub(10).max(1);
     equipment_in_range(rarity, minimum, maximum, choice)
@@ -2863,6 +2864,27 @@ mod tests {
             }
         }
     }
+    #[test]
+    fn every_monster_level_rolls_nearby_gear_of_each_rarity() {
+        for level in 1..=MAX_LEVEL + 5 {
+            let lower_step = (level.min(MAX_LEVEL) - 1) / 5 * 5;
+            let range = lower_step.max(1)..=lower_step + 10;
+            for rarity in ["common", "uncommon", "rare", "epic"] {
+                let chance = roll_for("green", rarity);
+                for choice in [0., 0.5, 0.999_999] {
+                    let drop = roll_equipment("green", level, chance, choice).unwrap();
+                    assert_eq!(drop.rarity, rarity);
+                    assert!(
+                        range.contains(&drop.required_level),
+                        "monster level {level}: {} requires level {}",
+                        drop.id,
+                        drop.required_level,
+                    );
+                }
+            }
+        }
+    }
+
     #[test]
     fn every_level_has_gray_green_blue_and_purple_every_other_step() {
         let has = |class: Option<Class>, kind: &str, level: u32, rarity: &str| {

@@ -21,9 +21,9 @@ Ten families of five slots (armor, weapon, headgear, shoulders, gloves), one lev
 
 ## Rules
 - `requiredLevel` is the family level and is enforced on equip like any other gear.
-- A hero is only offered pieces with `requiredLevel <= hero level + 5` (`drop.levelWindow`). Nothing drops below
-  level 5. The pick is uniform over the eligible pool. The rebirth boost (`roll_orange_boosted`, `copies()`) and the chest
-  opener use the same filter, with the credited hero's / opener's level. The random draws are the same at every level.
+- A monster can drop an orange family within five levels of its own level. The first family starts at level 10,
+  so monsters below level 5 have no eligible family. Chests use the opener's level plus five as their upper limit.
+  Each roll picks uniformly from its eligible pool, and the rebirth multiplier widens the chance of a successful roll.
 - Stats: nominal = purple budget of that slot and level (`gear_levels.budget`) x 1.175 (orange is 17.5% over purple),
   every roll spans +-4% of it, in whole numbers. Armor uses the 3.0 chest base, weapons attack 4.0, the rest defense 1.0.
   Stamina follows `ATTRIBUTE_BONUS` (extended to 114 at 99) x 1.175; accuracy and dexterity follow it but stop at

@@ -4,7 +4,7 @@
     "date": "2026-11-26",
     "new": [],
     "changed": [
-      "Ordinary monster gear drops now stay near the monster's level."
+      "Monsters at every level drop world gear near their own level, including legendary gear."
     ],
     "removed": []
   },

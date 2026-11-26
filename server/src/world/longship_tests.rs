@@ -170,6 +170,42 @@ fn longship_trash_drops_gear_near_its_level() {
 }
 
 #[test]
+fn longship_legendary_gear_uses_the_foe_level_when_the_hero_outlevels_it() {
+    let mut w = world();
+    let _receiver = join(&mut w, 1, Class::Warrior);
+    w.players.get_mut(&1).unwrap().character.level = 99;
+    enter(&mut w, 1);
+    let zone = w.players[&1].character.zone;
+    assert_eq!(w.public_zone(zone), LONGSHIP);
+    let enemy = w
+        .slimes
+        .iter()
+        .position(|s| s.zone == zone && s.kind == "keel_crab")
+        .unwrap();
+    assert_eq!(w.slimes[enemy].level, 35);
+    let point = w.slimes[enemy].point();
+    place(&mut w, 1, zone, point);
+
+    // Roll a legendary and pick from the beginning of the eligible pool.
+    w.rng = 6234;
+    w.hit_slime(enemy, 1, 1e9, false);
+    let drop = w
+        .drops
+        .iter()
+        .filter(|d| d.zone == zone)
+        .filter_map(|d| d.gear.as_ref())
+        .find(|gear| gear.rarity == "legendary")
+        .expect("the seeded roll drops legendary gear");
+    let piece = item(&drop.item).unwrap();
+    assert!(
+        (30..=40).contains(&piece.required_level),
+        "{} requires level {}",
+        piece.id,
+        piece.required_level,
+    );
+}
+
+#[test]
 fn longship_bosses_drop_exclusive_gear_and_only_clear_their_copy() {
     let mut w = world();
     let _receivers: Vec<_> = (1..=2).map(|id| join(&mut w, id, Class::Warrior)).collect();

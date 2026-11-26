@@ -42,27 +42,52 @@ fn uniform(range: [u32; 2], random: f64) -> u32 {
     range[0] + ((random.clamp(0., 1. - f64::EPSILON) * f64::from(range[1] - range[0] + 1)) as u32)
 }
 
-/// Run once after every credited mob death, for the hero at `level`. Each successful copy gets five independent
-/// rolls; the returned values travel with the drop through party voting and are never rolled at pickup.
 #[cfg(test)]
 pub fn roll_orange(level: u32, random: impl FnMut() -> f64) -> Option<GearInstance> {
     roll_orange_boosted(1, level, random)
 }
 
-/// The pieces a hero at `level` can find: none is more than `level_window` levels above them.
-fn pool(level: u32) -> impl Iterator<Item = &'static Piece> {
-    let reach = level.saturating_add(RULES.drop.level_window);
+fn pool(minimum: u32, maximum: u32) -> impl Iterator<Item = &'static Piece> + Clone {
     RULES
         .pieces
         .iter()
-        .filter(move |piece| piece.required_level <= reach)
+        .filter(move |piece| (minimum..=maximum).contains(&piece.required_level))
 }
 
-/// `roll_orange` at a drop multiplier (docs/rebirth.md): the first draw, the one that decides whether anything drops,
-/// is compared with `multiplier` times the chance. At 1 it is the plain roll.
+fn chest_pool(hero_level: u32) -> impl Iterator<Item = &'static Piece> + Clone {
+    pool(0, hero_level.saturating_add(RULES.drop.level_window))
+}
+
+/// Chests use the opener's level to decide which orange pieces they can find.
 pub fn roll_orange_boosted(
     multiplier: u32,
-    level: u32,
+    hero_level: u32,
+    random: impl FnMut() -> f64,
+) -> Option<GearInstance> {
+    roll_boosted(multiplier, chest_pool(hero_level), random)
+}
+
+/// Monster kills can roll orange pieces within the configured window around the monster's level.
+pub fn roll_monster_orange_boosted(
+    multiplier: u32,
+    enemy_level: u32,
+    random: impl FnMut() -> f64,
+) -> Option<GearInstance> {
+    let window = RULES.drop.level_window;
+    roll_boosted(
+        multiplier,
+        pool(
+            enemy_level.saturating_sub(window),
+            enemy_level.saturating_add(window),
+        ),
+        random,
+    )
+}
+
+/// The rebirth multiplier widens the initial roll. Every successful copy rolls its five stats.
+fn roll_boosted(
+    multiplier: u32,
+    mut candidates: impl Iterator<Item = &'static Piece> + Clone,
     mut random: impl FnMut() -> f64,
 ) -> Option<GearInstance> {
     let mut first = true;
@@ -77,10 +102,10 @@ pub fn roll_orange_boosted(
     if random() >= RULES.drop.chance_per_kill {
         return None;
     }
-    let eligible = pool(level).count();
+    let eligible = candidates.clone().count();
     // The pick is drawn even when nothing qualifies, so the random sequence does not depend on the level.
     let pick = random().clamp(0., 1. - f64::EPSILON);
-    let piece = pool(level).nth((pick * eligible as f64) as usize)?;
+    let piece = candidates.nth((pick * eligible as f64) as usize)?;
     Some(GearInstance {
         id: 0,
         item: piece.id.clone(),
@@ -105,7 +130,7 @@ pub fn roll_orange_boosted(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::model::{Character, Class};
+    use crate::model::{Character, Class, MAX_LEVEL};
     use std::collections::BTreeMap;
 
     const TOP: u32 = 99;
@@ -161,14 +186,14 @@ mod tests {
     }
 
     #[test]
-    fn a_piece_is_found_only_by_a_hero_within_five_levels_of_it() {
+    fn a_chest_can_drop_any_family_up_to_five_levels_above_the_hero() {
         // Nobody below level 5 finds anything: the lowest piece is level 10.
         for level in 1..5 {
             assert!(roll_orange(level, || 0.0).is_none(), "level {level}");
         }
         // Sweep the pick across the eligible pool, so every eligible piece comes out exactly once.
         let found = |level: u32| -> Vec<String> {
-            let size = pool(level).count();
+            let size = chest_pool(level).count();
             (0..size)
                 .map(|n| {
                     let mut values = [0., (n as f64 + 0.5) / size as f64].into_iter();
@@ -193,11 +218,11 @@ mod tests {
             }
         }
         // Boundaries: level 5 reaches the level 10 family, level 15 the level 20 family, level 94 the top one.
-        assert_eq!(pool(5).count(), 6);
-        assert_eq!(pool(14).count(), 6);
-        assert_eq!(pool(15).count(), 12);
-        assert_eq!(pool(93).count(), 54);
-        assert_eq!(pool(94).count(), 60);
+        assert_eq!(chest_pool(5).count(), 6);
+        assert_eq!(chest_pool(14).count(), 6);
+        assert_eq!(chest_pool(15).count(), 12);
+        assert_eq!(chest_pool(93).count(), 54);
+        assert_eq!(chest_pool(94).count(), 60);
         // The random sequence is the same at every level (a pick is drawn even with nothing to pick).
         let mut draws = 0;
         assert!(
@@ -208,6 +233,29 @@ mod tests {
             .is_none()
         );
         assert_eq!(draws, 2);
+    }
+
+    #[test]
+    fn monster_orange_drops_use_only_nearby_families_at_every_level() {
+        for enemy_level in 1..=MAX_LEVEL + 5 {
+            let expected: Vec<_> = RULES
+                .pieces
+                .iter()
+                .filter(|piece| piece.required_level.abs_diff(enemy_level) <= 5)
+                .collect();
+            if expected.is_empty() {
+                assert!(enemy_level < 5);
+                assert!(roll_monster_orange_boosted(1, enemy_level, || 0.).is_none());
+            }
+            for (index, piece) in expected.iter().enumerate() {
+                let pick = (index as f64 + 0.5) / expected.len() as f64;
+                let mut draws = [0.004, pick].into_iter();
+                let drop =
+                    roll_monster_orange_boosted(5, enemy_level, || draws.next().unwrap_or(0.))
+                        .unwrap();
+                assert_eq!(drop.item, piece.id, "monster level {enemy_level}");
+            }
+        }
     }
 
     #[test]

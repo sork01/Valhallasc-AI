@@ -6087,10 +6087,9 @@ impl World {
                 self.loot_drop(&credit_id, zone, point, licence);
             }
             let blackhour = self.maps[zone].final_boss == "null_hour";
-            let hero_level = self.players.get(&credit).map_or(1, |p| p.character.level);
             if !blackhour
                 && !self.maps[zone].raid
-                && let Some(gear) = roll_orange_boosted(boost, hero_level, || self.random())
+                && let Some(gear) = roll_monster_orange_boosted(boost, level, || self.random())
             {
                 self.loot_drop_with_gear(&credit_id, zone, point, &gear.item.clone(), Some(gear));
             }
@@ -9912,7 +9911,13 @@ mod tests {
                 .filter(|i| is_gear(i) && i.rarity == "uncommon")
                 .collect();
             assert_eq!(greens.len(), 1, "{kind} must drop one guaranteed green");
-            assert!(greens[0].required_level <= max_drop_level(w.slimes[id].level));
+            let level = w.slimes[id].level;
+            let highest = max_drop_level(level.min(MAX_LEVEL));
+            assert!(
+                (highest.saturating_sub(10).max(1)..=highest).contains(&greens[0].required_level),
+                "{kind} at level {level} dropped level {} gear",
+                greens[0].required_level,
+            );
         }
     }
 
