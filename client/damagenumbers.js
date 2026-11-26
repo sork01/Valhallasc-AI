@@ -5,9 +5,10 @@
 (() => {
   // size: font px; rise: px climbed over `life`; pop: peak scale of the pop-in; hold: fraction of life at full opacity;
   // arc: sideways drift in px; shake: crit tremble in px; ease: 1 = fast then slow, 0 = a straight line.
+  // settle: optional time in seconds to finish all motion and hold the resulting pose.
   const KINDS = {
     hit:    { size: 24, rise: 58, life: 1.0,  pop: 1.25, hold: .5,  arc: 22, shake: 0, ease: .75 },
-    crit:   { size: 38, rise: 78, life: 1.3,  pop: 1.55, hold: .55, arc: 26, shake: 3, ease: .8 },
+    crit:   { size: 38, rise: 48, life: 1.5,  pop: 1.55, hold: .8,  arc: 26, shake: 3, ease: 1, settle: .18 },
     hurt:   { size: 26, rise: 52, life: 1.1,  pop: 1.2,  hold: .5,  arc: 14, shake: 0, ease: .75 },
     heal:   { size: 26, rise: 44, life: 1.3,  pop: 1.08, hold: .6,  arc: 10, shake: 0, ease: .45 },
     miss:   { size: 18, rise: 34, life: .7,   pop: 1.05, hold: .35, arc: 12, shake: 0, ease: .85 },
@@ -34,10 +35,15 @@
     if (f.t < 0 || f.t >= k.life) return { dx: 0, dz: 0, scale: 1, alpha: 0, visible: false };
     const p = f.t / k.life, fade = clamp01((p - k.hold) / (1 - k.hold));
     if (reduced) return { dx: 0, dz: 0, scale: 1, alpha: 1 - fade, visible: true };                 // fades in place: no arc, no pop, no climb
-    const pop = f.t < .12 ? .45 + (k.pop - .45) * easeOut(f.t / .12) : k.pop + (1 - k.pop) * clamp01((f.t - .12) / .1);
-    const rise = k.rise * (k.ease * easeOut(p) + (1 - k.ease) * p);
-    const shake = k.shake && f.t < .25 ? Math.sin(f.t * 110) * k.shake * (1 - f.t / .25) : 0;
-    return { dx: f.lane * LANE_W + f.side * k.arc * easeOut(p) + shake, dz: (f.z0 || 0) + rise, scale: pop, alpha: 1 - fade, visible: true };
+    const travel = k.settle ? clamp01(f.t / k.settle) : p;
+    const popTime = k.settle ? k.settle / 2 : .12;
+    const settleTime = k.settle ? k.settle / 2 : .1;
+    const shakeTime = k.settle ?? .25;
+    const pop = f.t < popTime ? .45 + (k.pop - .45) * easeOut(f.t / popTime) : k.pop + (1 - k.pop) * clamp01((f.t - popTime) / settleTime);
+    const easedTravel = easeOut(travel);
+    const rise = k.rise * (k.ease * easedTravel + (1 - k.ease) * travel);
+    const shake = k.shake && f.t < shakeTime ? Math.sin(f.t * 110) * k.shake * (1 - f.t / shakeTime) : 0;
+    return { dx: f.lane * LANE_W + f.side * k.arc * easedTravel + shake, dz: (f.z0 || 0) + rise, scale: pop, alpha: 1 - fade, visible: true };
   }
   // The box a number occupies, relative to its anchor (screen px, y down): for the overlap checks.
   function box(f, reduced = false) {
@@ -50,6 +56,7 @@
   function spawn(list, spec, rand = Math.random) {
     const kind = KINDS[spec.kind] ? spec.kind : 'banner', k = KINDS[kind], stacked = kind === 'pickup' || kind === 'xp';
     const delay = Math.min(MAX_DELAY, Math.max(0, spec.delay || 0));
+    const maxDelay = kind === 'crit' ? Math.max(delay, SPACING) : MAX_DELAY;
     const f = { x: spec.x, y: spec.y, head: spec.head || 0, text: String(spec.text), color: spec.color, kind, t: -delay, lane: 0, z0: 0, side: rand() < .5 ? -1 : 1 };
     const aliveAt = o => o.t < (KINDS[o.kind] || KINDS.banner).life - .05;
     const screenOffset = o => ({ x: ((o.x - o.y) - (f.x - f.y)) * 44, y: ((o.x + o.y) - (f.x + f.y)) * 22 - (o.head - f.head) });
@@ -58,16 +65,17 @@
       : (Math.hypot(o.x - f.x, o.y - f.y) < .6 && Math.abs(o.head - f.head) < 12)));
     // A busy party can hit faster than the stagger drains. Keep the delay
     // short so old damage cannot queue up for seconds after combat stops.
-    if (delayMates.length) f.t = -Math.min(MAX_DELAY, Math.max(delay, Math.max(...delayMates.map(o => -o.t)) + SPACING));
+    if (delayMates.length) f.t = -Math.min(maxDelay, Math.max(delay, Math.max(...delayMates.map(o => -o.t)) + SPACING));
     const mates = (k.arc || stacked) ? list.filter(aliveAt).map(o => {
       if (!stacked && o.kind !== 'pickup' && o.kind !== 'xp') return (Math.hypot(o.x - f.x, o.y - f.y) < .6 && Math.abs(o.head - f.head) < 12) ? { o, ox: 0, oy: 0 } : null;
       const off = screenOffset(o);
       return (Math.abs(off.x) < 280 && Math.abs(off.y) < 220) ? { o, ox: off.x, oy: off.y } : null;
     }).filter(Boolean) : [];
     if (mates.length) {
-      // The lowest start over each lane that clears every mate while both are moving. Follow both paths over the next 0.8-1.2 s
-      // (the newcomer is invisible until its delay is over, and that is when they are near); the mates' boxes are worked out once.
-      const taus = [], mateBoxes = [], horizon = stacked ? 1.2 : .8;
+      // Check the full remaining path near sticky crits, which can still be in the path of later hits after they settle.
+      const nearCrit = kind === 'crit' || mates.some(({ o }) => o.kind === 'crit');
+      const taus = [], mateBoxes = [], horizon = nearCrit ? k.life - f.t : stacked ? 1.2 : .8;
+      const maxLift = nearCrit ? 208 : MAX_LIFT;
       for (let tau = 0; tau <= horizon; tau += .04) {
         taus.push(tau);
         mateBoxes.push(mates.map(({ o, ox, oy }) => {
@@ -81,7 +89,7 @@
       let best = null;
       for (const lane of [0, 1, -1, 2, -2]) {
         c.lane = lane; c.side = lane < 0 ? -1 : lane > 0 ? 1 : f.side;
-        for (let z0 = 0; z0 <= (best ? best.z0 - 4 : MAX_LIFT); z0 += 4) {
+        for (let z0 = 0; z0 <= (best ? best.z0 - 4 : maxLift); z0 += 4) {
           c.z0 = z0;
           let free = true;
           for (let i = 0; i < taus.length && free; i++) {

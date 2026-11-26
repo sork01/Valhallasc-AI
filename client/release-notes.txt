@@ -1,5 +1,14 @@
 [
   {
+    "version": "1.14.2",
+    "date": "2026-11-26",
+    "new": [],
+    "changed": [
+      "Critical hit numbers pop up quickly and stay still for about a second before fading."
+    ],
+    "removed": []
+  },
+  {
     "version": "1.14.1",
     "date": "2026-11-25",
     "new": [
