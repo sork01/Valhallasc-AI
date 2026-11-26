@@ -1,27 +1,27 @@
 {
   "abysszealot": [
-    1.0,
-    11.2
+    2.0,
+    22.4
   ],
   "acolyte": [
-    1.0,
-    4.9
+    2.0,
+    9.8
   ],
   "amber_moth": [
-    1.0,
-    16.8
+    2.0,
+    33.6
   ],
   "amber_page": [
-    1.0,
-    16.8
+    2.0,
+    33.6
   ],
   "amber_sentinel": [
-    1.0,
-    16.8
+    2.0,
+    33.6
   ],
   "archer": [
-    1.0,
-    4.9
+    2.0,
+    9.8
   ],
   "bellmammoth": [
     1.15,
@@ -40,8 +40,8 @@
     1.1
   ],
   "dew_moth": [
-    1.0,
-    16.8
+    2.0,
+    33.6
   ],
   "dunecolossus": [
     1.25,
@@ -88,8 +88,8 @@
     1.0
   ],
   "lumen_eel": [
-    1.0,
-    16.8
+    2.0,
+    33.6
   ],
   "mireheart": [
     2.06,
@@ -112,316 +112,316 @@
     1.0
   ],
   "rain_crown_droplet": [
-    1.0,
-    21.0
+    2.0,
+    42.0
   ],
   "rain_crown_guard": [
-    1.0,
-    21.0
+    2.0,
+    42.0
   ],
   "rain_crown_oracle": [
-    1.0,
-    21.0
+    2.0,
+    42.0
   ],
   "reliccrab": [
-    1.0,
-    14.0
+    2.0,
+    28.0
   ],
   "rimesaber": [
     1.14,
     1.0
   ],
   "rootbell": [
-    1.0,
-    16.8
+    2.0,
+    33.6
   ],
   "seed_amberwing": [
-    1.0,
-    16.8
+    2.0,
+    33.6
   ],
   "seed_mote": [
-    1.0,
-    16.8
+    2.0,
+    33.6
   ],
   "seed_rootguard": [
-    1.0,
-    16.8
+    2.0,
+    33.6
   ],
   "silverwidow": [
     2.04,
     1.0
   ],
   "solar_crucible_guard": [
-    1.0,
-    16.8
+    2.0,
+    33.6
   ],
   "solar_emberling": [
-    1.0,
-    16.8
+    2.0,
+    33.6
   ],
   "solar_sunmoth": [
-    1.0,
-    16.8
+    2.0,
+    33.6
   ],
   "sunshard": [
     1.15,
     1.0
   ],
   "thrall": [
-    1.0,
-    4.9
+    2.0,
+    9.8
   ],
   "thunder_guard": [
-    1.0,
-    16.8
+    2.0,
+    33.6
   ],
   "thunder_ray": [
-    1.0,
-    16.8
+    2.0,
+    33.6
   ],
   "thunder_spark": [
-    1.0,
-    16.8
+    2.0,
+    33.6
   ],
   "tidecantor": [
-    1.0,
-    14.0
+    2.0,
+    28.0
   ],
   "tideleech": [
-    1.0,
-    11.2
+    2.0,
+    22.4
   ],
   "tidetemplar": [
-    1.0,
-    14.0
+    2.0,
+    28.0
   ],
   "whitebarktitan": [
     1.16,
     1.0
   ],
   "barrow_fatebound": [
-    1.15,
-    1.0
+    2.3,
+    2.0
   ],
   "barrow_doorward": [
-    1.45,
-    1.0
+    2.9,
+    2.0
   ],
   "barrow_threadkeeper": [
-    1.45,
-    1.0
+    2.9,
+    2.0
   ],
   "span_archon": [
-    1.15,
-    1.0
+    2.3,
+    2.0
   ],
   "span_warden": [
-    1.45,
-    1.0
+    2.9,
+    2.0
   ],
   "span_weaver": [
-    1.45,
-    1.0
+    2.9,
+    2.0
   ],
   "astro_warden": [
-    2.0,
-    1.0
+    4.0,
+    2.0
   ],
   "astro_navigator": [
-    1.34,
-    1.0
+    2.68,
+    2.0
   ],
   "thunder_conductor": [
-    2.35,
-    1.0
+    4.7,
+    2.0
   ],
   "thunder_bastion": [
-    2.28,
-    1.0
+    4.56,
+    2.0
   ],
   "bloom_thornkeeper": [
-    2.37,
-    1.0
+    4.74,
+    2.0
   ],
   "bloom_mirror": [
-    2.21,
-    1.0
+    4.42,
+    2.0
   ],
   "solar_ashwarden": [
-    2.36,
-    1.0
+    4.72,
+    2.0
   ],
   "solar_heliomancer": [
-    1.93,
-    1.0
+    3.86,
+    2.0
   ],
   "elder_gatekeeper": [
-    2.43,
-    1.0
+    4.86,
+    2.0
   ],
   "elder_matron": [
-    1.73,
-    1.0
+    3.46,
+    2.0
   ],
   "pavilion_mirror": [
-    2.5,
-    1.0
+    5.0,
+    2.0
   ],
   "pavilion_weaver": [
-    1.33,
-    1.0
+    2.66,
+    2.0
   ],
   "rain_crown_gatekeeper": [
-    2.22,
-    1.0
+    4.44,
+    2.0
   ],
   "rain_crown_sibyl": [
-    1.73,
-    1.0
+    3.46,
+    2.0
   ],
   "seed_warden": [
-    2.15,
-    1.0
+    4.3,
+    2.0
   ],
   "seed_germinator": [
-    1.57,
-    1.0
+    3.14,
+    2.0
   ],
   "solstice_watcher": [
-    2.29,
-    1.0
+    4.58,
+    2.0
   ],
   "solstice_harbinger": [
-    1.91,
-    1.0
+    3.82,
+    2.0
   ],
   "chainmarshal": [
-    3.86,
-    1.0
+    7.72,
+    2.0
   ],
   "starseraph": [
-    2.67,
-    1.0
+    5.34,
+    2.0
   ],
   "tidejudicator": [
-    3.41,
-    1.0
+    6.82,
+    2.0
   ],
   "tideglass_heron": [
-    2.98,
-    1.0
+    5.96,
+    2.0
   ],
   "hourpetal_stag": [
-    2.37,
-    1.0
+    4.74,
+    2.0
   ],
   "moonskein_weaver": [
-    1.59,
-    1.0
+    3.18,
+    2.0
   ],
   "eye_lenswarden": [
-    2.63,
-    1.0
+    5.26,
+    2.0
   ],
   "eye_undertide": [
-    2.0,
-    1.0
+    4.0,
+    2.0
   ],
   "amber_curator": [
-    2.31,
-    1.0
+    4.62,
+    2.0
   ],
   "amber_chronicle": [
-    2.3,
-    1.0
+    4.6,
+    2.0
   ],
   "gatewarden": [
-    1.37,
-    1.0
+    2.74,
+    2.0
   ],
   "bellkeeper": [
-    2.4,
-    1.0
+    4.8,
+    2.0
   ],
   "mournsister": [
-    2.01,
-    1.0
+    4.02,
+    2.0
   ],
   "rootabbot": [
-    1.91,
-    1.0
+    3.82,
+    2.0
   ],
   "pearlwidow": [
-    3.06,
-    1.0
+    6.12,
+    2.0
   ],
   "glasscantor": [
-    1.66,
-    1.0
+    3.32,
+    2.0
   ],
   "relicwarden": [
-    2.52,
-    1.0
+    5.04,
+    2.0
   ],
   "barrow_hound": [
-    1.0,
-    4.9
+    2.0,
+    9.8
   ],
   "barrow_scarab": [
-    1.0,
-    4.9
+    2.0,
+    9.8
   ],
   "barrow_spinner": [
-    1.0,
-    4.9
+    2.0,
+    9.8
   ],
   "keel_crab": [
-    1,
-    5.6
+    2,
+    11.2
   ],
   "keel_deckhand": [
-    1,
-    5.6
+    2,
+    11.2
   ],
   "keel_lantern": [
-    1,
-    5.6
+    2,
+    11.2
   ],
   "null_hauler": [
-    18,
-    1
+    36,
+    2
   ],
   "null_breaker": [
-    18,
-    1
+    36,
+    2
   ],
   "null_coil": [
-    18,
-    1
+    36,
+    2
   ],
   "null_bell": [
-    15,
-    1
+    30,
+    2
   ],
   "null_conductor": [
-    15,
-    1
+    30,
+    2
   ],
   "null_hour": [
-    8.5,
-    1
+    17.0,
+    2
   ],
   "span_lynx": [
-    1.0,
-    5.6
+    2.0,
+    11.2
   ],
   "span_sentinel": [
-    1.0,
-    5.6
+    2.0,
+    11.2
   ],
   "span_caster": [
-    1.0,
-    5.6
+    2.0,
+    11.2
   ],
   "voidmoth": [
     2.0,
@@ -766,5 +766,185 @@
   "starrocketeer": [
     1.0,
     1.0
+  ],
+  "amber_cocoon": [
+    2.0,
+    2.0
+  ],
+  "amber_memory": [
+    2.0,
+    2.0
+  ],
+  "astro_axis": [
+    2.0,
+    2.0
+  ],
+  "astro_gearling": [
+    2.0,
+    2.0
+  ],
+  "astro_sentinel": [
+    2.0,
+    2.0
+  ],
+  "astro_starling": [
+    2.0,
+    2.0
+  ],
+  "bloom_guard": [
+    2.0,
+    2.0
+  ],
+  "bloom_heart": [
+    2.0,
+    2.0
+  ],
+  "bloom_moth": [
+    2.0,
+    2.0
+  ],
+  "bloom_spore": [
+    2.0,
+    2.0
+  ],
+  "choir": [
+    2.0,
+    2.0
+  ],
+  "choirmother": [
+    2.0,
+    2.0
+  ],
+  "choirsinger": [
+    2.0,
+    2.0
+  ],
+  "colossus": [
+    2.0,
+    2.0
+  ],
+  "coralregent": [
+    2.0,
+    2.0
+  ],
+  "elder_barkguard": [
+    2.0,
+    2.0
+  ],
+  "elder_heart": [
+    2.0,
+    2.0
+  ],
+  "elder_moth": [
+    2.0,
+    2.0
+  ],
+  "elder_thornling": [
+    2.0,
+    2.0
+  ],
+  "eye_adept": [
+    2.0,
+    2.0
+  ],
+  "eye_drifter": [
+    2.0,
+    2.0
+  ],
+  "eye_lurker": [
+    2.0,
+    2.0
+  ],
+  "eye_unblinking": [
+    2.0,
+    2.0
+  ],
+  "hierophant": [
+    2.0,
+    2.0
+  ],
+  "hollowking": [
+    2.0,
+    2.0
+  ],
+  "keel_bosun": [
+    2.0,
+    2.0
+  ],
+  "keel_captain": [
+    2.0,
+    2.0
+  ],
+  "keel_cargomaw": [
+    2.0,
+    2.0
+  ],
+  "moonwell_echo": [
+    2.0,
+    2.0
+  ],
+  "pavilion_foldling": [
+    2.0,
+    2.0
+  ],
+  "pavilion_inkmoth": [
+    2.0,
+    2.0
+  ],
+  "pavilion_silkguard": [
+    2.0,
+    2.0
+  ],
+  "pavilion_sovereign": [
+    2.0,
+    2.0
+  ],
+  "rain_crown_sovereign": [
+    2.0,
+    2.0
+  ],
+  "reliquarypearl": [
+    2.0,
+    2.0
+  ],
+  "seed_sprout": [
+    2.0,
+    2.0
+  ],
+  "seed_treant": [
+    2.0,
+    2.0
+  ],
+  "seed_worldseed": [
+    2.0,
+    2.0
+  ],
+  "solar_cinder": [
+    2.0,
+    2.0
+  ],
+  "solar_heart": [
+    2.0,
+    2.0
+  ],
+  "solstice_flurry": [
+    2.0,
+    2.0
+  ],
+  "solstice_guard": [
+    2.0,
+    2.0
+  ],
+  "solstice_heart": [
+    2.0,
+    2.0
+  ],
+  "solstice_owl": [
+    2.0,
+    2.0
+  ],
+  "thunder_heart": [
+    2.0,
+    2.0
   ]
 }

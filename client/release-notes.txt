@@ -1,5 +1,14 @@
 [
   {
+    "version": "1.15.5",
+    "date": "2026-11-26",
+    "new": [],
+    "changed": [
+      "Dungeon monsters and bosses now have 100% more health and deal 100% more damage."
+    ],
+    "removed": []
+  },
+  {
     "version": "1.15.4",
     "date": "2026-11-26",
     "new": [

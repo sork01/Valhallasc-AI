@@ -248,6 +248,8 @@ mod duel_tests;
 #[cfg(test)]
 mod dungeon_admission_tests;
 #[cfg(test)]
+mod dungeon_difficulty_tests;
+#[cfg(test)]
 mod dungeon_solo_tests;
 #[cfg(test)]
 mod easter_tests;
