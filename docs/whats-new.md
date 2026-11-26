@@ -8,6 +8,16 @@ The centered window is above the game's confirmations, registered in Settings `W
 
 If the notes cannot be loaded, the game remains usable and the version is not acknowledged. Opening from Settings retries the request. A blocked localStorage still allows reading and closing; a reload can show the update again when the browser cannot save its acknowledgement.
 
+## Game name (1.15.3)
+
+The game is **Valhalla Saga**. The SVG title uses `SAGA` and the Korean ribbon
+uses `발할라 사가`; browser/accessibility titles, the welcome and web app manifest
+use the same name. Historical release notes keep the name used at their release.
+`BRAND_ONLY=1` with the bounded `tests/whats-new-ui.cjs` runner checks the name
+and title layout at desktop and short phone sizes; `MUTATE=brand` must fail the
+visible-logo assertion. This text change keeps the existing logo artwork and
+requires only a client release.
+
 ## Updating the notes
 
 Every game version bump must update `client/index.html`, `scripts/sv-keep.txt` and `client/release-notes.txt` in the same change, followed by `python3 scripts/build_swedish.py`. Put the newest entry first, with its full displayed version, date, and `new`, `changed`, `removed` arrays. Use everyday English. Omit empty sections when rendering; keep all three arrays in the file. Every removal explains why. Describe balance changes as nearest whole percentages, never decimal factors or programming terms.

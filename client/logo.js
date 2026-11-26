@@ -1,5 +1,5 @@
 'use strict';
-/* The title logo: "VALHALLA RUMBLE" as chunky frozen-rune letters with a gold trim,
+/* The title logo: "VALHALLA SAGA" as chunky frozen-rune letters with a gold trim,
    3D extrusion, snow caps, icicles, frost sparkles, wings and a Korean ribbon.
    Drawn as SVG so it stays sharp at any size and the text stays real text. */
 (() => {
@@ -11,7 +11,7 @@
   const f = n => Math.round(n * 10) / 10;
   const FONT = '"Lilita One", "Jua", Impact, "Arial Rounded MT Bold", sans-serif';
   const L1 = { id: 't1', text: 'VALHALLA', y: 172, size: 196, sp: 5 };
-  const L2 = { id: 't2', text: 'RUMBLE', y: 318, size: 140, sp: 8 };
+  const L2 = { id: 't2', text: 'SAGA', y: 318, size: 140, sp: 8 };
 
   const star = (cx, cy, r1, r2) => {
     let p = '';
@@ -68,7 +68,7 @@
     <path d="M226 372 L292 372 L292 430 L226 430 L252 401 Z" fill="#0b1c52" stroke="#e0a92a" stroke-width="4" stroke-linejoin="round"/>
     <path d="M774 372 L708 372 L708 430 L774 430 L748 401 Z" fill="#0b1c52" stroke="#e0a92a" stroke-width="4" stroke-linejoin="round"/>
     <path d="M270 362 H730 V420 H270 Z" fill="url(#lRibbon)" stroke="#e0a92a" stroke-width="5" stroke-linejoin="round"/>
-    <text id="ko" x="503" y="392" text-anchor="middle" dominant-baseline="central" font-family='"Jua","Noto Sans KR","Malgun Gothic",sans-serif' font-size="46" letter-spacing="6" fill="#fff3c4" stroke="#5c3f08" stroke-width="7" paint-order="stroke" stroke-linejoin="round" lang="ko">발할라 럼블</text>
+    <text id="ko" x="503" y="392" text-anchor="middle" dominant-baseline="central" font-family='"Jua","Noto Sans KR","Malgun Gothic",sans-serif' font-size="46" letter-spacing="6" fill="#fff3c4" stroke="#5c3f08" stroke-width="7" paint-order="stroke" stroke-linejoin="round" lang="ko">발할라 사가</text>
   </g>
 
   <g id="line1">${face(L1, 26, 140)}</g>

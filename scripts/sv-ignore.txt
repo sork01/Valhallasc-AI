@@ -81,7 +81,7 @@
   "VALHALLA_BOSSMECH_FILE is on: boss mechanics come from {0}",
   "VALHALLA_BOSSMECH_FILE: {0}",
   "Valhalla Boss Mechanic Cues",
-  "Valhalla Rumble, 발할라 럼블",
+  "Valhalla Saga, 발할라 사가",
   "Valhalla multiplayer server ready",
   "WeaponNames",
   "World time · {0}{1} · one day every 20 minutes",

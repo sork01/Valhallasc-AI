@@ -1,5 +1,14 @@
 [
   {
+    "version": "1.15.3",
+    "date": "2026-11-26",
+    "new": [],
+    "changed": [
+      "Valhalla Rumble is now Valhalla Saga, with the new name on the title screen and welcome."
+    ],
+    "removed": []
+  },
+  {
     "version": "1.15.2",
     "date": "2026-11-26",
     "new": [
