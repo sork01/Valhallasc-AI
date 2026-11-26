@@ -404,6 +404,8 @@ const ENEMY_HIT_REACH: f64 = 1.25;
 /// Dungeons and raids (`hunting`) ignore both bounds and chase without limit.
 const CLOSE_CHASE_RANGE: f64 = 9.;
 const HOME_LEASH_RANGE: f64 = 14.;
+const RETREAT_HEALTH_FRACTION: f64 = 0.2;
+const MELEE_RETREAT_SECONDS: f64 = 1.5;
 /// Health and damage change by this fraction per level from the default; gold changes by 10%. XP does not scale
 /// this way: an enemy pays `enemy_xp(level)`, set by its own level alone.
 const LEVEL_HP_DAMAGE: f64 = 0.12;
@@ -951,6 +953,9 @@ struct Slime {
     /// Seconds spent in this fight, for the soft enrage (`items::enrage`); it drains while nobody is near.
     #[serde(skip)]
     fight: f64,
+    /// A deadline stays set after the retreat ends so the mob only tries it once per fight.
+    #[serde(skip)]
+    melee_retreat_until: Option<f64>,
     #[serde(skip)]
     xp: u32,
     #[serde(skip)]
@@ -1983,6 +1988,7 @@ impl Slime {
             set_slow: 0.,
             damage: (damage * strength).round(),
             fight: 0.,
+            melee_retreat_until: None,
             xp: Self::kill_xp(&s.kind, s.zone, level),
             gold: (Self::base_gold(&s.kind) as f64 * Self::level_scale(&s.kind, level, 0.1)).round()
                 as u32,
@@ -2000,6 +2006,13 @@ impl Slime {
         Point {
             x: self.x,
             y: self.y,
+        }
+    }
+    fn retreat_goal(&self, threat: Point) -> Point {
+        let away = threat.direction(self.point());
+        Point {
+            x: self.x + away.x * 3.,
+            y: self.y + away.y * 3.,
         }
     }
     /// Alive, resting at its post with nothing to chase: until somebody enters its zone there is nothing to simulate.
@@ -6375,6 +6388,7 @@ impl World {
         // restarts when it lets go and returns home.
         if matches!(s.state.as_str(), "idle" | "wander" | "return") {
             s.fight = 0.;
+            s.melee_retreat_until = None;
         } else if target.is_some_and(|(_, _, d)| d < ENRAGE_RANGE) {
             s.fight += TICK;
         } else {
@@ -6398,6 +6412,7 @@ impl World {
         let mut fire = None;
         let mut slammed: Vec<u64> = vec![];
         let mut slam_now = false;
+        let mut melee_retreating = false;
         let ranged = Slime::ranged(&s.kind);
         let slam = Slime::slam_radius(&s.kind);
         match s.state.as_str() {
@@ -6434,7 +6449,30 @@ impl World {
                     let shoots = ranged.as_ref().is_some_and(|r| {
                         visible && d > Slime::melee_inside(&s.kind) + s.r && d < r.range * 3.
                     });
-                    if let (true, Some(r)) = (shoots, ranged.as_ref()) {
+                    let melee_retreat_room = if s.hp <= s.max_hp * RETREAT_HEALTH_FRACTION
+                        && matches!(s.kind.as_str(), "wolf" | "toad" | "boar")
+                        && !hunting
+                        && !s.elite
+                    {
+                        let home = Point { x: s.hx, y: s.hy };
+                        // Keep the retreat inside both chase limits so it does not cause a reset.
+                        let room = (HOME_LEASH_RANGE - s.point().distance(home))
+                            .min(CLOSE_CHASE_RANGE - 0.5 - d)
+                            .max(0.);
+                        if room > 0. && s.melee_retreat_until.is_none() {
+                            s.melee_retreat_until = Some(self.time + MELEE_RETREAT_SECONDS);
+                        }
+                        s.melee_retreat_until
+                            .filter(|&end| self.time < end)
+                            .map(|_| room)
+                    } else {
+                        None
+                    };
+                    if let Some(room) = melee_retreat_room {
+                        melee_retreating = true;
+                        goal = Some(s.retreat_goal(point));
+                        movement = movement.min(room);
+                    } else if let (true, Some(r)) = (shoots, ranged.as_ref()) {
                         if d <= r.range && s.atk_cd <= 0. {
                             s.state = "windup".into();
                             s.st = windup;
@@ -6443,18 +6481,14 @@ impl World {
                         } else if d > r.range * 0.85 {
                             goal = Some(point);
                         } else if d < r.range * 0.35
-                            && s.hp < s.max_hp * 0.2
+                            && s.hp < s.max_hp * RETREAT_HEALTH_FRACTION
                             && matches!(
                                 s.kind.as_str(),
                                 "archer" | "acolyte" | "crow" | "skyray"
                             )
                         {
                             // A badly hurt ranged mob backs away while the shot recovers.
-                            let away = point.direction(s.point());
-                            goal = Some(Point {
-                                x: s.x + away.x * 3.,
-                                y: s.y + away.y * 3.,
-                            });
+                            goal = Some(s.retreat_goal(point));
                             movement *= 0.8;
                         }
                     } else if visible
@@ -6661,9 +6695,9 @@ impl World {
             walk_with_actors(map, &mut point, direction, movement, s.r, &bodies);
             if map.in_city(point) {
                 point = s.point();
-                if !s
-                    .target
-                    .is_some_and(|tid| self.players.get(&tid).is_some_and(|p| p.guard.is_some()))
+                if !melee_retreating
+                    && !s.target
+                        .is_some_and(|tid| self.players.get(&tid).is_some_and(|p| p.guard.is_some()))
                 {
                     s.target = None;
                     s.state = "return".into();
@@ -13800,6 +13834,84 @@ mod tests {
                 assert_eq!(enemy.target, Some(1));
             }
         }
+    }
+
+    #[test]
+    fn melee_mobs_retreat_once_at_twenty_percent() {
+        let mut w = world();
+        let _rx = join(&mut w, 1, Class::Warrior);
+        off_pier(&mut w, 1);
+        let spawn_x = OPEN_GROUND.x + 2.5;
+        for kind in ["wolf", "toad", "boar", "troll"] {
+            let spawn = SlimeSpawn {
+                ambush: None,
+                kind: kind.into(),
+                zone: 0,
+                x: spawn_x,
+                y: OPEN_GROUND.y,
+            };
+            let mut enemy = Slime::new(0, &spawn);
+            enemy.target = Some(1);
+            enemy.state = "chase".into();
+            enemy.hp = enemy.max_hp * 0.201;
+            w.slimes[0] = enemy;
+            w.update_slime(0);
+            assert!(w.slimes[0].x < spawn_x, "{kind} still pursues above 20%");
+
+            let enemy = &mut w.slimes[0];
+            enemy.x = spawn_x;
+            enemy.hp = enemy.max_hp * 0.2;
+            let hp = enemy.hp;
+            w.update_slime(0);
+            if kind == "troll" {
+                assert!(w.slimes[0].x < spawn_x, "the troll still pursues");
+                continue;
+            }
+            let first_step = w.slimes[0].x;
+            assert!(first_step > spawn_x, "{kind} flees at exactly 20%");
+
+            w.time += 0.5;
+            w.update_slime(0);
+            assert!(w.slimes[0].x > first_step, "{kind} keeps running briefly");
+            assert_eq!(w.slimes[0].target, Some(1));
+            assert_eq!(w.slimes[0].hp, hp);
+
+            let end = w.slimes[0].x;
+            w.time += 2.;
+            w.update_slime(0);
+            assert!(w.slimes[0].x < end, "{kind} resumes fighting after its retreat");
+        }
+    }
+
+    #[test]
+    fn melee_mobs_retreat_stays_inside_the_home_leash() {
+        let mut w = world();
+        let _rx = join(&mut w, 1, Class::Warrior);
+        off_pier(&mut w, 1);
+        let mut enemy = Slime::new(
+            0,
+            &SlimeSpawn {
+                ambush: None,
+                kind: "wolf".into(),
+                zone: 0,
+                x: OPEN_GROUND.x + 2.5,
+                y: OPEN_GROUND.y,
+            },
+        );
+        enemy.hp = enemy.max_hp * 0.19;
+        enemy.hx = enemy.x - HOME_LEASH_RANGE + 0.03;
+        enemy.target = Some(1);
+        enemy.state = "chase".into();
+        let (start_x, edge, hp) = (enemy.x, enemy.hx + HOME_LEASH_RANGE, enemy.hp);
+        w.slimes[0] = enemy;
+        for _ in 0..4 {
+            w.time += TICK;
+            w.update_slime(0);
+        }
+        let enemy = &w.slimes[0];
+        assert!(enemy.x > start_x && enemy.x <= edge + 1e-8);
+        assert_eq!(enemy.target, Some(1));
+        assert_eq!(enemy.hp, hp);
     }
 
     /// ENEMY-CHASE-CLOSE-RANGE: open-world enemies keep chasing past `HOME_LEASH_RANGE` while the target is close,

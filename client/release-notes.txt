@@ -1,5 +1,14 @@
 [
   {
+    "version": "1.14.5",
+    "date": "2026-11-26",
+    "new": [],
+    "changed": [
+      "Frostfang Wolves, Fen Toads, and Rotfang Boars briefly flee at 20% health or lower."
+    ],
+    "removed": []
+  },
+  {
     "version": "1.14.4",
     "date": "2026-11-26",
     "new": [],
