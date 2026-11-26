@@ -6134,7 +6134,7 @@ impl World {
                     let pieces = copies(outdoor_elite_drop_chance(rarity), boost, || self.random());
                     for _ in 0..pieces {
                         let choice = self.random();
-                        if let Some(i) = equipment_of_rarity(rarity, level, choice) {
+                        if let Some(i) = monster_equipment_of_rarity(rarity, level, choice) {
                             self.loot_drop(&credit_id, zone, point, &i.id);
                         }
                     }

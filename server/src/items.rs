@@ -1014,14 +1014,30 @@ pub fn outdoor_elite_drop_chance(rarity: &str) -> f64 {
         _ => 0.,
     }
 }
-/// A random piece of gear of the rolled tier that an enemy of this level can drop (see `max_drop_level`); starter
-/// pieces never drop, and an empty tier drops nothing.
+/// A random piece of world gear of the rolled tier near the enemy's level.
 pub fn roll_equipment(kind: &str, level: u32, chance: f64, choice: f64) -> Option<&'static Item> {
     let rarity = roll_rarity(kind, chance)?;
-    equipment_of_rarity(rarity, level, choice)
+    monster_equipment_of_rarity(rarity, level, choice)
 }
+pub fn monster_equipment_of_rarity(rarity: &str, level: u32, choice: f64) -> Option<&'static Item> {
+    let maximum = max_drop_level(level);
+    // Include the preceding gear step and keep the next step available.
+    let minimum = maximum.saturating_sub(10).max(1);
+    equipment_in_range(rarity, minimum, maximum, choice)
+}
+/// Zone-scaled chest gear uses the chest's existing regional level bands.
 pub fn equipment_of_rarity(rarity: &str, level: u32, choice: f64) -> Option<&'static Item> {
-    let limit = max_drop_level(level);
+    let minimum = match level {
+        75.. => 75,
+        70..=74 => 70,
+        65..=69 => 65,
+        55..=64 => 55,
+        50..=54 => 50,
+        _ => 0,
+    };
+    equipment_in_range(rarity, minimum, max_drop_level(level), choice)
+}
+fn equipment_in_range(rarity: &str, minimum: u32, maximum: u32, choice: f64) -> Option<&'static Item> {
     let pool: Vec<_> = ITEMS
         .iter()
         .filter(|i| {
@@ -1029,20 +1045,7 @@ pub fn equipment_of_rarity(rarity: &str, level: u32, choice: f64) -> Option<&'st
                 && is_gear(i)
                 && !i.starter
                 && i.source.is_none()
-                && i.required_level <= limit
-                && (level < 50
-                    || i.required_level
-                        >= (if level >= 75 {
-                            75
-                        } else if level >= 70 {
-                            70
-                        } else if level >= 65 {
-                            65
-                        } else if level >= 55 {
-                            55
-                        } else {
-                            50
-                        }))
+                && (minimum..=maximum).contains(&i.required_level)
         })
         .collect();
     pool.get((choice * pool.len() as f64) as usize).copied()
@@ -2714,9 +2717,9 @@ mod tests {
         assert_eq!(outdoor_elite_drop_chance("legendary"), 0.0005);
         for rarity in ["uncommon", "rare", "epic"] {
             for level in [5, 10, 20, 30, 40, 45] {
-                let gear = equipment_of_rarity(rarity, level, 0.5).unwrap();
+                let gear = monster_equipment_of_rarity(rarity, level, 0.5).unwrap();
                 assert_eq!(gear.rarity, rarity);
-                assert!(gear.required_level <= max_drop_level(level));
+                assert!((level.saturating_sub(5)..=max_drop_level(level)).contains(&gear.required_level));
                 assert!(gear.source.is_none());
             }
         }
@@ -2733,13 +2736,13 @@ mod tests {
                             && is_gear(i)
                             && !i.starter
                             && i.source.is_none()
-                            && i.required_level <= top
+                            && (enemy_level - 5..=top).contains(&i.required_level)
                     })
                     .collect();
                 assert!(!pool.is_empty());
                 let highest = (0..pool.len())
                     .filter_map(|n| {
-                        equipment_of_rarity(
+                        monster_equipment_of_rarity(
                             rarity,
                             enemy_level,
                             (n as f64 + 0.5) / pool.len() as f64,
@@ -2804,10 +2807,15 @@ mod tests {
             let roll = roll_for(kind, rarity);
             let pool = ITEMS
                 .iter()
-                .filter(|i| i.rarity == rarity && is_gear(i) && !i.starter)
+                .filter(|i| {
+                    i.rarity == rarity
+                        && is_gear(i)
+                        && !i.starter
+                        && i.source.is_none()
+                        && (10..=20).contains(&i.required_level)
+                })
                 .count();
-            assert!(pool > 0, "{rarity} has gear");
-            // Level 12 enemies can drop every required level (the limit is 20).
+            assert!(pool > 0, "{rarity} has level 10–20 world gear");
             for n in 0..pool {
                 let i = roll_equipment(kind, 12, roll, (n as f64 + 0.5) / pool as f64).unwrap();
                 assert_eq!(i.rarity, rarity);
@@ -2819,31 +2827,40 @@ mod tests {
         assert!(roll_equipment("big", 6, roll, 0.).is_none());
     }
     #[test]
-    fn enemies_drop_gear_up_to_one_step_above_their_zone() {
-        assert_eq!(
-            [1, 5, 6, 10, 11, 12].map(max_drop_level),
-            [10, 10, 15, 15, 20, 20]
-        );
-        for (level, limit) in [(2, 10), (6, 15), (12, 20)] {
-            let roll = roll_for("green", "uncommon");
-            let pool = ITEMS
-                .iter()
-                .filter(|i| {
-                    i.rarity == "uncommon" && is_gear(i) && !i.starter && i.required_level <= limit
-                })
-                .count();
-            let mut top = 0;
-            for n in 0..pool {
-                let i =
-                    roll_equipment("green", level, roll, (n as f64 + 0.5) / pool as f64).unwrap();
-                assert!(
-                    i.required_level <= limit,
-                    "{} for a level {level} enemy",
-                    i.id
-                );
-                top = top.max(i.required_level);
+    fn monster_drops_cover_only_the_nearby_gear_steps() {
+        for (level, minimum, maximum) in [
+            (1, 1, 10),
+            (6, 5, 15),
+            (12, 10, 20),
+            (35, 30, 40),
+            (36, 35, 45),
+            (50, 45, 55),
+            (71, 70, 80),
+            (99, 95, 105),
+        ] {
+            for rarity in ["common", "uncommon", "rare", "epic"] {
+                let expected: Vec<_> = ITEMS
+                    .iter()
+                    .filter(|i| {
+                        i.rarity == rarity
+                            && is_gear(i)
+                            && !i.starter
+                            && i.source.is_none()
+                            && (minimum..=maximum).contains(&i.required_level)
+                    })
+                    .collect();
+                assert!(!expected.is_empty(), "{rarity} at monster level {level}");
+                let chance = roll_for("green", rarity);
+                for (index, expected_item) in expected.iter().enumerate() {
+                    let choice = (index as f64 + 0.5) / expected.len() as f64;
+                    let actual = roll_equipment("green", level, chance, choice).unwrap();
+                    assert_eq!(
+                        actual.id, expected_item.id,
+                        "{rarity} at monster level {level}: {} requires level {}",
+                        actual.id, actual.required_level,
+                    );
+                }
             }
-            assert_eq!(top, limit, "the top step is reachable");
         }
     }
     #[test]
@@ -2984,7 +3001,7 @@ mod tests {
             assert!(e.loot_source.is_none());
             assert!(boss_piece_for(&e.kind, &["weapon"], 0.).is_none());
         }
-        // Walk every level-50+ ordinary drop-pool cell. Source and obsolete gear must never leak in.
+        // Walk every ordinary drop-pool cell for the level-50 boss. Authored gear must never leak in.
         for rarity in ["common", "uncommon", "rare", "epic"] {
             let eligible: std::collections::BTreeSet<_> = ITEMS
                 .iter()
@@ -2993,7 +3010,7 @@ mod tests {
                         && i.rarity == rarity
                         && !i.starter
                         && i.source.is_none()
-                        && (50..=55).contains(&i.required_level)
+                        && (45..=55).contains(&i.required_level)
                 })
                 .map(|i| i.id.as_str())
                 .collect();

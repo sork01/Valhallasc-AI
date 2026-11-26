@@ -1,5 +1,14 @@
 [
   {
+    "version": "1.14.7",
+    "date": "2026-11-26",
+    "new": [],
+    "changed": [
+      "Ordinary monster gear drops now stay near the monster's level."
+    ],
+    "removed": []
+  },
+  {
     "version": "1.14.6",
     "date": "2026-11-26",
     "new": [
