@@ -1,5 +1,12 @@
 [
   {
+    "version": "1.15.0",
+    "date": "2026-11-26",
+    "new": ["Choose which floating text you see in Settings: damage, healing, loot, experience, profession gains, combat status, skills, and more."],
+    "changed": ["Floating equipment pickup text now matches the item's rarity color."],
+    "removed": []
+  },
+  {
     "version": "1.14.7",
     "date": "2026-11-26",
     "new": [],

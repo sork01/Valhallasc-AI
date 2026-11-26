@@ -46,7 +46,7 @@
     <svg id="logo" class="logo" viewBox="0 0 1000 440" role="img" aria-label="Valhalla Rumble, 발할라 럼블"></svg>
 
     <p class="cta"><span class="cta-en">[ Touch to Awaken the Horn ]</span><span class="cta-ko" lang="ko">터치하여 시작</span></p>
-    <p class="version">1.14.7</p>
+    <p class="version">1.15.0</p>
 
     <button class="start" id="start" type="button" aria-label="Touch to awaken the horn"></button>
   </section>
@@ -547,6 +547,7 @@
           <button class="settings-tab" id="set-tab-video" type="button" role="tab" aria-controls="set-section-video" aria-selected="false" tabindex="-1">Video</button>
           <button class="settings-tab" id="set-keys" type="button" role="tab" aria-controls="keys-panel" aria-selected="false" tabindex="-1">Keybinds</button>
           <button class="settings-tab" id="set-tab-interface" type="button" role="tab" aria-controls="set-section-interface" aria-selected="false" tabindex="-1">Interface</button>
+          <button class="settings-tab" id="set-tab-floating" type="button" role="tab" aria-controls="set-section-floating" aria-selected="false" tabindex="-1">Floating Text</button>
           <button class="settings-tab" id="set-tab-general" type="button" role="tab" aria-controls="set-section-general" aria-selected="false" tabindex="-1">General</button>
         </div>
         <div class="settings-content">
@@ -580,6 +581,23 @@
             <p class="world-menu-note">Edit UI lets you drag the skillbar, quest tracker, chat and the other panels where you want them.</p>
             <button class="btn ghost" id="set-win-reset" type="button">Reset window sizes</button>
             <p class="world-menu-note">UI size scales the whole interface. Drag the corner grip of a window to resize it; double-click the grip to reset it.</p>
+          </div>
+          <div class="settings-section" id="set-section-floating" role="tabpanel" aria-labelledby="set-tab-floating" hidden>
+            <p class="world-menu-note">Choose the text shown above characters. Changes apply immediately.</p>
+            <div class="floating-text-actions"><button class="btn ghost" id="set-floating-all" type="button">All on</button><button class="btn ghost" id="set-floating-none" type="button">All off</button></div>
+            <div class="floating-text-options">
+            <label class="setting-check"><input id="set-floating-damage" data-floating-text="damage" type="checkbox"> Damage dealt</label>
+            <label class="setting-check"><input id="set-floating-incoming" data-floating-text="incoming" type="checkbox"> Damage taken</label>
+            <label class="setting-check"><input id="set-floating-healing" data-floating-text="healing" type="checkbox"> Healing and resources</label>
+            <label class="setting-check"><input id="set-floating-misses" data-floating-text="misses" type="checkbox"> Misses and dodges</label>
+            <label class="setting-check"><input id="set-floating-loot" data-floating-text="loot" type="checkbox"> Items and coins</label>
+            <label class="setting-check"><input id="set-floating-xp" data-floating-text="xp" type="checkbox"> Experience gains</label>
+            <label class="setting-check"><input id="set-floating-professions" data-floating-text="professions" type="checkbox"> Profession skill gains</label>
+            <label class="setting-check"><input id="set-floating-combat" data-floating-text="combat" type="checkbox"> Entering and leaving combat</label>
+            <label class="setting-check"><input id="set-floating-skills" data-floating-text="skills" type="checkbox"> Skill names and set bonuses</label>
+            <label class="setting-check"><input id="set-floating-levels" data-floating-text="levels" type="checkbox"> Level ups and rebirth</label>
+            <label class="setting-check"><input id="set-floating-notices" data-floating-text="notices" type="checkbox"> Other floating notices</label>
+            </div>
           </div>
           <div class="settings-section" id="set-section-general" role="tabpanel" aria-labelledby="set-tab-general" hidden>
             <label class="setting-row" for="set-language"><span>Language</span><select id="set-language"><option value="en">English</option><option value="sv">Svenska</option><option value="ko">한국어</option></select></label>

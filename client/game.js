@@ -2,6 +2,7 @@
 (() => {
   // ---------- tiny persistent state ----------
   const KEY = 'valhallasc.save.v1';
+  const FLOATING_TEXT = ['damage', 'incoming', 'healing', 'misses', 'loot', 'xp', 'professions', 'combat', 'skills', 'levels', 'notices'];
   const defaults = { lang: /^ko/i.test(navigator.language || '') ? 'ko' : /^sv/i.test(navigator.language || '') ? 'sv' : 'en', sound: true, masterVol: 1, musicVol: .35, sfxVol: 1, night: 1, weather: 1, weatherAudio: .7, lowGraphics: false, touchGraphicsSuggested: false, ui: {}, uiScale: .8, winScale: {}, panelSize: {}, char: null, draft: null };
   let save = { ...defaults };
   try { Object.assign(save, JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) { /* private mode */ }
@@ -1581,6 +1582,7 @@
     get lang() { return save.lang; },
     get master() { return save.masterVol; },
     get music() { return save.musicVol; }, get sfx() { return save.sfxVol; }, get sound() { return save.sound; },
+    get floatingText() { return Object.fromEntries(FLOATING_TEXT.map(key => [key, save.floatingText?.[key] !== false])); },
     get combatSounds() { return save.combatSounds; },
     get touchSkills() { return save.touchSkills && typeof save.touchSkills === 'object' ? save.touchSkills : {}; },
     get questArrow() { return save.questArrow === true; },
@@ -1601,6 +1603,7 @@
     get winScale() { return save.winScale && typeof save.winScale === 'object' ? save.winScale : {}; },
     get panelSize() { return !save.panelSizeSet && !has(save.panelSize) ? DEFAULT_PANEL_SIZE : save.panelSize && typeof save.panelSize === 'object' ? save.panelSize : {}; },
     set(patch) {
+      if ('floatingText' in patch) save.floatingText = Object.fromEntries(FLOATING_TEXT.map(key => [key, typeof patch.floatingText?.[key] === 'boolean' ? patch.floatingText[key] : save.floatingText?.[key] !== false]));
       if ('lang' in patch && ['en', 'sv', 'ko'].includes(patch.lang) && patch.lang !== save.lang) {
         save.lang = patch.lang; persist(); location.reload(); return;
       }

@@ -1638,8 +1638,9 @@
     return sx > -100 && sx < VW + 100 && sy > -160 && sy < VH + 160;
   }
   // kind: hit, crit, hurt, heal, miss, pickup, xp, banner (names and notices), level; `head` overrides the start height (px).
-  function floater(x, y, text, color, big, kind = big ? 'level' : 'banner', head) {
-    if (!numberAnchorVisible(x, y)) return;
+  function floater(x, y, text, color, big, kind = big ? 'level' : 'banner', head, category) {
+    category ||= { hit: 'damage', crit: 'damage', hurt: 'incoming', heal: 'healing', miss: 'misses', pickup: 'loot', xp: 'xp', level: 'levels', banner: 'notices' }[kind] || 'notices';
+    if (window.Prefs?.floatingText?.[category] === false || !numberAnchorVisible(x, y)) return;
     DamageNumbers.spawn(floaters, { x, y, text, color, kind, head: head ?? (['hit', 'crit', 'hurt', 'heal', 'miss'].includes(kind) ? headAt(x, y, kind === 'hit' || kind === 'crit' ? currentHitKind : null) : 60) });
   }
   let currentHitKind = null;
@@ -1769,8 +1770,12 @@
     if(SLIME.ember_firelord) SLIME.ember_firelord.name=zdef.crosses?.[0]?.bossName || 'Firelord';
     const selectedTarget = own.danceT != null ? null : hero.target?.id;
     if (own.danceT != null && hero.danceT == null) { Field.clearInput(); hero.goal = null; hero.pvpTargetId = null; }
+    const previousCombat = hero.inCombat;
     const wasDead = hero.dead, wasGhost = !!(hero.dead && hero.ghost), wasFallen = !!hero.fallen, oldSets = hero.setCounts || {};
     applyActor(hero, own, initial || (moved && !seamShift) || !!hero.sparkTravel !== !!own.sparkTravel);
+    if (!initial && !moved && previousCombat !== undefined && !!previousCombat !== !!own.inCombat) {
+      floater(hero.x, hero.y, own.inCombat ? '+Combat' : '-Combat', own.inCombat ? '#ff8b9b' : '#7dff9a', false, 'banner', 118, 'combat');
+    }
     hero.raidSupport = own.raidSupport || null;
     if (!initial && !moved) for (const source of new Set([...Object.keys(oldSets), ...Object.keys(own.setCounts || {})])) {
       const before = oldSets[source] || 0, after = own.setCounts?.[source] || 0;
@@ -1944,7 +1949,7 @@
     if (event.kind === 'miss' || event.kind === 'dodge') floater(event.x, event.y, event.kind === 'miss' ? 'Miss' : 'Dodge', '#c9c9bd', false, 'miss');
     if (event.kind === 'itemPickup') {
       const item = WORLD_ITEMS.find(i => i.id === event.item), rarity = event.rarity || item?.rarity;
-      floater(event.x, event.y, `+${event.quantity} ${event.name}`, item?.kind === 'bag' ? bagColor(item) : '#64b5ff', false, 'pickup');
+      floater(event.x, event.y, `+${event.quantity} ${event.name}`, item?.kind === 'bag' ? bagColor(item) : ({ common: '#c4c4c4', uncommon: '#4ad66d', rare: '#64b5ff', epic: '#b45cff', legendary: '#ff9a2e', hierloom: '#ffd24a', gm: '#ffd24a' }[rarity] || '#64b5ff'), false, 'pickup');
       if (event.actor === Online.id) {
         say('pickup'); say('rarePickup', event);
         const tier = { uncommon: 1, rare: 2, epic: 3, legendary: 4, hierloom: 5 }[rarity] || 0;
@@ -2015,6 +2020,7 @@
   function skillFx(ev) {
     const def = SKILL_BY_ID[ev.skill]; if (!def) return;
     const [core, glow] = SKILL_COL[ev.skill] || ['#ffffff', '#9fd0ff'], kind = def.effect.effect, own = ev.actor === Online.id, a = Math.atan2(ev.fy, ev.fx);
+    floater(ev.x, ev.y, def.name, glow, false, 'banner', undefined, 'skills');
     const base = { actor: ev.actor, x: ev.x, y: ev.y, core, glow, a, t: 0 }, pts = (ev.points || []).map(([x, y]) => ({ x, y }));
     if (kind === 'cone') {
       effects.push({ ...base, kind: ev.skill === 'cleave' ? 'skCleave' : ev.skill === 'earthshatter' ? 'skWarFissure' : ev.skill === 'thousandcuts' ? 'skAssassinFan' : 'skCone', r: def.effect.reach,
@@ -2091,7 +2097,7 @@
       const hunterBuff = def.class === 'hunter';
       effects.push({ ...base, kind: hunterBuff ? 'skHunterBuff' : priestBuff ? 'skPriestBuff' : warriorBuff || (ev.skill === 'arcaneward' ? 'skMageWard' : assassinBuff ? 'skAssassinBuff' : 'skAura'),
         style: hunterBuff || priestBuff ? ev.skill : assassinBuff, targets: pts, r: def.effect.range, col, life: hunterBuff || priestBuff ? 1.2 : warriorBuff || ev.skill === 'arcaneward' || assassinBuff ? 1.15 : 1 });
-      spark(ev.x, ev.y, 22, [core, col], 12, 1.2, 1); floater(ev.x, ev.y, def.name, col, false);
+      spark(ev.x, ev.y, 22, [core, col], 12, 1.2, 1);
     } else if (kind === 'heal') { effects.push({ ...base, kind: ev.skill === 'secondwind' ? 'skWarHeal' : ev.skill === 'guardianlight' ? 'skPriestSanctuary' : 'skAura', col: glow, life: 1.15 }); spark(ev.x, ev.y, 26, [core, glow], 12, 1.2, 1.1); }
     else if (kind === 'mend') {
       effects.push({ ...base, kind: ev.skill === 'mend' ? 'skPriestMend' : ev.skill === 'prayer' ? 'skPriestPrayer' : 'skPriestHymn',
@@ -2128,7 +2134,7 @@
       const col = '#' + base.map(v => Math.round((v + .43) * 255).toString(16).padStart(2, '0')).join('');
       effects.push({ ...base, kind: 'skAura', col, life: 1.2 });
       spark(ev.x, ev.y, 30, [col, '#ffffff'], 10, 2.6, 1);
-      floater(ev.x, ev.y, WORLD_SET_BONUSES.signatures[ev.setSignature]?.name || 'Set bonus', col, true);
+      floater(ev.x, ev.y, WORLD_SET_BONUSES.signatures[ev.setSignature]?.name || 'Set bonus', col, true, 'banner', undefined, 'skills');
     }
   }
   // Canvas-built stand-in mount, only for an actor whose mount art has not loaded (or in test mode): the horse body in the
@@ -5942,7 +5948,7 @@
       if (!running || !Online.connected || hero.dead) return false;
       return Online.send({ type: 'use_item', item: id, bag_slot: bagSlot });
     },
-    floatHero(text, color = '#ffe066') { if (running && !hero.dead) floater(hero.x, hero.y, text, color, false, 'banner', 118); },
+    floatHero(text, color = '#ffe066', category = 'notices') { if (running && !hero.dead) floater(hero.x, hero.y, text, color, false, 'banner', 118, category); },
     error(text) { if (running) window.WorldFeedback?.error(text); },
     equipSlot(slot, item) {
       if (!running || !Online.connected || hero.dead) return false;

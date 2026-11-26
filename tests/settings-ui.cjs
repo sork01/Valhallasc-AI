@@ -10,6 +10,7 @@ const { StdioClientTransport, getDefaultEnvironment } = require('@modelcontextpr
 const root = path.resolve(__dirname, '..');
 const client = new Client({ name: 'valhallasc-settings-ui', version: '1.0.0' });
 const musicDefaultOnly = process.env.SETTINGS_MUSIC_DEFAULT === '1';
+const floatingOnly = process.env.SETTINGS_FLOATING === '1';
 const categoriesOnly = process.env.SETTINGS_CATEGORIES === '1';
 const touch = process.env.TOUCH === '1';
 let browser, started = false, checks = 0;
@@ -54,8 +55,39 @@ const stageRect = page => rect(page, '#stage');
       return connect.call(this, to, ...rest);
     };
     if (!onlyDefault && !sessionStorage.getItem('seeded')) { sessionStorage.setItem('seeded', '1'); localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: true, char: null, draft: null })); }
-  }, musicDefaultOnly || categoriesOnly);
+  }, musicDefaultOnly || categoriesOnly || floatingOnly);
   await page.goto(world.url);
+  if (floatingOnly) {
+    const show = async () => {
+      await page.evaluate(() => {
+        document.getElementById('scene-splash').hidden = true;
+        document.getElementById('scene-game').hidden = false;
+        Settings.show();
+      });
+      if (touch && await page.locator('#low-gfx-dismiss').isVisible()) await page.locator('#low-gfx-dismiss').tap();
+    };
+    await show();
+    await page.locator('#set-tab-floating').click();
+    const floatingControls = page.locator('input[data-floating-text]');
+    check(await floatingControls.count() === 11, 'Eleven floating text categories');
+    check(await floatingControls.evaluateAll(nodes => nodes.every(n => n.checked)), 'Existing saves show all categories by default');
+    await page.locator('#set-floating-none').click();
+    check(await floatingControls.evaluateAll(nodes => nodes.every(n => !n.checked)), 'All off updates every control immediately');
+    await page.locator('#set-floating-professions').check();
+    await page.locator('#set-floating-combat').check();
+    check(await page.evaluate(() => Prefs.floatingText.professions && Prefs.floatingText.combat && !Prefs.floatingText.skills), 'Independent toggles preserve the other categories');
+    await page.reload(); await show(); await page.locator('#set-tab-floating').click();
+    check(await page.locator('#set-floating-combat').isChecked() && !await page.locator('#set-floating-loot').isChecked(), 'Choices persist after reload');
+    await page.locator('#set-floating-notices').scrollIntoViewIfNeeded();
+    const last = await page.locator('#set-floating-notices').boundingBox();
+    check(last.y >= 0 && last.y + last.height <= (touch ? 320 : 900), 'Last option is reachable');
+    await page.locator('#set-floating-all').click();
+    check(await floatingControls.evaluateAll(nodes => nodes.every(n => n.checked)), 'All on restores every category');
+    check(errors.length === 0, `No page errors: ${errors.join('; ')}`);
+    await page.screenshot({ path: path.join(world.artifacts, touch ? 'floating-text-touch.png' : 'floating-text-desktop.png') });
+    console.log(`${checks} floating text Settings checks passed. ${world.artifacts}`);
+    return;
+  }
   if (categoriesOnly) {
     const show = () => page.evaluate(() => {
       document.getElementById('scene-splash').hidden = true;
@@ -66,7 +98,7 @@ const stageRect = page => rect(page, '#stage');
     const tabs = page.locator('.settings-tab');
     await show();
     if (touch && await page.locator('#low-gfx-dismiss').isVisible()) await page.locator('#low-gfx-dismiss').tap();
-    check(await tabs.count() === 5, 'Settings has five categories');
+    check(await tabs.count() === 6, 'Settings has six categories');
     check(await master.isVisible() && await master.inputValue() === '100', 'Sound opens with Master volume at 100%');
     check(await page.locator('#set-music').inputValue() === '35', 'The Music default is 35%');
     check(await page.locator('[role=tabpanel]:visible').count() === 1, 'Only the selected panel is visible');

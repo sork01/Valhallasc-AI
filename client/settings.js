@@ -347,7 +347,13 @@
 
   // ---------- the volume panel ----------
   const master = $('set-master'), music = $('set-music'), sfx = $('set-sfx'), sound = $('set-sound'), night = $('set-night'), weather = $('set-weather'), weatherAudio = $('set-weather-audio'), language = $('set-language'), size = $('set-uiscale');
+  const floatingChecks = [...panel.querySelectorAll('input')].filter(input => input.dataset.floatingText);
+  for (const input of floatingChecks) input.addEventListener('change', () => window.Prefs.set({ floatingText: { [input.dataset.floatingText]: input.checked } }));
+  for (const [id, enabled] of [['set-floating-all', true], ['set-floating-none', false]]) $(id).addEventListener('click', () => {
+    window.Prefs.set({ floatingText: Object.fromEntries(floatingChecks.map(input => [input.dataset.floatingText, enabled])) });
+  });
   function syncPanel() {
+    for (const input of floatingChecks) input.checked = window.Prefs.floatingText[input.dataset.floatingText];
     language.value = window.Prefs.lang;
     $('set-low-graphics').checked = window.Prefs.lowGraphics;
     $('set-quest-arrow').checked = window.Prefs.questArrow;

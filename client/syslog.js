@@ -281,6 +281,7 @@
     skills[key] = skill;
     if (previous != null && skill > previous) {
       add(`${professions[key]} skill increased to ${skill}.`, 'sys-xp', null, 'progress');
+      window.Field?.floatHero(`${professions[key]} +${skill - previous} (${skill})`, '#7dff9a', 'professions');
     }
   }
   function mailCount(count) {
