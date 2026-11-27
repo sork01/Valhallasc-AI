@@ -42,20 +42,38 @@
     const shared = withActions && m.id !== myId() ? (window.Quests?.sharedWith?.(m) || []) : [];
     if (shared.length) { const line = el('small', `Same quest: ${shared.join(', ')}`, 'member-quests'); line.dataset.sharedQuests = String(shared.length); who.append(line); }
     const bar = el('span', '', 'member-bar'); bar.append(el('i', '', 'member-fill'), el('em', ''));
-    row.append(who, bar);
-    paintHealth(row, m);
+    const resource = el('span', '', 'member-bar member-resource');
+    const resourceText = el('em'); resourceText.append(el('span', '', 'member-resource-name'), el('span', '', 'member-resource-value'));
+    resource.append(el('i', '', 'member-resource-fill'), resourceText);
+    resource.setAttribute('role', 'progressbar'); resource.setAttribute('aria-valuemin', '0');
+    const bars = el('span', '', 'member-bars'); bars.append(bar, resource);
+    row.append(who, bars);
+    paintVitals(row, m);
     if (withActions && isLeader() && m.id !== myId()) {
       row.append(button('Make leader', `promote:${m.id}`, () => send({ op: 'party_promote', id: m.id })),
         button('Remove', `kick:${m.id}`, () => send({ op: 'party_kick', id: m.id })));
     }
     return row;
   }
-  function paintHealth(row, m) {
+  function paintVitals(row, m) {
     const fill = row.querySelector('.member-fill'), text = row.querySelector('.member-bar em');
     const share = m.online && m.maxHp > 0 ? Math.max(0, Math.min(1, m.hp / m.maxHp)) : 0;
     fill.style.width = `${share * 100}%`;
     text.textContent = !m.online ? '' : m.dead ? 'Defeated' : `${Math.min(Math.ceil(m.hp), Math.round(m.maxHp))}/${Math.round(m.maxHp)}`;
     row.dataset.dead = String(!!m.dead);
+    const resource = row.querySelector('.member-resource');
+    const known = m.online && Number.isFinite(m.resource) && Number.isFinite(m.maxResource) && m.maxResource > 0 && ['mana', 'energy', 'rage'].includes(m.resourceType);
+    resource.hidden = !known;
+    if (!known) return;
+    const amount = Math.max(0, Math.min(m.resource, m.maxResource));
+    const name = { mana: 'Mana', energy: 'Energy', rage: 'Rage' }[m.resourceType];
+    resource.dataset.type = m.resourceType;
+    resource.title = name; resource.setAttribute('aria-label', name);
+    resource.setAttribute('aria-valuemax', String(m.maxResource));
+    resource.setAttribute('aria-valuenow', String(amount));
+    resource.querySelector('.member-resource-fill').style.width = `${amount / m.maxResource * 100}%`;
+    resource.querySelector('.member-resource-name').textContent = name;
+    resource.querySelector('.member-resource-value').textContent = `${Math.min(Math.ceil(amount), Math.round(m.maxResource))}/${Math.round(m.maxResource)}`;
   }
   // Party level: how much of a kill's XP each member earns, and the progress to the next level.
   function fellowship(xp) {
@@ -178,7 +196,7 @@
     const again = focused && body.querySelector(`[data-key="${CSS.escape(focused)}"]`);
     if (again) again.focus({ preventScroll: true });
   }
-  // The party frame at the top left: names and health, always visible while in a party.
+  // The party frame at the top left: names, health and resources, always visible while in a party.
   function renderFrame() {
     const frame = $('party-frame'), party = state.party;
     frame.hidden = !party; if (!party) { frame.replaceChildren(); return; }
@@ -211,13 +229,13 @@
   }
   function render() { renderFrame(); renderPrompts(); renderPanel(); }
   const shape = party => party && JSON.stringify([party.leader, party.raid, party.max, party.xp, party.members.map(m => [m.id, m.online, m.dead, m.level, m.reborn, m.place, (m.quests || []).map(q => q.id)])]);
-  // Party health arrives twice a second; update the bars in place and rebuild only when the members change.
+  // Party health and resources arrive twice a second; update the bars in place and rebuild only when the members change.
   function updateParty(party) {
     const changed = shape(party) !== shape(state.party), quests = questShape(party) !== questShape(state.party);
     state.party = party;
     if (quests) window.Quests?.refresh?.();
     if (changed) { render(); return; }
-    for (const m of party?.members || []) for (const row of document.querySelectorAll(`[data-member="${CSS.escape(m.id)}"]`)) paintHealth(row, m);
+    for (const m of party?.members || []) for (const row of document.querySelectorAll(`[data-member="${CSS.escape(m.id)}"]`)) paintVitals(row, m);
   }
   function setState(next) {
     const now = performance.now();
@@ -226,7 +244,7 @@
     const frameChanged = shape(next.party) !== shape(state.party), questsChanged = questShape(next.party) !== questShape(state.party);
     state = { ...empty(), ...next };
     if (frameChanged) renderFrame();
-    else for (const m of state.party?.members || []) for (const row of document.querySelectorAll(`[data-member="${CSS.escape(m.id)}"]`)) paintHealth(row, m);
+    else for (const m of state.party?.members || []) for (const row of document.querySelectorAll(`[data-member="${CSS.escape(m.id)}"]`)) paintVitals(row, m);
     renderPrompts(); renderPanel();
     if (questsChanged) window.Quests?.refresh?.();
     if (open() && tab === 'online') send({ op: 'who' });

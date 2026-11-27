@@ -184,11 +184,13 @@ impl World {
                 Some(p) => {
                     let c = &p.character;
                     json!({"id":m.id,"name":m.name,"class":c.look.class,"level":c.level,"hp":c.hp.max(0.),"maxHp":c.max_hp(),
+                        "resource":c.resource(),"maxResource":c.max_resource(),"resourceType":c.look.class.resource_type(),
                         "zone":c.zone,"place":self.zone_name(c.zone),"online":true,"dead":c.hp<=0.,"reborn":c.rebirth_highest_tier(),
                         "quests":c.quests.iter().filter(|q| !q.claimed).map(|q| json!({"id":q.id,"counts":q.counts})).collect::<Vec<_>>()})
                 }
                 None => json!({"id":m.id,"name":m.name,"class":m.class,"level":m.level,"hp":0,"maxHp":0,"zone":null,
-                    "place":null,"online":false,"dead":false,"quests":[]}),
+                    "place":null,"online":false,"dead":false,"quests":[],
+                    "resource":0,"maxResource":0,"resourceType":m.class.resource_type()}),
             })
             .collect();
         json!({"leader":party.leader,"max":party.cap(),"raid":party.raid,"members":members,"xp":self.party_xp_value(&party.leader)})
@@ -2012,6 +2014,52 @@ mod tests {
         let seconds = played["seconds"].as_u64().unwrap();
         assert!((9..=11).contains(&seconds), "{seconds}");
         assert_eq!(w.players[&1].character.played_secs.floor() as u64, seconds);
+    }
+
+    #[test]
+    fn party_resources_follow_every_class_across_zones_and_disconnects() {
+        let mut w = world();
+        let mut members: Vec<_> = (1..=5).map(|s| add(&mut w, s, &format!("Mate{s}"))).collect();
+        let mut stranger = add(&mut w, 6, "Stranger");
+        for (member, class) in members.iter().zip([
+            Class::Warrior, Class::Mage, Class::Priest, Class::Hunter, Class::Assassin,
+        ]) {
+            let c = &mut w.players.get_mut(&member.session).unwrap().character;
+            c.look.class = class;
+            c.level = 50;
+            c.resource = Some(37.);
+        }
+        for member in &members[1..] {
+            say(&mut w, &members[0], invite_by_id(member));
+            say(&mut w, member, accept_party(&members[0]));
+        }
+        // The mage is elsewhere: resources belong to the party stream, not the visible-actor stream.
+        w.players.get_mut(&2).unwrap().character.zone = 1;
+        heard(&mut members[0]);
+        heard(&mut stranger);
+        for _ in 0..10 { w.step(); }
+        let packet = heard(&mut members[0]).into_iter().rfind(|v| v["type"] == "party").unwrap();
+        for member in &members {
+            let c = &w.players[&member.session].character;
+            let row = packet["party"]["members"].as_array().unwrap().iter().find(|m| m["id"] == member.id).unwrap();
+            assert_eq!(row["resource"], c.resource());
+            assert_eq!(row["maxResource"], c.max_resource());
+            assert_eq!(row["resourceType"], c.look.class.resource_type());
+        }
+        assert!(!heard(&mut stranger).iter().any(|v| v["type"] == "party"));
+        w.leave(2);
+        let party = w.party_value(0);
+        let offline = party["members"].as_array().unwrap().iter().find(|m| m["id"] == members[1].id).unwrap();
+        assert_eq!(offline["online"], false);
+        assert_eq!(offline["resource"], 0);
+        assert_eq!(offline["maxResource"], 0);
+        assert_eq!(offline["resourceType"], "mana");
+        let _mage = rejoin(&mut w, 7, &members[1].token);
+        let party = w.party_value(0);
+        let online = party["members"].as_array().unwrap().iter().find(|m| m["id"] == members[1].id).unwrap();
+        assert_eq!(online["online"], true);
+        assert_eq!(online["resource"], w.players[&7].character.resource());
+        assert_eq!(online["maxResource"], w.players[&7].character.max_resource());
     }
 
     #[test]

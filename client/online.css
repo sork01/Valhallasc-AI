@@ -566,6 +566,14 @@
 .social-row .window-tool.danger, .social-body > .window-tool.danger { color: #ffc4b3; }
 .social-body > .window-tool { align-self: flex-start; }
 .member-bar { position: relative; width: 8cqw; height: 1.3cqw; border-radius: .3cqw; background: #16263dcc; overflow: hidden; flex: none; }
+.member-bars { display: flex; flex-direction: column; gap: .15cqw; width: 8cqw; flex: none; }
+.member-bars .member-bar { width: 100%; }
+.member-resource-fill { position: absolute; inset: 0 auto 0 0; }
+.member-resource[data-type="mana"] i { background: linear-gradient(#85c8ff, #3464db); }
+.member-resource[data-type="energy"] i { background: linear-gradient(#fff08c, #dca52e); }
+.member-resource[data-type="rage"] i { background: linear-gradient(#ffb070, #d85a26); }
+.member-resource[hidden] { display: none; }
+.member-bar.member-resource em { display: flex; justify-content: center; align-items: center; gap: .3cqw; }
 .member-fill { position: absolute; inset: 0 auto 0 0; background: linear-gradient(#a6f0b5, #4fb871); }
 .social-row[data-dead="true"] .member-fill { background: #8a4b4b; }
 .member-bar em { position: absolute; inset: 0; display: grid; place-items: center; font: normal .75cqw/1 'Jua', sans-serif; color: #fff; text-shadow: 0 1px 2px #000; }
@@ -575,10 +583,13 @@
 .party-frame[data-compact="1"] .social-list { gap: .15cqw; }
 .party-frame[data-compact="1"] .social-row { flex-wrap: nowrap; padding: .2cqw .5cqw; }
 .party-frame[data-compact="1"] .social-who b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.party-frame[data-compact="1"] .member-bar { width: 6.5cqw; height: 1.1cqw; }
+.party-frame[data-compact="1"] .member-bars { width: 6.5cqw; }
+.party-frame[data-compact="1"] .member-bar { height: .8cqw; }
+.party-frame[data-compact="1"] .member-resource-name { display: none; }
 .party-frame .social-row { padding: .3cqw .5cqw; background: #101a2ccc; flex-wrap: wrap; gap: .2cqw .5cqw; }
 .party-frame .social-who small { display: none; }
-.party-frame .member-bar { width: 100%; height: 1cqw; }
+.party-frame .member-bars { width: 100%; }
+.party-frame .member-bar { height: 1cqw; }
 .loot-rolls { position: absolute; left: 50%; top: 11cqw; transform: translateX(-50%); z-index: 43; align-items: stretch; display: flex; flex-direction: column; gap: .5cqw; width: 18cqw; }
 .rare-pickup { --rare-col: #4ad66d; position: absolute; left: 50%; top: 12%; transform: translateX(-50%); z-index: 62; pointer-events: none; display: grid; gap: .25cqw; min-width: 25cqw; max-width: 70%; padding: .9cqw 2.4cqw; border: 2px solid var(--rare-col); border-radius: .8cqw; background: #10152eec; box-shadow: 0 0 1cqw var(--rare-col); color: var(--rare-col); text-align: center; }
 .rare-pickup b { font: max(18px, 2cqw) 'Lilita One', 'Jua', sans-serif; text-shadow: 0 0 .7cqw var(--rare-col); }

@@ -1,5 +1,14 @@
 [
   {
+    "version": "1.15.11",
+    "date": "2026-11-27",
+    "new": [
+      "Party and raid frames show each member’s mana, energy or rage below their health, including hired mercenaries."
+    ],
+    "changed": [],
+    "removed": []
+  },
+  {
     "version": "1.15.10",
     "date": "2026-11-27",
     "new": [
