@@ -41,15 +41,25 @@ pass. Report: `test-results/driver-xkENHt/report.json`. The normal release gates
 (notes, Swedish, all client JavaScript syntax) pass. The 55 MiB optimized
 executable is frozen with the backups below for activation after approval.
 
-Candidate: 1.15.8 on `fix/dungeon-mercenary-wipes` in
-`/media/raid/valhallasc-data/firefox-scrolling`. Builds and private databases use
-isolated paths under that checkout; the main checkout's pending artwork and the
-separate staged loot/melee work are excluded. An optimized executable and a
-matching client must be activated together after fresh owner restart approval.
-The public game remains 1.15.7 until that approval and deployment.
+Released as **1.15.8-c4059296** after the owner's explicit “deploy” approval.
+Source is pushed on `fix/dungeon-mercenary-wipes` from
+`/media/raid/valhallasc-data/firefox-scrolling`. The normal unit runs the exact
+privately tested executable, PID `1325363`, SHA-256
+`0871707af1d23e4d4e91c4d47b132253ba8a2172348080dc137c934343a33ffc`.
+All ten saved character states are byte-equivalent before the stop, after the
+stop and after startup. SQLite, public/legacy/bridge health, both changed public
+files and the unchanged Firefox renderer pass verification. No test flags or
+warning/error journal entries are present.
+
+Builds and private databases use isolated paths under that checkout. The main
+checkout's pending artwork and the separate staged loot/melee work are excluded.
 
 Before-build backup (frozen live executable and consistent running SQLite
 backup):
 `/media/raid/valhallasc-data/backups/valhalla-dungeon-mercs-20261127T075626Z-r_cnlxut/`.
-Refresh the SQLite backup immediately before an approved restart. Previous
-client: `1.15.7-0098d3a7`.
+The backup includes fresh pre-restart and stopped SQLite copies, previous and
+candidate executables, validation logs and `receipt.json`. Public receipt:
+`www/Valhalla/dungeon-mercenary-wipes-release-receipt.json`.
+
+Client rollback is `1.15.7-0098d3a7`; executable rollback uses
+`previous-before-build` from that backup and requires fresh restart approval.
