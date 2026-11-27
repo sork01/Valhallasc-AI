@@ -18,6 +18,7 @@ Highlights, so the intent is clear:
 - Sandstorms only in the Lapis Erg and the Prismwaste; ash wind in the Crags; no rain or snow in the Crags.
 - Thunderstorms in Greenmeadow, Gloamfen, Wyrdwood, Bifrost Reach, the Stormglass Shore, the Tanglecrown and the Yearwheel.
 - Nacrehold lies beneath a quiet tide, so it is always clear.
+- GM Island uses clear outdoor weather for repeatable combat comparisons.
 - The Yearwheel's type follows the **season of the quadrant the hero stands in** (spring rain, summer thunderstorm, autumn leaf wind, winter snow), using the same season map as the seasonal enemies. Crossing a boundary fades one type out and the next in over 3 seconds. The fog entry applies in every quadrant.
 
 ## Inside

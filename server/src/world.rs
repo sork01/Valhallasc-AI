@@ -273,6 +273,9 @@ mod gauntlet;
 #[cfg(test)]
 mod gauntlet_tests;
 mod gm_test;
+mod gm_island;
+#[cfg(test)]
+mod gm_island_tests;
 #[cfg(test)]
 mod gm_test_tests;
 mod gm_visibility;
@@ -1034,6 +1037,7 @@ impl Slime {
             return (hp, damage, speed, scale);
         }
         match kind {
+            "gmi_dummy" => (1e12, 0., 0., 1.),
             "blue" => (80., 10., 2.4, 1.05),
             "pink" => (70., 9., 2.1, 1.),
             "yellow" => (90., 11., 2.2, 1.05),
@@ -1261,6 +1265,7 @@ impl Slime {
             return e.level;
         }
         match kind {
+            "gmi_dummy" => 1,
             "blue" | "pink" => 3,
             "yellow" => 4,
             "beetle" => 5,
@@ -2338,7 +2343,9 @@ impl World {
             // Ambushers sleep until their escort's journey passes them.
             return self.dormant_enemy(id);
         }
-        let level = if self.maps[spawn.zone].final_boss == "moonwell_echo" {
+        let level = if spawn.kind == gm_island::DUMMY {
+            [1, 20, 40, 60, 80, 99][((spawn.x - 182.) / 12.).round().clamp(0., 5.) as usize]
+        } else if self.maps[spawn.zone].final_boss == "moonwell_echo" {
             // Every foe in the new level-60 instance holds its level, including
             // creatures whose outdoor versions are weaker.
             self.maps[spawn.zone].min_level
@@ -2350,6 +2357,11 @@ impl World {
             self.roll_level(&spawn.kind)
         };
         let mut enemy = Slime::with_level(id, &spawn, level);
+        if spawn.kind == gm_island::DUMMY {
+            enemy.hp = gm_island::DUMMY_HP;
+            enemy.max_hp = gm_island::DUMMY_HP;
+            enemy.damage = 0.;
+        }
         if spawn.kind == "big" {
             // Keep stable entity IDs while hiding kings until the world timer fires.
             enemy.dead = true;
@@ -2474,7 +2486,8 @@ impl World {
     fn separate_enemies(&mut self) {
         let populated = self.populated_zones();
         for id in 0..self.slimes.len() {
-            if self.slimes[id].dead
+            if self.slimes[id].kind == gm_island::DUMMY
+                || self.slimes[id].dead
                 || self.zone_idle(self.slimes[id].zone)
                 || !populated[self.slimes[id].zone]
             {
@@ -2512,14 +2525,17 @@ impl World {
     }
     fn update_king_spawn(&mut self) {
         if self.time < self.next_king_spawn
-            || self.slimes.iter().any(|s| s.kind == "big" && !s.dead)
+            || self
+                .slimes
+                .iter()
+                .any(|s| s.kind == "big" && !s.dead && !self.maps[s.zone].gm_only)
         {
             return;
         }
         let locations: Vec<_> = self
             .slimes
             .iter()
-            .filter(|s| s.kind == "big")
+            .filter(|s| s.kind == "big" && !self.maps[s.zone].gm_only)
             .map(|s| s.id)
             .collect();
         if locations.is_empty() {
@@ -2913,7 +2929,20 @@ impl World {
         c.rested.join(crate::store::unix_now().max(0) as u64);
         // The Empty Seat can no longer be abandoned: directions dropped before that rule come back.
         c.abandoned_quests.retain(|id| !id.starts_with("es_"));
-        if c.zone >= self.maps.len() || self.is_arena_zone(c.zone) {
+        if !c.gm {
+            c.gm_island_backup = None;
+            if c.spark_travel.as_ref().is_some_and(|f| {
+                f.points
+                    .iter()
+                    .any(|p| self.maps.get(p.zone).is_some_and(|m| m.gm_only))
+            }) {
+                c.spark_travel = None;
+            }
+        }
+        if c.zone >= self.maps.len()
+            || self.is_arena_zone(c.zone)
+            || (!c.gm && self.maps[c.zone].gm_only)
+        {
             // A zone that no longer exists sends the character back to the start.
             c.zone = 0;
             c.x = self.maps[0].spawn.x;
@@ -3549,6 +3578,9 @@ impl World {
             if let Some(p) = self.players.get(&session) {
                 let _=p.peer.try_send(json!({"type":"notice","ok":result.is_ok(),"text":result.err().unwrap_or_else(||format!("{} answers the summons.",spec.name))}));
             }
+            return;
+        }
+        if self.gm_island_interact(session, npc_id) {
             return;
         }
         if self.travel_master(npc_id).is_some() {
@@ -4327,6 +4359,20 @@ impl World {
         self.save();
     }
     fn update_player(&mut self, session: u64) {
+        let p = self.players.get_mut(&session).unwrap();
+        if p.character.gm && self.maps[p.character.zone].gm_only && p.character.hp <= 0. {
+            let spawn = self.maps[p.character.zone].spawn;
+            p.character.hp = p.character.max_hp();
+            p.character.reset_resource();
+            p.character.x = spawn.x;
+            p.character.y = spawn.y;
+            p.character.ghost = false;
+            p.character.corpse = None;
+            p.dead_time = 0.;
+            p.fallen = false;
+            p.stop();
+            p.target = None;
+        }
         self.update_resource(session);
         self.update_enchanting(session);
         self.expire_mend_proc(session);
@@ -4839,6 +4885,14 @@ impl World {
         if portal.to >= self.maps.len() {
             return;
         }
+        if self.maps[portal.to].gm_only && !p.character.gm {
+            let p = self.players.get_mut(&session).unwrap();
+            p.portal_at = self.time;
+            let _ = p.peer.try_send(
+                json!({"type":"notice","ok":false,"text":"Only a GM may enter GM Island."}),
+            );
+            return;
+        }
         if let Some(seam) = &portal.seam
             && let Some(arrival) = seam.crossing(here)
         {
@@ -5000,6 +5054,9 @@ impl World {
         if self.is_instance(portal.to) {
             self.enter_instance(portal.to);
         }
+        if self.gm_island_before_travel(session, portal.to).is_err() {
+            return;
+        }
         let p = &self.players[&session];
         let actor = p.character.id.clone();
         if portal.walk.is_none() && portal.seam.is_none() {
@@ -5013,6 +5070,10 @@ impl World {
         let time = self.time;
         let p = self.players.get_mut(&session).unwrap();
         p.character.zone = portal.to;
+        if self.maps[portal.to].gm_only {
+            p.hidden = false;
+            p.visible_zone = portal.to;
+        }
         if !self.maps[portal.to].allows_mount(&p.character.mount) {
             p.character.mounted = false;
         }
@@ -5841,7 +5902,8 @@ impl World {
         }
         // A GM strike is tied to the server-owned character and its worn golden weapon.
         // This path covers basic attacks, projectiles, and damaging skills alike.
-        let gm_strike = p.character.gm
+        let gm_strike = self.slimes[id].kind != gm_island::DUMMY
+            && p.character.gm
             && p.character.look.warrior_weapon == "gm"
             && p.character.quantity("warrior_weapon_gm") > 0;
         let actor = p.character.id.clone();
@@ -5877,7 +5939,11 @@ impl World {
             self.event("miss", &actor, point, 0., false);
             return 0.;
         }
-        let dealt = damage.min(s.hp);
+        let dealt = if s.kind == gm_island::DUMMY {
+            damage
+        } else {
+            damage.min(s.hp)
+        };
         self.damage_meter.record(self.time, s.zone, id, p, dealt);
         #[cfg(test)]
         {
@@ -5898,8 +5964,15 @@ impl World {
             s.contributors.insert(actor.clone());
             s.contributors.insert(credit_id.clone());
         }
-        s.hp = (s.hp - damage).max(0.);
+        s.hp = if s.kind == gm_island::DUMMY {
+            s.max_hp
+        } else {
+            (s.hp - damage).max(0.)
+        };
         s.hurt_t = 0.4;
+        if s.kind == gm_island::DUMMY {
+            s.st = self.time;
+        }
         s.target = Some(session);
         if is_guard && s.state == "return" {
             s.state = "chase".into();
@@ -5951,6 +6024,9 @@ impl World {
             crit,
             json!({"enemy":kind,"level":level,"skill":self.cur_skill,"killed":killed}),
         );
+        if self.spawns[id].ambush.as_deref() == Some("gmi_summon") {
+            return dealt;
+        }
         if killed && seasonal_hunt::for_kind(&kind).is_some() {
             self.festival_killed(id);
             return dealt;
@@ -6233,6 +6309,9 @@ impl World {
         });
     }
     fn update_slime(&mut self, id: usize) {
+        if self.update_gm_island_enemy(id) {
+            return;
+        }
         let wander = self.random();
         let angle = self.random() * std::f64::consts::TAU;
         let zone = self.slimes[id].zone;
@@ -6251,7 +6330,7 @@ impl World {
         } else {
             self.actor_bodies(zone, None, Some(id))
         };
-        let event_members = if seasonal_hunt::for_kind(&self.slimes[id].kind).is_some() {
+        let event_members = if seasonal_hunt::for_kind(&self.slimes[id].kind).is_some() && !self.maps[zone].gm_only {
             Some(
                 self.seasonal_hunt
                     .as_ref()
@@ -12056,6 +12135,7 @@ mod tests {
             crosses: vec![],
             name: String::new(),
             theme: String::new(),
+            gm_only: false,
             size: 96,
             rooms: vec![],
             spawn: Point::default(),

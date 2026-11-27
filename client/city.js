@@ -563,6 +563,7 @@
     }
     else if(['merchant','sell','merge','refine','repair','stat_reset','fisher','transmog','smith'].includes(view.kind))$('npc-quests').replaceChildren();
     const offers=[];
+    if(view.kind==='gossip')offers.push(...(window.GMIsland?.controls(packet)||[]));
     if(view.kind==='gossip'){
       if(packet.travel?.length){
         // Destinations are chosen on the world map: it shows every station, its fare and the stops on the way.
@@ -575,6 +576,7 @@
         b.addEventListener('click',()=>show({kind:'merchant'},'#npc-x'));offers.push(b);
       }
       for(const offer of npc.offers){
+        if(offer.id.startsWith('gmi:'))continue;
         const meta=(area().npcs||[]).find(n=>n.id===npc.id)?.offers?.find(o=>o.id===offer.id)||offer;
         if(meta.season&&!window.Seasonal?.isActive(meta.season)||meta.quest&&!window.Quests?.active(meta.quest))continue;
         if(window.Shop?.isStockOffer(offer))continue;

@@ -64,6 +64,7 @@ const actionSchema = z.discriminatedUnion('type', [
 // the public service never does, and it refuses these messages.
 const questAction = z.enum(['accept', 'complete', 'claim', 'finish', 'reset']);
 const debugSchema = z.discriminatedUnion('op', [
+  z.object({op:z.literal('gm_island'),action:z.enum(['info','enter','setup','summon','clear','mercs','dismiss','reset_dps','refresh','leave']),npc:z.string().optional(),kind:z.string().optional(),level:z.number().int().min(1).max(99).optional(),class:z.enum(['warrior','mage','assassin','priest','hunter']).optional(),gear:z.enum(['common','uncommon','rare','epic','legendary']).optional(),count:z.number().int().min(1).max(24).optional()}).strict(),
   z.object({op:z.literal('season_time'),unix:z.number().int().nonnegative().max(253402214399).nullable()}).strict(),
   z.object({ op: z.literal('set_level'), level: z.number().int().min(1).max(100) }).strict(),
   z.object({ op: z.literal('give_xp'), amount: z.number().int().min(0).max(4294967295) }).strict(),

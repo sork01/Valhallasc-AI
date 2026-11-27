@@ -3,6 +3,8 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { execFileSync } = require('node:child_process');
 const root = path.resolve(__dirname, '..');
+// Public overlays never see private island NPCs, mailboxes or its GM-only gate.
+execFileSync('python3', [path.join(__dirname, 'generate_gm_island.py'), '--detach'], { cwd: root, stdio: 'pipe' });
 execFileSync('python3', [path.join(__dirname, 'zone_shapes.py'), 'unshape'], { cwd: root, stdio: 'pipe' });
 execFileSync('python3', [path.join(__dirname, 'bag_tiers.py')], { cwd: root, stdio: 'pipe' });
 execFileSync('python3', [path.join(__dirname, 'stat_reset_npcs.py')], { cwd: root, stdio: 'pipe' });
@@ -42,6 +44,10 @@ execFileSync('python3', [path.join(__dirname, 'blacksmithing_catalog.py')], { cw
 execFileSync('python3', [path.join(__dirname, 'alchemy_catalog.py')], { cwd: root, stdio: 'pipe' });
 execFileSync('python3', [path.join(__dirname, 'hold_radii.py')], { cwd: root, stdio: 'pipe' });
 execFileSync('python3', [path.join(__dirname, 'dungeon_services.py')], { cwd: root, stdio: 'pipe' });
+// Private island is authored after all public overlays and never participates in public Spark routes.
+execFileSync('python3', [path.join(__dirname, 'generate_gm_island.py')], { cwd: root, stdio: 'pipe' });
+execFileSync('python3', [path.join(__dirname, 'weather_zones.py'), '--write'], { cwd: root, stdio: 'pipe' });
+execFileSync('python3', [path.join(__dirname, 'chest_zones.py'), '--write'], { cwd: root, stdio: 'pipe' });
 const map = JSON.parse(fs.readFileSync(path.join(root, 'world/map.txt'), 'utf8'));
 execFileSync('python3', [path.join(__dirname, 'quest_sources.py')], { cwd: root, stdio: 'pipe' });
 const items = JSON.parse(fs.readFileSync(path.join(root, 'world/items.txt'), 'utf8'));

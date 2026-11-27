@@ -156,7 +156,7 @@ impl World {
             .values()
             .filter(|p| p.merc.is_none() && p.ambient.is_none() && p.guard.is_none())
         {
-            if !self.is_instance(p.character.zone) {
+            if !self.is_instance(p.character.zone) && !self.maps[p.character.zone].gm_only {
                 occupied
                     .entry(p.character.zone)
                     .or_default()

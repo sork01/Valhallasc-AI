@@ -57,6 +57,15 @@ impl World {
         session: u64,
         command: DebugCommand,
     ) -> Result<Value, String> {
+        if let DebugCommand::Teleport { zone, x, y } = &command {
+            if *zone >= self.maps.len() {
+                return Err(format!("Unknown zone {zone}."));
+            }
+            if !x.is_finite() || !y.is_finite() {
+                return Err("Teleport needs finite coordinates.".into());
+            }
+            self.gm_island_before_travel(session, *zone)?;
+        }
         // A teleport to a dungeon lands in a copy of it (the party's own, else a free one) and wakes that copy.
         let command = match command {
             DebugCommand::SeasonTime { unix } => {
@@ -81,6 +90,26 @@ impl World {
                     .set(zone, &kind, intensity.as_deref(), daynight::unix_ms());
             }
             DebugCommand::GmTestInfo => return self.gm_test_info(session),
+            DebugCommand::GmIsland {
+                action,
+                npc,
+                kind,
+                level,
+                class,
+                gear,
+                count,
+            } => {
+                return self.gm_island_command(
+                    session,
+                    &action,
+                    npc.as_deref(),
+                    kind.as_deref(),
+                    level,
+                    class,
+                    gear.as_deref(),
+                    count,
+                );
+            }
             DebugCommand::GmActivity {
                 before,
                 query,
@@ -95,6 +124,13 @@ impl World {
                 gear,
                 mercs,
             } => {
+                if self
+                    .players
+                    .get(&session)
+                    .is_some_and(|p| self.maps[p.character.zone].gm_only)
+                {
+                    return Err("Leave GM Island before entering a dungeon copy.".into());
+                }
                 return self.gm_dungeon_enter(
                     session,
                     zone,
@@ -108,6 +144,13 @@ impl World {
             DebugCommand::GmDungeonReset => return self.gm_dungeon_reset(session),
             DebugCommand::GmEnrage { action } => return self.gm_enrage(session, &action),
             DebugCommand::GmGauntlet { level, fight } => {
+                if self
+                    .players
+                    .get(&session)
+                    .is_some_and(|p| self.maps[p.character.zone].gm_only)
+                {
+                    return Err("Leave GM Island before starting a gauntlet.".into());
+                }
                 return self.gm_gauntlet(session, level, fight);
             }
             DebugCommand::GmTune { key, value } => return self.gm_tune(session, &key, value),
@@ -259,13 +302,15 @@ impl World {
                     .find(|c| c.look.name.to_lowercase() == wanted)
                     .ok_or_else(|| format!("No player named {name} is online."))?;
                 let (zone, x, y) = (target.zone, target.x, target.y);
+                self.gm_island_before_travel(session, zone)?;
                 let mut arrival = Point { x, y };
                 self.maps[zone].collide(&mut arrival, PLAYER_RADIUS);
                 let time = self.time;
                 let p = self.players.get_mut(&session).ok_or("Unknown session.")?;
                 p.character.zone = zone;
                 if p.character.gm {
-                    p.hidden = true;
+                    p.hidden = !self.maps[zone].gm_only;
+                    p.visible_zone = zone;
                 }
                 p.character.x = arrival.x;
                 p.character.y = arrival.y;
@@ -289,7 +334,8 @@ impl World {
                 let time = self.time;
                 p.character.zone = zone;
                 if p.character.gm {
-                    p.hidden = true;
+                    p.hidden = !self.maps[zone].gm_only;
+                    p.visible_zone = zone;
                 }
                 p.character.x = arrival.x;
                 p.character.y = arrival.y;
@@ -481,6 +527,7 @@ impl World {
             DebugCommand::SpawnChest { .. } => unreachable!("handled before borrowing the player"),
             DebugCommand::SeasonTime { .. }
             | DebugCommand::GmTestInfo
+            | DebugCommand::GmIsland { .. }
             | DebugCommand::GmActivity { .. }
             | DebugCommand::GmDungeonEnter { .. }
             | DebugCommand::GmDungeonReset

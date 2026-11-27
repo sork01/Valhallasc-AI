@@ -113,7 +113,7 @@
     tuning.append(row(button('Reset multipliers', () => send({ op: 'gm_tune', key: 'reset', value: 0 }, () => 'Multipliers reset.').then(r => r.ok && fillTuning(r.result)))));
 
     status = node('p', 'Loading…', 'gmtest-status'); status.setAttribute('role', 'status');
-    body.append(dungeon, gauntlet, tuning, status);
+    body.append(row(button('Visit GM Island', () => { hide(); window.GMIsland?.enter(); })), dungeon, gauntlet, tuning, status);
     win.append(head, body); panel.append(win);
     (document.getElementById('stage') || document.body).append(panel);
     window.Settings?.registerWindow('gmtest-panel', '.gmtest-window', 'GM test menu');

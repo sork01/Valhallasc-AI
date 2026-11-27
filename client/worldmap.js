@@ -67,6 +67,7 @@
   // Base level and a dot colour for every enemy kind (the level matches Slime::default_level in server/src/world.rs;
   // the test compares the two).
   const KINDS = {
+    gmi_dummy: ['Training Dummy', 1, '#d5bc82'],
     ew_ashback: ['Ashback Salamander', 95, '#e99055'],
     ew_glasswing: ['Obsidian Glasswing', 96, '#a4b9cf'],
     ew_slagjaw: ['Slagjaw Burrower', 97, '#dca16b'],
@@ -295,11 +296,12 @@
     const key = `${index}:${px}:${showSpirit ? 1 : 0}`; if (cache.has(key)) return cache.get(key);
     const z = zones[index], k = px / z.size, c = document.createElement('canvas'); c.width = c.height = px;
     const g = c.getContext('2d');
-    g.fillStyle = GROUND[z.theme]; g.fillRect(0, 0, px, px);
+    g.fillStyle = GROUND[z.theme] || '#6a8f7e'; g.fillRect(0, 0, px, px);
+    if(z.gmOnly)for(let y=0;y<z.size;y++)for(let x=0;x<z.size;x++){g.fillStyle=GMIsland.ground(x,y,0,false,0);g.fillRect(x*k,y*k,k+.1,k+.1);}
     if(z.theme==='yearwheel'){const half=px/2;for(const [x,y,c] of [[0,0,'#c3dfeb'],[half,0,'#c88055'],[0,half,'#8acb83'],[half,half,'#ecc274']]){g.fillStyle=c;g.fillRect(x,y,half,half);}g.fillStyle='#f5e4b4';g.beginPath();g.arc(half,half,px*.028,0,6.283);g.fill();}
     let seed = 7 + index * 131; const rnd = () => (seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296;
     for (let n = 0; n < 70; n++) { g.fillStyle = rnd() < .5 ? 'rgba(255,255,255,.05)' : 'rgba(0,0,0,.07)'; g.beginPath(); g.arc(rnd() * px, rnd() * px, (4 + rnd() * 9) * k, 0, 6.283); g.fill(); }
-    g.lineCap = g.lineJoin = 'round'; g.strokeStyle = g.fillStyle = DIRT[z.theme]; g.lineWidth = 2.8 * k;
+    g.lineCap = g.lineJoin = 'round'; g.strokeStyle = g.fillStyle = DIRT[z.theme] || '#dac8a0'; g.lineWidth = 2.8 * k;
     for (const p of z.paths || []) { g.beginPath(); p.forEach(([x, y], i) => i ? g.lineTo(x * k, y * k) : g.moveTo(x * k, y * k)); g.stroke(); }
     if (z.theme === 'meadow') { const o = z.shape ? z.shape.offset : [0, 0]; g.beginPath(); g.arc((36 + o[0]) * k, (36 + o[1]) * k, 3.5 * k, 0, 6.283); g.fill(); }
     if (z.shapeFloor) { g.fillStyle = 'rgba(6,10,9,.9)'; z.shapeFloor.forEach((row, y) => { for (let x = 0; x < z.size; x++) if (row[x] !== '#') g.fillRect(x * k, y * k, k + .6, k + .6); }); }
@@ -735,7 +737,7 @@
     const fg = $('wm-fog').getContext('2d'); fg.clearRect(0, 0, 768, 768); window.Field.fog.paint(fg, 768, 768, index);
     const markers = $('wm-markers'); markers.replaceChildren();
     for (const p of z.portals) {
-      const dest = zones[p.to]; if (!dest || !known(index, p.x, p.y)) continue;
+      const dest = zones[p.to]; if (dest?.gmOnly && !window.Field?.hero?.gm || !dest || !known(index, p.x, p.y)) continue;
       const gate = el('button', '', 'wm-gate'); gate.type = 'button'; gate.classList.toggle('wm-path-gate',!!p.walk); gate.dataset.portal = p.id; gate.dataset.to = String(p.to); gate.style.setProperty('--glow', PORTAL[dest.theme]);
       Object.assign(gate.style, pos(z, p.x, p.y));
       gate.classList.toggle('low', p.y / z.size > .85); gate.classList.toggle('right', p.x / z.size > .72); gate.classList.toggle('high', p.y / z.size < .08);
@@ -1035,6 +1037,7 @@
     window.Field.setPaused(true); $('worldmap').hidden = false;
     if (!tiles.length) buildWorld(); else if (JSON.stringify(window.Field.explored) !== fogSignature) refreshFog();
     worldZoom=1; worldScroll=[0,0]; setView('world');
+    if(zones[window.Field.zone]?.gmOnly){renderZone(window.Field.zone);setView('zone');}
     const here = window.Field.zone || 0, tile = tiles[parentOf(here)] || tiles[0];
     tile.focus({ preventScroll: true });
     clearInterval(tickTimer); tickTimer = setInterval(tick, 250);

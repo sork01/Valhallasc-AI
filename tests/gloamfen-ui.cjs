@@ -94,7 +94,7 @@ const look = (page, [x0, y0, x1, y1] = [.15, .2, .85, .8], fenWater = false) => 
 
   // The map data the client uses comes from the same file the server loads.
   const zones = await page.evaluate(() => Field._debug.zones.map(z => ({ name: z.name, theme: z.theme, size: z.size, levels: z.levels, portals: z.portals.map(p => p.id + '>' + p.to), water: z.objects.filter(o => o.kind === 'water').length, thicket: z.objects.filter(o => o.kind === 'thicket').length })));
-  check(zones.length === 47 && zones[3].name === 'Gloamfen' && zones[3].theme === 'fen' && zones[3].size === 280 && zones[3].levels.join() === '15,20', 'The client knows the fen: name, fen theme, 280 tiles (the authored shape), levels 15-20');
+  check(zones.length === 48 && zones[3].name === 'Gloamfen' && zones[3].theme === 'fen' && zones[3].size === 280 && zones[3].levels.join() === '15,20', 'The client knows the fen: name, fen theme, 280 tiles (the authored shape), levels 15-20');
   check(['crags_gate>1', 'fen_gate>3', 'city_gate>4'].every(g => zones[2].portals.includes(g)) && zones[3].portals.includes('summit_gate>2'), 'The glacier summit has a gate to the fen, which has the gate back (other portals are the compact-atlas walking routes)');
   check(zones[3].water > 150 && zones[3].thicket >= 100, `The fen has a lake of ${zones[3].water} water discs and ${zones[3].thicket} thicket blocks`);
 

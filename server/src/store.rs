@@ -264,6 +264,7 @@ impl Store {
             cutscenes: vec![],
             achievements: Default::default(),
             gm: false,
+            gm_island_backup: None,
             party_points: 0,
             travel_stops: vec![],
             spark_travel: None,

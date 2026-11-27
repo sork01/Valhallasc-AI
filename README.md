@@ -4,6 +4,10 @@ A Rust multiplayer server and a browser client for Windows and Linux, built from
 
 Public repository: [sork01/Valhallasc-AI](https://github.com/sork01/Valhallasc-AI).
 
+The private [GM Island](docs/gm-island.md) provides six permanent seasonal villages,
+a summoning arena, class/level/equipment services and immortal DPS training dummies.
+Generate its map with `python3 scripts/generate_gm_island.py` (also run by world sync).
+
 The client runs in current Firefox, Chrome, or Edge on either OS. There is no client build step and players do not need Rust. Open the server's URL in a browser. The server serves the client and accepts WebSocket connections on the same origin.
 
 ## Start

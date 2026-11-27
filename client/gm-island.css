@@ -1,0 +1,7 @@
+.gmi-controls{display:flex;flex-direction:column;gap:10px;padding:12px;border:1px solid #b7a06b;background:#222938;color:#f5e8c9;border-radius:8px}
+.gmi-controls label{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.gmi-controls input,.gmi-controls select{min-width:0;max-width:75%;padding:8px;border:1px solid #95876c;border-radius:5px;background:#151e2c;color:#fff2d2;font:inherit}
+.gmi-controls input[type=number]{width:90px}
+#npc-dialogue .gossip-parchment .gmi-controls p{margin:0;line-height:1.4;color:#f5e8c9}#npc-dialogue .gossip-parchment .gmi-controls .gmi-status{color:#f2d37a;overflow-wrap:anywhere}
+.gmi-controls button{min-height:42px;white-space:normal}
+@media(max-width:600px){.gmi-controls{padding:8px}.gmi-controls label{flex-wrap:wrap}.gmi-controls select{max-width:100%;width:100%}}

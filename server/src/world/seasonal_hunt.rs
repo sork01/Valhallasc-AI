@@ -140,6 +140,10 @@ pub(super) fn wins_mount(roll: f64, chance: f64) -> bool {
 }
 impl World {
     pub(super) fn festival_member(&self, kind: &str, session: u64) -> bool {
+        if self.players.get(&session).is_some_and(|p| self.maps[p.character.zone].gm_only)
+            && self.players.get(&self.credit_session(session)).is_some_and(|p| p.character.gm) {
+            return true;
+        }
         self.seasonal_hunt.as_ref().is_some_and(|r| {
             r.spec.kind == kind
                 && self

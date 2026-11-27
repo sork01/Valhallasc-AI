@@ -42,7 +42,8 @@ pub(super) fn dist_to_rect(hub: &City, point: Point) -> f64 {
 
 /// All distinct outposts/towns in an open-world hostile zone that should be guarded.
 pub(super) fn hubs_for_map(map: &Map) -> Vec<(City, bool)> {
-    if map.template.is_some()
+    if map.gm_only
+        || map.template.is_some()
         || map.copies > 0
         || map.raid
         || !map.slimes.iter().any(|s| s.ambush.is_none())

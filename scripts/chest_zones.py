@@ -2,7 +2,7 @@
 """Derive which maps may roll treasure chests (docs/chests.md, CHEST-RULES).
 
 A map is eligible when it has monsters (`slimes`). A map with `copies` is a dungeon: each running party copy rolls on
-its own. Everything else with monsters is an open-world zone. Cities and enemy-free maps never roll.
+its own. Everything else with monsters is an open-world zone. Cities, enemy-free maps and GM-only laboratories never roll.
 
     python3 scripts/chest_zones.py          # print the list
     python3 scripts/chest_zones.py --write  # rewrite docs/chest-eligibility.txt
@@ -24,7 +24,7 @@ def derive():
         name = z.get("name", "?")
         count = len(z.get("slimes", []))
         lo, hi = (z.get("levels") or [0, 0])[:2] if z.get("levels") else (0, 0)
-        if not count:
+        if not count or z.get("gmOnly"):
             never.append((number, name))
         elif z.get("copies"):
             dungeons.append((number, name, count, z["copies"], lo, hi))
@@ -44,7 +44,7 @@ def render():
     lines += [
         f"  zone {n:>2} {name} (monsters {c}, copies {k}, levels {lo}-{hi})" for n, name, c, k, lo, hi in dungeons
     ]
-    lines.append(f"never {len(never)} (no monsters)")
+    lines.append(f"never {len(never)} (no monsters or private GM laboratory)")
     lines += [f"  zone {n:>2} {name}" for n, name in never]
     return "\n".join(lines) + "\n"
 

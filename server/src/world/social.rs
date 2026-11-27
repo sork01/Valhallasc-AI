@@ -550,6 +550,9 @@ impl World {
         }
         let needed = self.maps[zone].min_level;
         let p = &self.players[&session];
+        if self.maps[zone].gm_only && !p.character.gm {
+            return Err("Only a GM may enter GM Island.".into());
+        }
         if p.character.level < needed {
             return Err(format!("You must be level {needed} to accept this summon."));
         }

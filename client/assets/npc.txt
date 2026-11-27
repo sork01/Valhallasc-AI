@@ -9588,6 +9588,192 @@
         "hat": "straw"
       },
       "color": "#527e89"
+    },
+    "gmi_host_christmas": {
+      "art": "special_travel_springmere",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "gmi_travel_christmas": {
+      "art": "special_travel_springmere",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "gmi_host_newyear": {
+      "art": "special_travel_springmere",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "gmi_travel_newyear": {
+      "art": "special_travel_springmere",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "gmi_host_halloween": {
+      "art": "special_travel_springmere",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "gmi_travel_halloween": {
+      "art": "special_travel_springmere",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "gmi_host_solstice": {
+      "art": "special_travel_springmere",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "gmi_travel_solstice": {
+      "art": "special_travel_springmere",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "gmi_host_easter": {
+      "art": "special_travel_springmere",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "gmi_travel_easter": {
+      "art": "special_travel_springmere",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "gmi_host_valentine": {
+      "art": "special_travel_springmere",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "gmi_travel_valentine": {
+      "art": "special_travel_springmere",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "gmi_summoner": {
+      "art": "special_travel_springmere",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "gmi_quartermaster": {
+      "art": "smith",
+      "identity": {
+        "skin": "#edc5a1",
+        "hair": "#8a6550"
+      },
+      "color": "#ac7650"
+    },
+    "gmi_mentor": {
+      "art": "physician",
+      "identity": {
+        "skin": "#edc5a1",
+        "hair": "#eae8df"
+      },
+      "color": "#e7e3da"
+    },
+    "gmi_recruiter": {
+      "art": "sentinel",
+      "identity": {
+        "skin": "#edc5a1",
+        "hair": "#755841"
+      },
+      "color": "#627b9f"
+    },
+    "gmi_trainer": {
+      "art": "sentinel",
+      "identity": {
+        "skin": "#edc5a1",
+        "hair": "#755841"
+      },
+      "color": "#627b9f"
+    },
+    "gmi_ferryman": {
+      "art": "named_dock_skipper",
+      "identity": {
+        "skin": "#c08a66",
+        "hair": "#d8d2c4",
+        "style": "short",
+        "hat": "cap",
+        "hatColor": "#2f4560"
+      },
+      "color": "#4f6d8a"
     }
   },
   "tops": {

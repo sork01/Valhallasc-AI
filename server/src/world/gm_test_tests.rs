@@ -153,7 +153,9 @@ fn gm_raid_hires_nine_with_balanced_classes_and_replaces_them_on_reentry() {
     assert_eq!(enter(&mut w, 1, zone, "door")["mercs"], 4);
     assert_eq!(w.party_mates(&owner).len(), 5);
     assert_eq!(w.players.values().filter(|p| p.merc.is_some()).count(), 4);
-    assert!(w.players.values().all(|p| p.merc_instance.is_none()));
+    let copy = w.players[&1].character.zone;
+    assert!(w.players.values().filter(|p| p.merc.is_some())
+        .all(|p| p.merc_instance == Some(copy)));
 }
 
 #[test]

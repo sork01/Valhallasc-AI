@@ -142,10 +142,10 @@ fn chained_forge_floor_collision_halls_portals_and_three_copies() {
         .filter(|i| i.template == ZONE)
         .map(|i| i.zone)
         .collect();
-    assert_eq!(copies, vec![46, 107, 108]);
+    assert_eq!(copies, vec![46, 108, 109]);
     assert!(copies.iter().all(|z| w.maps[*z].raid));
-    assert_eq!(w.public_zone(107), ZONE);
-    assert_eq!(w.maps.len(), 117);
+    assert_eq!(w.public_zone(copies[1]), ZONE);
+    assert_eq!(w.maps.len(), 118);
 }
 #[test]
 fn chained_forge_open_muster_preserves_seal_level_and_ten_fighter_gates() {
@@ -306,7 +306,7 @@ fn chained_forge_empty_copy_reserves_twenty_minutes_and_resets_only_itself() {
     place(&mut w, 1, ZONE, at(30., 303.));
     w.enter_instance(ZONE);
     w.update_instances();
-    let second = 107;
+    let second = w.instances.iter().filter(|i| i.template == ZONE).nth(1).unwrap().zone;
     w.enter_instance(second);
     place(&mut w, 1, 45, at(127., 25.));
     w.update_instances();

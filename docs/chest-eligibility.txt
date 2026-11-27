@@ -43,9 +43,10 @@ dungeons 21 (each party copy rolls separately; copies per dungeon shown)
   zone 43 The Drowned Longship (monsters 15, copies 4, levels 35-35)
   zone 44 The Black Hour Foundry (monsters 15, copies 4, levels 99-99)
   zone 46 The Chained Forge (monsters 56, copies 3, levels 99-99)
-never 5 (no monsters)
+never 6 (no monsters or private GM laboratory)
   zone  4 Skaldholm
   zone  9 Nacrehold
   zone 17 Asterion
   zone 24 Veyrroot Heartwood
   zone 40 The Arena
+  zone 47 GM Island

@@ -478,5 +478,14 @@
     ],
     "variant": null,
     "inside": true
+  },
+  {
+    "zone": 47,
+    "theme": "gm_island",
+    "allowed": [
+      "clear"
+    ],
+    "variant": null,
+    "inside": false
   }
 ]

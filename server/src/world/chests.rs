@@ -266,7 +266,7 @@ impl World {
     /// Whether `zone` currently counts as a chest area (see `docs/chests.md`).
     pub(super) fn chest_area(&self, zone: usize) -> bool {
         let map = &self.maps[zone];
-        if map.slimes.is_empty() {
+        if map.gm_only || map.slimes.is_empty() {
             return false;
         }
         match self.instance_at(zone) {
@@ -714,6 +714,7 @@ mod tests {
         (0..w.maps.len())
             .filter(|&z| {
                 w.maps[z].copies == 0
+                    && !w.maps[z].gm_only
                     && w.maps[z].template.is_none()
                     && !w.maps[z].slimes.is_empty()
             })

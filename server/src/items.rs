@@ -1539,7 +1539,8 @@ impl Character {
     /// empty (the set grew after the first GM was created). A piece the GM took off on purpose stays off, because it
     /// is still owned.
     pub fn grant_missing_gm_gear(&mut self) {
-        if !self.gm {
+        // A saved island loadout must reconnect in the same ordinary equipment.
+        if !self.gm || self.gm_island_backup.is_some() {
             return;
         }
         for id in GM_GEAR {

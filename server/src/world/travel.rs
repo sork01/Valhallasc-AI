@@ -203,11 +203,11 @@ impl World {
     fn spark_options(&self, session: u64, from: &str) -> Vec<Value> {
         let c = &self.players[&session].character;
         let routes = self.spark_routes(from);
-        self.maps.iter().filter(|m| m.copies == 0 && m.template.is_none()).flat_map(|m| &m.npcs)
+        self.maps.iter().filter(|m| m.copies == 0 && m.template.is_none() && m.gm_only == self.maps[c.zone].gm_only).flat_map(|m| &m.npcs)
             .filter(|n| n.travel_stop.is_some() && n.id != from).map(|n| {
                 let route = routes.get(&n.id);
                 let missing: Vec<_> = route.into_iter().flatten().filter(|id| !c.travel_stops.contains(id)).filter_map(|id| self.travel_master(id).map(|(_, n)| n.travel_stop.clone().unwrap())).collect();
-                let cost = route.map(|r| c.spark_fare((r.len() as u32 - 1) * LEG_COST));
+                let cost = route.map(|r| if c.gm && self.maps[c.zone].gm_only { 0 } else { c.spark_fare((r.len() as u32 - 1) * LEG_COST) });
                 let stops: Vec<_> = route.into_iter().flatten().filter_map(|id| self.travel_master(id).map(|(_, n)| n.travel_stop.clone().unwrap())).collect();
                 let reason = if route.is_none() { "No connected Spark Travel route.".into() }
                     else if !missing.is_empty() { format!("Visit {} to discover its travel master first.", missing.join(", ")) }
@@ -231,6 +231,14 @@ impl World {
             .spark_route(from, to)
             .filter(|r| r.len() > 1)
             .ok_or("Choose a connected destination.")?;
+        if !c.gm
+            && stops.iter().any(|id| {
+                self.travel_master(id)
+                    .is_some_and(|(z, _)| self.maps[z].gm_only)
+            })
+        {
+            return Err("Only a GM may enter GM Island.".into());
+        }
         if let Some(id) = stops.iter().find(|id| !c.travel_stops.contains(id)) {
             return Err(format!(
                 "Visit {} to discover its travel master first.",
@@ -242,7 +250,7 @@ impl World {
                     .unwrap()
             ));
         }
-        let cost = c.spark_fare((stops.len() as u32 - 1) * LEG_COST);
+        let cost = if c.gm && self.maps[c.zone].gm_only { 0 } else { c.spark_fare((stops.len() as u32 - 1) * LEG_COST) };
         if c.gold < cost {
             return Err(format!(
                 "Spark Travel costs {}. You do not have enough.",

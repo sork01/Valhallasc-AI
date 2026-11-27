@@ -45,6 +45,7 @@ THEMES = {
     "cairnspine": (["rain", "snow", "fog", "wind"], "dust"),
     # The four seasons: the type follows the quadrant the hero stands in (see docs/weather.md).
     "yearwheel": (["rain", "thunderstorm", "wind", "snow", "fog"], "leaves"),
+    "gm_island": ([], None),  # clear outdoor light for repeatable combat comparisons
 }
 
 

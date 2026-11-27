@@ -56,7 +56,7 @@ impl World {
             .collect();
         for session in changed {
             let zone = self.players[&session].character.zone;
-            if self.is_arena_zone(zone) {
+            if self.is_arena_zone(zone) || self.maps[zone].gm_only {
                 self.players.get_mut(&session).unwrap().visible_zone = zone;
                 continue;
             }

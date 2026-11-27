@@ -448,6 +448,9 @@ pub struct Character {
     /// golden GM gear. Set only by the server when that character is created; a client's look can never carry it.
     #[serde(default)]
     pub gm: bool,
+    /// Original GM character while using island test loadouts. Saved across reconnects.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub gm_island_backup: Option<Box<Character>>,
     /// Fellowship points earned by killing in a party (see `world/partyxp.rs`). The party's level comes from the
     /// average of its members' points, so it survives a restart and a party that is rebuilt.
     #[serde(default)]
@@ -755,6 +758,7 @@ impl Character {
             cutscenes: vec![],
             achievements: Default::default(),
             gm: false,
+            gm_island_backup: None,
             party_points: 0,
             travel_stops: vec![],
             spark_travel: None,
@@ -1939,6 +1943,22 @@ pub enum DebugCommand {
     SummonKing,
     /// The game master's test menu (`world/gm_test.rs`): the dungeons, the gauntlet quest levels and the current tuning.
     GmTestInfo,
+    /// Strictly GM-only island services. Mutations require the relevant nearby NPC.
+    GmIsland {
+        action: String,
+        #[serde(default)]
+        npc: Option<String>,
+        #[serde(default)]
+        kind: Option<String>,
+        #[serde(default)]
+        level: Option<u32>,
+        #[serde(default)]
+        class: Option<Class>,
+        #[serde(default)]
+        gear: Option<String>,
+        #[serde(default)]
+        count: Option<u32>,
+    },
     /// GM-only activity history. Never included in normal snapshots.
     GmActivity {
         #[serde(default)]
@@ -2353,6 +2373,9 @@ pub struct Map {
     /// The zone's look (`deep`, `nacre`, `ember`, ...): the client's theme name, read here only for `underwater`.
     #[serde(default)]
     pub theme: String,
+    /// Server-owned admission rule, independent of client UI and private test shortcuts.
+    #[serde(default, rename = "gmOnly")]
+    pub gm_only: bool,
     pub size: u32,
     pub spawn: Point,
     pub objects: Vec<Obstacle>,
@@ -2883,6 +2906,7 @@ mod tests {
             crosses: vec![],
             name: String::new(),
             theme: String::new(),
+            gm_only: false,
             size: 72,
             rooms: vec![],
             spawn: Point::default(),

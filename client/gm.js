@@ -36,6 +36,7 @@
 
   // name -> [usage, help, build(args) -> a debug command, or a string with the problem]
   const COMMANDS = {
+    island: ['', 'Visit the private GM island.', () => ({op:'gm_island',action:'enter'})],
     god: ['[on|off]', 'Take no damage (only you; others are unaffected).', a => ({ op: 'set_god_mode', enabled: a[0] ? !/^(off|0|false|no)$/i.test(a[0]) : !(self?.god) })],
     tp: ['<zone> [x y] | <x y> | <player>', 'Teleport: a zone number or name (to its start point, or to x y), just x y in this zone, or the name of an online player (to where they are, in any zone or dungeon copy).', a => {
       if (a.length === 2 && number(a[0]) !== null && number(a[1]) !== null) return { op: 'teleport', zone: self?.zone ?? 0, x: number(a[0]), y: number(a[1]) };

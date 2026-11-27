@@ -96,7 +96,7 @@ async function talk(w, bot, npcId, offer) {
   }
 }
 // Each kind's default level; every enemy rolls within two of it, and health/damage rise 12% per level above it.
-const DEFAULT_LEVELS = { hollow_rider: 1, grinch: 1, green: 2, blue: 3, pink: 3, yellow: 4, beetle: 5, big: 6, wisp: 5, spider: 7, wraith: 8, golem: 10, cinderlord: 10, crab: 10, wolf: 12, yeti: 13, wyrm: 15, toad: 15, croc: 17, knight: 18, hydra: 20, gloomroot: 20, thrall: 19, archer: 19, acolyte: 20, gatewarden: 20, choir: 20, colossus: 21, hollowking: 21, boar: 21, crow: 23, troll: 25, weaver: 27, ram: 29, oakhorn: 25, hrungnir: 30, galehound: 30, prismgolem: 31, skyray: 32, einherjar: 33, thunderroc: 35, draugr: 35, angler: 36, moray: 37, siren: 38, shellback: 39, kraken: 40, hvitserk: 37, ghostmaw: 39, voidmoth: 40, crystalwyrm: 41, orbitbeetle: 42, eclipsedryad: 43, meteorgolem: 45, miragejackal: 45, shardscarab: 46, glassharrier: 47, prismsentinel: 48, mirrorqueen: 49, sunshard: 50, bronzemantis: 50, gearling: 51, orbitseer: 52, chronoguard: 53, pendulummatron: 54, epochengine: 55, glowcapgrazer: 55, silkwing: 56, rootlurker: 57, lanternwraith: 58, mireheart: 58, silverwidow: 59, nightbloom: 60, dew_moth: 60, lumen_eel: 60, rootbell: 60, tideglass_heron: 60, hourpetal_stag: 60, moonskein_weaver: 60, moonwell_echo: 60, saltclaw: 60, stormgull: 61, glassray: 62, breakersentinel: 64, maelstromheart: 65, meadowhare: 65, sunbacksnail: 66, brushfox: 67, spadebadger: 68, honeyjaw: 69, wickerwarden: 70 };
+const DEFAULT_LEVELS = { gmi_dummy: 1, hollow_rider: 1, grinch: 1, green: 2, blue: 3, pink: 3, yellow: 4, beetle: 5, big: 6, wisp: 5, spider: 7, wraith: 8, golem: 10, cinderlord: 10, crab: 10, wolf: 12, yeti: 13, wyrm: 15, toad: 15, croc: 17, knight: 18, hydra: 20, gloomroot: 20, thrall: 19, archer: 19, acolyte: 20, gatewarden: 20, choir: 20, colossus: 21, hollowking: 21, boar: 21, crow: 23, troll: 25, weaver: 27, ram: 29, oakhorn: 25, hrungnir: 30, galehound: 30, prismgolem: 31, skyray: 32, einherjar: 33, thunderroc: 35, draugr: 35, angler: 36, moray: 37, siren: 38, shellback: 39, kraken: 40, hvitserk: 37, ghostmaw: 39, voidmoth: 40, crystalwyrm: 41, orbitbeetle: 42, eclipsedryad: 43, meteorgolem: 45, miragejackal: 45, shardscarab: 46, glassharrier: 47, prismsentinel: 48, mirrorqueen: 49, sunshard: 50, bronzemantis: 50, gearling: 51, orbitseer: 52, chronoguard: 53, pendulummatron: 54, epochengine: 55, glowcapgrazer: 55, silkwing: 56, rootlurker: 57, lanternwraith: 58, mireheart: 58, silverwidow: 59, nightbloom: 60, dew_moth: 60, lumen_eel: 60, rootbell: 60, tideglass_heron: 60, hourpetal_stag: 60, moonskein_weaver: 60, moonwell_echo: 60, saltclaw: 60, stormgull: 61, glassray: 62, breakersentinel: 64, maelstromheart: 65, meadowhare: 65, sunbacksnail: 66, brushfox: 67, spadebadger: 68, honeyjaw: 69, wickerwarden: 70 };
 Object.assign(DEFAULT_LEVELS, { sandhopper: 80, dunefennec: 81, glassscorpion: 82, sunvulture: 83, dunecolossus: 84, mirageroc: 85 });
 Object.assign(DEFAULT_LEVELS, { snowhare: 85, iceotter: 86, frostheron: 87, glaciercrab: 88, bellmammoth: 88, auroramanta: 89, crevasseleviathan: 90 });
 Object.assign(DEFAULT_LEVELS, { screeferret: 90, stoneibex: 91, slateraven: 92, ridgeadder: 93, cairnbehemoth: 93, whitebarktitan: 94, stormcondor: 95 });
@@ -4965,3 +4965,23 @@ scenarios.seam_walks = {
 };
 
 scenarios.fishing = require('./fishing-scenario.cjs')(kit, map);
+
+
+scenarios.gm_island = {
+  description: 'GM Island stays private even with test shortcuts enabled: ordinary heroes cannot teleport in or invoke island services.',
+  startLevel: 1, levelSpread: 0, godMode: true,
+  async run(w, check) {
+    const bot='IslandVisitor'; await w.connect({bot,class:'warrior'});
+    const island=1+map.zones.findIndex(z=>z.gmOnly);
+    check(island===47,'GM Island appended without changing public zone IDs');
+    for(const op of [{op:'gm_island',action:'enter'},{op:'gm_island',action:'info'},
+      {op:'teleport',zone:island,x:212,y:337}]) {
+      let refused=false; try {await w.debug(bot,op);} catch(e) {refused=/Only a GM/.test(e.message);}
+      check(refused,`${op.op} refused for a normal character despite private test shortcuts`);
+    }
+    const gate=map.portals.find(p=>p.id==='gmi_gate');
+    await w.debug(bot,{op:'teleport',zone:0,x:gate.x-3,y:gate.y});
+    await w.advance(700);await w.action(bot,{type:'move',x:gate.x,y:gate.y});await w.advance(1600);
+    check(w.player(bot).zone===0,'ordinary walking cannot enter the GM gate');
+  },
+};
