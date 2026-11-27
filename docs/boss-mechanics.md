@@ -79,6 +79,12 @@ Things worth knowing:
   * `cargo test boss_mechanics` and `cargo test bossmech` run the engine's tests; `every_shipped_boss_is_fair_and_its_tags_exist_in_the_map` reads whatever the sixteen tasks add and fails on a point with no way out in time or a tag with no sleeping monster behind it.
   * Found while building it: the design's *Moon Lance* has a 3 s cast and kills, which is under the 5 s floor of rule 2; `BOSSMECH-MOONWELL-ECHO` has to lengthen it to 5 s or make it a heavy hit. The Flooded Cloister's boss room is 8 by 8 tiles and *Toll of the Deep* is a ring of radius 8, which fills the room: the fairness walk lets players run out of the door, but the room (or the ring) may need to change in `BOSSMECH-CHOIRMOTHER`.
 
+## Lane collision and the Longship captain (1.15.14)
+
+Anchorfall's client warning is a rectangle with flat ends. The old server used distance to a finite line segment, which added invisible rounded caps: the normal cast could kill up to two tiles behind its start, and the low-health cast up to three. `Shape::Lane::contains` now checks the rectangle's along/across bounds; ground behind the start or past the end is safe. Widths, the five-second cast, and the wider low-health cast with its three-second echo retain their authored values. This shared lane correction also matches other zone/mark lane warnings to their existing rectangular client drawing; independent wall/spoke/body-overlap collision remains separate.
+
+`longship_anchorfall_warns_and_spares_players_outside_the_drawn_lane` exercises both shipped phases: a player behind the red lane survives the initial strike and echo, while players in the red lane still fall. `lane_hitbox_stops_at_both_drawn_ends` covers both widths, four directions, corners and a zero-length lane; the old implementation fails its behind-start assertion. `tests/boss-lane-geometry.cjs` checks the actual client polygon for the same cases without launching a browser.
+
 ## The client (`BOSSMECH-CLIENT`, built 2026-10-18)
 
 `client/bossmech.js` (`window.BossMech`) draws what the snapshot's `bossMech` says and nothing else; `field.js` feeds it (`update` in `applySnapshot`, `drawFloor` after the ground decals, `drawHud` before the minimap, `onEvent` for the death cause).

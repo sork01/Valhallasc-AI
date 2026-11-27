@@ -199,7 +199,7 @@ fn warrior_half_rage_generation_also_applies_to_both_sides_of_pvp() {
 }
 
 #[test]
-fn assassin_basic_damage_is_halved_without_changing_other_classes_or_skill_rolls() {
+fn class_basic_damage_multipliers_preserve_hit_crit_and_skill_rolls() {
     for class in [
         Class::Assassin,
         Class::Hunter,
@@ -224,13 +224,14 @@ fn assassin_basic_damage_is_halved_without_changing_other_classes_or_skill_rolls
             } else {
                 hits += 1;
                 crits += usize::from(normal.1);
-                let expected = if class == Class::Assassin {
-                    normal.0 * 0.5
-                } else {
-                    normal.0
+                let factor = match class {
+                    Class::Assassin => 0.5,
+                    Class::Hunter | Class::Priest => 1.5,
+                    _ => 1.,
                 };
+                let expected = normal.0 * factor;
                 assert!(
-                    (basic.0 - expected).abs() <= 0.5,
+                    (basic.0 - expected).abs() <= 1.,
                     "{class:?}: {basic:?} / {normal:?}"
                 );
             }
@@ -246,28 +247,39 @@ fn assassin_basic_damage_is_halved_without_changing_other_classes_or_skill_rolls
 }
 
 #[test]
-fn assassin_strike_uses_reduced_damage_with_buffs_and_no_energy() {
-    let (mut w, _rx) = setup(Class::Assassin);
-    let p = w.players.get_mut(&1).unwrap();
-    p.character.level = 60;
-    p.character.resource = Some(0.);
-    p.face = Point { x: 1., y: 0. };
-    p.apply_buff("test_damage", BuffKind::Damage, 0.3, 10.);
-    let s = &mut w.slimes[0];
-    s.dead = false;
-    s.zone = 0;
-    s.x = 277.;
-    s.y = 226.;
-    s.hp = 100000.;
-    s.kind = "slime".into();
-    for seed in 0..20 {
-        w.rng = seed;
-        let expected = w.roll_damage(1, 0.5).0;
-        let before = w.slimes[0].hp;
-        w.rng = seed;
-        w.strike(1);
-        assert_eq!(before - w.slimes[0].hp, expected);
-        assert_eq!(resource(&w), 0.);
+fn class_basic_strikes_use_their_multiplier_with_buffs_and_no_energy() {
+    for (class, mult) in [
+        (Class::Assassin, 0.5),
+        (Class::Hunter, 1.5),
+        (Class::Priest, 1.5),
+    ] {
+        let (mut w, _rx) = setup(class);
+        let p = w.players.get_mut(&1).unwrap();
+        p.character.level = 60;
+        p.character.resource = Some(0.);
+        p.face = Point { x: 1., y: 0. };
+        p.apply_buff("test_damage", BuffKind::Damage, 0.3, 10.);
+        let s = &mut w.slimes[0];
+        s.dead = false;
+        s.zone = 0;
+        s.x = 277.;
+        s.y = 226.;
+        s.hp = 100000.;
+        s.kind = "slime".into();
+        for seed in 0..20 {
+            w.rng = seed;
+            let expected = w.roll_damage(1, mult);
+            let before = w.slimes[0].hp;
+            w.rng = seed;
+            w.strike(1);
+            if class.ranged() {
+                let bolt = w.bolts.pop().unwrap();
+                assert_eq!((bolt.damage, bolt.crit), expected, "{class:?}");
+            } else {
+                assert_eq!(before - w.slimes[0].hp, expected.0);
+            }
+            assert_eq!(resource(&w), 0.);
+        }
     }
 }
 

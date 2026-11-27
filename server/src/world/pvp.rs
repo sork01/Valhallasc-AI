@@ -1135,30 +1135,36 @@ mod tests {
         assert!(w.players[&2].character.hp >= 1.);
     }
     #[test]
-    fn assassin_pvp_basic_attack_uses_half_damage_before_player_defences() {
-        let mut w = world();
-        add(&mut w, 1, "Assassin");
-        let target = add(&mut w, 2, "Defender");
-        for p in w.players.values_mut() {
-            p.pvp_flag = true;
-            p.character.level = 60;
-            p.character.hp = 100000.;
+    fn class_pvp_basic_attacks_use_their_multiplier_before_player_defences() {
+        for (class, mult) in [
+            (Class::Assassin, 0.5),
+            (Class::Hunter, 1.5),
+            (Class::Priest, 1.5),
+        ] {
+            let mut w = world();
+            add(&mut w, 1, "Assassin");
+            let target = add(&mut w, 2, "Defender");
+            for p in w.players.values_mut() {
+                p.pvp_flag = true;
+                p.character.level = 60;
+                p.character.hp = 100000.;
+            }
+            w.players.get_mut(&1).unwrap().character.look.class = class;
+            let mut hits = 0;
+            for seed in 0..30 {
+                let before = w.players[&2].character.hp;
+                w.rng = seed;
+                let (damage, crit) = w.roll_damage(1, mult);
+                let expected = w.pvp_hit(1, 2, damage, crit);
+                w.players.get_mut(&2).unwrap().character.hp = before;
+                w.players.get_mut(&1).unwrap().cooldown = 0.;
+                w.rng = seed;
+                w.pvp_attack(1, &target).unwrap();
+                assert!((before - w.players[&2].character.hp - expected).abs() < 1e-8);
+                hits += usize::from(expected > 0.);
+            }
+            assert!(hits > 0, "{class:?}");
         }
-        w.players.get_mut(&1).unwrap().character.look.class = Class::Assassin;
-        let mut hits = 0;
-        for seed in 0..30 {
-            let before = w.players[&2].character.hp;
-            w.rng = seed;
-            let (damage, crit) = w.roll_damage(1, 0.5);
-            let expected = w.pvp_hit(1, 2, damage, crit);
-            w.players.get_mut(&2).unwrap().character.hp = before;
-            w.players.get_mut(&1).unwrap().cooldown = 0.;
-            w.rng = seed;
-            w.pvp_attack(1, &target).unwrap();
-            assert!((before - w.players[&2].character.hp - expected).abs() < 1e-8);
-            hits += usize::from(expected > 0.);
-        }
-        assert!(hits > 0);
     }
     #[test]
     fn ranged_pvp_refuses_a_target_behind_a_wall() {

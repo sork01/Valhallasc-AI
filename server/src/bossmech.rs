@@ -832,7 +832,20 @@ impl Shape {
                 }
                 turn.abs() <= half
             }
-            Self::Lane { a, b, half } => segment_distance(p, a, b) <= half,
+            // The client paints a rectangle with flat ends, not the rounded caps of
+            // segment_distance. In particular, the ground behind the cast origin is safe.
+            Self::Lane { a, b, half } => {
+                let (dx, dy) = (b.x - a.x, b.y - a.y);
+                let length_sq = dx * dx + dy * dy;
+                if length_sq <= 1e-12 {
+                    return false;
+                }
+                let (px, py) = (p.x - a.x, p.y - a.y);
+                let along = px * dx + py * dy;
+                along >= 0.
+                    && along <= length_sq
+                    && (px * dy - py * dx).abs() <= half * length_sq.sqrt()
+            }
             Self::Half { x, y, nx, ny } => (p.x - x) * nx + (p.y - y) * ny > 0.,
             Self::Arena(rect) => rect.contains(p),
         }
@@ -2111,6 +2124,44 @@ mod tests {
             )
             .is_err()
         );
+    }
+
+    #[test]
+    fn lane_hitbox_stops_at_both_drawn_ends() {
+        for (dx, dy) in [(1., 0.), (0., 1.), (0.6, 0.8), (-0.6, -0.8)] {
+            let a = Point { x: 10., y: 20. };
+            let point = |along: f64, across: f64| Point {
+                x: a.x + dx * along - dy * across,
+                y: a.y + dy * along + dx * across,
+            };
+            for half in [2., 3.] {
+                let lane = Shape::Lane {
+                    a,
+                    b: point(10., 0.),
+                    half,
+                };
+                assert!(lane.contains(point(5., half - 0.01)));
+                assert!(!lane.contains(point(5., half + 0.01)));
+                assert!(lane.contains(point(0.01, 0.)));
+                assert!(lane.contains(point(9.99, 0.)));
+                assert!(
+                    !lane.contains(point(-1., 0.)),
+                    "no invisible hit behind the start"
+                );
+                assert!(
+                    !lane.contains(point(11., 0.)),
+                    "no invisible hit beyond the end"
+                );
+                assert!(
+                    !lane.contains(point(-0.5, half * 0.5)),
+                    "no invisible rounded corner"
+                );
+            }
+            assert!(
+                !Shape::Lane { a, b: a, half: 3. }.contains(a),
+                "zero-length painted lane has no area"
+            );
+        }
     }
 
     #[test]

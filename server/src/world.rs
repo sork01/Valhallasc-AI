@@ -5098,10 +5098,10 @@ impl World {
     }
     /// Only basic attacks use this class multiplier; skills retain their own damage rolls.
     fn roll_basic_damage(&mut self, session: u64) -> (f64, bool) {
-        let mult = if self.players[&session].character.look.class == Class::Assassin {
-            0.5
-        } else {
-            1.
+        let mult = match self.players[&session].character.look.class {
+            Class::Assassin => 0.5,
+            Class::Hunter | Class::Priest => 1.5,
+            _ => 1.,
         };
         self.roll_damage(session, mult)
     }

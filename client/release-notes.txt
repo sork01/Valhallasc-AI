@@ -5,7 +5,9 @@
     "new": [],
     "changed": [
       "Hunters regenerate energy 50% faster: 15 per second, including in combat.",
-      "Assassin autoattacks deal 50% less damage. Skill damage is unchanged."
+      "Assassin autoattacks deal 50% less damage. Skill damage is unchanged.",
+      "Hunter and priest autoattacks deal 50% more damage. Skill damage is unchanged.",
+      "The Drowned Longship captain’s Anchorfall hits only inside its red warning lane, including its delayed repeat."
     ],
     "removed": []
   },

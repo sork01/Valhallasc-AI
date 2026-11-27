@@ -291,10 +291,10 @@ fn longship_hull_hatches_and_bulkheads_are_physical() {
 }
 
 #[test]
-fn longship_anchorfall_warns_and_spares_players_who_step_aside() {
+fn longship_anchorfall_warns_and_spares_players_outside_the_drawn_lane() {
     for low_health in [false, true] {
         let mut w = world();
-        let _receivers: Vec<_> = (1..=2).map(|id| join(&mut w, id, Class::Warrior)).collect();
+        let _receivers: Vec<_> = (1..=3).map(|id| join(&mut w, id, Class::Warrior)).collect();
         for s in &mut w.slimes {
             s.dead = true;
             s.respawn = 1e9;
@@ -313,6 +313,7 @@ fn longship_anchorfall_warns_and_spares_players_who_step_aside() {
         w.enter_instance(LONGSHIP);
         place(&mut w, 1, LONGSHIP, at(64., 30.));
         place(&mut w, 2, LONGSHIP, at(64., 32.));
+        place(&mut w, 3, LONGSHIP, at(66., 32.));
         let mut lane = None;
         for _ in 0..(30. / TICK) as usize {
             w.time += TICK;
@@ -340,16 +341,24 @@ fn longship_anchorfall_warns_and_spares_players_who_step_aside() {
                     resolved.distance(safe) < 1e-6,
                     "safe ground fits inside the real hull"
                 );
-                lane = Some((mid, safe));
+                let behind = at(ax - (bx - ax) / len, ay - (by - ay) / len);
+                let mut resolved = behind;
+                w.maps[LONGSHIP].collide(&mut resolved, PLAYER_RADIUS);
+                assert!(
+                    resolved.distance(behind) < 1e-6,
+                    "ground behind the warning fits the hull"
+                );
+                lane = Some((mid, safe, behind));
                 break;
             }
             if lane.is_some() {
                 break;
             }
         }
-        let (danger, safe) = lane.expect("visible Anchorfall warning");
+        let (danger, safe, behind) = lane.expect("visible Anchorfall warning");
         place(&mut w, 1, LONGSHIP, safe);
         place(&mut w, 2, LONGSHIP, danger);
+        place(&mut w, 3, LONGSHIP, behind);
         for _ in 0..(4.8 / TICK) as usize {
             w.time += TICK;
             w.tick += 1;
@@ -368,6 +377,10 @@ fn longship_anchorfall_warns_and_spares_players_who_step_aside() {
             w.players[&1].character.hp > 0.,
             "stepping sideways avoids the anchor"
         );
+        assert!(
+            w.players[&3].character.hp > 0.,
+            "behind the flat start of the red lane is safe"
+        );
         assert!(w.players[&2].fallen && w.players[&2].character.hp <= 0.);
         if low_health {
             place(&mut w, 1, LONGSHIP, danger);
@@ -376,6 +389,10 @@ fn longship_anchorfall_warns_and_spares_players_who_step_aside() {
                 w.tick += 1;
                 w.update_boss_mechanics();
             }
+            assert!(
+                w.players[&3].character.hp > 0.,
+                "the echo also spares ground behind the red lane"
+            );
             assert!(
                 w.players[&1].fallen,
                 "the wider final phase pulls the same strip again"
