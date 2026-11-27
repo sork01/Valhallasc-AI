@@ -61,6 +61,7 @@ impl World {
             return;
         }
         let amount = match p.character.look.class.resource_type() {
+            "energy" if p.character.look.class == Class::Hunter => 15. * TICK,
             "energy" => 10. * TICK,
             "rage" if p.combat_left <= 0. => -5. * TICK,
             // Out of combat mana returns quickly; in a fight a trickle keeps a healer going (a mend every few seconds).

@@ -580,7 +580,7 @@ impl World {
         p.combat_left = 5.;
         p.cooldown = p.character.attack_cooldown() / (1. + p.buff(BuffKind::Haste));
         p.attack = 0.0001;
-        let (damage, crit) = self.roll_damage(session, 1.);
+        let (damage, crit) = self.roll_basic_damage(session);
         let defender_session = *self
             .players
             .iter()
@@ -1133,6 +1133,32 @@ mod tests {
         assert_eq!(w.players[&2].character.hp, 1.);
         assert_eq!(w.players[&2].character.xp, 0);
         assert!(w.players[&2].character.hp >= 1.);
+    }
+    #[test]
+    fn assassin_pvp_basic_attack_uses_half_damage_before_player_defences() {
+        let mut w = world();
+        add(&mut w, 1, "Assassin");
+        let target = add(&mut w, 2, "Defender");
+        for p in w.players.values_mut() {
+            p.pvp_flag = true;
+            p.character.level = 60;
+            p.character.hp = 100000.;
+        }
+        w.players.get_mut(&1).unwrap().character.look.class = Class::Assassin;
+        let mut hits = 0;
+        for seed in 0..30 {
+            let before = w.players[&2].character.hp;
+            w.rng = seed;
+            let (damage, crit) = w.roll_damage(1, 0.5);
+            let expected = w.pvp_hit(1, 2, damage, crit);
+            w.players.get_mut(&2).unwrap().character.hp = before;
+            w.players.get_mut(&1).unwrap().cooldown = 0.;
+            w.rng = seed;
+            w.pvp_attack(1, &target).unwrap();
+            assert!((before - w.players[&2].character.hp - expected).abs() < 1e-8);
+            hits += usize::from(expected > 0.);
+        }
+        assert!(hits > 0);
     }
     #[test]
     fn ranged_pvp_refuses_a_target_behind_a_wall() {

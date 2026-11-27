@@ -715,7 +715,7 @@
     const resource = $('resource-bar'), kind = s.resourceType || 'rage', current = s.resource || 0, max = wholeMax(s.maxResource) || 100;
     resource.dataset.type = kind; resource.setAttribute('aria-label', kind[0].toUpperCase() + kind.slice(1));
     resource.setAttribute('aria-valuenow', wholeRes(current)); resource.setAttribute('aria-valuemax', max);
-    resource.title = kind === 'energy' ? 'Energy · regenerates 10 per second, including in combat · food and resource potions restore it' : kind === 'rage' ? 'Rage · gain 1 per 4 damage dealt and 1 per 2 damage taken · fades outside combat' : 'Mana · each skill cast has a 10% chance to restore 20% of maximum mana · food and mana potions restore it';
+    resource.title = kind === 'energy' ? (s.class === 'hunter' ? 'Energy · regenerates 15 per second, including in combat · food and resource potions restore it' : 'Energy · regenerates 10 per second, including in combat · food and resource potions restore it') : kind === 'rage' ? 'Rage · gain 1 per 4 damage dealt and 1 per 2 damage taken · fades outside combat' : 'Mana · each skill cast has a 10% chance to restore 20% of maximum mana · food and mana potions restore it';
     $('resource-fill').style.width = (current / max * 100).toFixed(1) + '%';
     $('resource-text').textContent = `${kind[0].toUpperCase() + kind.slice(1)} ${Math.min(wholeRes(current), max)} / ${max}`;
     hud.xp.style.width = s.maxLevel ? '100%' : (s.xp / s.xpNeed * 100).toFixed(1) + '%'; hud.xp.parentElement.classList.toggle('max-level', !!s.maxLevel); hud.lv.textContent = ` ${t('lvl')} ${s.level}${s.maxLevel ? ' · ' + (window.Locale?.translate('Max level') || 'Max level') : ''}`; window.Quests?.setLevel(s.level);

@@ -1952,6 +1952,7 @@
   "End duel": "Avsluta duellen",
   "Enemies": "Fiender",
   "Energy": "Energi",
+  "Energy · regenerates 15 per second, including in combat · food and resource potions restore it": "Energi · återhämtar 15 per sekund, även i strid · mat och resursdrycker fyller på den",
   "Energy · regenerates 10 per second, including in combat · food and resource potions restore it": "Energi · återhämtar 10 per sekund, även i strid · mat och resursdrycker fyller på den",
   "English": "Engelska",
   "Enter": "Gå in",

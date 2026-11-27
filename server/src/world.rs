@@ -5096,6 +5096,15 @@ impl World {
         };
         (damage, crit)
     }
+    /// Only basic attacks use this class multiplier; skills retain their own damage rolls.
+    fn roll_basic_damage(&mut self, session: u64) -> (f64, bool) {
+        let mult = if self.players[&session].character.look.class == Class::Assassin {
+            0.5
+        } else {
+            1.
+        };
+        self.roll_damage(session, mult)
+    }
     fn strike(&mut self, session: u64) {
         let p = &self.players[&session];
         let point = p.character.point();
@@ -5103,7 +5112,7 @@ impl World {
         let face = p.face;
         let class = p.character.look.class;
         let reach = class.reach();
-        let (damage, crit) = self.roll_damage(session, 1.);
+        let (damage, crit) = self.roll_basic_damage(session);
         if class.ranged() {
             let id = self.entity();
             let (color, size) = if class == Class::Hunter {

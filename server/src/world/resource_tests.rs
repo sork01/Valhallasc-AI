@@ -199,6 +199,79 @@ fn warrior_half_rage_generation_also_applies_to_both_sides_of_pvp() {
 }
 
 #[test]
+fn assassin_basic_damage_is_halved_without_changing_other_classes_or_skill_rolls() {
+    for class in [
+        Class::Assassin,
+        Class::Hunter,
+        Class::Warrior,
+        Class::Mage,
+        Class::Priest,
+    ] {
+        let (mut w, _rx) = setup(class);
+        w.players.get_mut(&1).unwrap().character.level = 60;
+        let mut hits = 0;
+        let mut misses = 0;
+        let mut crits = 0;
+        for seed in 0..100 {
+            w.rng = seed;
+            let normal = w.roll_damage(1, 1.);
+            w.rng = seed;
+            let basic = w.roll_basic_damage(1);
+            assert_eq!(basic.1, normal.1, "{class:?}: critical chance");
+            if normal.0 == 0. {
+                assert_eq!(basic.0, 0., "miss stays a miss");
+                misses += 1;
+            } else {
+                hits += 1;
+                crits += usize::from(normal.1);
+                let expected = if class == Class::Assassin {
+                    normal.0 * 0.5
+                } else {
+                    normal.0
+                };
+                assert!(
+                    (basic.0 - expected).abs() <= 0.5,
+                    "{class:?}: {basic:?} / {normal:?}"
+                );
+            }
+            // Skill rolls still apply their authored multiplier, without the basic-attack reduction.
+            w.rng = seed;
+            let skill = w.roll_damage(1, 2.);
+            if normal.0 > 0. {
+                assert!((skill.0 - normal.0 * 2.).abs() <= 1.);
+            }
+        }
+        assert!(hits > 0 && misses > 0 && crits > 0, "{class:?}");
+    }
+}
+
+#[test]
+fn assassin_strike_uses_reduced_damage_with_buffs_and_no_energy() {
+    let (mut w, _rx) = setup(Class::Assassin);
+    let p = w.players.get_mut(&1).unwrap();
+    p.character.level = 60;
+    p.character.resource = Some(0.);
+    p.face = Point { x: 1., y: 0. };
+    p.apply_buff("test_damage", BuffKind::Damage, 0.3, 10.);
+    let s = &mut w.slimes[0];
+    s.dead = false;
+    s.zone = 0;
+    s.x = 277.;
+    s.y = 226.;
+    s.hp = 100000.;
+    s.kind = "slime".into();
+    for seed in 0..20 {
+        w.rng = seed;
+        let expected = w.roll_damage(1, 0.5).0;
+        let before = w.slimes[0].hp;
+        w.rng = seed;
+        w.strike(1);
+        assert_eq!(before - w.slimes[0].hp, expected);
+        assert_eq!(resource(&w), 0.);
+    }
+}
+
+#[test]
 fn each_class_starts_with_its_resource_and_authoritative_snapshot() {
     for (class, kind, amount) in [
         (Class::Warrior, "rage", 0.),
@@ -224,7 +297,18 @@ fn energy_recovers_in_combat_caps_at_one_hundred_and_stops_when_dead() {
         for _ in 0..20 {
             w.update_resource(1);
         }
-        assert!((resource(&w) - 10.).abs() < 1e-8);
+        let expected = if class == Class::Hunter { 15. } else { 10. };
+        assert!((resource(&w) - expected).abs() < 1e-8, "{class:?}");
+        let p = w.players.get_mut(&1).unwrap();
+        p.character.resource = Some(0.);
+        p.combat_left = 0.;
+        for _ in 0..20 {
+            w.update_resource(1);
+        }
+        assert!(
+            (resource(&w) - expected).abs() < 1e-8,
+            "{class:?} out of combat"
+        );
         for _ in 0..250 {
             w.update_resource(1);
         }
