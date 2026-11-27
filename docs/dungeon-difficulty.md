@@ -1,6 +1,6 @@
 # Dungeon enemy health and damage
 
-## Boss-only follow-up, 1.15.13: 50% more health (staged, not live)
+## Boss-only follow-up, released 1.15.13: 50% more health
 
 Owner request, 2026-11-27: dungeon bosses get 50% more HP. Applied to the current
 values for the same 65 ordinary-dungeon boss kinds as 1.15.11 (150,000 becomes
@@ -19,8 +19,17 @@ Verified: three `dungeon_difficulty_` checks pass and all three fail on the old
 table through `ELITE_POWER_FILE`. The optimized candidate passes 65 private boss
 comparisons with 34 pack/raid controls unchanged (Gatewarden 123,300 to 184,950);
 using the old executable on both sides fails. Branch
-`balance/dungeon-boss-health-plus50`. Candidate, previous executable and database
-backup: `/media/raid/valhallasc-data/backups/valhalla-boss-hp-plus50-20261127-PxlUND/`. Not released: the restart needs the owner's approval.
+`balance/dungeon-boss-health-plus50`.
+
+Owner approved with "deploy it". Released as **1.15.13-c32ee8bc** and
+fast-forwarded to main. The only non-test server or world file that differs from
+1.15.12 is `world/elite-power.txt`. Verified PID `1543908`, exact candidate
+executable, all ten character rows unchanged, SQLite, public/legacy/bridge health,
+both changed public files, no test flags and a clean journal. Receipt
+`www/Valhalla/boss-hp-plus50-release-receipt.json`; backups and frozen executables
+`/media/raid/valhallasc-data/backups/valhalla-boss-hp-plus50-20261127-PxlUND/`. Client rollback is
+`1.15.12-85b15f7e`; executable rollback is `previous-before-build` there and needs
+fresh restart approval.
 
 ## Boss-only follow-up, released 1.15.11: another 25% less health
 
