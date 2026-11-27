@@ -1,5 +1,27 @@
 # Dungeon enemy health and damage
 
+## Boss-only follow-up, 1.15.13: 50% more health (staged, not live)
+
+Owner request, 2026-11-27: dungeon bosses get 50% more HP. Applied to the current
+values for the same 65 ordinary-dungeon boss kinds as 1.15.11 (150,000 becomes
+225,000). Health only: damage, packs, helpers, raid and outdoor enemies are
+unchanged. Boss health is now 1.6875 of the pre-1.15.5 baseline.
+
+The pre-change table is pinned in
+`tests/fixtures/dungeon-power-before-boss-hp-plus50.txt`. The spawn test rounds the
+combined factor to the table's 10 decimals: Mournsister two levels down lands on
+exactly 670,234.5, and multiplying the factors one at a time rounds it the other way.
+`tests/dungeon-boss-health-probe.cjs` defaults to this change (`BOSS_HP_FACTOR`,
+`BOSS_HP_FIXTURE` override it; 0.75 with `dungeon-power-before-boss-hp.txt`
+reproduces 1.15.11).
+
+Verified: three `dungeon_difficulty_` checks pass and all three fail on the old
+table through `ELITE_POWER_FILE`. The optimized candidate passes 65 private boss
+comparisons with 34 pack/raid controls unchanged (Gatewarden 123,300 to 184,950);
+using the old executable on both sides fails. Branch
+`balance/dungeon-boss-health-plus50`. Candidate, previous executable and database
+backup: `/media/raid/valhallasc-data/backups/valhalla-boss-hp-plus50-20261127-PxlUND/`. Not released: the restart needs the owner's approval.
+
 ## Boss-only follow-up, released 1.15.11: another 25% less health
 
 Owner clarification, 2026-11-27: **dungeon bosses only, not raids**. Multiply

@@ -1,5 +1,14 @@
 [
   {
+    "version": "1.15.13",
+    "date": "2026-11-27",
+    "new": [],
+    "changed": [
+      "Dungeon bosses have 50% more health. Their damage is unchanged; raid bosses are unchanged."
+    ],
+    "removed": []
+  },
+  {
     "version": "1.15.12",
     "date": "2026-11-27",
     "new": [

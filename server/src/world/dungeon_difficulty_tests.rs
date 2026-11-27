@@ -1,12 +1,13 @@
 //! The owner's 1.15.9 correction: 25% below current dungeon health and damage,
 //! leaving the earlier baseline's 50% increase, scoped to ordinary dungeons.
+//! Boss health was then cut by 25% (1.15.11) and raised by 50% (1.15.13).
 use super::wyrd_tests::world;
 use super::*;
 use std::collections::BTreeSet;
 
 fn boss_hp_factor(kind: &str) -> f64 {
     if crate::items::is_boss(kind) {
-        0.75
+        0.75 * 1.5
     } else {
         1.
     }
@@ -111,6 +112,9 @@ fn dungeon_difficulty_reaches_spawned_monsters_and_every_private_copy() {
         copies.insert(spawn.zone);
         let prior = old.get(&spawn.kind).copied().unwrap_or([1., 1.]);
         let (base_hp, base_damage, _, _) = Slime::base_stats(&spawn.kind);
+        // The table stores 10 decimals; round the combined factor the same way,
+        // or an exact .5 health value rounds differently (mournsister).
+        let hp_factor = (prior[0] * 0.75 * boss_hp_factor(&spawn.kind) * 1e10).round() / 1e10;
         // Check normal levels as well as the existing random level spread.
         for level in [
             Slime::default_level(&spawn.kind).saturating_sub(2).max(1),
@@ -121,7 +125,7 @@ fn dungeon_difficulty_reaches_spawned_monsters_and_every_private_copy() {
             let strength = Slime::level_scale(&spawn.kind, level, LEVEL_HP_DAMAGE);
             close(
                 monster.max_hp,
-                (base_hp * prior[0] * 0.75 * boss_hp_factor(&spawn.kind) * strength).round(),
+                (base_hp * hp_factor * strength).round(),
                 &spawn.kind,
                 "spawn health",
             );
@@ -139,10 +143,10 @@ fn dungeon_difficulty_reaches_spawned_monsters_and_every_private_copy() {
 }
 
 #[test]
-fn dungeon_difficulty_boss_health_cut_preserves_every_other_power_value() {
+fn dungeon_difficulty_boss_health_raise_preserves_every_other_power_value() {
     let w = world();
     let prior: BTreeMap<String, [f64; 2]> = serde_json::from_str(include_str!(
-        "../../../tests/fixtures/dungeon-power-before-boss-hp.txt"
+        "../../../tests/fixtures/dungeon-power-before-boss-hp-plus50.txt"
     ))
     .unwrap();
     let bosses: BTreeSet<_> = w
@@ -164,7 +168,7 @@ fn dungeon_difficulty_boss_health_cut_preserves_every_other_power_value() {
             actual.0,
             old[0]
                 * if bosses.contains(kind.as_str()) {
-                    0.75
+                    1.5
                 } else {
                     1.
                 },
