@@ -1,5 +1,14 @@
 [
   {
+    "version": "1.15.7",
+    "date": "2026-11-27",
+    "new": [],
+    "changed": [
+      "World scrolling draws cached ground more efficiently, improving Firefox performance, including in Low Graphics mode."
+    ],
+    "removed": []
+  },
+  {
     "version": "1.15.6",
     "date": "2026-11-26",
     "new": [],

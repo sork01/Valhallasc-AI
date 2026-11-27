@@ -454,7 +454,7 @@
       const G = chunkGeom(bx, by), dx = G.ox - (shx - shy) * TW / 2 - cx + VW / 2 + sxo, dy = G.oy - (shx + shy) * TH / 2 - cy + VH / 2 + syo;
       if (dx > VW || dy > VH || dx + G.w < 0 || dy + G.h < 0) continue;
       if (wanted && !wanted(bx, by)) continue;      // a clipped region: never render a chunk nothing of it will show
-      const ch = neighbourChunk(c, bx, by); if (ch) { g.drawImage(ch.c, dx, dy, G.w, G.h); c.usedAt = performance.now(); }
+      const ch = neighbourChunk(c, bx, by); if (ch) { drawGroundChunk(g, ch.c, dx, dy, G); c.usedAt = performance.now(); }
     }
   }
   // A chunk drawn before a seam neighbour's context existed holds a generic stand-in for the ground beyond the line. Seen as a neighbour from across the line, such a chunk
@@ -816,6 +816,11 @@
   }
   const CLIFF = 120, PADX = 10, PADTOP = 40;
   function chunkGeom(cx, cy) { const x0 = cx * CH, y0 = cy * CH; return { x0, y0, ox: (x0 - (y0 + CH)) * TW / 2 - TW / 2 - PADX, oy: (x0 + y0) * TH / 2 - PADTOP, w: CH * TW + TW + PADX * 2, h: CH * TH + TH + PADTOP + CLIFF }; }
+  function drawGroundChunk(g, c, dx, dy, G) {
+    // canvasOf rounds the backing size up. Sample only the painted extent so
+    // the padding cannot turn a 1:1 blit into a rescale on every scrolling frame.
+    g.drawImage(c, 0, 0, G.w * chunkScale, G.h * chunkScale, dx, dy, G.w, G.h);
+  }
   let stand_in = new Set();
   function renderChunk(cx, cy) {
     const G = chunkGeom(cx, cy), [c, g] = canvasOf(G.w, G.h, chunkScale);
@@ -5007,7 +5012,7 @@
     for (const [chx, chy] of groundChunks) {
       const G = chunkGeom(chx, chy), dx = G.ox - cx + VW / 2 + sxo, dy = G.oy - cy + VH / 2 + syo;
       if (dx > VW || dy > VH || dx + G.w < 0 || dy + G.h < 0) continue;      // the world box of the screen is much bigger than the screen itself
-      g.drawImage(getChunk(chx, chy).c, dx, dy, G.w, G.h);
+      drawGroundChunk(g, getChunk(chx, chy).c, dx, dy, G);
     }
     for (const p of zdef.portals) if (p.seam) { const nc = ctxs.get(p.to); if (nc) drawNeighbourGround(g, nc, p.seam.shift, cx, cy, sxo, syo); }
     for (const R of map.vregs || []) {      // what the other zone owns beyond the wall line: its ground, clipped to that region (never over our own land)
