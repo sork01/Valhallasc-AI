@@ -2,7 +2,7 @@
 
 A hired fighter wears the hirer's gear in the fighter's own class. The hire uses the hirer's level and the usual price.
 
-The Repair Smith at each dungeon or raid entrance handles hiring, dismissal and repairs. A hire belongs to that instance copy until the party clears it or the hirer leaves. Outdoor group-quest contracts last until the quest objective is complete or the hirer enters an instance.
+The Repair Smith at each dungeon or raid entrance handles hiring, dismissal and repairs. A hire belongs to that instance copy until the party clears it or the hirer leaves. Deaths and party wipes do not end an instance contract: fallen hires revive under the existing pack/boss rules and can retry with the hirer. The old hirer-death doom applies only to outdoor hires. Outdoor group-quest contracts last until the quest objective is complete or the hirer enters an instance.
 
 Meeting Stones offer summon invitations to online party members. Each dungeon has a stone near its Repair Smith. A party member who accepts arrives beside the stone in the sender's copy if they meet the destination's minimum level. Walking through the normal entrance uses the dungeon's usual gates.
 

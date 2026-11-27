@@ -126,6 +126,58 @@ fn pack_recovery_owner_returns_to_entrance_while_hires_keep_fighting() {
 }
 
 #[test]
+fn pack_recovery_dungeon_hires_keep_their_contracts_after_a_full_wipe() {
+    let w = world();
+    let mut zones = vec![5, 46];
+    for template in [5, 46] {
+        zones.push(
+            w.instances
+                .iter()
+                .find(|i| i.template == template && i.zone != template)
+                .unwrap()
+                .zone,
+        );
+    }
+    drop(w);
+    for zone in zones {
+        let mut r = Rig::new(zone);
+        r.kill(1);
+        r.w.update_mercenaries();
+        for &merc in &r.mercs {
+            assert!(
+                r.w.players[&merc].merc_doom.is_none(),
+                "copy {zone} doomed a hire"
+            );
+        }
+        for merc in r.mercs.clone() {
+            r.kill(merc);
+        }
+        assert!(
+            !r.w.pack_fights.contains_key(&zone),
+            "the wipe ends the pull"
+        );
+        r.w.time += 4.;
+        for session in std::iter::once(1).chain(r.mercs.iter().copied()) {
+            r.w.players.get_mut(&session).unwrap().dead_time = 4.;
+            r.w.update_player(session);
+        }
+        r.w.time += 35.;
+        r.w.update_mercenaries();
+        for session in std::iter::once(1).chain(r.mercs.iter().copied()) {
+            let p = &r.w.players[&session];
+            assert!(p.character.hp > 0., "copy {zone} lost fighter {session}");
+            assert!(!p.character.ghost && !p.fallen && p.merc_doom.is_none());
+            assert!(p.character.point().distance(r.w.maps[zone].spawn) < 5.);
+        }
+        assert_eq!(
+            r.w.players.len(),
+            r.mercs.len() + 1,
+            "the same party can retry"
+        );
+    }
+}
+
+#[test]
 fn pack_recovery_full_wipe_resets_only_living_mobs_even_after_owner_respawn() {
     let mut r = Rig::new(46);
     let killed = r.enemies[2];

@@ -463,8 +463,11 @@ impl World {
                 self.remove_mercenary(session);
                 continue;
             }
-            // The hirer falling dooms the contract: the fighter fights on, but badly (see `merc_doom`), and is dead within 30 seconds.
-            if self.players[&owner].character.hp <= 0. && self.players[&session].merc_doom.is_none()
+            // Only outdoor hires are doomed by their hirer's death. Instance
+            // contracts survive deaths and wipes until completion or departure.
+            if self.players[&session].merc_instance.is_none()
+                && self.players[&owner].character.hp <= 0.
+                && self.players[&session].merc_doom.is_none()
             {
                 let deadline = self.time + 12. + 18. * self.random();
                 self.players.get_mut(&session).unwrap().merc_doom = Some(deadline);
@@ -1130,6 +1133,117 @@ mod follow_tests {
             w.update_player(merc);
         }
         assert!(!w.players.contains_key(&merc), "the fighter died and left");
+    }
+}
+
+#[cfg(test)]
+mod instance_contract_tests {
+    use super::*;
+    use crate::world::wyrd_tests::{calm, join, place, world};
+
+    #[test]
+    fn dungeon_hires_survive_the_hirers_death_in_every_instance_copy() {
+        let mut w = world();
+        calm(&mut w);
+        let _rx = join(&mut w, 1, Class::Warrior);
+        let owner = w.players[&1].character.id.clone();
+        let zones: Vec<_> = w.instances.iter().map(|i| i.zone).collect();
+        assert!(zones.iter().any(|&z| w.maps[z].raid));
+        assert!(zones.iter().any(|&z| w.maps[z].template.is_some()));
+        for zone in zones {
+            let point = w.maps[zone].spawn;
+            place(&mut w, 1, zone, point);
+            w.enter_instance(zone);
+            w.players.get_mut(&1).unwrap().character.hp = 100.;
+            w.place_mercenary(
+                &owner,
+                Class::Priest,
+                w.dungeon_level(zone),
+                zone,
+                point,
+                w.maps[zone].raid,
+                None,
+            )
+            .unwrap();
+            let merc = w.mercenaries_of(&owner)[0];
+            assert_eq!(w.players[&merc].merc_instance, Some(zone));
+
+            w.players.get_mut(&1).unwrap().character.hp = 0.;
+            w.update_mercenaries();
+            assert!(
+                w.players[&merc].merc_doom.is_none(),
+                "copy {zone} doomed its hire"
+            );
+            w.time += 35.;
+            w.update_mercenaries();
+            assert!(
+                w.players[&merc].character.hp > 0.,
+                "copy {zone} killed its hire"
+            );
+            w.players.get_mut(&1).unwrap().character.hp = 100.;
+            w.time += 35.;
+            w.update_mercenaries();
+            assert!(w.players[&merc].merc_doom.is_none());
+            assert_eq!(w.players[&merc].merc_instance, Some(zone));
+            assert!(
+                w.party_mates(&owner)
+                    .contains(&w.players[&merc].character.id)
+            );
+
+            // The same contract still ends when the hirer actually leaves.
+            let outside = w.maps[0].spawn;
+            place(&mut w, 1, 0, outside);
+            w.update_mercenaries();
+            assert!(
+                !w.players.contains_key(&merc),
+                "copy {zone} kept a departed hire"
+            );
+        }
+    }
+
+    #[test]
+    fn dungeon_hires_still_depart_on_final_boss_completion_after_a_death() {
+        let mut w = world();
+        calm(&mut w);
+        let _rx = join(&mut w, 1, Class::Warrior);
+        let owner = w.players[&1].character.id.clone();
+        let zones: Vec<_> = w.instances.iter().map(|i| i.zone).collect();
+        for zone in zones {
+            let point = w.maps[zone].spawn;
+            place(&mut w, 1, zone, point);
+            w.enter_instance(zone);
+            w.players.get_mut(&1).unwrap().character.hp = 100.;
+            w.place_mercenary(
+                &owner,
+                Class::Mage,
+                w.dungeon_level(zone),
+                zone,
+                point,
+                w.maps[zone].raid,
+                None,
+            )
+            .unwrap();
+            let merc = w.mercenaries_of(&owner)[0];
+            w.players.get_mut(&1).unwrap().character.hp = 0.;
+            w.update_mercenaries();
+            w.players.get_mut(&1).unwrap().character.hp = 100.;
+            w.time += 35.;
+            w.update_mercenaries();
+            assert!(
+                w.players[&merc].character.hp > 0.,
+                "copy {zone} lost its hire before completion"
+            );
+            w.instances
+                .iter_mut()
+                .find(|i| i.zone == zone)
+                .unwrap()
+                .cleared = true;
+            w.update_mercenaries();
+            assert!(
+                !w.players.contains_key(&merc),
+                "copy {zone} kept a completed hire"
+            );
+        }
     }
 }
 

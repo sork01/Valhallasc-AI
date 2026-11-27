@@ -570,7 +570,7 @@ struct Player {
     merc_quest: Option<String>,
     /// The private copy in which an instance mercenary was hired.
     merc_instance: Option<usize>,
-    /// Set when the hirer falls: the world time this fighter drops dead for good. Until then it wanders, dazed.
+    /// Set when an outdoor hire's hirer falls: the time it dies for good. Instance contracts never acquire this deadline.
     merc_doom: Option<f64>,
     merc_navigation: mercs::Navigation,
     /// A temporary autonomous adventurer in an occupied shared zone.
