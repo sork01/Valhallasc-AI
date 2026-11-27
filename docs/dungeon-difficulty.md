@@ -47,17 +47,20 @@ checks cover every kind and damage value. The candidate also checks 30 snapshots
 arrive within 3000 ms, with tick gaps of two. No balance grind or multi-seed
 win-rate sweep is required or performed.
 
-The power table is embedded in the executable. A client release alone cannot
-activate it. Candidate 1.15.9 is prepared on `balance/dungeon-difficulty-150-percent`
-in `/media/raid/valhallasc-data/firefox-scrolling`; it requires a privately tested
-optimized executable and fresh owner approval before restarting the public game.
-Until that approval and deployment, the public game remains 1.15.8.
+Released after the owner's explicit “deploy” approval as **1.15.9-3493e600**,
+source branch `balance/dungeon-difficulty-150-percent` in
+`/media/raid/valhallasc-data/firefox-scrolling`. All 20 private executable
+comparisons pass, and 30 snapshots arrive in 2956 ms with tick gaps two. Using the
+unchanged executable as both sides fails the 75% health assertion as expected.
+The running and installed executable match the frozen candidate, PID `1344169`,
+SHA-256 `2c8dc909c7bbf3e26deeedd3449d2f36f9801ebace4929bb82c02778185054cf`.
+All ten saved character states are unchanged. SQLite, public/legacy/bridge health,
+the changed public files and clean journal pass; no test flags are present.
 
-Before-build executable and consistent running SQLite backup:
-`/media/raid/valhallasc-data/backups/valhalla-dungeon-minus25-20261127T082522Z-2pklrsno/`.
-Refresh the SQLite backup before an approved stop and preserve the stopped
-SQLite/WAL/shm files. Retain client `1.15.8-c4059296` and the previous executable
-for rollback; executable rollback also requires fresh restart approval.
+Receipt: `www/Valhalla/dungeon-minus25-release-receipt.json`. Backups and frozen
+executables: `/media/raid/valhallasc-data/backups/valhalla-dungeon-minus25-20261127T082522Z-2pklrsno/`.
+Client rollback is `1.15.8-c4059296`; executable rollback uses
+`previous-before-build` there and requires fresh restart approval.
 
 ## Earlier increase: 1.15.5
 
