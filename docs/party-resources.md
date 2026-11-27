@@ -4,7 +4,7 @@ Party and raid members show mana, energy or rage below their health in the alway
 
 `World::party_value` sends `resource`, `maxResource` and `resourceType` through the existing party-only half-second updates and full social state. Values use the same Character accessors as the owner's snapshot, including equipment bonuses. This includes hired mercenaries and members in other zones. No new polling, messages, storage or gameplay rules. The client repaints existing rows as values change and safely hides resources when an older executable omits the fields.
 
-Verified on 2026-11-27: one focused native regression passed, 24 desktop/viewport checks passed, and 12 further checks passed with touch controls (1,001 MiB peak under the 1.5 GiB limit). The first fixture accidentally created a mage instead of a warrior, then exposed the test driver’s bot-only disconnect counter; the final test sets the class explicitly and waits for actual offline party updates. No gameplay changes were needed.
+Verified on 2026-11-27: the focused native regression and bounded desktop and touch checks pass. Browser tests close bot sockets directly because the driver's disconnect health counter assumes all humans are driver bots. The browser player's real party packets determine offline/reconnected state.
 
 Focused checks:
 
