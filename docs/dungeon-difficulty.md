@@ -1,6 +1,6 @@
 # Dungeon enemy health and damage
 
-## Pending boss-only follow-up: another 25% less health
+## Boss-only follow-up, released 1.15.11: another 25% less health
 
 Owner clarification, 2026-11-27: **dungeon bosses only, not raids**. Multiply
 current boss health by 0.75 (200,000 becomes 150,000), preserving damage.
@@ -21,7 +21,7 @@ private copy. `tests/dungeon-boss-health-probe.cjs` compares the retained public
 and candidate executables in private worlds: all 65 boss max-HP values become
 75%, and representative dungeon packs and all raid enemy kinds retain exact HP.
 No encounter grinding or win-rate sweep. This follow-up is included with the
-pending 1.15.11 party-resource update; deployment remains separate.
+1.15.11 party-resource update.
 
 Verified: all three focused native checks pass. The exact optimized executable
 passes 65 private boss comparisons, plus 20 ordinary pack and 14 raid enemy-kind
@@ -35,8 +35,23 @@ Frozen candidate: 57,204,176 bytes, SHA-256
 `12e11e1cfc1e694bc2d8ffcada5fb61c353e21303085a2779dc21789cc5b4fdc`.
 Backups and staged receipt:
 `/media/raid/valhallasc-data/backups/valhalla-dungeon-boss-hp-20261127-y50wu_mj/`;
-public receipt `dungeon-boss-hp-staged-receipt.json`. Public 1.15.10 remains live;
-the earlier standalone party-bar candidate is superseded by this combined build.
+public receipt `dungeon-boss-hp-release-receipt.json`.
+
+Owner approved “merge whatever branch there is and deploy”. Merged to main as
+`40429bbe`, released from `78b2254d` as **1.15.11-78b2254d**. The merge changes
+only backlog documentation relative to the tested runtime. Verified PID
+`1480788`, exact candidate executable, all ten character states unchanged,
+SQLite, public/legacy/bridge health, five public files, no test flags and a clean
+journal. The release helper verified the whole client copy byte-for-byte.
+Rollback client: `1.15.10-a5e486f2`; executable: `previous-before-build` in the
+backup directory (a rollback restart needs fresh approval).
+
+Main is checked out in `/media/raid/valhallasc-data/firefox-scrolling`. The
+original `/media/raid/valhallasc-data/valhalla-dev` checkout remains at its prior
+commit on `preserve/main-local-art-20261127`, with all 33 local/untracked artwork
+and note files preserved and hash-verified. Backups are under `main-local-work/`
+in the release backup directory. Production executable installation remains at
+that original checkout's `target/release/valhalla-server` path.
 
 
 ## Previous correction: 25% below the 1.15.5–1.15.8 values

@@ -15,3 +15,8 @@ Focused checks:
 Built on the released 1.15.10 priest Mend change and the 1.15.9 dungeon reduction. Deployment requires the matching executable and client. Candidate staging and verification are recorded in the release receipt; the public game is unchanged until deployment.
 
 The subsequent owner request adds another 25% HP reduction for ordinary-dungeon bosses only, with raid enemies and all damage unchanged. The combined candidate supersedes the standalone resource-bar executable; see `docs/dungeon-difficulty.md` and `dungeon-boss-hp-staged-receipt.json`.
+
+Released with the dungeon-boss HP change as **1.15.11-78b2254d**, merged and pushed
+to main after the owner requested deployment. Public files and exact executable
+verified; PID 1480788, all ten saved characters unchanged, all health endpoints
+and clean journal pass. Receipt: `www/Valhalla/dungeon-boss-hp-release-receipt.json`.
