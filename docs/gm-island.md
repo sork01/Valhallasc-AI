@@ -1,5 +1,10 @@
 # GM Island
 
+Released silently as **1.15.14-b74de9da** on 2026-11-27. Refresh the game and use
+`/island` on the GM character, or **Test → Visit GM Island**. The visible version
+and existing release notes stay at 1.15.14; returning players receive no new
+version announcement.
+
 Private festival island and combat laboratory, authored at file zone 47. Its 68,509
 land tiles are within 1% of Greenmeadow's 68,006. Christmas (Hollyhaven), New Year
 (Midnight Quay), Halloween (Pumpkin Hollow), Midsummer (Sunribbon), Easter
@@ -127,6 +132,34 @@ Local evidence (ignored test artifacts):
 At implementation sign-off, public service PID remained **1572995**. No live
 database writes, release, restart, commit or push had been performed. The private optimized build has only the existing
 unused `mail_unread` warning.
+
+## Verified silent deployment
+
+The owner approved “deploy as a silent update”. Source `b74de9da` was committed,
+fast-forwarded to main and pushed. The production executable was built in the
+isolated `/media/raid/valhallasc-data/gm-island-release-20261127` checkout and frozen
+before testing. Its SHA-256 is
+`0da4141ff7a6f2cf81175cc2b9687e13acb452c9f07c5d9526d0822b92d33f87`.
+The exact executable passed 28 real GM gameplay checks and six private MCP checks.
+The final 30-snapshot window took 2,979 ms; its unaligned window took 3,087 ms.
+An initial 3,058 ms steady-window outlier is retained in the backup's logs; the
+latency caveat above still applies.
+
+Verified running PID **1793005**, exact installed/frozen executable, all 13 public
+files (12 changed client files plus the unchanged release notes), public/legacy/
+bridge health, no test flags, SQLite and a clean warning/error journal. The
+stopped audit inspected every saved zone, corpse and flight reference: all ten
+characters referenced stable public zones, so **zero rows required migration**.
+Every full character row, including authentication columns, remains unchanged.
+The visible label and release-note bytes match the previous release.
+
+Receipt: `www/Valhalla/gm-island-release-receipt.json`. Backups, stopped database,
+source/build logs, exact executable and verification scripts:
+`/media/raid/valhallasc-data/backups/valhalla-gm-island-silent-20261127-nijmcjt0/`.
+Client rollback: `1.15.14-2be66591`; executable: `previous-before-build` there.
+A later rollback requires fresh restart approval and must account for any new
+island/copy saves before starting the old executable. Do not restore an older
+matching database over new progress without reviewing that loss.
 
 ## Deployment and saved-zone migration
 
