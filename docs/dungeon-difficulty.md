@@ -23,6 +23,22 @@ and candidate executables in private worlds: all 65 boss max-HP values become
 No encounter grinding or win-rate sweep. This follow-up is included with the
 pending 1.15.11 party-resource update; deployment remains separate.
 
+Verified: all three focused native checks pass. The exact optimized executable
+passes 65 private boss comparisons, plus 20 ordinary pack and 14 raid enemy-kind
+controls with unchanged HP. Gatewarden changes from 164,400 to 123,300 HP.
+Using the unchanged executable for both sides fails that comparison as expected.
+Swedish, release notes, all client JavaScript syntax and whitespace gates pass.
+
+Implementation `1ebe3ade`, branch `balance/dungeon-boss-health-minus25` in
+`/media/raid/valhallasc-data/firefox-scrolling`, includes the staged party bars.
+Frozen candidate: 57,204,176 bytes, SHA-256
+`12e11e1cfc1e694bc2d8ffcada5fb61c353e21303085a2779dc21789cc5b4fdc`.
+Backups and staged receipt:
+`/media/raid/valhallasc-data/backups/valhalla-dungeon-boss-hp-20261127-y50wu_mj/`;
+public receipt `dungeon-boss-hp-staged-receipt.json`. Public 1.15.10 remains live;
+the earlier standalone party-bar candidate is superseded by this combined build.
+
+
 ## Previous correction: 25% below the 1.15.5–1.15.8 values
 
 Owner clarification, 2026-11-27: reduce current dungeon enemies by **25%**.

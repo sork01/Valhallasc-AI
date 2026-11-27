@@ -13,3 +13,5 @@ Focused checks:
 - Normal release notes, Swedish, JavaScript syntax and whitespace gates.
 
 Built on the released 1.15.10 priest Mend change and the 1.15.9 dungeon reduction. Deployment requires the matching executable and client. Candidate staging and verification are recorded in the release receipt; the public game is unchanged until deployment.
+
+The subsequent owner request adds another 25% HP reduction for ordinary-dungeon bosses only, with raid enemies and all damage unchanged. The combined candidate supersedes the standalone resource-bar executable; see `docs/dungeon-difficulty.md` and `dungeon-boss-hp-staged-receipt.json`.
