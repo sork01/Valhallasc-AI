@@ -19,3 +19,5 @@ Focused validation:
 - Existing `tests/floating-text.cjs` and normal release gates.
 
 Built on live 1.15.11, retaining party resources and the dungeon-only boss-health reduction. No map generation or save migration. Deployment requires the matching executable and client; release state and frozen artifacts are recorded in the staging/deployment receipt.
+
+Released after the owner requested “hurry and deploy”: **1.15.12-85b15f7e**, merged/pushed to main, PID **1503762**. All 21 focused native checks, seven bounded UI checks and the private mage/priest return probe pass; old executable and old renderer controls fail as expected. Exact executable, all ten character saves, SQLite, five public files, all health endpoints, absent test flags and clean journal verified. Receipt: `www/Valhalla/class-resources-release-receipt.json`. Backups: `/media/raid/valhallasc-data/backups/valhalla-class-resources-20261127-7dh6xq90/`. Client rollback `1.15.11-78b2254d`; executable `previous-before-build` there requires fresh restart approval.
