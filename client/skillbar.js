@@ -90,6 +90,9 @@
     return `${skill.description}${current ? ` ${current.capstone ? 'Capstone' : `Rank ${currentNumber}`}: ${current.description}` : ''}${next ? ` Next ${next.capstone ? 'capstone' : `rank ${nextNumber}`} at level ${next.level}: ${next.description}` : ''} ${costText(skill)} · ${cooldown}s cooldown.`;
   };
   const unlocked = skill => !!skill && skill.level <= level();
+  // A priest's normal hit can make Mend free for a few seconds; the server owns the timer and the real price.
+  const free = skill => skill?.id === 'mend' && Field.hero.mendFree > 0;
+  const price = skill => free(skill) ? 0 : skill?.cost || 0;
   const find = id => { const skill = skills.find(s => s.id === id); return unlocked(skill) ? skill : undefined; };
   const defaults = () => { const ready = skills.filter(unlocked).slice(0, SLOTS).map(s => s.id); return Array.from({ length: SLOTS }, (_, i) => ready[i] || null); };
   const remaining = skill => skill?.id === 'attack' ? Field.hero.atkCd || 0 : skill?.id === 'shadowstep' ? Field.hero.dashCd || 0 : Field.hero.skillCd?.[skill?.id] || 0;
@@ -214,17 +217,20 @@
     else if (slot >= 0 && Field.canAct) { event.preventDefault(); const skill = find(slots[slot]); if (skill) Field.useSkill(skill.id); }
   });
   addEventListener('keymap-change', () => { if (character) render(); });
-  window.Skillbar = { show, close, icon, get catalog() { return skills.length ? skills : available(); }, state(id) { const skill = (skills.length ? skills : available()).find(s => s.id === id); return { skill, cooldown: remaining(skill), ready: Field.canAct && unlocked(skill) && remaining(skill) <= 0 && (!skill.cost || Field.hero.resource >= skill.cost) }; }, get open() { return open(); }, update() {
+  window.Skillbar = { show, close, icon, price, get catalog() { return skills.length ? skills : available(); }, state(id) { const skill = (skills.length ? skills : available()).find(s => s.id === id); return { skill, cooldown: remaining(skill), free: free(skill), ready: Field.canAct && unlocked(skill) && remaining(skill) <= 0 && (!price(skill) || Field.hero.resource >= price(skill)) }; }, get open() { return open(); }, update() {
     sync();
     for (const b of $('skillbar-slots').children) {
       const skill = find(b.dataset.skill), cooldown = skill ? remaining(skill) : 0;
       // Snapshot values are the authority; never start a local gameplay cooldown.
-      const empty = !!skill?.cost && (Field.hero.resource || 0) < skill.cost;
+      const empty = !!price(skill) && (Field.hero.resource || 0) < price(skill);
+      b.classList.toggle('free-cast', free(skill));
       b.disabled = !Field.canAct || cooldown > 0 || empty;
       b.classList.toggle('resource-empty', empty);
       b.classList.toggle('on-cooldown', cooldown > 0);
       b.style.setProperty('--cooldown', skill ? Math.min(1, cooldown / skill.cooldown) : 0);
-      b.querySelector('.skill-cooldown').textContent = cooldown > 0 ? cooldown.toFixed(1) : '';
+      const label = b.querySelector('.skill-cooldown');
+      const text = cooldown > 0 ? cooldown.toFixed(1) : free(skill) ? window.Locale?.translate?.('Free!') ?? 'Free!' : '';
+      if (label.textContent !== text) label.textContent = text;
     }
     $('skills-open').disabled = !Online.connected || Field.hero.dead;
     window.Quickuse?.update();

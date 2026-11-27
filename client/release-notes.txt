@@ -1,5 +1,14 @@
 [
   {
+    "version": "1.15.10",
+    "date": "2026-11-27",
+    "new": [
+      "Each of a priest's normal hits on a monster has a 10% chance to ready Mend and make it cost no mana for 4 seconds. Mend lights up on the skill bar while it is free. Hired priests benefit too. This does not happen in fights between players."
+    ],
+    "changed": [],
+    "removed": []
+  },
+  {
     "version": "1.15.9",
     "date": "2026-11-27",
     "new": [],

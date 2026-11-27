@@ -785,7 +785,7 @@ impl World {
             }
             let p = &self.players[&session];
             if p.skill_cd.contains_key(&skill.id)
-                || p.character.resource() < skill.cost
+                || p.character.resource() < self.skill_price(session, &skill)
                 || p.dash > 0.
                 || p.stun > 0.
             {

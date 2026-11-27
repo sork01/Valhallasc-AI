@@ -16,6 +16,7 @@ mod blacksmithing;
 mod enchanting;
 mod fishing;
 mod fishing_workshop;
+mod mend_proc;
 #[cfg(test)]
 mod fishing_workshop_tests;
 #[cfg(test)]
@@ -533,6 +534,8 @@ struct Player {
     forge_ward_left: f64,
     dash_skill: String,
     skill_cd: BTreeMap<String, f64>,
+    /// Seconds left in which Mend costs nothing (`world/mend_proc.rs`).
+    mend_free_left: f64,
     set_cd: BTreeMap<String, f64>,
     set_shield: f64,
     set_shield_left: f64,
@@ -711,6 +714,7 @@ impl Player {
             forge_ward_left: 0.,
             dash_skill: String::new(),
             skill_cd: BTreeMap::new(),
+            mend_free_left: 0.,
             set_cd: BTreeMap::new(),
             set_shield: 0.,
             set_shield_left: 0.,
@@ -790,6 +794,7 @@ impl Player {
             });
         }
         view["daze"] = json!(self.daze);
+        view["mendFree"] = json!(r2(self.mend_free_left));
         view["danceT"] = json!(self.dance);
         view["festivalDance"] = self
             .festival_dance
@@ -4322,6 +4327,7 @@ impl World {
     fn update_player(&mut self, session: u64) {
         self.update_resource(session);
         self.update_enchanting(session);
+        self.expire_mend_proc(session);
         let carry_speed = self.forge_carry_speed(session);
         let arena_opponent = self.players[&session].arena_target.and_then(|target| {
             self.arena_opponent(session, target).map(|point| (target, point))
@@ -4347,6 +4353,7 @@ impl World {
             &mut p.pvp_fight,
             &mut p.absorb_left,
             &mut p.forge_ward_left,
+            &mut p.mend_free_left,
         ] {
             *timer = if *timer - TICK < 1e-9 {
                 0.
@@ -5138,8 +5145,12 @@ impl World {
             })
             .map(|s| s.id)
             .collect();
+        let mut landed = false;
         for id in hit {
-            self.enchant_hit(id, session, damage, crit, enchanting::Hit::Basic);
+            landed |= self.enchant_hit(id, session, damage, crit, enchanting::Hit::Basic) > 0.;
+        }
+        if landed {
+            self.roll_mend_proc(session);
         }
     }
     /// Announces a level gain to the zone, with the new level and the skills it unlocks.
@@ -5330,13 +5341,16 @@ impl World {
         };
         let now = self.enchant_now();
         let pve = self.enchant_pve(session);
+        let price = self.skill_price(session, &skill);
         let p = self.players.get_mut(&session).unwrap();
         let (discounted, borrowed) = if pve {
             p.enchant_cast_modifiers(self.time)
         } else {
             (false, false)
         };
-        let cost = skill.cost * if discounted { 0.7 } else { 1. };
+        // A free cast keeps the Spellweaver discount for one that costs something.
+        let discounted = discounted && price > 0.;
+        let cost = price * if discounted { 0.7 } else { 1. };
         if p.character.resource() < cost {
             let text = format!(
                 "Not enough {}: {} costs {}.",

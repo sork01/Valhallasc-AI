@@ -5944,7 +5944,7 @@
       if (id === 'attack' && hero.atkCd <= 0 && hero.dashT <= 0) { swing(); return true; }
       if (id === 'shadowstep' && isAssassin() && hero.dashCd <= 0 && hero.dashT <= 0 && hero.resource >= 20) { shadowstep(); return true; }
       const def = SKILL_BY_ID[id];
-      if (def && def.class === hero.look.class && hero.level >= def.level && !(hero.skillCd?.[id] > 0) && hero.dashT <= 0 && hero.resource >= def.cost) { castSkill(def); return true; }
+      if (def && def.class === hero.look.class && hero.level >= def.level && !(hero.skillCd?.[id] > 0) && hero.dashT <= 0 && hero.resource >= (window.Skillbar?.price(def) ?? def.cost)) { castSkill(def); return true; }
       return false;
     },
     get canAct() { return running && !paused && Online.connected && !hero.dead; },

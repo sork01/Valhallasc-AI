@@ -234,6 +234,9 @@
 .skill-slot .skill-icon > span { font: 2.3cqw sans-serif; color: #65748b; }
 .skill-name { position: absolute; left: 3%; right: 3%; bottom: .25cqw; font: max(8px, .65cqw)/1.1 'Jua', sans-serif; color: #efdfc0; }
 .skill-slot:disabled { cursor: default; filter: saturate(.4); }
+/* A skill that costs nothing for a moment. A still glow: nothing here repaints on its own. */
+.skill-slot.free-cast[data-skill] { border-color: #b9ffcf; box-shadow: 0 0 0 2px #6dff9d, 0 0 .9cqw #4dff8a; }
+.skill-slot.free-cast:not(.on-cooldown) .skill-cooldown { top: 52%; font-size: max(10px, 1cqw); color: #c9ffd9; }
 .skill-slot.on-cooldown::after { content: ''; position: absolute; inset: 0; background: #080e22ba; transform: scaleY(var(--cooldown)); transform-origin: bottom; pointer-events: none; }
 .skill-cooldown { position: absolute; z-index: 3; left: 0; right: 0; top: 33%; color: white; font: 1.4cqw 'Jua', sans-serif; text-shadow: 0 2px 3px black; }
 .skills-open { border: 0; border-left: 1px solid #cfb17955; padding: .4cqw .7cqw; color: #edd6a6; background: transparent; font: max(11px, 1cqw) 'Jua', sans-serif; cursor: pointer; }

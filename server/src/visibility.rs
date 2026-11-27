@@ -8,6 +8,7 @@ use std::collections::BTreeSet;
 const OWN_ONLY: &[&str] = &[
     "equippedLook", "transmogs", "wardrobe",
     "fishDeadline",
+    "mendFree",
     "fishingLog",
     "gathering",
     "professions",

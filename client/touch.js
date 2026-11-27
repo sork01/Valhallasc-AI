@@ -187,7 +187,7 @@
     targetMenu.hidden = $('hud-target').hidden || !$('hud-target').classList.contains('has-menu');
     targetMenu.setAttribute('aria-expanded', String(PortraitMenu.isOpen));
     chatButton.setAttribute('aria-expanded', String($('stage').classList.contains('touch-chat-open')));
-    const key = JSON.stringify(states.map(s => [s.skill?.id, s.ready, Math.ceil(s.cooldown)]));
+    const key = JSON.stringify(states.map(s => [s.skill?.id, s.ready, Math.ceil(s.cooldown), s.free]));
     if (key === lastState) return; lastState = key;
     states.forEach((state, i) => {
       const b = skillButtons[i], skill = state.skill; b.dataset.skill = skill?.id || ''; b.disabled = !state.ready; b.hidden = !skill;
@@ -195,8 +195,10 @@
       if (skill) { const glyph = document.createElement('span'); glyph.innerHTML = Skillbar.icon(skill.icon); b.append(glyph); }
       const name = document.createElement('span'); name.textContent = skill?.name || tr('Empty'); b.append(name);
       b.classList.toggle('cooling', state.cooldown > 0);
+      b.classList.toggle('free-cast', !!state.free);
       b.setAttribute('aria-label', (skill?.name || tr('Empty')) + (state.cooldown > 0 ? ` · ${Math.ceil(state.cooldown)}s` : ''));
       if (state.cooldown > 0) { const cd = document.createElement('small'); cd.className = 'touch-cooldown'; cd.textContent = Math.ceil(state.cooldown); b.append(cd); }
+      else if (state.free) { const tag = document.createElement('small'); tag.className = 'touch-free'; tag.textContent = tr('Free!'); b.append(tag); }
     });
   }
   addEventListener('keydown', e => {
