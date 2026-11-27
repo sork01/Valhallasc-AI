@@ -85,6 +85,8 @@ Anchorfall's client warning is a rectangle with flat ends. The old server used d
 
 `longship_anchorfall_warns_and_spares_players_outside_the_drawn_lane` exercises both shipped phases: a player behind the red lane survives the initial strike and echo, while players in the red lane still fall. `lane_hitbox_stops_at_both_drawn_ends` covers both widths, four directions, corners and a zero-length lane; the old implementation fails its behind-start assertion. `tests/boss-lane-geometry.cjs` checks the actual client polygon for the same cases without launching a browser.
 
+The exact optimized executable also passes a private lethal-impact probe using the shipped Anchorfall definition on a weak fixture enemy: a player in red dies and a player behind the start lives. The previous live executable fails that same assertion. Wait for the survivor's snapshot to reach the victim's impact tick before asserting survival; two sockets can otherwise report pre-impact and post-impact states together. Probe source and logs are retained with `class-anchorfall-release-receipt.json`'s backup. Released as **1.15.14-2be66591**, PID **1572995**, with all ten saves and the public release verified.
+
 ## The client (`BOSSMECH-CLIENT`, built 2026-10-18)
 
 `client/bossmech.js` (`window.BossMech`) draws what the snapshot's `bossMech` says and nothing else; `field.js` feeds it (`update` in `applySnapshot`, `drawFloor` after the ground decals, `drawHud` before the minimap, `onEvent` for the death cause).
