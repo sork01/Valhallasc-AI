@@ -79,7 +79,7 @@ All earlier tasks are finished (list cleared 2026-10-21; the full list is in git
 - [x] `ALCHEMY-DATA` — After `ALCHEMY-SERVER`, author flowers, recipes, trainers, supplies and any recipe drops. Generate validated, reachable flower candidates after zone shaping. Verify full zone coverage, alternate positions, ingredient access and a complete 1–600 ladder.
 - [x] `ALCHEMY-CLIENT` — After `ALCHEMY-DATA`, add desktop and touch gathering and brewing, tier and source guidance, ingredient costs, buff tooltips and remaining timers. Add Swedish translations.
 - [x] `ALCHEMY-ART` — After `ALCHEMY-CLIENT`, create readable flower patches and flower, potion, flask and recipe icons in PixelFlow. Add picking, brewing and drinking cues.
-- [x] `ALCHEMY-CHECK` — Twelve focused Rust tests, the two-player protocol and restart, data and client checks, and bounded desktop and Swedish touch runs passed. Alchemy generation preserves the order of the existing item catalog and workshop entries.
+- [x] `ALCHEMY-CHECK` — Twelve focused Rust tests, the two-player protocol and restart, data and client checks, and bounded desktop and Swedish touch runs passed. Alchemy generation preserves the order of the existing item catalog and workshop entries. Verified in candidate `8ca0e02e` on `fix/workshop-and-loot`.
 - [x] `ALCHEMY-RELEASE` — Live as `1.6.0-8fe38684` on 2026-11-22. Alchemy is merged and pushed to main. Verified the public client, executable, health and all five saved characters. See `docs/alchemy.md`.
 
 - [x] `BLACKSMITHING-RULES` — Design and owner decisions recorded 2026-11-21. Add Blacksmithing as a secondary profession that characters can learn alongside Fishing and Enchanting. Mine ore with a pick, smelt it into bars and use blueprints to forge equipment.
