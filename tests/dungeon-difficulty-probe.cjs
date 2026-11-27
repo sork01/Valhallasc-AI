@@ -3,6 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const { TestWorld } = require('../scripts/testing/driver.cjs');
+const { frameJson } = require('./lib/frames.cjs');
 const raw = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../world/map.txt'), 'utf8'));
 const fixtures = [raw, ...raw.zones].flatMap((map, zone) => {
   if (!map.copies || map.raid) return [];
@@ -24,7 +25,7 @@ async function capture(binary, performance = false) {
     if (performance) {
       await w.debug('DungeonProbe', { op: 'teleport', zone: 0, x: raw.spawn.x, y: raw.spawn.y });
       const ticks = [], times = [];
-      const sample = data => { const p = JSON.parse(data.toString()); if (p.type === 'snapshot') { ticks.push(p.tick); times.push(Date.now()); } };
+      const sample = data => { const p = frameJson(data); if (p.type === 'snapshot') { ticks.push(p.tick); times.push(Date.now()); } };
       const socket = w.bots.get('DungeonProbe').socket; socket.on('message', sample);
       await w.waitFor(() => ticks.length >= 30, 4000, '30 private snapshots'); socket.off('message', sample);
       const milliseconds = times[29] - times[0];
@@ -45,7 +46,7 @@ async function capture(binary, performance = false) {
   for (const [index, row] of after.rows.entries()) {
     const prior = before.rows[index];
     assert.deepEqual([row.zone, row.kind, row.level], [prior.zone, prior.kind, prior.level]);
-    assert.ok(Math.abs(row.maxHp - prior.maxHp * 2) <= 1, `${row.name}: health must double (${prior.maxHp} -> ${row.maxHp})`);
+    assert.ok(Math.abs(row.maxHp - prior.maxHp * 0.75) <= 1, `${row.name}: health must be 75% of the previous value (${prior.maxHp} -> ${row.maxHp})`);
   }
   const output = path.resolve(__dirname, '../test-results/dungeon-difficulty/protocol.json'); fs.mkdirSync(path.dirname(output), { recursive: true });
   fs.writeFileSync(output, JSON.stringify({ before, after }, null, 2) + '\n');

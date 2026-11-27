@@ -1,52 +1,75 @@
-# Dungeon difficulty increase (1.15.5)
+# Dungeon enemy health and damage
 
-The owner's request to make dungeons 100% harder is implemented as **100% more
-monster health and 100% more monster damage** in all 20 ordinary dungeons.
-It covers 127 kinds: packs, bosses and their sleeping helpers, across all four
-private copies of each dungeon.
+## Current correction: 25% below the 1.15.5–1.15.8 values
 
-`world/elite-power.txt` is the existing authoritative health/damage overlay.
-Each ordinary dungeon kind's two existing factors is multiplied by two. A kind
-without an earlier entry used the default `[1, 1]`, so its new entry is `[2, 2]`.
-The earlier table is pinned in
-`tests/fixtures/dungeon-power-before-1.15.5.txt` for regression comparisons.
-Dungeon kinds have no overlap with outdoor or raid kinds. Scope follows the
-map's `copies > 0` and `raid == false`, including cloned private copies through
-their template. Original table ordering and all other factors are retained.
+Owner clarification, 2026-11-27: reduce current dungeon enemies by **25%**.
+The requested example is 200,000 health becoming 150,000. This lowers the earlier
++100% boost to +50% of the original baseline; it does not halve current stats.
+Health and damage both use 0.75 of their current multipliers.
 
-`Slime::stats` applies the overlay before level scaling; `Slime::with_level`
-applies the existing level scaling and rounding to spawned health and damage.
-The existing melee, ranged and slam attacks use those scaled values. Boss
-mechanics that explicitly kill or use fixed health fractions retain their
-existing behavior, as do enrage timing, movement and attack speed. Raid, arena,
-player and outdoor stats retain their previous values. Loot and quest rewards
-retain their existing rules.
+The change covers all 127 kinds in the 20 ordinary dungeons: packs, bosses and
+sleeping helpers, across all 80 runtime copies. Scope remains maps with
+`copies > 0` and `raid == false`, resolving private copies through their template.
+Dungeon kinds do not overlap outdoor or raid kinds. All other entries in
+`world/elite-power.txt` and their key ordering are preserved.
 
-The two focused `dungeon_difficulty_` Rust regressions check every affected kind,
-all preserved factors, normal and ±2 spawn levels, full starting health, all 20
-templates and their 80 copies. Restoring the pre-change table through the
-existing test-only `ELITE_POWER_FILE` override must fail these tests. The old
-solo/party calibration and win-rate rules are retired; no encounter grinding or
-multi-seed balance sweep is required or performed for this change.
+The exact previous table is pinned in
+`tests/fixtures/dungeon-power-before-1.15.9.txt`. The older pre-increase table
+remains in `tests/fixtures/dungeon-power-before-1.15.5.txt`. Both health and damage
+are 0.75 of the former and 1.5 of the latter.
 
-The power table is embedded in the executable. Releasing the client alone does
-not activate this change. Prepare an optimized executable and matching 1.15.5
-client, verify them privately, then obtain fresh owner approval before stopping
-and restarting the public game. Keep the previous executable and a consistent
-SQLite backup before the build and refresh the backup immediately before an
-approved restart. No world generation or save migration is needed.
+`Slime::stats` applies the existing power overlay before level scaling.
+`Slime::with_level` applies level scaling and rounds spawned health/damage, so
+snapshot comparisons allow one point for integer rounding. Speed, attack timing,
+enrage timing, fixed/fractional/instant-kill boss mechanics, rewards, loot and
+player stats keep their existing rules. The raid and outdoor enemies are outside
+this change. Dungeon/raid mercenary contracts retain the 1.15.8 death/wipe fix.
+No world generation or save migration is needed.
 
-Focused validation: both `dungeon_difficulty_` Rust regressions passed. Running
-the same test executable with the pre-change power table failed both new tests,
-confirming the assertions detect missing health/damage scaling. The optimized
-release and private executable comparison are recorded in the staged deployment
-receipt; the public game requires fresh restart approval before activation.
+## Verification and activation
 
-Released after the owner's explicit “restart and deploy” approval on 2026-11-26
-as client and executable `667091cb` / client label `1.15.5`. The running binary
-matches the frozen candidate; PID `908531`, all eight serialized character saves,
-SQLite, public/legacy/bridge health and the restart journal were verified.
-Receipt: `/home/serveperry/webserver/www/Valhalla/dungeon-difficulty-release-receipt.json`.
-Backups are under `/media/raid/valhallasc-data/backups/valhalla-dungeon-double-20261126T173855Z-ifp8b6p9/`.
-Client rollback is `1.15.4-fa58aa8b`; executable rollback uses
-`previous-before-approved-restart` there and needs fresh restart approval.
+The two `dungeon_difficulty_` Rust regressions check every affected kind, all
+preserved factors, default and ±2 spawn levels, full starting health, all 20
+templates and their 80 copies. They also check that the resulting multipliers
+are 1.5 of the original baseline. Through the existing test-only
+`ELITE_POWER_FILE` override, both the previous doubled table and an incorrect
+half-current table must fail the new expectations.
+
+Both native checks pass. Both also fail with each incorrect table: retaining the
+current doubled factors gives Abyss Zealot 94,000 HP instead of 70,500; halving
+current factors gives 47,000 instead of 70,500. This checks the clarified 25%
+reduction rather than either of the earlier interpretations.
+
+`tests/dungeon-difficulty-probe.cjs` compares the retained live and candidate
+executables in separate private worlds: authoritative health must be 75% of the
+previous value in all 20 dungeons, with matching kinds and levels. The native
+checks cover every kind and damage value. The candidate also checks 30 snapshots
+arrive within 3000 ms, with tick gaps of two. No balance grind or multi-seed
+win-rate sweep is required or performed.
+
+The power table is embedded in the executable. A client release alone cannot
+activate it. Candidate 1.15.9 is prepared on `balance/dungeon-difficulty-150-percent`
+in `/media/raid/valhallasc-data/firefox-scrolling`; it requires a privately tested
+optimized executable and fresh owner approval before restarting the public game.
+Until that approval and deployment, the public game remains 1.15.8.
+
+Before-build executable and consistent running SQLite backup:
+`/media/raid/valhallasc-data/backups/valhalla-dungeon-minus25-20261127T082522Z-2pklrsno/`.
+Refresh the SQLite backup before an approved stop and preserve the stopped
+SQLite/WAL/shm files. Retain client `1.15.8-c4059296` and the previous executable
+for rollback; executable rollback also requires fresh restart approval.
+
+## Earlier increase: 1.15.5
+
+On 2026-11-26, the owner requested dungeons become 100% harder. Release
+`1.15.5-667091cb` doubled both health and damage for these same 127 kinds and
+20 ordinary dungeons. Existing factors were multiplied by two; missing entries
+used `[1, 1]`. Raid and outdoor factors were unchanged. The original two native
+checks, previous-table mutation and all 20 private comparisons passed.
+
+That release followed explicit “restart and deploy” approval. It verified PID
+`908531`, all eight then-saved character states, SQLite, health and journal.
+Historical receipt: `www/Valhalla/dungeon-difficulty-release-receipt.json`.
+Backups: `/media/raid/valhallasc-data/backups/valhalla-dungeon-double-20261126T173855Z-ifp8b6p9/`.
+The full history is in wiki
+`10_projects:valhallasc_dungeon_difficulty_double_staged_20261126`.

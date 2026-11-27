@@ -1,11 +1,12 @@
-//! The owner's 1.15.5 dungeon increase: double health and damage, scoped to ordinary dungeons.
+//! The owner's 1.15.9 correction: 25% below current dungeon health and damage,
+//! leaving the earlier baseline's 50% increase, scoped to ordinary dungeons.
 use super::wyrd_tests::world;
 use super::*;
 use std::collections::BTreeSet;
 
 fn before() -> BTreeMap<String, [f64; 2]> {
     serde_json::from_str(include_str!(
-        "../../../tests/fixtures/dungeon-power-before-1.15.5.txt"
+        "../../../tests/fixtures/dungeon-power-before-1.15.9.txt"
     ))
     .unwrap()
 }
@@ -23,9 +24,13 @@ fn close(actual: f64, expected: f64, kind: &str, stat: &str) {
 }
 
 #[test]
-fn dungeon_difficulty_doubles_every_pack_boss_and_helper_kind_only() {
+fn dungeon_difficulty_reduces_current_pack_boss_and_helper_stats_by_25_percent_only() {
     let w = world();
     let old = before();
+    let original: BTreeMap<String, [f64; 2]> = serde_json::from_str(include_str!(
+        "../../../tests/fixtures/dungeon-power-before-1.15.5.txt"
+    ))
+    .unwrap();
     let dungeon_kinds: BTreeSet<_> = w
         .spawns
         .iter()
@@ -44,8 +49,21 @@ fn dungeon_difficulty_doubles_every_pack_boss_and_helper_kind_only() {
         let prior = old.get(*kind).copied().unwrap_or([1., 1.]);
         let (base_hp, base_damage, speed, scale) = Slime::base_stats(kind);
         let actual = Slime::stats(kind);
-        close(actual.0, base_hp * prior[0] * 2., kind, "health");
-        close(actual.1, base_damage * prior[1] * 2., kind, "damage");
+        close(actual.0, base_hp * prior[0] * 0.75, kind, "health");
+        close(actual.1, base_damage * prior[1] * 0.75, kind, "damage");
+        let unboosted = original.get(*kind).copied().unwrap_or([1., 1.]);
+        close(
+            prior[0] * 0.75,
+            unboosted[0] * 1.5,
+            kind,
+            "remaining health boost",
+        );
+        close(
+            prior[1] * 0.75,
+            unboosted[1] * 1.5,
+            kind,
+            "remaining damage boost",
+        );
         assert_eq!((actual.2, actual.3), (speed, scale));
     }
     for kind in outside_kinds
@@ -90,13 +108,13 @@ fn dungeon_difficulty_reaches_spawned_monsters_and_every_private_copy() {
             let strength = Slime::level_scale(&spawn.kind, level, LEVEL_HP_DAMAGE);
             close(
                 monster.max_hp,
-                (base_hp * prior[0] * 2. * strength).round(),
+                (base_hp * prior[0] * 0.75 * strength).round(),
                 &spawn.kind,
                 "spawn health",
             );
             close(
                 monster.damage,
-                (base_damage * prior[1] * 2. * strength).round(),
+                (base_damage * prior[1] * 0.75 * strength).round(),
                 &spawn.kind,
                 "spawn damage",
             );
