@@ -1,5 +1,16 @@
 [
   {
+    "version": "1.15.12",
+    "date": "2026-11-27",
+    "new": [
+      "Priests and mages have a 10% chance per skill cast to restore 20% of their maximum mana. Hired casters benefit too."
+    ],
+    "changed": [
+      "Warriors generate 50% less rage from damage dealt and taken."
+    ],
+    "removed": []
+  },
+  {
     "version": "1.15.11",
     "date": "2026-11-27",
     "new": [

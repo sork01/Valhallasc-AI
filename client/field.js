@@ -1974,11 +1974,11 @@
       if (Math.hypot(event.x - hero.x, event.y - hero.y) <= 50) kick(event.value > 4 ? 14 : 9, .45);
     }
     if (event.kind === 'cleared') { clearedAt = performance.now() / 1000; instanceCleared = true; if (mini) buildMini(); burst(event.x, event.y, 20, 40, ['#d4ffc8', '#9cff8f', '#ffffff'], 6, 4); effects.push({ kind: 'ring', x: event.x, y: event.y, t: 0, life: 1.6, grow: 2.4, col: '#9cff8f' }); }
+    if ((event.kind === 'consume' || event.kind === 'skill') && event.mana > 0) floater(event.x, event.y, '+' + DamageNumbers.format(event.mana) + ' ' + (event.resourceType || 'mana'), '#85baff', false, 'heal');
     // Food and potions: a potion lands at once with a ring and its number; a meal shows its share every second.
     if (event.kind === 'consume') {
       if (event.alchemy && event.actor === Online.id) say('alchemySound', 'drink');
       spark(event.x, event.y, 14, ['#9dffb4', '#d8ffe0', '#f0d9a0'], 10, 1, .9);
-      if (event.mana > 0) floater(event.x, event.y, '+' + event.mana + ' ' + (event.resourceType || 'mana'), '#85baff', false, 'heal');
       if (event.value > 0) { effects.push({ kind: 'skAura', x: event.x, y: event.y, core: '#d9ffe0', glow: '#3fd36a', col: '#3fd36a', a: 0, t: 0, life: 1 }); floater(event.x, event.y, '+' + DamageNumbers.format(event.value), '#7dff9a', true, 'heal'); }
     }
     // A party member healed by a priest: their own number and glow, whoever cast it.

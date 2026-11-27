@@ -62,6 +62,7 @@ mod tests {
     /// A hero of `class` at `level` on open ground with one very tough monster in reach, facing it.
     fn rig(class: Class, level: u32) -> (World, mpsc::Receiver<Value>) {
         let mut w = world();
+        w.resource_rng = 1; // This fixture isolates the free-Mend proc.
         let rx = join(&mut w, 1, class);
         w.players.get_mut(&1).unwrap().character.level = level;
         place(&mut w, 1, 0, OPEN);

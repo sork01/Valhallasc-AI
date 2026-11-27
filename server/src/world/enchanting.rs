@@ -1749,6 +1749,7 @@ mod tests {
     #[test]
     fn enchanting_cast_uses_the_discount_and_half_cooldown_only_on_success() {
         let mut w = world();
+        w.resource_rng = 1; // Isolate the price/discount from mana-return procs.
         let _rx = join(&mut w, 1, Class::Mage);
         worn(&mut w, 1, "gloves", "epic", Spellweaver);
         worn(&mut w, 1, "headgear", "legendary", BorrowedTime);

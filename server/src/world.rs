@@ -2120,6 +2120,7 @@ pub struct World {
     tick: u64,
     rng: u64,
     enchant_rng: u64,
+    resource_rng: u64,
     profession_rng: u64,
     enchant_epoch: f64,
     enchant_skill_hits: Option<Vec<enchanting::SkillHit>>,
@@ -2270,6 +2271,7 @@ impl World {
             time: 0.,
             tick: 0,
             rng: u64::from_le_bytes(uuid::Uuid::new_v4().as_bytes()[..8].try_into().unwrap()),
+            resource_rng: u64::from_le_bytes(uuid::Uuid::new_v4().as_bytes()[..8].try_into().unwrap()),
             enchant_rng: u64::from_le_bytes(
                 uuid::Uuid::new_v4().as_bytes()[..8].try_into().unwrap(),
             ),
@@ -5695,10 +5697,11 @@ impl World {
         let set_signature =
             self.apply_set_signature(session, id, origin, face, target, &before_set_hits);
         self.finish_enchant_skill(session, id);
+        let restored_mana = self.roll_cast_mana(session);
         self.emit_zone(
             zone,
             json!({"type":"event","kind":"skill","skill":id,"actor":actor,"x":origin.x,"y":origin.y,
-                "fx":face.x,"fy":face.y,"value":value,"crit":false,"points":points,"heal":healed,"capstone":capstone,"setDouble":power_sets>0,"setSignature":set_signature}),
+                "fx":face.x,"fy":face.y,"value":value,"crit":false,"points":points,"heal":healed,"capstone":capstone,"setDouble":power_sets>0,"setSignature":set_signature,"mana":restored_mana}),
         );
     }
     /// Sessions of the living party members (the caster included) in the caster's zone within `range`.
@@ -5878,7 +5881,7 @@ impl World {
             entry.1 += 1;
         }
         if !enchant_damage && p.character.look.class == Class::Warrior {
-            p.character.change_resource(dealt * 0.5);
+            p.character.change_resource(dealt * resources::RAGE_DEALT_RATE);
         }
         if is_guard {
             s.guard_damage += dealt;
@@ -6828,7 +6831,7 @@ impl World {
             p.daze = 4.;
         }
         if p.character.look.class == Class::Warrior {
-            p.character.change_resource(taken);
+            p.character.change_resource(taken * resources::RAGE_TAKEN_RATE);
         }
         p.character.hp = (p.character.hp - value).max(0.);
         p.last_hurt = self.time;

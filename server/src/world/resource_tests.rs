@@ -2,6 +2,7 @@ use super::*;
 
 fn setup(class: Class) -> (World, mpsc::Receiver<Value>) {
     let mut w = World::with_level_spread(Store::open(std::path::Path::new(":memory:")).unwrap(), 0);
+    w.resource_rng = 1; // No mana return on the first cast unless a test explicitly forces it.
     let (tx, rx) = mpsc::channel(256);
     let welcome = w
         .join(
@@ -26,6 +27,175 @@ fn setup(class: Class) -> (World, mpsc::Receiver<Value>) {
 }
 fn resource(w: &World) -> f64 {
     w.players[&1].character.resource()
+}
+
+#[test]
+fn mana_return_once_per_accepted_cast_for_both_casters() {
+    for (class, id) in [(Class::Mage, "twinbolt"), (Class::Priest, "blessing")] {
+        let (mut w, mut rx) = setup(class);
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        c.level = 40;
+        let max = c.max_resource();
+        c.resource = Some(max * 0.5);
+        let before = c.resource();
+        let cost = skills::find(class, id).unwrap().cost;
+        w.resource_rng = 0; // First roll is below 10%.
+        w.use_skill(1, id, Point { x: 1., y: 0. });
+        assert!((resource(&w) - (before - cost + max * 0.2)).abs() < 1e-8);
+        assert_eq!(w.resource_rng, 1, "one roll, including a multi-bolt spell");
+        let event = std::iter::from_fn(|| rx.try_recv().ok())
+            .find(|v| v["kind"] == "skill")
+            .unwrap();
+        assert_eq!(event["mana"], max * 0.2);
+        assert!(w.players[&1].skill_cd.contains_key(id));
+        if class == Class::Mage {
+            assert_eq!(w.bolts.len(), 2);
+        }
+    }
+}
+
+#[test]
+fn mana_return_rejected_casts_never_spend_mana_or_roll() {
+    let (mut w, _rx) = setup(Class::Mage);
+    for gate in [
+        "locked",
+        "poor",
+        "stunned",
+        "dead",
+        "cooldown",
+        "dashing",
+        "no target",
+        "wrong class",
+    ] {
+        let p = w.players.get_mut(&1).unwrap();
+        p.character.level = if gate == "locked" { 1 } else { 40 };
+        p.character.hp = if gate == "dead" {
+            0.
+        } else {
+            p.character.max_hp()
+        };
+        p.character.resource = Some(if gate == "poor" { 1. } else { 100. });
+        p.stun = if gate == "stunned" { 1. } else { 0. };
+        p.dash = if gate == "dashing" { 1. } else { 0. };
+        p.skill_cd.clear();
+        if gate == "cooldown" {
+            p.skill_cd.insert("twinbolt".into(), 2.);
+        }
+        let before = p.character.resource();
+        w.resource_rng = 0;
+        let skill = match gate {
+            "no target" => "lifedrain",
+            "wrong class" => "mend",
+            _ => "twinbolt",
+        };
+        w.use_skill(1, skill, Point { x: 1., y: 0. });
+        assert_eq!(resource(&w), before, "{gate}");
+        assert_eq!(w.resource_rng, 0, "{gate} consumed a roll");
+    }
+}
+
+#[test]
+fn mana_return_counts_free_mend_and_caps_the_actual_event_amount() {
+    let (mut w, mut rx) = setup(Class::Priest);
+    let p = w.players.get_mut(&1).unwrap();
+    p.character.level = 25;
+    p.character.hp = p.character.max_hp() * 0.5;
+    p.character.resource = Some(0.);
+    p.mend_free_left = 4.;
+    let max = p.character.max_resource();
+    w.resource_rng = 0;
+    w.use_skill(1, "mend", Point::default());
+    assert_eq!(resource(&w), max * 0.2, "a valid free cast also rolls");
+    let p = w.players.get_mut(&1).unwrap();
+    p.character.hp = p.character.max_hp() * 0.5;
+    p.character.resource = Some(max);
+    p.skill_cd.clear();
+    while rx.try_recv().is_ok() {}
+    w.resource_rng = 0;
+    w.use_skill(1, "mend", Point::default());
+    assert_eq!(resource(&w), max);
+    assert_eq!(w.resource_rng, 1);
+    let event = std::iter::from_fn(|| rx.try_recv().ok())
+        .find(|v| v["kind"] == "skill")
+        .unwrap();
+    assert_eq!(event["mana"], 0., "no false gain when already full");
+    // A paid cast at full mana restores only the room left by its cost.
+    let (mut w, _rx) = setup(Class::Mage);
+    w.players.get_mut(&1).unwrap().character.level = 40;
+    w.players.get_mut(&1).unwrap().character.reset_resource();
+    w.resource_rng = 0;
+    w.use_skill(1, "twinbolt", Point::default());
+    assert_eq!(resource(&w), w.players[&1].character.max_resource());
+}
+
+#[test]
+fn mana_return_chance_is_one_in_ten_and_other_resources_do_not_roll() {
+    for class in [Class::Priest, Class::Mage] {
+        let (mut w, _rx) = setup(class);
+        w.players.get_mut(&1).unwrap().character.level = 40;
+        let max = w.players[&1].character.max_resource();
+        let mut count = 0;
+        for _ in 0..6000 {
+            w.players.get_mut(&1).unwrap().character.resource = Some(0.);
+            let gained = w.roll_cast_mana(1);
+            assert!(gained == 0. || (gained - max * 0.2).abs() < 1e-8);
+            count += usize::from(gained > 0.);
+        }
+        assert!((510..=690).contains(&count), "{class:?}: {count}/6000");
+    }
+    for class in [Class::Warrior, Class::Hunter, Class::Assassin] {
+        let (mut w, _rx) = setup(class);
+        w.players.get_mut(&1).unwrap().character.resource = Some(0.);
+        w.resource_rng = 0;
+        assert_eq!(w.roll_cast_mana(1), 0.);
+        assert_eq!(w.resource_rng, 0);
+    }
+}
+
+#[test]
+fn mana_return_also_applies_to_hired_casters_through_the_normal_ai_cast_path() {
+    for class in [Class::Mage, Class::Priest] {
+        let (mut w, mut rx) = setup(class);
+        let p = w.players.get_mut(&1).unwrap();
+        p.merc = Some("Owner".into());
+        p.character.level = 4; // Exactly one available skill for each class.
+        p.character.hp = p.character.max_hp() * 0.5;
+        let max = p.character.max_resource();
+        p.character.resource = Some(max * 0.5);
+        w.resource_rng = 0;
+        w.ai_combat_at(1, &[1], Some((Point { x: 279., y: 226. }, 0.5)));
+        assert_eq!(w.resource_rng, 1, "{class:?}: AI made exactly one cast");
+        let event = std::iter::from_fn(|| rx.try_recv().ok())
+            .find(|v| v["kind"] == "skill")
+            .unwrap();
+        assert_eq!(event["mana"], max * 0.2);
+    }
+}
+
+#[test]
+fn warrior_half_rage_generation_also_applies_to_both_sides_of_pvp() {
+    let (mut w, _rx) = setup(Class::Warrior);
+    let _other_rx = super::wyrd_tests::join(&mut w, 2, Class::Warrior);
+    super::wyrd_tests::place(&mut w, 2, 0, Point { x: 277., y: 226. });
+    for p in w.players.values_mut() {
+        p.pvp_flag = true;
+    }
+    let mut landed = 0;
+    for _ in 0..30 {
+        for p in w.players.values_mut() {
+            p.character.hp = p.character.max_hp();
+            p.character.resource = Some(0.);
+        }
+        let before = w.players[&2].character.hp;
+        w.pvp_hit(1, 2, 20., false);
+        let taken = before - w.players[&2].character.hp;
+        if taken > 0. {
+            landed += 1;
+        }
+        assert!((resource(&w) - taken * 0.25).abs() < 1e-8);
+        assert!((w.players[&2].character.resource() - taken * 0.5).abs() < 1e-8);
+    }
+    assert!(landed > 0);
 }
 
 #[test]
@@ -87,7 +257,8 @@ fn mana_trickles_in_combat_including_enemy_aggro_without_damage_and_returns_quic
     // A visible enemy chasing the mage is combat even with no damage dealt.
     // The old fixture left the enemy at its unrelated world spawn, possibly behind cover.
     w.maps[0].objects.clear();
-    w.slimes[0].x = 277.; w.slimes[0].y = 226.;
+    w.slimes[0].x = 277.;
+    w.slimes[0].y = 226.;
     w.slimes[0].zone = 0;
     assert!((gain(&mut w) - 0.075).abs() < 1e-9);
     assert_eq!(w.players[&1].combat_left, 5.);
@@ -126,25 +297,25 @@ fn warrior_gains_rage_only_from_actual_damage_and_loses_it_outside_combat() {
     w.hit_slime(0, 1, 0., false);
     assert_eq!(resource(&w), 0.);
     w.hit_slime(0, 1, 20., false);
-    assert_eq!(resource(&w), 10.);
+    assert_eq!(resource(&w), 5.);
     let point = w.players[&1].character.point();
     w.hurt_player(1, 43., point);
-    assert_eq!(resource(&w), 20.);
+    assert_eq!(resource(&w), 10.);
     w.update_resource(1);
-    assert_eq!(resource(&w), 20.);
+    assert_eq!(resource(&w), 10.);
     w.slimes[0].dead = true;
     w.players.get_mut(&1).unwrap().combat_left = 0.;
     for _ in 0..20 {
         w.update_resource(1);
     }
-    assert!((resource(&w) - 15.).abs() < 1e-8);
+    assert!((resource(&w) - 5.).abs() < 1e-8);
     w.players.get_mut(&1).unwrap().character.resource = Some(0.);
     w.slimes[0].dead = false;
     w.slimes[0].hp = 2.;
     w.hit_slime(0, 1, 10000., false);
-    assert_eq!(resource(&w), 1., "Overkill cannot grant extra rage");
+    assert_eq!(resource(&w), 0.5, "Overkill cannot grant extra rage");
     w.hit_slime(0, 1, 10000., false);
-    assert_eq!(resource(&w), 1., "Dead enemies cannot grant rage");
+    assert_eq!(resource(&w), 0.5, "Dead enemies cannot grant rage");
 }
 #[test]
 fn insufficient_resources_and_invalid_targets_spend_nothing_and_start_no_cooldown() {

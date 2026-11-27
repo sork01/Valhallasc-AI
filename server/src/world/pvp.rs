@@ -772,7 +772,7 @@ impl World {
             p.combat_left = 5.;
             p.character.mounted = false;
             if p.character.look.class == Class::Warrior {
-                p.character.change_resource(taken);
+                p.character.change_resource(taken * resources::RAGE_TAKEN_RATE);
             }
         }
         if landed {
@@ -839,7 +839,7 @@ impl World {
             if let Some(p) = self.players.get_mut(&session)
                 && p.character.look.class == Class::Warrior
             {
-                p.character.change_resource(taken_total * 0.5);
+                p.character.change_resource(taken_total * resources::RAGE_DEALT_RATE);
             }
             #[cfg(test)]
             {

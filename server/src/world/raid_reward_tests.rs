@@ -208,6 +208,7 @@ fn raid_rewards_real_casts_keep_the_original_skill_slot_cost_and_cooldown() {
         (Class::Hunter, "arrowstorm"),
     ] {
         let mut w = rig(class);
+        w.resource_rng = 1; // This check measures the normal price, not a mana-return proc.
         let p = w.players.get_mut(&1).unwrap();
         p.character.change_resource(1000.);
         p.character.hp = 1.;

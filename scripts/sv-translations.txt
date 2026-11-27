@@ -1,4 +1,6 @@
 {
+  "Mana · each skill cast has a 10% chance to restore 20% of maximum mana · food and mana potions restore it": "Mana · varje färdighet har 10% chans att återställa 20% av maximal mana · mat och manadrycker fyller på den",
+  "Rage · gain 1 per 4 damage dealt and 1 per 2 damage taken · fades outside combat": "Raseri · få 1 per 4 utdelad skada och 1 per 2 mottagen skada · avtar utanför strid",
   "Floating Text": "Flytande text",
   "Choose the text shown above characters. Changes apply immediately.": "Välj vilken text som visas ovanför karaktärer. Ändringarna gäller direkt.",
   "All on": "Alla på",
