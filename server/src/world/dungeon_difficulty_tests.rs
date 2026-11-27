@@ -4,6 +4,14 @@ use super::wyrd_tests::world;
 use super::*;
 use std::collections::BTreeSet;
 
+fn boss_hp_factor(kind: &str) -> f64 {
+    if crate::items::is_boss(kind) {
+        0.75
+    } else {
+        1.
+    }
+}
+
 fn before() -> BTreeMap<String, [f64; 2]> {
     serde_json::from_str(include_str!(
         "../../../tests/fixtures/dungeon-power-before-1.15.9.txt"
@@ -49,12 +57,17 @@ fn dungeon_difficulty_reduces_current_pack_boss_and_helper_stats_by_25_percent_o
         let prior = old.get(*kind).copied().unwrap_or([1., 1.]);
         let (base_hp, base_damage, speed, scale) = Slime::base_stats(kind);
         let actual = Slime::stats(kind);
-        close(actual.0, base_hp * prior[0] * 0.75, kind, "health");
+        close(
+            actual.0,
+            base_hp * prior[0] * 0.75 * boss_hp_factor(kind),
+            kind,
+            "health",
+        );
         close(actual.1, base_damage * prior[1] * 0.75, kind, "damage");
         let unboosted = original.get(*kind).copied().unwrap_or([1., 1.]);
         close(
-            prior[0] * 0.75,
-            unboosted[0] * 1.5,
+            prior[0] * 0.75 * boss_hp_factor(kind),
+            unboosted[0] * 1.5 * boss_hp_factor(kind),
             kind,
             "remaining health boost",
         );
@@ -108,7 +121,7 @@ fn dungeon_difficulty_reaches_spawned_monsters_and_every_private_copy() {
             let strength = Slime::level_scale(&spawn.kind, level, LEVEL_HP_DAMAGE);
             close(
                 monster.max_hp,
-                (base_hp * prior[0] * 0.75 * strength).round(),
+                (base_hp * prior[0] * 0.75 * boss_hp_factor(&spawn.kind) * strength).round(),
                 &spawn.kind,
                 "spawn health",
             );
@@ -123,4 +136,41 @@ fn dungeon_difficulty_reaches_spawned_monsters_and_every_private_copy() {
     }
     assert_eq!(templates.len(), 20);
     assert_eq!(copies.len(), 80, "four copies of each ordinary dungeon");
+}
+
+#[test]
+fn dungeon_difficulty_boss_health_cut_preserves_every_other_power_value() {
+    let w = world();
+    let prior: BTreeMap<String, [f64; 2]> = serde_json::from_str(include_str!(
+        "../../../tests/fixtures/dungeon-power-before-boss-hp.txt"
+    ))
+    .unwrap();
+    let bosses: BTreeSet<_> = w
+        .spawns
+        .iter()
+        .filter(|s| is_dungeon(&w, s.zone) && crate::items::is_boss(&s.kind))
+        .map(|s| s.kind.as_str())
+        .collect();
+    assert_eq!(bosses.len(), 65);
+    assert!(
+        w.spawns
+            .iter()
+            .filter(|s| !is_dungeon(&w, s.zone))
+            .all(|s| !bosses.contains(s.kind.as_str()))
+    );
+    for (kind, old) in &prior {
+        let actual = crate::items::elite_power(kind);
+        close(
+            actual.0,
+            old[0]
+                * if bosses.contains(kind.as_str()) {
+                    0.75
+                } else {
+                    1.
+                },
+            kind,
+            "boss-only health",
+        );
+        close(actual.1, old[1], kind, "preserved damage");
+    }
 }

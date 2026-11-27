@@ -5,7 +5,9 @@
     "new": [
       "Party and raid frames show each member’s mana, energy or rage below their health, including hired mercenaries."
     ],
-    "changed": [],
+    "changed": [
+      "Dungeon bosses have 25% less health. Their damage is unchanged; raid bosses are unchanged."
+    ],
     "removed": []
   },
   {

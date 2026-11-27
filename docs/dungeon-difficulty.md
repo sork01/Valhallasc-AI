@@ -1,6 +1,29 @@
 # Dungeon enemy health and damage
 
-## Current correction: 25% below the 1.15.5–1.15.8 values
+## Pending boss-only follow-up: another 25% less health
+
+Owner clarification, 2026-11-27: **dungeon bosses only, not raids**. Multiply
+current boss health by 0.75 (200,000 becomes 150,000), preserving damage.
+The 65 boss kinds across all 20 ordinary dungeons and their 80 runtime copies
+are selected through `items::is_boss` and the existing ordinary-dungeon scope.
+Boss kinds do not overlap raid/outdoor kinds. Ordinary packs and sleeping
+helpers retain their current health. All damage multipliers remain identical.
+
+The pre-change table is pinned in
+`tests/fixtures/dungeon-power-before-boss-hp.txt`. Only the first number of those
+65 entries changes. Boss health becomes 1.125 of the pre-1.15.5 baseline;
+ordinary enemy health and all ordinary-dungeon damage remain 1.5 of that baseline.
+No world regeneration, mechanics changes or save migration.
+
+The three focused `dungeon_difficulty_` checks cover every power value, unchanged
+speed/scale and damage, default and ±2 spawn levels, all 65 bosses and every
+private copy. `tests/dungeon-boss-health-probe.cjs` compares the retained public
+and candidate executables in private worlds: all 65 boss max-HP values become
+75%, and representative dungeon packs and all raid enemy kinds retain exact HP.
+No encounter grinding or win-rate sweep. This follow-up is included with the
+pending 1.15.11 party-resource update; deployment remains separate.
+
+## Previous correction: 25% below the 1.15.5–1.15.8 values
 
 Owner clarification, 2026-11-27: reduce current dungeon enemies by **25%**.
 The requested example is 200,000 health becoming 150,000. This lowers the earlier

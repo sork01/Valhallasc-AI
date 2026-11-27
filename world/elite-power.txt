@@ -200,167 +200,167 @@
     1.0
   ],
   "barrow_fatebound": [
-    1.725,
+    1.29375,
     1.5
   ],
   "barrow_doorward": [
-    2.175,
+    1.63125,
     1.5
   ],
   "barrow_threadkeeper": [
-    2.175,
+    1.63125,
     1.5
   ],
   "span_archon": [
-    1.725,
+    1.29375,
     1.5
   ],
   "span_warden": [
-    2.175,
+    1.63125,
     1.5
   ],
   "span_weaver": [
-    2.175,
+    1.63125,
     1.5
   ],
   "astro_warden": [
-    3.0,
+    2.25,
     1.5
   ],
   "astro_navigator": [
-    2.01,
+    1.5075,
     1.5
   ],
   "thunder_conductor": [
-    3.525,
+    2.64375,
     1.5
   ],
   "thunder_bastion": [
-    3.42,
+    2.565,
     1.5
   ],
   "bloom_thornkeeper": [
-    3.555,
+    2.66625,
     1.5
   ],
   "bloom_mirror": [
-    3.315,
+    2.48625,
     1.5
   ],
   "solar_ashwarden": [
-    3.54,
+    2.655,
     1.5
   ],
   "solar_heliomancer": [
-    2.895,
+    2.17125,
     1.5
   ],
   "elder_gatekeeper": [
-    3.645,
+    2.73375,
     1.5
   ],
   "elder_matron": [
-    2.595,
+    1.94625,
     1.5
   ],
   "pavilion_mirror": [
-    3.75,
+    2.8125,
     1.5
   ],
   "pavilion_weaver": [
-    1.995,
+    1.49625,
     1.5
   ],
   "rain_crown_gatekeeper": [
-    3.33,
+    2.4975,
     1.5
   ],
   "rain_crown_sibyl": [
-    2.595,
+    1.94625,
     1.5
   ],
   "seed_warden": [
-    3.225,
+    2.41875,
     1.5
   ],
   "seed_germinator": [
-    2.355,
+    1.76625,
     1.5
   ],
   "solstice_watcher": [
-    3.435,
+    2.57625,
     1.5
   ],
   "solstice_harbinger": [
-    2.865,
+    2.14875,
     1.5
   ],
   "chainmarshal": [
-    5.79,
+    4.3425,
     1.5
   ],
   "starseraph": [
-    4.005,
+    3.00375,
     1.5
   ],
   "tidejudicator": [
-    5.115,
+    3.83625,
     1.5
   ],
   "tideglass_heron": [
-    4.47,
+    3.3525,
     1.5
   ],
   "hourpetal_stag": [
-    3.555,
+    2.66625,
     1.5
   ],
   "moonskein_weaver": [
-    2.385,
+    1.78875,
     1.5
   ],
   "eye_lenswarden": [
-    3.945,
+    2.95875,
     1.5
   ],
   "eye_undertide": [
-    3.0,
+    2.25,
     1.5
   ],
   "amber_curator": [
-    3.465,
+    2.59875,
     1.5
   ],
   "amber_chronicle": [
-    3.45,
+    2.5875,
     1.5
   ],
   "gatewarden": [
-    2.055,
+    1.54125,
     1.5
   ],
   "bellkeeper": [
-    3.6,
+    2.7,
     1.5
   ],
   "mournsister": [
-    3.015,
+    2.26125,
     1.5
   ],
   "rootabbot": [
-    2.865,
+    2.14875,
     1.5
   ],
   "pearlwidow": [
-    4.59,
+    3.4425,
     1.5
   ],
   "glasscantor": [
-    2.49,
+    1.8675,
     1.5
   ],
   "relicwarden": [
-    3.78,
+    2.835,
     1.5
   ],
   "barrow_hound": [
@@ -400,15 +400,15 @@
     1.5
   ],
   "null_bell": [
-    22.5,
+    16.875,
     1.5
   ],
   "null_conductor": [
-    22.5,
+    16.875,
     1.5
   ],
   "null_hour": [
-    12.75,
+    9.5625,
     1.5
   ],
   "span_lynx": [
@@ -772,11 +772,11 @@
     1.5
   ],
   "amber_memory": [
-    1.5,
+    1.125,
     1.5
   ],
   "astro_axis": [
-    1.5,
+    1.125,
     1.5
   ],
   "astro_gearling": [
@@ -796,7 +796,7 @@
     1.5
   ],
   "bloom_heart": [
-    1.5,
+    1.125,
     1.5
   ],
   "bloom_moth": [
@@ -808,11 +808,11 @@
     1.5
   ],
   "choir": [
-    1.5,
+    1.125,
     1.5
   ],
   "choirmother": [
-    1.5,
+    1.125,
     1.5
   ],
   "choirsinger": [
@@ -820,11 +820,11 @@
     1.5
   ],
   "colossus": [
-    1.5,
+    1.125,
     1.5
   ],
   "coralregent": [
-    1.5,
+    1.125,
     1.5
   ],
   "elder_barkguard": [
@@ -832,7 +832,7 @@
     1.5
   ],
   "elder_heart": [
-    1.5,
+    1.125,
     1.5
   ],
   "elder_moth": [
@@ -856,31 +856,31 @@
     1.5
   ],
   "eye_unblinking": [
-    1.5,
+    1.125,
     1.5
   ],
   "hierophant": [
-    1.5,
+    1.125,
     1.5
   ],
   "hollowking": [
-    1.5,
+    1.125,
     1.5
   ],
   "keel_bosun": [
-    1.5,
+    1.125,
     1.5
   ],
   "keel_captain": [
-    1.5,
+    1.125,
     1.5
   ],
   "keel_cargomaw": [
-    1.5,
+    1.125,
     1.5
   ],
   "moonwell_echo": [
-    1.5,
+    1.125,
     1.5
   ],
   "pavilion_foldling": [
@@ -896,11 +896,11 @@
     1.5
   ],
   "pavilion_sovereign": [
-    1.5,
+    1.125,
     1.5
   ],
   "rain_crown_sovereign": [
-    1.5,
+    1.125,
     1.5
   ],
   "reliquarypearl": [
@@ -916,7 +916,7 @@
     1.5
   ],
   "seed_worldseed": [
-    1.5,
+    1.125,
     1.5
   ],
   "solar_cinder": [
@@ -924,7 +924,7 @@
     1.5
   ],
   "solar_heart": [
-    1.5,
+    1.125,
     1.5
   ],
   "solstice_flurry": [
@@ -936,7 +936,7 @@
     1.5
   ],
   "solstice_heart": [
-    1.5,
+    1.125,
     1.5
   ],
   "solstice_owl": [
@@ -944,7 +944,7 @@
     1.5
   ],
   "thunder_heart": [
-    1.5,
+    1.125,
     1.5
   ]
 }
