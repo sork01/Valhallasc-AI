@@ -107,7 +107,7 @@
   ],
   "size": 48,
   "cols": 13,
-  "rows": 7,
+  "rows": 11,
   "sources": [
     {
       "sprite": "65ccf93e7d5b859c",
@@ -302,7 +302,49 @@
     "dish_spring_grill",
     "dish_spring_feast",
     "dish_lava_grill",
-    "dish_lava_feast"
+    "dish_lava_feast",
+    "fish_cloud_minnow",
+    "fish_storm_barb",
+    "fish_gale_eel",
+    "fish_thundercrest_ray",
+    "fish_star_dace",
+    "fish_comet_perch",
+    "fish_nebula_gar",
+    "fish_prism_gudgeon",
+    "fish_glass_spindlefish",
+    "fish_suncut_carp",
+    "fish_prismatic_mirrorfish",
+    "fish_clockwork_chub",
+    "fish_obsidian_bream",
+    "fish_orrery_sturgeon",
+    "fish_spore_rasbora",
+    "fish_veil_catfish",
+    "fish_dreamfin_pike",
+    "fish_moonwake_dragonfish",
+    "fish_crescent_bleak",
+    "fish_silver_crescent_eel",
+    "fish_ringwater_koi",
+    "fish_ribbon_shiner",
+    "fish_jubilee_guppy",
+    "fish_parade_gourami",
+    "fish_festival_crownfin",
+    "fish_rootfoot_dace",
+    "fish_nectar_perch",
+    "fish_canopy_lungfish",
+    "fish_heartwood_whitefish",
+    "fish_pithscale_char",
+    "fish_amberroot_gar",
+    "fish_mountainheart_paddlefish",
+    "fish_cairn_minnow",
+    "fish_tarn_grayling",
+    "fish_graniteback_sturgeon",
+    "rod_rootbraid_rod",
+    "rod_cairnsteel_rod",
+    "dish_cloudwater_grill",
+    "dish_glasswater_grill",
+    "dish_moonwater_grill",
+    "dish_greenwater_grill",
+    "dish_deep_springs_grill"
   ],
   "at": {
     "fish_pier_sprat": [
@@ -668,6 +710,218 @@
     "dish_lava_feast": [
       12,
       6
+    ],
+    "fish_cloud_minnow": [
+      0,
+      7
+    ],
+    "fish_storm_barb": [
+      1,
+      7
+    ],
+    "fish_gale_eel": [
+      2,
+      7
+    ],
+    "fish_thundercrest_ray": [
+      3,
+      7
+    ],
+    "fish_star_dace": [
+      4,
+      7
+    ],
+    "fish_comet_perch": [
+      5,
+      7
+    ],
+    "fish_nebula_gar": [
+      6,
+      7
+    ],
+    "fish_prism_gudgeon": [
+      7,
+      7
+    ],
+    "fish_glass_spindlefish": [
+      8,
+      7
+    ],
+    "fish_suncut_carp": [
+      9,
+      7
+    ],
+    "fish_prismatic_mirrorfish": [
+      10,
+      7
+    ],
+    "fish_clockwork_chub": [
+      11,
+      7
+    ],
+    "fish_obsidian_bream": [
+      12,
+      7
+    ],
+    "fish_orrery_sturgeon": [
+      0,
+      8
+    ],
+    "fish_spore_rasbora": [
+      1,
+      8
+    ],
+    "fish_veil_catfish": [
+      2,
+      8
+    ],
+    "fish_dreamfin_pike": [
+      3,
+      8
+    ],
+    "fish_moonwake_dragonfish": [
+      4,
+      8
+    ],
+    "fish_crescent_bleak": [
+      5,
+      8
+    ],
+    "fish_silver_crescent_eel": [
+      6,
+      8
+    ],
+    "fish_ringwater_koi": [
+      7,
+      8
+    ],
+    "fish_ribbon_shiner": [
+      8,
+      8
+    ],
+    "fish_jubilee_guppy": [
+      9,
+      8
+    ],
+    "fish_parade_gourami": [
+      10,
+      8
+    ],
+    "fish_festival_crownfin": [
+      11,
+      8
+    ],
+    "fish_rootfoot_dace": [
+      12,
+      8
+    ],
+    "fish_nectar_perch": [
+      0,
+      9
+    ],
+    "fish_canopy_lungfish": [
+      1,
+      9
+    ],
+    "fish_heartwood_whitefish": [
+      2,
+      9
+    ],
+    "fish_pithscale_char": [
+      3,
+      9
+    ],
+    "fish_amberroot_gar": [
+      4,
+      9
+    ],
+    "fish_mountainheart_paddlefish": [
+      5,
+      9
+    ],
+    "fish_cairn_minnow": [
+      6,
+      9
+    ],
+    "fish_tarn_grayling": [
+      7,
+      9
+    ],
+    "fish_graniteback_sturgeon": [
+      8,
+      9
+    ],
+    "rod_rootbraid_rod": [
+      9,
+      9
+    ],
+    "rod_cairnsteel_rod": [
+      10,
+      9
+    ],
+    "dish_cloudwater_grill": [
+      11,
+      9
+    ],
+    "dish_glasswater_grill": [
+      12,
+      9
+    ],
+    "dish_moonwater_grill": [
+      0,
+      10
+    ],
+    "dish_greenwater_grill": [
+      1,
+      10
+    ],
+    "dish_deep_springs_grill": [
+      2,
+      10
     ]
-  }
+  },
+  "local": [
+    "fish_cloud_minnow",
+    "fish_storm_barb",
+    "fish_gale_eel",
+    "fish_thundercrest_ray",
+    "fish_star_dace",
+    "fish_comet_perch",
+    "fish_nebula_gar",
+    "fish_prism_gudgeon",
+    "fish_glass_spindlefish",
+    "fish_suncut_carp",
+    "fish_prismatic_mirrorfish",
+    "fish_clockwork_chub",
+    "fish_obsidian_bream",
+    "fish_orrery_sturgeon",
+    "fish_spore_rasbora",
+    "fish_veil_catfish",
+    "fish_dreamfin_pike",
+    "fish_moonwake_dragonfish",
+    "fish_crescent_bleak",
+    "fish_silver_crescent_eel",
+    "fish_ringwater_koi",
+    "fish_ribbon_shiner",
+    "fish_jubilee_guppy",
+    "fish_parade_gourami",
+    "fish_festival_crownfin",
+    "fish_rootfoot_dace",
+    "fish_nectar_perch",
+    "fish_canopy_lungfish",
+    "fish_heartwood_whitefish",
+    "fish_pithscale_char",
+    "fish_amberroot_gar",
+    "fish_mountainheart_paddlefish",
+    "fish_cairn_minnow",
+    "fish_tarn_grayling",
+    "fish_graniteback_sturgeon",
+    "rod_rootbraid_rod",
+    "rod_cairnsteel_rod",
+    "dish_cloudwater_grill",
+    "dish_glasswater_grill",
+    "dish_moonwater_grill",
+    "dish_greenwater_grill",
+    "dish_deep_springs_grill"
+  ]
 }

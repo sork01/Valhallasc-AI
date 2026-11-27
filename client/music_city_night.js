@@ -1,3 +1,3 @@
 'use strict';
-/* The Last Lantern: Skaldholm's night remix. */
+// Skaldholm at Midnight.
 window.createCityNightMusic = ctx => window.createLoopMusic(ctx, 'assets/music_city_night.mp3');

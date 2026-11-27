@@ -62,11 +62,11 @@ const call=async(name,args={})=>{const r=await client.callTool({name,arguments:a
   await debug({op:'set_time',hour:12,freeze:true});
   await debug({op:'set_weather',kind:'clear'});
   await page.waitForFunction(()=>valhalla.emberwakeMusic?.loaded&&valhalla.emberwakeNightMusic?.loaded,null,{timeout:60000});
-  assert.ok(await page.evaluate(()=>Math.abs(valhalla.emberwakeMusic.duration-32*4*60/110)<.05),'Day loop decodes');
+  assert.ok(await page.evaluate(()=>Math.abs(valhalla.emberwakeMusic.duration-96)<.05),'Day loop decodes');
   assert.ok(await page.evaluate(()=>Math.abs(valhalla.emberwakeNightMusic.duration-80)<.05),'Night loop decodes');
   assert.equal(await page.evaluate(()=>Field.zoneTheme),'emberwake');
   assert.ok(await page.locator('#world-weather').textContent().then(t=>!t.includes('Indoors')),'The caldera has outdoor weather');
-  assert.ok(await page.evaluate(()=>WORLD_MAP.zones[44].objects.some(o=>o.kind==='meetingstone')),'The hire service has a visible Meeting Stone');
+  assert.ok(await page.evaluate(()=>WORLD_MAP.zones[44].objects.some(o=>o.kind==='meetingstone')),'The summon service has a visible Meeting Stone');
   if(!STUB)await page.waitForFunction(()=>Field.cathedralSprites?.meta.kinds.filter(k=>k.startsWith('ew_')).length===7);
   // The zone's three authored elites; the Empty Seat overlay adds an es_ foe (Shade of the Unbound King) at its echo circle, which is not one of them.
   assert.equal(await page.evaluate(()=>WORLD_MAP.zones[44].slimes.filter(s=>!s.kind.startsWith('es_')&&CATHEDRAL_ENEMIES.find(e=>e.kind===s.kind)?.elite).length),3);

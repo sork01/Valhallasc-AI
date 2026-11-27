@@ -33,7 +33,7 @@ pub(super) fn step_off(c: &mut Character, maps: &[Map]) -> Vec<String> {
     if c.zone == 0 && dock.contains(c.point()) {
         return arrived;
     }
-    c.landing = false;
+    let room = c.quest_slots_left();
     let first = maps[0].quests.iter().filter(|q| q.id == dock.quest);
     let rest = maps[0]
         .quests
@@ -43,6 +43,9 @@ pub(super) fn step_off(c: &mut Character, maps: &[Map]) -> Vec<String> {
         if c.quests.iter().any(|q| q.id == quest.id) || c.abandoned_quests.contains(&quest.id) {
             continue;
         }
+        if arrived.len() == room {
+            return arrived;
+        }
         c.quests.push(QuestProgress {
             id: quest.id.clone(),
             counts: vec![0; quest.objectives.len()],
@@ -51,6 +54,7 @@ pub(super) fn step_off(c: &mut Character, maps: &[Map]) -> Vec<String> {
         });
         arrived.push(quest.title.clone());
     }
+    c.landing = false;
     arrived
 }
 

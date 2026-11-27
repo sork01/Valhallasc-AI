@@ -53,8 +53,9 @@ def female_layers(inks, p, psi, R, xf, joints):
     H, hd, front = head['H'], head['hd'], head['front']
     sw = p['sway']
     # Long straight hair to the hips (the back sheet), then the legacy angular crown and fringe wedges.
-    body.plate([xf(q) for q in [(-6, -5, 84), (6, -5, 84), (9 + sw * .8, -8.4, 62), (9.6 + sw * 1.4, -10, 40), (6 + sw * 2, -11, 27), (1 + sw * 2.2, -10.6, 33), (-4 + sw * 2, -11, 26), (-9.4 + sw * 1.4, -10, 40), (-9 + sw * .8, -8.4, 62)]], 'hair', 1)
-    body.plate([xf(q) for q in [(-2.4, -5.4, 82), (2.8, -5.4, 82), (4 + sw, -9.6, 60), (3 + sw * 1.8, -10.8, 40), (0 + sw * 2, -10.4, 44), (-2 + sw, -9.6, 60)]], 'hair', 2, True)
+    if not cc.HAT_HAIR:
+        body.plate([xf(q) for q in [(-6, -5, 84), (6, -5, 84), (9 + sw * .8, -8.4, 62), (9.6 + sw * 1.4, -10, 40), (6 + sw * 2, -11, 27), (1 + sw * 2.2, -10.6, 33), (-4 + sw * 2, -11, 26), (-9.4 + sw * 1.4, -10, 40), (-9 + sw * .8, -8.4, 62)]], 'hair', 1)
+        body.plate([xf(q) for q in [(-2.4, -5.4, 82), (2.8, -5.4, 82), (4 + sw, -9.6, 60), (3 + sw * 1.8, -10.8, 40), (0 + sw * 2, -10.4, 44), (-2 + sw, -9.6, 60)]], 'hair', 2, True)
     if not cc.face(body, head, p):
         body.poly([H(*q) for q in [(-9, 8), (-10, 0), (-8, -8), (-4, -10), (5, -9), (9, -5), (10, 4), (6, 12), (-3, 13)]], COLOR['hair'][1], hd - 5)
     crown = [(-10, 2), (-11, 8), (-8, 12), (-9, 15), (-3, 13), (1, 16), (3, 13),
@@ -63,8 +64,9 @@ def female_layers(inks, p, psi, R, xf, joints):
     for wedge in [[(-8, 10), (-2, 12), (-4, 6), (-8, 3)], [(-1, 12), (3, 13), (6, 7), (2, 7)], [(6, 11), (9, 8), (8, 3)]]:
         body.poly([H(*q) for q in wedge], COLOR['hair'][2], hd - 6.1, False)
     body.poly([H(*q) for q in [(-6, 11), (-2, 12), (-3, 10), (-6, 8)]], COLOR['hair'][3], hd - 6.2, False)
-    for sx_ in (-1, 1):
-        body.plate([xf(q) for q in [(sx_ * 9.4, -1.2, 86), (sx_ * 11.2, -1.2, 80), (sx_ * 11, .8, 64), (sx_ * 9.2, .6, 62), (sx_ * 8.6, -.4, 74)]], 'hair', 2 if sx_ > 0 else 1, True)
+    if not cc.HAT_HAIR:
+        for sx_ in (-1, 1):
+            body.plate([xf(q) for q in [(sx_ * 9.4, -1.2, 86), (sx_ * 11.2, -1.2, 80), (sx_ * 11, .8, 64), (sx_ * 9.2, .6, 62), (sx_ * 8.6, -.4, 74)]], 'hair', 2 if sx_ > 0 else 1, True)
 
     scalp.finish()
     for key, mat, scarf in [('armor_shadow', 'night', 'scarf'), ('armor_moon', 'moon', 'ribbon')]:

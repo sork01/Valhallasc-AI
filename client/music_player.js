@@ -10,8 +10,10 @@
 (() => {
   const FADE_IN = 2.5, FADE_OUT = 1.2;
   const releaseAfter = () => (window.__musicReleaseS ?? 60) * 1000;      // tests shorten it
+  const outputs = new WeakMap();
+  window.setLoopMusicOutput = (ctx, output) => outputs.set(ctx, output);
   function createLoopMusic(ctx, url) {
-    const master = ctx.createGain(); master.gain.value = 0; master.connect(ctx.destination);
+    const master = ctx.createGain(); master.gain.value = 0; master.connect(outputs.get(ctx) || ctx.destination);
     let buffer = null, loading = null, voice = null, running = false, level = 1, duckUntil = 0, gen = 0, unload = 0;
 
     function load() {
@@ -54,9 +56,20 @@
       },
       get running() { return running; },
       get loaded() { return !!buffer; },
-      get output() { return master; },                                // the node wired to the speakers (tests tell it from the effects bus)
+      get output() { return master; },                                // the per-track level before the shared master gain
       get duration() { return buffer ? buffer.duration : 0; },
     };
   }
+  // Use audio time so suspending a background tab cannot skip the outgoing fade.
+  window.createMusicTransition = ctx => {
+    let current = null, quietAt = 0;
+    return next => {
+      const now = ctx.currentTime;
+      if (current && current !== next) {
+        current.stop(); current = null; quietAt = now + FADE_OUT;
+      }
+      if (!current && next && now >= quietAt) { current = next; current.start(); }
+    };
+  };
   window.createLoopMusic = createLoopMusic;
 })();

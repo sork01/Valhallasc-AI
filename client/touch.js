@@ -32,17 +32,18 @@
     }
     saved[cls()] = next; window.Prefs.set({ touchSkills: saved }); update(); return true;
   }
-  function button(label, action, parent) {
+  function button(label, action, parent, activate = () => Keys.invoke(action)) {
     const b = document.createElement('button'); b.type = 'button'; b.textContent = tr(label); b.dataset.action = action;
     let lastTouch = -Infinity;
     b.addEventListener('pointerdown', e => {
       if (parent !== arc || e.pointerType !== 'touch' || b.disabled) return;
-      e.preventDefault(); lastTouch = performance.now(); Keys.invoke(action);
+      e.preventDefault(); lastTouch = performance.now(); activate();
     });
-    b.addEventListener('click', e => { if (!e.detail || performance.now() - lastTouch > 700) Keys.invoke(action); }); parent.append(b); return b;
+    b.addEventListener('click', e => { if (!e.detail || performance.now() - lastTouch > 700) activate(); }); parent.append(b); return b;
   }
   Keys.register('attack', () => coarse.matches && !Field.hero?.pvpTargetId ? Field.startNearestAutoattack() : Field.action('attack'));
-  for (const name of ['dash', 'talk', 'interact', 'mount', 'fish']) Keys.register(name, () => Field.action(name));
+  for (const name of ['dash', 'talk', 'interact', 'mount']) Keys.register(name, () => Field.action(name));
+  Keys.register('fish', () => Field.action('fish', true));
   for (let i = 0; i < 12; i++) Keys.register('skill' + (i + 1), () => {
     const id = $('skillbar-slots').children[i]?.dataset.skill; return id ? Field.useSkill(id) : false;
   });
@@ -59,6 +60,7 @@
   });
   Keys.register('quests', () => { Quests.show(); return true; });
   const fish = button('Cast', 'fish', arc); fish.className = 'touch-fish'; fish.hidden = true;
+  const mine = button('Mine ore', 'mine', arc, () => Field.action('mine')); mine.className = 'touch-mine'; mine.hidden = true;
   const attack = button('Attack', 'attack', arc); attack.className = 'touch-attack';
   const skillButtons = Array.from({ length: 4 }, (_, i) => {
     const action = 'touchSkill' + (i + 1), b = button('Empty', action, arc); b.className = 'touch-skill'; b.dataset.arc = i; b.hidden = true;
@@ -168,15 +170,24 @@
   let lastState = '';
   function update() {
     if (!coarse.matches || !Field.hero) return;
-    fish.hidden = !window.Fishing?.available(); fish.disabled = !Field.canAct || !!Field.hero.sparkTravel;
-    fish.title = window.Fishing?.requirement(Field.hero?.zone || 0) || '';
-    const bite = window.Fishing?.phase === 'bite'; fish.dataset.bite = String(bite); fish.textContent = tr(bite ? 'Hook!' : 'Cast');
+    const fishing = window.Fishing, phase = fishing?.phase, bite = phase === 'bite';
+    const waiting = phase === 'cast' || phase === 'waiting';
+    fish.hidden = !fishing?.touchAvailable();
+    fish.disabled = !Field.canAct || !fishing?.ready() || waiting;
+    fish.dataset.bite = String(bite);
+    const fishLabel = tr(bite ? 'Hook!' : waiting ? 'Fishing…' : fishing?.available() ? 'Cast' : 'Go fishing');
+    if (fish.textContent !== fishLabel) fish.textContent = fishLabel;
+    const smithing = window.Blacksmithing, mining = smithing?.isMining;
+    mine.hidden = !(smithing?.nearbyVein || mining) || !!Field.hero.dead;
+    mine.disabled = !Field.canAct || !!Field.hero.sparkTravel || !!mining;
+    const mineLabel = tr(mining ? 'Mining…' : 'Mine ore');
+    if (mine.textContent !== mineLabel) mine.textContent = mineLabel;
     const ids = assignments(), states = ids.map(id => Skillbar.state(id));
     attack.disabled = !Field.canAct || !!Field.hero.sparkTravel;
     targetMenu.hidden = $('hud-target').hidden || !$('hud-target').classList.contains('has-menu');
     targetMenu.setAttribute('aria-expanded', String(PortraitMenu.isOpen));
     chatButton.setAttribute('aria-expanded', String($('stage').classList.contains('touch-chat-open')));
-    const key = JSON.stringify(states.map(s => [s.skill?.id, s.ready, Math.ceil(s.cooldown)]));
+    const key = JSON.stringify(states.map(s => [s.skill?.id, s.ready, Math.ceil(s.cooldown), s.free]));
     if (key === lastState) return; lastState = key;
     states.forEach((state, i) => {
       const b = skillButtons[i], skill = state.skill; b.dataset.skill = skill?.id || ''; b.disabled = !state.ready; b.hidden = !skill;
@@ -184,8 +195,10 @@
       if (skill) { const glyph = document.createElement('span'); glyph.innerHTML = Skillbar.icon(skill.icon); b.append(glyph); }
       const name = document.createElement('span'); name.textContent = skill?.name || tr('Empty'); b.append(name);
       b.classList.toggle('cooling', state.cooldown > 0);
+      b.classList.toggle('free-cast', !!state.free);
       b.setAttribute('aria-label', (skill?.name || tr('Empty')) + (state.cooldown > 0 ? ` · ${Math.ceil(state.cooldown)}s` : ''));
       if (state.cooldown > 0) { const cd = document.createElement('small'); cd.className = 'touch-cooldown'; cd.textContent = Math.ceil(state.cooldown); b.append(cd); }
+      else if (state.free) { const tag = document.createElement('small'); tag.className = 'touch-free'; tag.textContent = tr('Free!'); b.append(tag); }
     });
   }
   addEventListener('keydown', e => {

@@ -112,6 +112,13 @@ All eleven changed public client hashes match, public/bridge health is healthy,
 and server PID 183593 is unchanged. Swedish freshness, release notes, changed
 JavaScript syntax and whitespace checks pass.
 
+## Active quest limit (1.13.9)
+
+The journal holds 20 active quests, including quests ready to turn in. Claims
+and abandonment free space. Automatic quests wait for room. Existing saves that
+are already above 20 keep their active quests and must free space before adding
+another.
+
 ## Classic quest journal (Beta 1.47.0)
 
 The owner's FileDrop reference `pvw69993.png` replaces the earlier accordion

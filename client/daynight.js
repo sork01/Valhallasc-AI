@@ -10,6 +10,7 @@
   const hour = () => (clock.hour + (performance.now() - clock.at) / 1000 * clock.speed) % 24;
   const phase = h => h < 5 || h >= 20 ? 'Night' : h < 7 ? 'Dawn' : h < 18 ? 'Day' : 'Dusk';
   const night = h => h < 5 ? 1 : h < 7 ? (7 - h) / 2 : h < 18 ? 0 : h < 20 ? (h - 18) / 2 : 1;
+  const getNightMix = (allowIndoor = false) => clock.synced && (allowIndoor || isOutdoor(zone)) ? night(hour()) : 0;
   const warm = h => Math.max(0, 1 - Math.abs(h - 6) / 1.5, 1 - Math.abs(h - 18.5) / 1.5);
   // [shadow veil RGB, dusk/dawn warmth RGB, cool moonlight multiply RGB]
   const palette = theme => {
@@ -67,6 +68,8 @@
   function lightAnchor(light) {
     const k = light?.kind;
     if (!k) return [0, -46];
+    const art = window.City?.art?.[k];
+    if (art?.lightAnchor) return art.lightAnchor(light);
     if (LIGHT_ANCHORS[k]) return LIGHT_ANCHORS[k];
     if (k.includes('campfire')) return [0, -24];
     if (k.includes('brazier')) return [0, -68];
@@ -99,8 +102,11 @@
         const [ax, ay] = lightAnchor(light);
         const [bx, by] = project(light.x, light.y);
         const lx = bx + ax, ly = by + ay;
-        if (lx > -140 && lx < width + 140 && ly > -140 && ly < height + 140) {
-          visibleLights.push([lx, ly]);
+        const greatBeacon = light.kind === 'beacon' && light.great;
+        const cutRadius = greatBeacon ? 320 : 120;
+        const glowRadius = greatBeacon ? 240 : 64;
+        if (lx > -cutRadius - 20 && lx < width + cutRadius + 20 && ly > -cutRadius - 20 && ly < height + cutRadius + 20) {
+          visibleLights.push({ x: lx, y: ly, cutRadius, glowRadius });
           if (visibleLights.length >= 32) break;
         }
       }
@@ -143,19 +149,11 @@
           v.fillStyle = gr; v.beginPath(); v.arc(cx, cy, cr, 0, Math.PI * 2); v.fill();
         };
         const lightCut = .92 * Math.min(1, n * 1.15);
-        for (const [lx, ly] of visibleLights) cut(lx, ly, 120, lightCut);
+        for (const { x, y, cutRadius } of visibleLights) cut(x, y, cutRadius, lightCut);
         if (focus?.hero) cut(focus.hero[0], focus.hero[1] - 34, 195, .36);
         if (focus?.target) cut(focus.target[0], focus.target[1] - 24, 95, .36);
       }
       g.drawImage(veil, 0, 0, width, height);
-    }
-    if (n > .3) {
-      const alpha = n * outdoorBlend * .75;
-      g.fillStyle = `rgba(234,246,255,${alpha})`;
-      for (let i = 0; i < 28; i++) {
-        const x = (i * 619 + 127) % width, y = (i * 137 + 19) % Math.max(1, height * .25);
-        g.fillRect(x, y, i % 5 === 0 ? 2 : 1, i % 5 === 0 ? 2 : 1);
-      }
     }
     // A zone's own night glow (fades in over its lower part; weight k when two zones mix).
     const nightGlow = (theme, k) => {
@@ -180,12 +178,12 @@
       const sprite = glowSprite();
       g.globalCompositeOperation = 'lighter';
       g.globalAlpha = glowAlpha;
-      for (const [lx, ly] of visibleLights) g.drawImage(sprite, lx - 64, ly - 64);
+      for (const { x, y, glowRadius: r } of visibleLights) g.drawImage(sprite, x - r, y - r, 2 * r, 2 * r);
       g.globalCompositeOperation = 'source-over';
     }
     g.restore();
   }
   window.DayNight = { sync, setZone, tick, draw, isOutdoor, get hour() { return hour(); }, get outdoorBlend() { return outdoorBlend; },
-    get nightMix() { return clock.synced && isOutdoor(zone) ? night(hour()) : 0; },
+    getNightMix, get nightMix() { return getNightMix(); },
     get shadowOffset() { return isOutdoor(zone) && hour() >= 7 && hour() <= 18 ? (12 - hour()) * 1.4 : 0; } };
 })();

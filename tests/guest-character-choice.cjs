@@ -104,9 +104,10 @@ function fixture({ characters = [], current = null, cached = null, mode = 'guest
     const f = fixture({ characters: guestSlots, current: 'guest-two', cached: guestSlots[1].look });
     f.get('login-guest').click(); f.get('chars-new').click();
     check(f.scenes.at(-1) === 'create' && !f.sockets.length, 'New character opens job and appearance choices before connecting');
-    f.ctx.cfg = { name: 'NewHunter', class: 'hunter', gender: 'female' }; f.get('name').value = 'NewHunter'; f.get('go').click();
+    f.ctx.cfg = { name: 'NewHunter', class: 'hunter', gender: 'female', race: 'mothkin' }; f.get('name').value = 'NewHunter'; f.get('go').click();
     const join = f.open();
     check(join.token === null && join.look.name === 'NewHunter' && join.look.class === 'hunter', 'new job creates a new guest rather than modifying the old one');
+    check(join.look.race === 'mothkin', 'new guest sends the selected race in its creation look');
     check(f.store.get(f.guestKey).includes('guest-one') && f.store.get(f.guestKey).includes('guest-two'), 'creating preserves previous guest access');
   }
   {

@@ -1,4 +1,4 @@
-use crate::items::{GearInstance, is_gear, is_quest_item, item};
+use crate::items::{GearInstance, equipment, is_gear, is_quest_item, item};
 use crate::model::Character;
 use crate::profession::{band_cap, gear_skill_cap};
 use serde::{Deserialize, Serialize};
@@ -24,13 +24,42 @@ pub enum Enchant {
     BorrowedTime,
     Moonstep,
     HeartwoodGrove,
+    HorizonStep,
+    PrismEcho,
+    Siltweave,
+    LanternKeeper,
+    RibbonRush,
+    Rootguard,
+    Cairnstrike,
+    EvergreenSigil,
+}
+
+#[derive(Clone, Copy, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
+#[serde(rename_all = "lowercase")]
+enum Rarity {
+    Rare,
+    Epic,
+    Legendary,
+}
+
+impl Rarity {
+    fn gear(rarity: &str) -> Option<Self> {
+        match rarity {
+            "rare" => Some(Self::Rare),
+            "epic" => Some(Self::Epic),
+            "legendary" => Some(Self::Legendary),
+            _ => None,
+        }
+    }
 }
 
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Tier {
-    rarity: String,
+    rarity: Rarity,
     skill: u16,
+    #[serde(default)]
+    min_gear_level: u32,
     pub min_enemy_level: u32,
     pub drop_chance: f64,
 }
@@ -38,6 +67,10 @@ pub struct Tier {
 impl Tier {
     pub fn skill_cap(&self) -> u16 {
         band_cap(self.skill)
+    }
+
+    fn quality(&self) -> u8 {
+        self.rarity as u8 + 1
     }
 }
 
@@ -61,7 +94,7 @@ pub struct Recipe {
 
 #[derive(Deserialize)]
 pub struct Catalog {
-    pub tiers: [Tier; 3],
+    pub tiers: Vec<Tier>,
     materials: [Material; 4],
     pub enchants: Vec<Recipe>,
 }
@@ -86,15 +119,18 @@ impl Enchant {
 }
 
 impl Recipe {
+    pub fn min_gear_level(&self) -> u32 {
+        CATALOG.tiers[self.tier].min_gear_level
+    }
+
     pub fn fits(&self, gear: &GearInstance) -> bool {
         let Some(catalog) = item(&gear.item).filter(|i| !i.starter && is_gear(i)) else {
             return false;
         };
-        let rarity = CATALOG
-            .tiers
-            .iter()
-            .position(|tier| tier.rarity == gear.rarity);
-        catalog.kind == self.kind && rarity.is_some_and(|rank| rank >= self.tier)
+        let tier = &CATALOG.tiers[self.tier];
+        catalog.kind == self.kind
+            && catalog.required_level >= self.min_gear_level()
+            && Rarity::gear(&gear.rarity).is_some_and(|rarity| rarity >= tier.rarity)
     }
 }
 
@@ -121,6 +157,8 @@ pub enum Command {
     },
     Craft {
         enchant: Enchant,
+        #[serde(default)]
+        all: bool,
     },
     Apply {
         enchant: Enchant,
@@ -132,6 +170,7 @@ pub enum Command {
 pub struct Training {
     pub quality: u8,
     pub cap: u16,
+    pub attempts: u32,
 }
 
 pub fn equipment_skill_cap(gear: &GearInstance) -> u16 {
@@ -139,6 +178,14 @@ pub fn equipment_skill_cap(gear: &GearInstance) -> u16 {
 }
 
 impl Character {
+    pub(crate) fn weapon_enchant(&self) -> Option<Enchant> {
+        let weapon = equipment(self.look.class, "weapon", self.gear().1)?;
+        let copy = self.worn_gear_instance(&weapon.id, 0)?;
+        copy.enchant.filter(|enchant| {
+            weapon.required_level <= self.level && !copy.broken() && enchant.recipe().kind == "weapon"
+        })
+    }
+
     pub fn wears_enchant(&self, enchant: Enchant) -> bool {
         let recipe = enchant.recipe();
         self.worn_slots().into_iter().any(|(slot, piece)| {
@@ -199,6 +246,7 @@ impl Character {
                 let training = Training {
                     quality: quality as u8,
                     cap: equipment_skill_cap(gear),
+                    attempts: 1,
                 };
                 if !self.consume_item(&id, 1) {
                     return Err("That gear copy is unavailable.");
@@ -207,7 +255,7 @@ impl Character {
                 self.enchant_output(&material.id, material.quantity)?;
                 Ok(("Equipment disenchanted.", Some(training)))
             }
-            Craft { enchant } => {
+            Craft { enchant, all } => {
                 self.require_enchanting()?;
                 let recipe = enchant.recipe();
                 let tier = &CATALOG.tiers[recipe.tier];
@@ -216,17 +264,25 @@ impl Character {
                 {
                     return Err("This recipe requires training and more Enchanting skill.");
                 }
-                for (material, amount) in CATALOG.materials.iter().zip(recipe.cost) {
-                    if amount > 0 && !self.consume_item(&material.id, amount) {
-                        return Err("You need more enchanting materials.");
-                    }
-                }
-                self.enchant_output(&enchant.item("scroll"), 1)?;
+                let costs = CATALOG
+                    .materials
+                    .iter()
+                    .zip(recipe.cost)
+                    .filter(|(_, amount)| *amount > 0)
+                    .map(|(material, amount)| (std::iter::once(material.id.as_str()), amount));
+                let attempts = self.produce_recipe(
+                    &enchant.item("scroll"),
+                    0,
+                    all,
+                    costs,
+                    "You need more enchanting materials.",
+                )?;
                 Ok((
                     "Enchant scroll crafted.",
                     Some(Training {
-                        quality: recipe.tier as u8 + 1,
+                        quality: tier.quality(),
                         cap: tier.skill_cap(),
+                        attempts,
                     }),
                 ))
             }
@@ -236,9 +292,10 @@ impl Character {
                 expected,
             } => {
                 let (at, gear) = self.enchant_target(copy, expected)?;
-                if !enchant.recipe().fits(gear) {
+                let recipe = enchant.recipe();
+                if !recipe.fits(gear) {
                     return Err(
-                        "This enchantment requires matching equipment of at least its rarity.",
+                        "This enchantment requires matching equipment of its level and rarity or higher.",
                     );
                 }
                 if expected == Some(enchant) {
@@ -247,6 +304,7 @@ impl Character {
                 let training = Training {
                     quality: enchant.recipe().tier as u8 + 1,
                     cap: equipment_skill_cap(gear),
+                    attempts: 1,
                 };
                 if !self.consume_item(&enchant.item("scroll"), 1) {
                     return Err("You need the crafted scroll in your bags.");
@@ -292,10 +350,16 @@ impl Character {
     }
 }
 
+static DROP_TIERS: LazyLock<Vec<(usize, &'static Tier)>> = LazyLock::new(|| {
+    let mut tiers: Vec<_> = CATALOG.tiers.iter().enumerate().collect();
+    tiers.sort_by_key(|(index, tier)| std::cmp::Reverse((tier.rarity, *index)));
+    tiers
+});
+
 pub fn drop_recipe(level: u32, elite: bool, chance: f64, choice: f64) -> Option<Enchant> {
     let bonus = if elite { 3. } else { 1. };
     let mut roll = chance;
-    for (index, tier) in CATALOG.tiers.iter().enumerate().rev() {
+    for &(index, tier) in DROP_TIERS.iter() {
         if level < tier.min_enemy_level {
             continue;
         }

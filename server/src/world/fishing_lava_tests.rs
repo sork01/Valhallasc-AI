@@ -13,6 +13,7 @@ fn pool(w: &mut World, zone: usize, kind: &str, rod: &str) {
     p.character.level = 99;
     p.character.inventory.clear();
     p.character.fishing = Default::default();
+    p.character.fishing.proficiency.skill = water_skill_requirement(zone).unwrap();
     p.character.add_item(rod, 1);
     p.face = Point { x: 1., y: 0. };
     p.fishing = Session::default();
@@ -31,7 +32,7 @@ fn fishing_lava_cast_requires_the_whole_hero_on_clear_shore() {
             let mut corrected = from;
             w.maps[zone].collide(&mut corrected, PLAYER_RADIUS);
             assert!(corrected.distance(from) > 0.01);
-            assert!(w.fishing_line(1, 20.).is_err(), "zone {zone}, x {x}");
+            assert!(w.fishing_line(1, 20., false).is_err(), "zone {zone}, x {x}");
             assert_eq!(w.players[&1].character.point().distance(from), 0.);
         }
         // A rock on the shore also makes the origin invalid; casting must not push us out.
@@ -40,7 +41,7 @@ fn fishing_lava_cast_requires_the_whole_hero_on_clear_shore() {
             .objects
             .push(serde_json::from_value(json!({"kind":"rock","x":50.,"y":50.,"r":0.5})).unwrap());
         w.maps[zone].grid = Default::default();
-        assert!(w.fishing_line(1, 20.).is_err(), "blocked shore in {zone}");
+        assert!(w.fishing_line(1, 20., false).is_err(), "blocked shore in {zone}");
     }
 }
 
@@ -50,35 +51,35 @@ fn fishing_lava_rods_surfaces_zone_and_level_are_enforced() {
     for (zone, surface) in [(1, "lava"), (45, "ew_lava")] {
         pool(&mut w, zone, surface, "rod_twig_rod");
         assert!(
-            w.fishing_line(1, 20.).is_err(),
+            w.fishing_line(1, 20., false).is_err(),
             "starter rod in lava {zone}"
         );
         let p = w.players.get_mut(&1).unwrap();
         p.character.add_item("rod_emberline_rod", 1);
         p.character.level = 4;
-        assert!(w.fishing_line(1, 20.).is_err(), "underlevel Emberline");
+        assert!(w.fishing_line(1, 20., false).is_err(), "underlevel Emberline");
         w.players.get_mut(&1).unwrap().character.level = 5;
-        assert_eq!(w.fishing_line(1, 20.).is_ok(), zone == 1);
+        assert_eq!(w.fishing_line(1, 20., false).is_ok(), zone == 1);
         let p = w.players.get_mut(&1).unwrap();
         p.character.add_item("rod_magma_reel", 1);
         p.character.level = 44;
-        assert_eq!(w.fishing_line(1, 20.).is_ok(), zone == 1);
+        assert_eq!(w.fishing_line(1, 20., false).is_ok(), zone == 1);
         w.players.get_mut(&1).unwrap().character.level = 45;
-        assert_eq!(w.fishing_line(1, 20.).unwrap().tier, 6);
+        assert_eq!(w.fishing_line(1, 20., false).unwrap().tier, 6);
         w.players.get_mut(&1).unwrap().face.x = -1.;
-        assert!(w.fishing_line(1, 20.).is_err(), "facing away");
+        assert!(w.fishing_line(1, 20., false).is_err(), "facing away");
         w.players.get_mut(&1).unwrap().face.x = 1.;
         w.maps[zone].objects[0].surface = FishingSurface::Water;
         w.maps[zone].grid = Default::default();
         assert!(
-            w.fishing_line(1, 20.).is_err(),
+            w.fishing_line(1, 20., false).is_err(),
             "lava zone water is not lava"
         );
     }
     for rod in ["rod_emberline_rod", "rod_magma_reel"] {
         pool(&mut w, 0, "water", rod);
         assert!(
-            w.fishing_line(1, 20.).is_ok(),
+            w.fishing_line(1, 20., false).is_ok(),
             "heat-resistant rod keeps water fishing: {rod}"
         );
         w.players
@@ -87,13 +88,13 @@ fn fishing_lava_rods_surfaces_zone_and_level_are_enforced() {
             .character
             .add_item("rod_twig_rod", 1);
         assert_eq!(
-            w.fishing_line(1, 20.).unwrap().tier,
+            w.fishing_line(1, 20., false).unwrap().tier,
             if rod == "rod_emberline_rod" { 2 } else { 6 }
         );
         w.maps[0].objects[0].surface = FishingSurface::Lava;
         w.maps[0].grid = Default::default();
         assert!(
-            w.fishing_line(1, 20.).is_err(),
+            w.fishing_line(1, 20., false).is_err(),
             "water zone lava is not water"
         );
     }
@@ -118,6 +119,7 @@ fn fishing_lava_all_real_shores_cast_without_moving_or_crossing_lava() {
             let p = w.players.get_mut(&1).unwrap();
             p.character.zone = zone;
             p.character.level = if zone == 1 { 5 } else { 45 };
+            p.character.fishing.proficiency.skill = water_skill_requirement(zone).unwrap();
             p.character.inventory.clear();
             p.character.add_item(
                 if zone == 1 {
@@ -132,7 +134,7 @@ fn fishing_lava_all_real_shores_cast_without_moving_or_crossing_lava() {
             p.face = face;
             p.fishing = Session::default();
             let hp = p.character.hp;
-            w.fish_press(1, 20.);
+            w.fish_press(1, 20., false);
             let p = &w.players[&1];
             let line = p
                 .fishing
@@ -181,10 +183,10 @@ fn fishing_lava_catches_use_local_species_junk_tiers_and_legendaries() {
             p.character.rebirth_tiers = [0, 0, 0, 0, 2];
             let from = p.character.point();
             let hp = p.character.hp;
-            w.fish_press(1, time);
+            w.fish_press(1, time, false);
             let line = w.players[&1].fishing.line.unwrap();
             w.rng = seed;
-            w.fish_press(1, line.deadline());
+            w.fish_press(1, line.deadline(), false);
             let packets: Vec<_> = std::iter::from_fn(|| rx.try_recv().ok()).collect();
             let catch = packets.iter().find(|v| v["kind"] == "fish_catch").unwrap();
             let announcements: Vec<_> =
@@ -221,7 +223,7 @@ fn fishing_lava_catches_use_local_species_junk_tiers_and_legendaries() {
         }
         // Emberline cannot roll the tier-two rare even when the rarity draw is high.
         w.players.get_mut(&1).unwrap().fishing = Session::default();
-        let line = w.fishing_line(1, 100.).unwrap();
+        let line = w.fishing_line(1, 100., false).unwrap();
         w.rng = 53;
         w.land_fish(1, line, 110.);
         let catch = std::iter::from_fn(|| rx.try_recv().ok())
@@ -248,7 +250,7 @@ fn fishing_lava_active_spots_spend_one_fish_and_damage_cancels() {
     let (mut w, _) = super::super::fishing_tests::angler();
     for (zone, kind) in [(1, "lava"), (45, "ew_lava")] {
         pool(&mut w, zone, kind, "rod_magma_reel");
-        let line = w.fishing_line(1, 20.).unwrap();
+        let line = w.fishing_line(1, 20., false).unwrap();
         w.rich_fishing.insert(
             zone,
             vec![RichSpot {
@@ -258,27 +260,27 @@ fn fishing_lava_active_spots_spend_one_fish_and_damage_cancels() {
             }],
         );
         w.players.get_mut(&1).unwrap().character.rebirth_tiers = [0, 0, 0, 0, 2];
-        w.fish_press(1, 20.);
+        w.fish_press(1, 20., false);
         let line = w.players[&1].fishing.line.unwrap();
         assert!(line.rich.is_some());
         w.rng = 0;
-        w.fish_press(1, line.deadline());
+        w.fish_press(1, line.deadline(), false);
         assert_eq!(w.rich_fishing[&zone][0].remaining, 5, "junk spends no fish");
-        w.fish_press(1, 50.);
+        w.fish_press(1, 50., false);
         let line = w.players[&1].fishing.line.unwrap();
         w.rng = 2;
-        w.fish_press(1, line.deadline());
+        w.fish_press(1, line.deadline(), false);
         assert_eq!(
             w.rich_fishing[&zone][0].remaining, 4,
             "rebirth spends one fish"
         );
-        w.fish_press(1, 80.);
+        w.fish_press(1, 80., false);
         let line = w.players[&1].fishing.line.unwrap();
         let total = w.players[&1].character.fishing.total;
         let inventory = serde_json::to_value(&w.players[&1].character.inventory).unwrap();
         w.rng = 2; // An uncancelled line would award a real fish, never a log-free junk roll.
         w.players.get_mut(&1).unwrap().last_hurt += 1.;
-        w.fish_press(1, line.deadline());
+        w.fish_press(1, line.deadline(), false);
         assert!(w.players[&1].fishing.line.is_none());
         assert_eq!(w.players[&1].character.fishing.total, total);
         assert_eq!(
@@ -323,10 +325,10 @@ fn fishing_client_legendary_announcement_is_zone_scoped_and_respects_hidden_acto
         let p = w.players.get_mut(&1).unwrap();
         p.character.gm = hidden;
         p.hidden = hidden;
-        w.fish_press(1, time);
+        w.fish_press(1, time, false);
         let deadline = w.players[&1].fishing.line.unwrap().deadline();
         w.rng = 1434;
-        w.fish_press(1, deadline);
+        w.fish_press(1, deadline, false);
         let packets: Vec<_> = std::iter::from_fn(|| owner.try_recv().ok()).collect();
         let catches: Vec<_> = packets
             .iter()

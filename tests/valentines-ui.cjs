@@ -35,7 +35,7 @@ const check=(v,s)=>{assert.ok(v,s);console.log(++checks+': '+s);};
   for(const o of q.objectives){if(o.kind==='talk'){await npc(o.target);await interact(o.target);}else{const place=a.places.find(v=>v.id===o.target);await stand(z,place.x,place.y);}}
   await wait(id=>__self().quests.find(q=>q.id===id).counts.every(n=>n>=1),q.id);
   await npc(q.npc);await interact(q.npc,'quest:claim:'+q.id);await wait(id=>__self().seasonalClaims[id]===2027,q.id);
-  check(await p.evaluate(([g,r])=>__self().gold===g+r,[gold,q.rewardGold]),`${a.name}: actual talk/visit objectives and exact annual quest reward`);
+  check(await p.evaluate(([g,r])=>__self().gold===g+r,[gold,Math.floor((q.rewardGold * 105 + 50) / 100)]),`${a.name}: actual talk/visit objectives and exact annual quest reward`);
   await interact(q.npc,'quest:accept:'+q.id);check(await p.evaluate(id=>!Quests.offered([WORLD_MAP,...WORLD_MAP.zones][Field.zone].quests.find(q=>q.id===id).npc).some(q=>q.id===id),q.id),`${a.name}: the annual quest cannot be rewarded twice`);
   const tree=a.valentineDecor.find(o=>o.kind==='valentineGrandHeart')||a.valentineDecor.find(o=>o.kind==='valentineHeart');
   await debug({op:'set_time',hour:18,freeze:true});await stand(z,tree.x+2,tree.y+2);await wait(()=>NpcArt.readyFor(City.npcs));await p.waitForTimeout(500);
@@ -48,7 +48,7 @@ const check=(v,s)=>{assert.ok(v,s);console.log(++checks+': '+s);};
   await npc(host);await interact(host,'quest:accept:'+qid);await wait(id=>__self().quests.some(q=>q.id===id&&!q.claimed),qid);await debug({op:'quest',id:qid,action:'complete'});await interact(host,'quest:claim:'+qid);await wait(id=>__self().seasonalClaims[id]===2027,qid);
  }
  await p.evaluate(()=>Achievements.open());await wait(()=>window.__ach?.entries);
- check(await p.evaluate(()=>__ach.entries.find(a=>a.id==='lovefool').complete===false&&__ach.maximum===4090),'Four city errands alone do not grant Lovefool');
+ check(await p.evaluate(()=>__ach.entries.find(a=>a.id==='lovefool').complete===false&&__ach.maximum===4370),'Four city errands alone do not grant Lovefool');
  if(process.env.CHECK_ONLY==='titles'){
   await npc('baker');await interact('baker','quest:accept:valentine_hunt');await wait(()=>__self().quests.some(q=>q.id==='valentine_hunt'&&!q.claimed));await debug({op:'quest',id:'valentine_hunt',action:'complete'});await interact('baker','quest:claim:valentine_hunt');await wait(()=>__self().seasonalClaims.valentine_hunt===20270210);
   await wait(()=>document.querySelector('#achievement-toast-name').textContent.includes('Lovefool'));check(true,'The normal achievement celebration receives the Lovefool award');

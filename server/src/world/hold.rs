@@ -8,7 +8,7 @@ use std::collections::BTreeSet;
 
 /// Seconds without any channeller near a ward before its woken enemies go back to sleep.
 const AWAY_SECONDS: f64 = 12.;
-/// How far from the ward's edge a hero still counts as being at it (for the death rule and the sleep timer).
+/// How far beyond the authored place a hero still counts as being nearby for the death rule and sleep timer.
 const WATCH_RADIUS: f64 = 30.;
 
 #[derive(Default)]
@@ -103,7 +103,7 @@ impl World {
                     continue;
                 }
                 near.insert(key.clone());
-                if d > job.place.r {
+                if d > job.place.hold_radius() {
                     continue;
                 }
                 let ticks = self.hold.ticks.entry(session).or_insert(0);

@@ -85,7 +85,7 @@ const VARIANT = armor.id.replace('warrior_armor_', '');
     const bareCells = p => p.bagCapacity - (p.bags || []).reduce((n, id) => n + (items.find(i => i.id === id)?.bagSlots || 0), 0);
     assert.equal(bareCells(me()), 16);
 
-    // 1. A quest played before any rebirth pays its plain rewards.
+    // 1. Claim a low-level quest before rebirth to exercise the 30% floor.
     const claim = async id => {
       const before = { xp: me().xp, gold: me().gold, level: me().level };
       await debug('quest', { id, action: 'accept' });
@@ -95,9 +95,8 @@ const VARIANT = armor.id.replace('warrior_armor_', '');
       assert.ok(p.quests.find(q => q.id === id)?.claimed, `${id} is claimed`);
       return { xp: p.xp - before.xp, gold: p.gold - before.gold, levelBefore: before.level, level: p.level };
     };
-    // The hero is level 50 here, so its XP bar is huge and a 10 XP reward is exact.
     const first = await claim('welcome');
-    assert.deepEqual([first.xp, first.gold], [10, 12], 'the unreborn reward');
+    assert.deepEqual([first.xp, first.gold], [3, 12], 'the level-50 hero gets 30% of a level-1 quest’s XP');
 
     // A real hero has already stepped off the Greenmeadow dock (world/landing.rs grants the landing quests once, on
     // the first step off). Do the same here, so the rebirth below resets a character that has arrived.

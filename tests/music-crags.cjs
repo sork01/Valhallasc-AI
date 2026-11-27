@@ -17,14 +17,14 @@ async function call(name, args = {}) {
 const SONGS = [
   { id: 'title', make: 'createMusic', seconds: 84.71, name: 'Snowbound Hearth' },
   { id: 'night', make: 'createNightMusic', seconds: 80, name: 'Lanterns After Sundown' },
-  { id: 'meadow', make: 'createFieldMusic', seconds: 43.64, name: 'Greenmeadow Wander' },
-  { id: 'crags', make: 'createCragMusic', seconds: 54.86, name: 'Ashfall Run' },
-  { id: 'rime', make: 'createRimeMusic', seconds: 76.8, name: 'Rimeveil Spiral' },
-  { id: 'fen', make: 'createFenMusic', seconds: 72.73, name: 'Lanternmere Dusk' },
-  { id: 'city', make: 'createCityMusic', seconds: 101.05, name: 'Skaldholm Square' },
-  { id: 'wyrd', make: 'createWyrdMusic', seconds: 60.02, name: 'Wyrdwood Wanderings' },
-  { id: 'sky', make: 'createSkyMusic', seconds: 91.43, name: 'Above the Storm' },
-  { id: 'deep', make: 'createDeepMusic', seconds: 106.67, name: 'Lullaby of the Deep' },
+  { id: 'meadow', make: 'createFieldMusic', seconds: 79.565, name: 'Greenmeadow Wander' },
+  { id: 'crags', make: 'createCragMusic', seconds: 80.0, name: 'Ashfall Run' },
+  { id: 'rime', make: 'createRimeMusic', seconds: 99.661, name: 'Rimeveil Spiral' },
+  { id: 'fen', make: 'createFenMusic', seconds: 83.077, name: 'Gloamfen Lanternmere' },
+  { id: 'city', make: 'createCityMusic', seconds: 110.769, name: 'Skaldholm Square' },
+  { id: 'wyrd', make: 'createWyrdMusic', seconds: 90.0, name: 'Wyrdwood Wanderings' },
+  { id: 'sky', make: 'createSkyMusic', seconds: 109.16, name: 'Above the Storm' },
+  { id: 'deep', make: 'createDeepMusic', seconds: 121.59, name: 'Lullaby of the Deep' },
 ];
 (async () => {
   browser = await chromium.launch({ headless: true });

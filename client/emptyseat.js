@@ -60,12 +60,13 @@ window.EmptySeat = (() => {
   // Ring stones: a few small cut stones round a place, laid out from the place's seed so every ring sits a little differently.
   const glow = new Map(), stones = new Map();
   const rings = () => (area?.places || []).filter(p => p.ring && p.id.startsWith('es_'));
+  const ringRadius = p => p.holdRadius ?? p.r;
   function stonesOf(p) {
     let out = stones.get(p.id); if (out) return out;
     let seed = (p.ring.seed + 1) >>> 0; const rnd = () => (seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0) / 4294967296;
     const n = p.ring.stones, turn = rnd() * Math.PI * 2; out = [];
     for (let i = 0; i < n; i++) {
-      const a = turn + i * Math.PI * 2 / n + (rnd() - .5) * .2, rad = p.r + (rnd() - .5) * .26;
+      const a = turn + i * Math.PI * 2 / n + (rnd() - .5) * .2, rad = ringRadius(p) + (rnd() - .5) * .26;
       out.push({ x: p.x + Math.cos(a) * rad, y: p.y + Math.sin(a) * rad, w: 24 + rnd() * 14, h: 16 + rnd() * 16, skew: (rnd() - .5) * 4, tone: rnd(), taper: .6 + rnd() * .24 });
     }
     stones.set(p.id, out); return out;
@@ -83,15 +84,15 @@ window.EmptySeat = (() => {
     litOf: id => glow.get(id) ?? 0,      // 0..1: how lit a ring is (1 while the hero stands inside an active site); read by the tests
     ringPlaces: () => rings(),
     // The standing-stone rings are part of the zone: every es_ place carries `ring` (written by scripts/empty_seat.py), and the stones are drawn
-    // for the whole campaign, active or not. They are never obstacles; the walkable circle is still the place's own radius `r`.
+    // for the whole campaign, active or not. Each follows the radius of the objective it marks.
     drawFloor(g, project) {
       const live = new Map(sites().map(p => [p.id, p])), calm = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
       for (const p of rings()) {
-        const site = live.get(p.id), inside = !!site && Math.hypot(hero.x - p.x, hero.y - p.y) <= p.r;
+        const radius = ringRadius(p), site = live.get(p.id), inside = !!site && Math.hypot(hero.x - p.x, hero.y - p.y) <= radius;
         // The glow eases in and out (at once with reduced motion); it is a colour change only, never an animation.
         const lit = glow.get(p.id) ?? 0, next = calm ? +inside : lit + ((inside ? 1 : 0) - lit) * .18;
         glow.set(p.id, Math.abs(next - +inside) < .02 ? +inside : next);
-        const [x, y] = project(p.x, p.y), [rx, ry] = project(p.x + p.r, p.y), u = Math.abs(rx - x), v = Math.abs(ry - y);
+        const [x, y] = project(p.x, p.y), [rx, ry] = project(p.x + radius, p.y), u = Math.abs(rx - x), v = Math.abs(ry - y);
         const l = glow.get(p.id), tint = site?.kind === 'echo' ? '#d49ffa' : '#ffd493';
         g.save();
         if (l > 0) {   // warm light pooled on the ground inside the ring

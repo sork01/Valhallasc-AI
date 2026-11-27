@@ -8,6 +8,8 @@
     if(!open){Online.send({type:'shop_presence',open:true});open=true;}
     const owned=id=>(packet.inventory||[]).find(s=>s.item===id)?.quantity||0;
     const recipes=packet.fisherQuote||[];
+    let pending=false;
+    const buttons=[];
     const nodes=[make('h4','Fisher workshop'),make('p','Craft rods and cook fish'),make('p','One rod grows with you. Each upgrade replaces the previous rod and keeps its fishing waters.')];
     if(owned('fishing_rod_charm'))nodes.push(make('p','Rod Charm replaces one fish and is used up.'));
     for(const group of ['rod:','cook:']){
@@ -23,10 +25,20 @@
           const name=Inventory.definition(id)?.name||id;
           const line=make('small',`${Locale.translate(name)}: ${owned(id)} / ${count}`);line.dataset.ingredient=id;text.append(line);
         }
-        const b=make('button',`${Locale.translate(group==='rod:'?'Craft rod':'Cook fish')} · ${Money.text(r.cost)}`,'btn');b.type='button';b.dataset.offer=r.id;
-        b.disabled=packet.gold<r.cost||(packet.level||1)<(item.requiredLevel||1)||r.ingredients.some(([id,n])=>owned(id)<n);
-        b.addEventListener('click',()=>{if(Online.send({type:'interact',npc:npc.id,offer:r.id}))b.disabled=true;});
-        row.append(text,b);nodes.push(row);
+        const actions=make('div','','recipe-actions');
+        const disabled=packet.gold<r.cost||(packet.level||1)<(item.requiredLevel||1)||r.ingredients.some(([id,n])=>owned(id)<n);
+        const addAction=(offer,label)=>{
+          const b=make('button',label,'btn');b.type='button';b.dataset.offer=offer;b.disabled=disabled;
+          b.addEventListener('click',()=>{
+            if(pending||!Online.send({type:'interact',npc:npc.id,offer}))return;
+            pending=true;
+            for(const button of buttons)button.disabled=true;
+          });
+          actions.append(b);buttons.push(b);
+        };
+        addAction(r.id,Locale.translate(group==='rod:'?'Craft rod':'Cook fish')+' · '+Money.text(r.cost));
+        if(group==='cook:')addAction('cook_all:'+r.id.slice(group.length),Locale.translate('Cook All'));
+        row.append(text,actions);nodes.push(row);
       }
     }
     container.replaceChildren(...nodes);

@@ -14,9 +14,50 @@
   text-align: center;
   pointer-events: none;
 }
-#npc-dialogue.smith-mode:not(.merchant-mode) > .gossip-window {
-  width: min(610px, 88cqw);
-  height: min(585px, 88cqh);
+/* Center the scaled window even if its unscaled box is taller than the stage. */
+#stage #npc-dialogue.smith-mode {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+}
+#stage #npc-dialogue.smith-mode > .gossip-window {
+  /* The stage is an inline-size container. Its measured height can differ from the viewport. */
+  --workshop-width: var(--smith-width);
+  --workshop-height: var(--smith-height);
+  --workshop-height-limit: var(--touch-stage-h, 94dvh);
+  width: calc(clamp(min(420px, 86cqw), var(--workshop-width, min(820px, 90cqw)), 94cqw) / var(--window-k, .8));
+  height: calc(clamp(min(260px, var(--workshop-height-limit) * .76),
+    var(--workshop-height, min(640px, var(--workshop-height-limit) * .95)), var(--workshop-height-limit)) / var(--window-k, .8));
+}
+#stage #npc-dialogue[data-service="alchemy"] > .gossip-window {
+  --workshop-width: var(--alchemy-width);
+  --workshop-height: var(--alchemy-height);
+}
+#npc-smith-resize { display: none; }
+#npc-dialogue.smith-mode #npc-smith-resize {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .4em;
+  flex: none;
+  min-height: calc(26px / var(--window-k, .8));
+  padding: .25em .55em;
+  cursor: nwse-resize;
+  touch-action: none;
+  user-select: none;
+}
+#npc-smith-resize::after {
+  content: '';
+  width: .8em;
+  height: .8em;
+  background: repeating-linear-gradient(135deg, transparent 0 3px, currentColor 3px 4px);
+  clip-path: polygon(100% 0, 100% 100%, 0 100%);
+}
+@media (pointer: coarse) {
+  #stage #npc-dialogue.smith-mode .gossip-footer { padding-right: calc(8px / var(--window-k, .8)); }
+  #npc-dialogue.smith-mode #npc-smith-resize {
+    min-height: calc(44px / var(--window-k, .8));
+    font-size: calc(12px / var(--window-k, .8));
+  }
 }
 #npc-inventory.smith-workshop { display: block; }
 .smith-workshop h3 { margin: .2rem 0 .4rem; color: #392106; }

@@ -20,12 +20,12 @@
     ['skillbar', 'Skillbar', '#skillbar', '0 100%'], ['chat', 'Chat', '#chat', '0 100%'],
   ];
   // Scaled with the UI but not movable.
-  const EXTRA = [['#low-gfx-suggestion', '50% 0'], ['#loot-rolls', '0 0'], ['#social-invites', '0 0'], ['#pvp-duel-warning', '0 0'], ['#gauntlet-banner', '0 0'], ['#rare-pickup', '0 0'], ['#announce', '50% 0'], ['#toast', '0 100%']];
+  const EXTRA = [['#low-gfx-suggestion', '50% 0'], ['#loot-rolls', '0 0'], ['#social-invites', '0 0'], ['#pvp-duel-warning', '0 0'], ['#gauntlet-banner', '0 0'], ['#rare-pickup', '0 0'], ['#announce', '50% 0'], ['#quest-progress', '50% 0'], ['#toast', '0 100%']];
   // [overlay id, window selector or null for the overlay itself, name, origin, resizable]
   const WINDOWS = [
     ['connection-overlay', '.connection-panel', 'World connection', '50% 50%', false],
     ['whats-new', '.news-panel', "What's new", '50% 50%', true],
-    ['pause', '.pause-panel', 'World Menu', '50% 50%', false], ['settings-panel', '.settings-panel', 'Settings', '50% 50%', false], ['keys-panel', '.keys-panel', 'Keyboard', '50% 50%', false],
+    ['pause', '.pause-panel', 'World Menu', '50% 50%', false], ['settings-panel', '.settings-panel', 'Settings', '50% 50%', false],
     ['quest-journal', '.quest-panel', 'Quest journal', '50% 50%', true], ['npc-dialogue', '.gossip-window', 'Conversation', '50% 50%', true],
     ['worldmap', '.wm-panel', 'World map', '50% 50%', true], ['social-panel', '.social-panel', 'Social', '50% 50%', true],
     ['activity-panel', '.activity-window', 'Activity log', '50% 50%', true],
@@ -201,6 +201,7 @@
   // These two are lists, so they get a real width and height (the list scrolls inside) instead of the window zoom. Sizes are
   // stored in cqw of the layout box (Prefs.panelSize {id: {w, h}}), applied as --pw / --ph, and h is the height of the list.
   // The grip lives in the grip layer, not inside the piece: quests.js rebuilds the tracker's children on every update.
+  const WORKSHOP_PANELS = ['smith', 'alchemy'];
   const PANELS = [
     { id: 'quests', name: 'Quest tracker', top: false, w: [12, 60], h: [4, 50], body: el => el.querySelector('.tracker-list') },
     { id: 'chat', name: 'Chat', top: true, w: [14, 60], h: [3.5, 45], body: el => [...el.querySelectorAll('.chat-log')].find(x => !x.hidden) },
@@ -231,7 +232,9 @@
   }
   const currentPanel = p => ({ w: p.el.offsetWidth / cq(), h: (p.body(p.el)?.offsetHeight || 0) / cq() });
   function storePanels() {
-    const out = {}; for (const p of PANELS) if (p.size) out[p.id] = { ...p.size };
+    const out = {};
+    for (const id of WORKSHOP_PANELS) if (window.Prefs.panelSize[id]) out[id] = window.Prefs.panelSize[id];
+    for (const p of PANELS) if (p.size) out[p.id] = { ...p.size };
     window.Prefs.set({ panelSize: out });
   }
   function clearPanel(p) { p.size = null; paintPanel(p); placePanelGrip(p); storePanels(); }
@@ -279,22 +282,98 @@
   }
   function resetPanels() { window.Prefs.set({ panelSize: null }); loadPanels(); placePanelGrips(); }
 
+  // The centered workshops each remember their own dimensions in screen pixels.
+  const workshopGrip = $('npc-smith-resize');
+  if (workshopGrip) {
+    const workshop = workshopGrip.closest('.gossip-window');
+    const mode = () => $('npc-dialogue').dataset.service;
+    const paint = (id, size) => {
+      for (const [key, dimension] of [['w', 'width'], ['h', 'height']]) {
+        const prop = `--${id}-${dimension}`;
+        const value = Number(size?.[key]);
+        if (Number.isFinite(value) && value > 0) workshop.style.setProperty(prop, value + 'px');
+        else workshop.style.removeProperty(prop);
+      }
+    };
+    const restore = () => { for (const id of WORKSHOP_PANELS) paint(id, window.Prefs.panelSize[id]); };
+    function save(id, size) {
+      const sizes = { ...window.Prefs.panelSize };
+      if (size) sizes[id] = size; else delete sizes[id];
+      window.Prefs.set({ panelSize: sizes });
+    }
+    const dimensions = () => {
+      const { width, height } = workshop.getBoundingClientRect();
+      return { w: Math.round(width), h: Math.round(height) };
+    };
+    let resize = null;
+    workshopGrip.addEventListener('pointerdown', event => {
+      const id = mode();
+      if (resize || event.button !== 0 || !WORKSHOP_PANELS.includes(id)) return;
+      event.preventDefault();
+      workshopGrip.focus({ preventScroll: true });
+      resize = { id, pointer: event.pointerId, x: event.clientX, y: event.clientY, ...dimensions(), moved: false };
+      workshopGrip.setPointerCapture(event.pointerId);
+    });
+    workshopGrip.addEventListener('pointermove', event => {
+      if (resize?.pointer !== event.pointerId) return;
+      // A centered window grows on both sides, so the corner moves by half the change in size.
+      resize.moved = true;
+      paint(resize.id, { w: Math.max(1, resize.w + 2 * (event.clientX - resize.x)),
+        h: Math.max(1, resize.h + 2 * (event.clientY - resize.y)) });
+    });
+    const end = event => {
+      if (resize?.pointer !== event.pointerId) return;
+      const { id, moved } = resize;
+      resize = null;
+      const size = dimensions();
+      if (moved && mode() === id && size.w && size.h) save(id, size); else restore();
+    };
+    for (const event of ['pointerup', 'pointercancel', 'lostpointercapture']) workshopGrip.addEventListener(event, end);
+    workshopGrip.addEventListener('dblclick', () => { if (WORKSHOP_PANELS.includes(mode())) save(mode(), null); });
+    workshopGrip.addEventListener('keydown', event => {
+      const delta = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }[event.key];
+      const id = mode();
+      if ((!delta && event.key !== '0') || !WORKSHOP_PANELS.includes(id)) return;
+      event.preventDefault();
+      event.stopPropagation();
+      if (!delta) { save(id, null); return; }
+      const { w, h } = dimensions(), step = event.shiftKey ? 48 : 16;
+      paint(id, { w: Math.max(1, w + delta[0] * step), h: Math.max(1, h + delta[1] * step) });
+      save(id, dimensions());
+    });
+    addEventListener('prefs-change', () => { if (!resize) restore(); });
+    restore();
+  }
+
   // ---------- the volume panel ----------
-  const music = $('set-music'), sfx = $('set-sfx'), sound = $('set-sound'), night = $('set-night'), weather = $('set-weather'), weatherAudio = $('set-weather-audio'), language = $('set-language'), size = $('set-uiscale');
+  const master = $('set-master'), music = $('set-music'), sfx = $('set-sfx'), sound = $('set-sound'), night = $('set-night'), weather = $('set-weather'), weatherAudio = $('set-weather-audio'), language = $('set-language'), size = $('set-uiscale');
+  const floatingChecks = [...panel.querySelectorAll('input')].filter(input => input.dataset.floatingText);
+  for (const input of floatingChecks) input.addEventListener('change', () => window.Prefs.set({ floatingText: { [input.dataset.floatingText]: input.checked } }));
+  for (const [id, enabled] of [['set-floating-all', true], ['set-floating-none', false]]) $(id).addEventListener('click', () => {
+    window.Prefs.set({ floatingText: Object.fromEntries(floatingChecks.map(input => [input.dataset.floatingText, enabled])) });
+  });
   function syncPanel() {
+    for (const input of floatingChecks) input.checked = window.Prefs.floatingText[input.dataset.floatingText];
     language.value = window.Prefs.lang;
     $('set-low-graphics').checked = window.Prefs.lowGraphics;
     $('set-quest-arrow').checked = window.Prefs.questArrow;
+    $('set-track-ore').checked = window.Prefs.trackOre;
+    $('set-track-flowers').checked = window.Prefs.trackFlowers;
+    master.value = Math.round(window.Prefs.master * 100);
     music.value = Math.round(window.Prefs.music * 100); sfx.value = Math.round(window.Prefs.sfx * 100); sound.checked = window.Prefs.sound;
     $('set-combat-sounds').value = window.Prefs.combatSounds;
     night.value = Math.round(window.Prefs.night * 100); $('set-night-out').textContent = night.value + '%';
     weather.value = Math.round(window.Prefs.weather * 100); $('set-weather-out').textContent = weather.value + '%';
     weatherAudio.value = Math.round(window.Prefs.weatherAudio * 100); $('set-weather-audio-out').textContent = weatherAudio.value + '%';
     size.value = Math.round(uiScale() * 100); $('set-uiscale-out').textContent = size.value + '%';
+    $('set-master-out').textContent = master.value + '%';
     $('set-music-out').textContent = music.value + '%'; $('set-sfx-out').textContent = sfx.value + '%';
   }
+  $('set-track-ore').addEventListener('change', () => window.Prefs.set({ trackOre: $('set-track-ore').checked }));
+  $('set-track-flowers').addEventListener('change', () => window.Prefs.set({ trackFlowers: $('set-track-flowers').checked }));
   $('set-quest-arrow').addEventListener('change', () => window.Prefs.set({ questArrow: $('set-quest-arrow').checked }));
   $('set-low-graphics').addEventListener('change', () => window.Prefs.set({ lowGraphics: $('set-low-graphics').checked }));
+  master.addEventListener('input', () => window.Prefs.set({ masterVol: master.value / 100 }));
   music.addEventListener('input', () => window.Prefs.set({ musicVol: music.value / 100 }));
   language.addEventListener('change', () => window.Prefs.set({ lang: language.value }));
   sfx.addEventListener('input', () => window.Prefs.set({ sfxVol: sfx.value / 100 }));
@@ -314,14 +393,40 @@
   });
   addEventListener('prefs-change', () => { if (!panel.hidden) syncPanel(); });
 
+  const settingsTabs = [...panel.querySelectorAll('.settings-tab')];
+  const settingsContent = panel.querySelector('.settings-content');
+  function selectSettingsTab(tab) {
+    endCapture();
+    for (const button of settingsTabs) {
+      const selected = button === tab;
+      button.setAttribute('aria-selected', String(selected));
+      button.tabIndex = selected ? 0 : -1;
+      $(button.getAttribute('aria-controls')).hidden = !selected;
+    }
+    settingsContent.scrollTop = 0;
+    if (tab.id === 'set-keys') { say(''); renderKeys(); }
+  }
+  for (const [index, tab] of settingsTabs.entries()) {
+    tab.addEventListener('click', () => selectSettingsTab(tab));
+    tab.addEventListener('keydown', event => {
+      const next = { ArrowLeft: index - 1, ArrowRight: index + 1, Home: 0, End: settingsTabs.length - 1 }[event.key];
+      if (next === undefined) return;
+      event.preventDefault();
+      const target = settingsTabs[(next + settingsTabs.length) % settingsTabs.length];
+      selectSettingsTab(target);
+      target.focus();
+    });
+  }
   function show() {
-    $('pause').hidden = true; panel.hidden = false; syncPanel(); music.focus({ preventScroll: true });
+    $('pause').hidden = true; panel.hidden = false;
+    selectSettingsTab(settingsTabs[0]); syncPanel();
+    master.focus({ preventScroll: true });
   }
   // toMenu: go back to the World Menu; false: just shut everything (the caller is closing the menus itself).
   function close(toMenu = true) {
     if (editing && !previewing) stopEdit(false);
-    if (!keysPanel.hidden) { closeKeys(false); if (toMenu) { $('pause').hidden = false; $('p-settings').focus({ preventScroll: true }); } return; }
     if (panel.hidden) return;
+    endCapture();
     panel.hidden = true;
     if (toMenu) { $('pause').hidden = false; $('p-settings').focus({ preventScroll: true }); }
   }
@@ -366,16 +471,8 @@
       renderKeys(id, slot);
     });
   }
-  function showKeys() { panel.hidden = true; keysPanel.hidden = false; say(''); renderKeys(); $('keys-back').focus({ preventScroll: true }); }
-  function closeKeys(toSettings = true) {
-    endCapture(); if (keysPanel.hidden) return;
-    keysPanel.hidden = true;
-    if (toSettings) { panel.hidden = false; syncPanel(); $('set-keys').focus({ preventScroll: true }); }
-  }
-  $('set-keys').addEventListener('click', showKeys);
-  $('keys-back').addEventListener('click', () => closeKeys());
   $('keys-reset-all').addEventListener('click', () => { endCapture(); Keys.resetAll(); say(''); renderKeys(); });
-  addEventListener('keymap-change', () => { if (!keysPanel.hidden && !cancelCapture) renderKeys(); });
+  addEventListener('keymap-change', () => { if (!panel.hidden && !keysPanel.hidden && !cancelCapture) renderKeys(); });
 
   // ---------- Edit UI ----------
   function syncHandle(id) {
@@ -457,10 +554,10 @@
 
   // While editing the game must not see any key; Esc finishes and arrows move the focused handle.
   addEventListener('keydown', e => {
-    if (Keys.capturing || (!editing && panel.hidden && keysPanel.hidden)) return;
+    if (Keys.capturing || (!editing && panel.hidden)) return;
     if (e.key === 'Escape') {
       e.preventDefault(); e.stopImmediatePropagation();
-      if (editing) stopEdit(); else if (!keysPanel.hidden) closeKeys(); else close();
+      if (editing) stopEdit(); else close();
       return;
     }
     if (!editing) return;
@@ -482,7 +579,7 @@
   // Use the normal close actions so focus, server cancellation and borrowed bags
   // are restored just as they are by each window's own Close button.
   const outsideClose = {
-    'whats-new': 'news-close', pause: 'p-resume', 'settings-panel': 'set-back', 'keys-panel': 'keys-back',
+    'whats-new': 'news-close', pause: 'p-resume', 'settings-panel': 'set-back',
     'quest-journal': 'quest-close', 'npc-dialogue': 'npc-x', worldmap: 'wm-close',
     'social-panel': 'social-close', 'inspect-panel': 'inspect-close', 'rebirth-dialog': 'rebirth-cancel', 'recommended-dialog': 'recommended-cancel',
     'mail-panel': 'mail-close', 'bank-panel': 'bank-close', 'skills-panel': 'skills-close', equipment: 'equipment-close',

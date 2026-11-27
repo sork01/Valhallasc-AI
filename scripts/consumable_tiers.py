@@ -36,7 +36,7 @@ def tier_id(family, t):
 
 
 def fishing_dishes(fish):
-    """Sixteen stable dish IDs, using the vendor meal scale and shared meal timer."""
+    """Stable dish IDs using the vendor meal scale and shared meal timer."""
     result = []
     for dish in dict.fromkeys(f['dish'] for f in fish):
         source = next(f for f in fish if f['dish'] == dish)
@@ -45,7 +45,9 @@ def fishing_dishes(fish):
         feast = dish.endswith('_feast')
         factor = 1.25 if feast else 1.0
         kind = {'Shore':'haste', 'Cold':'shield', 'Swamp':'dodge', 'Forest':'crit',
-                'Jungle':'damage', 'Oasis':'fishing_speed', 'Spring':'fishing_luck', 'Lava':'damage'}[source['habitat']]
+                'Jungle':'damage', 'Oasis':'fishing_speed', 'Spring':'fishing_luck', 'Lava':'damage',
+                'Cloudwater':'fishing_speed', 'Glasswater':'crit', 'Moonwater':'fishing_luck',
+                'Greenwater':'dodge', 'Deep Springs':'shield'}[source['habitat']]
         amount = (0.1 if kind.startswith('fishing_') else 0.03 if source['habitat']=='Lava' else 0.02) * (2 if feast else 1)
         name = source['habitat'] + (' Fish Feast' if feast else ' Fish Grill')
         result.append(dict(id=dish, name=name, kind='food', rarity='uncommon' if feast else 'common',

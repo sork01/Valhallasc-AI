@@ -306,11 +306,12 @@ fn xp_gold_bags_fares_and_the_reset_price_follow_the_table() {
         kill(&mut w, id, 0, level);
         (w.players[&1].character.clone(), paid)
     };
-    let (control, paid) = kill_xp([0; 5]);
-    assert_eq!(control.xp, paid);
+    let (control, base) = kill_xp([0; 5]);
+    let adjusted = (base * 30 + 50) / 100;
+    assert_eq!(control.xp, adjusted, "low-level kills pay the 30% floor");
     for tiers in [[1, 0, 0, 0, 0], [5, 0, 0, 0, 0], [0, 0, 0, 0, 3]] {
-        let (hero, paid) = kill_xp(tiers);
-        assert_eq!(hero.xp, hero.boosted_xp(paid), "{tiers:?}");
+        let (hero, _) = kill_xp(tiers);
+        assert_eq!(hero.xp, hero.boosted_xp(adjusted), "{tiers:?}");
     }
     // Bag cells and the stat-reset price.
     let before = c(&w);
@@ -382,6 +383,29 @@ fn claim_onward(w: &mut World) {
 }
 
 #[test]
+fn xp_level_curve_uses_level_when_a_completed_quest_is_claimed() {
+    let mut w = world();
+    let (tx, _rx) = mpsc::channel(512);
+    let welcome = w.join(1, None, Some(Look::default()), tx).unwrap();
+    assert_eq!(
+        welcome["xpCurve"],
+        json!({ "minGap": -7, "rates": [30, 40, 50, 60, 70, 80, 90, 100, 103, 106, 109, 112, 115] }),
+    );
+    w.players.get_mut(&1).unwrap().character.level = 5;
+    w.step();
+    w.players.get_mut(&1).unwrap().character.zone = 1;
+    w.step();
+    let c = &mut w.players.get_mut(&1).unwrap().character;
+    assert_eq!(c.quests[0].counts, vec![1]);
+    c.level = 15;
+    let before = c.xp;
+    claim_onward(&mut w);
+    let c = &w.players[&1].character;
+    assert!(c.quests[0].claimed);
+    assert_eq!(c.xp - before, (xp_to_level(5) / 10) * 30 / 100);
+}
+
+#[test]
 fn a_quest_pays_the_bonus_and_pays_again_after_a_rebirth() {
     let mut w = world();
     let mut rx = join(&mut w, 1, Class::Warrior);
@@ -401,7 +425,7 @@ fn a_quest_pays_the_bonus_and_pays_again_after_a_rebirth() {
     assert!(c.quests[0].claimed);
     let want = (xp_to_level(5) / 10, 100);
     assert_eq!(c.xp - xp, c.boosted_xp(want.0));
-    assert_eq!(c.gold - gold, c.boosted_gold(want.1));
+    assert_eq!(c.gold - gold, c.quest_gold(want.1));
     assert!(c.gold - gold > 100);
     let said: Vec<String> = std::iter::from_fn(|| rx.try_recv().ok())
         .filter_map(|v| {
@@ -415,7 +439,7 @@ fn a_quest_pays_the_bonus_and_pays_again_after_a_rebirth() {
         said.iter().any(|t| t.contains(&format!(
             "+{} XP and +{}",
             c.boosted_xp(want.0),
-            crate::model::money_text(c.boosted_gold(want.1))
+            crate::model::money_text(c.quest_gold(want.1))
         ))),
         "the message names what was paid: {said:?}"
     );
@@ -448,6 +472,24 @@ fn a_quest_pays_the_bonus_and_pays_again_after_a_rebirth() {
 }
 
 #[test]
+fn racial_human_coin_bonus_pays_on_quest_claims_only() {
+    for (race, expected) in [(Race::Human, 105), (Race::Mothkin, 100), (Race::Tidekin, 100), (Race::Gnome, 100)] {
+        let mut w = world();
+        let _rx = join(&mut w, 1, Class::Warrior);
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        c.look.race = race;
+        c.level = 5;
+        c.gold = 0;
+        assert_eq!(c.boosted_gold(100), 100);
+        w.step();
+        claim_onward(&mut w);
+        let p = &w.players[&1];
+        assert_eq!(p.character.gold, expected, "{race:?}");
+        assert_eq!(p.snapshot()["questGoldPercent"], expected - 100);
+    }
+}
+
+#[test]
 fn a_party_member_gets_their_own_bonus_on_the_shared_xp() {
     let mut w = world();
     let _a = join(&mut w, 1, Class::Warrior);
@@ -472,14 +514,12 @@ fn a_party_member_gets_their_own_bonus_on_the_shared_xp() {
     }
     w.players.get_mut(&2).unwrap().character.rebirth_tiers = [4, 0, 0, 0, 0];
     let id = w.slimes.iter().position(|s| s.zone == 0).unwrap();
-    let level = w.slimes[id].level;
-    let paid = w.slimes[id].xp;
+    let base = w.slimes[id].xp;
     w.slimes[id].x = 10.;
     w.slimes[id].y = 10.;
     w.hit_slime(id, 1, 1e12, false);
     let (first, second) = (w.players[&1].character.xp, w.players[&2].character.xp);
-    let share = super::partyxp::shared_xp(paid, 1);
-    let _ = level;
+    let share = super::partyxp::shared_xp((base * 30 + 50) / 100, 1);
     assert_eq!(first, share);
     assert_eq!(second, w.players[&2].character.boosted_xp(share));
     assert!(second > first);

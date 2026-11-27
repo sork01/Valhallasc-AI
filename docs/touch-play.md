@@ -306,3 +306,8 @@ Fullscreen sits directly after Menu in the horizontally scrolling top bar.
 It shares the Settings request/exit handler, tracks fullscreen changes and
 hides on unsupported browsers. A denied request from the top bar shows the
 existing toast explanation. Focused coverage is in `tests/town-window-ui.cjs`.
+
+
+### Chat tabs
+
+Open **System** for game feedback, including combat, item receipts, catches and profession skill gains. **Filter** selects the categories shown in the current tab. Use **+** to name a custom tab and choose its categories, including player or party chat. Use **Filter** on that tab to rename or delete it. Filters and tab names are saved in the browser. Changing a filter reapplies it to recent messages from the session.

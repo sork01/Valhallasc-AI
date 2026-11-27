@@ -525,6 +525,7 @@
     // One parchment column (owner references questgiver.webp / npc_dialogue1.png, 2026-11-13): the greeting with quests and services as rows, or one
     // quest's page with Accept and Decline under it. The two-pane journal frame is the journal's alone again.
     const gossip=view.kind==='gossip',classic=false;
+    if($('npc-dialogue').dataset.service!==view.kind)$('npc-dialogue').dataset.service=view.kind;
     $('npc-dialogue').classList.toggle('transmog-mode',view.kind==='transmog');
     $('npc-dialogue').classList.toggle('smith-mode',view.kind==='smith'||view.kind==='alchemy');
     const shell=$('npc-dialogue').querySelector('.gossip-window');
@@ -626,7 +627,7 @@
         b.disabled=packet.gold<cost;
         b.addEventListener('click',()=>{
           if(offer.id==='merge'||offer.id==='refine')show({kind:offer.id},'#npc-back');
-          else if(Online.send({type:'interact',npc:npc.id,offer:offer.id}))b.disabled=true;
+          else if(Online.send({type:'interact',npc:npc.id,offer:offer.id})&&offer.id!=='summon_party')b.disabled=true;
         });offers.push(b);
       }
     }else if(view.kind==='stat_reset'){
@@ -705,7 +706,7 @@
   }
   function blacksmithingUpdate(packet) {
     if (!current || !lastPacket?.blacksmithing || (packet.npc && current.id !== packet.npc)) return;
-    Object.assign(lastPacket.blacksmithing, {skill:packet.skill, recipes:packet.recipes});
+    Object.assign(lastPacket.blacksmithing, {skill:packet.skill, maxSkill:packet.maxSkill, training:packet.training, recipes:packet.recipes});
     lastPacket.inventory = packet.inventory;
     City.shopGold(packet.gold);
   }

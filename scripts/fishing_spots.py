@@ -13,9 +13,9 @@ import numpy as np
 from scipy.ndimage import label
 
 ROOT = Path(__file__).resolve().parents[1]
-HABITATS = {0: 'Shore', 1: 'Lava', 2: 'Cold', 3: 'Swamp', 6: 'Forest',
-            19: 'Shore', 20: 'Forest', 22: 'Jungle', 25: 'Oasis',
-            26: 'Cold', 28: 'Spring', 45: 'Lava'}
+WATERS = {int(zone): data for zone, data in json.loads((ROOT/'world/fishing-waters.txt').read_text()).items()}
+HABITATS = {zone: data['habitat'] for zone, data in WATERS.items()}
+POND_RADIUS = 3.7
 SURFACES = {'water', 'seafoam', 'jungle_water', 'year_spring_pool',
             'frostwake_frozen_pool', 'jade_pool', 'lapis_oasis', 'lava', 'ew_lava'}
 MIN_RADIUS = {'seafoam', 'year_spring_pool', 'frostwake_frozen_pool', 'lapis_oasis'}
@@ -68,9 +68,9 @@ def segment_distance(x, y, a, b):
     return math.hypot(x-a[0]-t*dx, y-a[1]-t*dy)
 
 
-def clear_of_hubs_and_seams(area, x, y):
+def clear_of_hubs_and_seams(area, x, y, allow_hubs=False):
     hubs = ([area['city']] if area.get('city') else []) + area.get('camps', [])
-    for hub in hubs:
+    for hub in ([] if allow_hubs else hubs):
         dx = max(hub['x0'] - x, 0, x - hub['x1'])
         dy = max(hub['y0'] - y, 0, y - hub['y1'])
         if math.hypot(dx, dy) < 10:
@@ -124,7 +124,9 @@ def generate(area, zone):
             d = math.hypot(dx, dy)
             facing = dict(x=dx/d, y=dy/d)
             bobber = cast(pools, shore, facing)
-            if not bobber or not all(clear_of_hubs_and_seams(area, **p) for p in (shore, bobber)):
+            allow_hubs = bool(WATERS[zone].get('ponds'))
+            if not bobber or not all(clear_of_hubs_and_seams(area, **p, allow_hubs=allow_hubs)
+                                     for p in (shore, bobber)):
                 continue
             if any(math.hypot(bobber['x']-p['x'], bobber['y']-p['y']) < 1.1 for p in candidates):
                 continue
@@ -147,11 +149,23 @@ def generate(area, zone):
     return chosen
 
 
+def install_ponds(world):
+    for zone, area in enumerate([world, *world['zones']]):
+        waters = WATERS.get(zone, {})
+        area['objects'] = [obj for obj in area['objects'] if 'fishingWater' not in obj]
+        for index, (x, y) in enumerate(waters.get('ponds', []), 1):
+            area['objects'].append(dict(kind='water', x=x, y=y, r=POND_RADIUS,
+                                        fishingWater=f'fishing_pond_{zone}_{index}'))
+
+
 def build(world):
     areas = [world, *world['zones']]
     out = []
     for z in HABITATS:
         points = generate(areas[z], z)
+        for x, y in WATERS[z].get('ponds', []):
+            if not any(math.hypot(p['x'] - x, p['y'] - y) < POND_RADIUS for p in points):
+                raise ValueError(f"{areas[z]['name']}: no reachable cast for pond at {x}, {y}")
         print(f'{z}: {areas[z]["name"]}: {len(points)} candidate waters', flush=True)
         out.extend(points)
     return out
@@ -171,6 +185,7 @@ def main():
     args = parser.parse_args()
     path = ROOT / 'world/map.txt'
     world = json.loads(path.read_text())
+    install_ponds(world)
     points = build(world)
     text = json.dumps(points, indent=2, ensure_ascii=False) + '\n'
     file = ROOT / 'world/fishing-spots.txt'

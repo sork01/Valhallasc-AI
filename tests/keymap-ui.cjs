@@ -54,11 +54,11 @@ async function hold(page, key, ms) {
 
   // --- rebind on the Keyboard screen ---
   await page.keyboard.press('Escape'); await page.locator('#p-settings').click(); await page.locator('#set-keys').click();
-  check(await visible(page, '#keys-panel') && !(await visible(page, '#settings-panel')), 'The Keyboard screen opens from Settings');
+  check(await visible(page, '#keys-panel') && await visible(page, '#settings-panel'), 'Keybinds displays its editor inside Settings');
   // a short phone screen: the panel fits, the last row scrolls into view and takes a click
   await page.setViewportSize({ width: 844, height: 390 });
   await page.locator('.key-row').last().scrollIntoViewIfNeeded();
-  const small = await page.evaluate(() => { const p = document.querySelector('.keys-panel').getBoundingClientRect(), l = document.querySelector('.key-row:last-child').getBoundingClientRect(), hit = document.elementFromPoint(p.left + p.width / 2, p.top + p.height / 2); return { top: p.top, bottom: p.bottom, lastIn: l.top >= p.top - 1 && l.bottom <= p.bottom + 1, hits: !!hit?.closest('.keys-panel') }; });
+  const small = await page.evaluate(() => { const p = document.querySelector('.settings-content').getBoundingClientRect(), l = document.querySelector('.key-row:last-child').getBoundingClientRect(), hit = document.elementFromPoint(p.left + p.width / 2, p.top + p.height / 2); return { top: p.top, bottom: p.bottom, lastIn: l.top >= p.top - 1 && l.bottom <= p.bottom + 1, hits: !!hit?.closest('#keys-panel') }; });
   check(small.top >= 0 && small.bottom <= 390 && small.lastIn && small.hits, `At 844x390 the Keyboard panel fits and its last row is reachable: ${JSON.stringify(small)}`);
   await page.locator('.key-row').last().locator('.key-cell').first().click();
   check(await page.locator('.key-row').last().locator('.key-cell').first().textContent() === 'Press a key…', 'The last row takes a click');
@@ -97,8 +97,8 @@ async function hold(page, key, ms) {
   check(await page.locator('[data-action=friends] .key-reset').isDisabled() && await cell('friends', 0).textContent() === 'O' && await cell('friends', 1).textContent() === '—', 'Reset puts the row back to its shipped keys');
   await cell('quests', 1).click(); await page.keyboard.press('Tab');
   check(/cannot be used/.test(await say()), 'Tab is refused');
-  await page.locator('#keys-back').click();
-  check(await visible(page, '#settings-panel'), 'Back returns to Settings');
+  await page.locator('#set-tab-sound').click();
+  check(await visible(page, '#settings-panel') && !(await visible(page, '#keys-panel')), 'Changing categories closes the key editor');
   await page.locator('#set-back').click(); await page.locator('#p-resume').click();
 
   // --- play with them ---

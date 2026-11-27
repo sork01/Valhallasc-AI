@@ -1,5 +1,6 @@
 //! Party XP and party level. Inside a party the XP of a kill is shared: every real player who is alive, in the zone
-//! and near the body gets a cut of the enemy's XP set by the **party level**, which runs from 1 to 5:
+//! and near the body gets a cut of the kill XP adjusted for their own character level.
+//! The **party level** sets the size of that cut:
 //!
 //! | party level | each member's XP (percent of what a lone hero would get) |
 //! |---|---|
@@ -119,7 +120,9 @@ impl World {
     ) -> (u32, u32) {
         let group = self.xp_group(credit, zone, point);
         if group.len() < 2 || !group.iter().any(|g| g == credit) {
-            return self.grant(credit, xp).unwrap_or((xp, 0));
+            return self
+                .grant_kill_xp(credit, xp, enemy_level, PARTY_LEVEL_MAX)
+                .unwrap_or((xp, 0));
         }
         let before = party_level(self.party_points_of(credit));
         let strongest = group
@@ -137,10 +140,11 @@ impl World {
             }
         }
         let level = party_level(self.party_points_of(credit));
-        let share = shared_xp(xp, level);
-        let mut mine = (share, 0);
+        let mut mine = (shared_xp(xp, level), 0);
         for member in &group {
-            let (got, levels) = self.grant(member, share).unwrap_or((share, 0));
+            let Some((got, levels)) = self.grant_kill_xp(member, xp, enemy_level, level) else {
+                continue;
+            };
             if member == credit {
                 mine = (got, levels);
                 continue;
@@ -179,13 +183,21 @@ impl World {
         }
         mine
     }
-    /// Gives `xp` to the online character `id`, plus their rebirth bonus; returns the XP they got and the levels
-    /// gained, or nothing for someone who is not online.
-    fn grant(&mut self, id: &str, xp: u32) -> Option<(u32, u32)> {
+    /// Apply the recipient's level curve, party share and personal XP bonuses in that order.
+    fn grant_kill_xp(
+        &mut self,
+        id: &str,
+        base: u32,
+        enemy_level: u32,
+        party_level: u32,
+    ) -> Option<(u32, u32)> {
         self.players
             .values_mut()
             .find(|p| p.merc.is_none() && p.character.id == id)
-            .map(|p| p.character.reward_xp(xp))
+            .map(|p| {
+                let xp = level_adjusted_xp(base, p.character.level, enemy_level);
+                p.character.reward_xp(shared_xp(xp, party_level))
+            })
     }
 }
 
@@ -281,6 +293,19 @@ mod tests {
                 assert_eq!(xp_of(&w, *session), want, "party level {level}");
             }
         }
+    }
+
+    #[test]
+    fn xp_level_curve_is_personal_inside_a_party() {
+        let mut w = world();
+        let who = party(&mut w, &["Ann", "Bob"]);
+        w.players.get_mut(&1).unwrap().character.level = 18;
+        w.players.get_mut(&2).unwrap().character.level = 25;
+        let at = spot(&w);
+        assert_eq!(w.share_xp(&who[0].1, 0, at, 1000, 20, "slime"), (424, 0));
+        assert_eq!(xp_of(&w, 1), 424, "106% of a 40% share");
+        assert_eq!(xp_of(&w, 2), 200, "50% of a 40% share");
+        assert_eq!(w.players[&2].character.party_points, 1);
     }
 
     #[test]

@@ -74,8 +74,7 @@ async function call(name, args = {}) {
   check(await (await slot('bag_l50')).textContent().then(t => t.includes('+16 slots')), 'Traveler Pack shows its full slot gain');
   check(await (await slot('bag_l50')).isEnabled(), 'A larger bag can replace the smallest fitted bag');
   await page.evaluate(() => City.close());
-  check(await page.evaluate(() => SystemLog.lines({ kind:'itemPickup', actor:Online.id, item:'trail_pack_l20', name:'Trail Pack', quantity:1 }, Online.id)[0][0].includes('+10 bag slots')), 'Bag pickup message names the gained slots');
-  // Inventory tile tooltip/icon for a fitted bag is not checked here: a bag given to the hero sits on its own bag tab, not the backpack page (see lookinto.md).
+  check(await page.evaluate(() => SystemLog.lines({ kind:'itemPickup', actor:Online.id, item:'trail_pack_l20', name:'Trail Pack', quantity:1 }, Online.id)[0][0] === 'You pick up Trail Pack.'), 'Bag pickup reports the loose item');
   check(errors.length === 0, `No runtime errors: ${errors.join('; ')}`);
   console.log(`${checks} bag tier UI checks passed`);
 })().catch(error => { console.error(error); process.exitCode = 1; }).finally(async () => {

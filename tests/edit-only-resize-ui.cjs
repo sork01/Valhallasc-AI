@@ -50,7 +50,7 @@ const rect = (page, selector) => page.locator(selector).evaluate(n => { const r 
   await page.keyboard.press('Escape');
 
   // --- inside Edit UI ---
-  await page.keyboard.press('Escape'); await page.locator('#p-settings').click(); await page.locator('#set-edit-ui').click();
+  await page.keyboard.press('Escape'); await page.locator('#p-settings').click(); await page.locator('#set-tab-interface').click(); await page.locator('#set-edit-ui').click();
   check(await page.evaluate(() => Settings.editing), 'Edit UI is on');
   check(await page.locator('.panel-grip:visible').count() === 2, 'The tracker and chat grips show in Edit UI');
   check(await page.locator('.win-grip:visible').count() === 0, 'No window is open yet, so no window grip');

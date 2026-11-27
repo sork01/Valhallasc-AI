@@ -1,5 +1,5 @@
 'use strict';
-// Merchant frame and bag sales. Ownership, prices, payment and buy-back are server decisions.
+// Merchant stock, bag sales and buy-back. The server owns prices and payment.
 (() => {
   const $ = id => document.getElementById(id);
   const make = (tag, text = '', cls) => { const n = document.createElement(tag); n.textContent = text; if (cls) n.className = cls; return n; };
@@ -7,8 +7,15 @@
   const key = row => `${row.item}:${row.copy || 0}`;
   const price = row => Math.min(4294967295, Math.floor((row.base * row.quantity * (100 + (data?.goldPercent || 0)) + 50) / 100));
   const rarity = row => row.rarity || row.gear?.[0]?.rarity || Inventory.definition(row.item)?.rarity;
-  const isJunk = row => !window.Quests?.needsMaterial(row.item) && row.rarity === 'common' && !Inventory.definition(row.item)?.starter && (!!row.gear || Inventory.definition(row.item)?.kind === 'material');   // starter gear sells, but is never swept up as junk
+  const minedOres = new Set((window.BLACKSMITHING_DATA?.tiers || []).map(tier => tier.ore));
+  const gatheredFlowers = new Set((window.ALCHEMY_DATA?.flowers || []).map(flower => flower.item));
+  function isJunk(row) {
+    const item = Inventory.definition(row.item);
+    return row.rarity === 'common' && !item?.starter && !minedOres.has(row.item) && !gatheredFlowers.has(row.item)
+      && !window.Quests?.needsMaterial(row.item) && (!!row.gear || item?.kind === 'material');
+  }
   let npc = null, container = null, data = null, basket = new Map(), tab = 'merchant', page = 0, packet = null, pending = false, pendingKind = '', timer = 0, snapshotKey = '', warning = null, zone = null, lastNotice = '';
+  let quantityDialog = null;
   const bag = document.querySelector('.bag-window'), bagHome = bag.parentElement, bagNext = bag.nextSibling;
   const dock = make('div'); dock.id = 'merchant-bags'; dock.hidden = true; $('npc-dialogue').append(dock);
   const portrait = document.createElement('canvas'); portrait.id = 'merchant-portrait'; portrait.width = portrait.height = 128; portrait.hidden = true; $('npc-name').before(portrait);
@@ -21,9 +28,14 @@
   }
   function request() { send({ type: 'shop_open' }); }
   function closeWarning() { if (warning) { warning.close(); warning.remove(); warning = null; } }
+  function closeQuantity() {
+    if (!quantityDialog) return;
+    Settings.unregisterWindow('buy-quantity');
+    quantityDialog.close(); quantityDialog.remove(); quantityDialog = null;
+  }
   function close() {
     if (npc) Online.send({type:'shop_presence',open:false});
-    closeWarning(); settle(); npc = null; container = null; data = null; packet = null; basket.clear(); snapshotKey = ''; lastNotice = '';
+    closeWarning(); closeQuantity(); settle(); npc = null; container = null; data = null; packet = null; basket.clear(); snapshotKey = ''; lastNotice = '';
     $('merchant-service')?.remove();
     $('npc-dialogue').classList.remove('merchant-mode'); portrait.hidden = true; $('npc-dialogue').querySelector('.merchant-tabs')?.remove();
     if (bag.parentElement === dock) { Settings.unregisterWindow('merchant-bags'); bagHome.insertBefore(bag, bagNext); } dock.hidden = true;
@@ -68,9 +80,61 @@
     return (npc?.offers || []).filter(isStockOffer).map(offer => {
       const mount = offer.mount && window.Mounts?.MOUNTS.find(m => m.id === offer.mount);
       let item = mount ? { id: `mount:${mount.id}`, name: mount.name, kind: 'mount_licence', mount: mount.id, requiredLevel: mount.level, rarity: 'common', sell: 0 } : Inventory.definition(offer.item || offer.bag);
-      if (offer.tiered && item?.family) item = WORLD_ITEMS.filter(i => i.family === item.family && (i.requiredLevel || 1) <= (packet?.level || 1)).sort((a,b) => b.requiredLevel-a.requiredLevel)[0] || item;
-      return {offer,item,cost:offer.tiered ? item?.price : offer.cost};
+      const level = data?.level ?? packet?.level ?? 1;
+      if (offer.tiered && item?.family) item = WORLD_ITEMS.filter(i => i.family === item.family && (i.requiredLevel || 1) <= level).sort((a,b) => b.requiredLevel-a.requiredLevel)[0] || item;
+      const quote = (data?.stockPrices ?? packet?.stockPrices)?.[offer.id];
+      return {offer,item,cost:quote ?? (offer.tiered || offer.bag ? item?.price : offer.cost)};
     }).filter(({item}) => item && (item.kind !== 'weapon' || !item.class || item.class === Field.hero.look.class));
+  }
+  function maximumPurchase({ offer, item, cost }) {
+    const gold = data?.gold ?? packet.gold;
+    const affordable = cost > 0 ? Math.floor(gold / cost) : 4294967295;
+    const fitted = data?.bags ?? packet.bags ?? [];
+    if (offer.bag) {
+      const upgrades = fitted.filter(id => (Inventory.definition(id)?.bagSlots || 0) < item.bagSlots).length;
+      return Math.min(affordable, 4 - fitted.length + upgrades);
+    }
+    const room = Math.max(0, (data?.bagCapacity ?? packet.bagCapacity ?? 16) - (data?.bagUsed ?? Inventory.usedCells()));
+    const owned = Inventory.quantity(item.id);
+    if (Inventory.isGear(item)) return Math.min(affordable, room, 4294967295 - owned);
+    return owned || room ? Math.min(affordable, 4294967295 - owned) : 0;
+  }
+  function chooseQuantity(entry, maximum) {
+    if (pending) return;
+    Inventory.hideTooltip();
+    closeQuantity();
+    const dialog = quantityDialog = make('dialog', '', 'sell-warning panel');
+    dialog.id = 'buy-quantity';
+    dialog.setAttribute('aria-labelledby', 'buy-quantity-title');
+    const title = make('h3', entry.item.name); title.id = 'buy-quantity-title';
+    const form = make('form');
+    const label = make('label', 'Quantity'); label.htmlFor = 'buy-quantity-input';
+    const input = make('input'); input.type = 'number'; input.id = label.htmlFor;
+    input.min = 1; input.step = 1; input.max = maximum; input.value = Math.min(2, maximum); input.required = true;
+    const total = make('span', '', 'buy-quantity-total'); total.setAttribute('aria-live', 'polite');
+    const buy = make('button', 'Buy', 'btn ghost'); buy.type = 'submit';
+    const refresh = () => {
+      buy.disabled = !input.validity.valid;
+      if (buy.disabled) total.textContent = '—';
+      else Money.set(total, entry.cost * input.valueAsNumber);
+    };
+    const max = button('Max', () => { input.value = maximum; refresh(); });
+    const controls = make('div', '', 'buy-quantity-controls'); controls.append(input, max);
+    const actions = make('div', '', 'buy-quantity-actions'); actions.append(button('Cancel', closeQuantity), buy);
+    const price = make('p', 'Total'); price.append(' ', total);
+    form.append(label, controls, price, actions);
+    input.addEventListener('input', refresh);
+    form.addEventListener('submit', event => {
+      event.preventDefault();
+      if (input.validity.valid && send({ type: 'buy_stock', offer: entry.offer.id, quantity: input.valueAsNumber })) {
+        closeQuantity(); draw();
+      }
+    });
+    dialog.addEventListener('cancel', event => { event.preventDefault(); closeQuantity(); });
+    dialog.addEventListener('keydown', event => event.stopPropagation());
+    dialog.append(title, form); $('stage').append(dialog); dialog.showModal();
+    Settings.registerWindow('buy-quantity', null, 'Buy quantity', false);
+    refresh(); input.focus(); input.select();
   }
   function utility(label, glyph, action) {
     const b = button('', action); b.className = 'merchant-tool'; b.setAttribute('aria-label', label); b.title = label;
@@ -101,7 +165,7 @@
     $('merchant-service')?.remove();
     const service = make('small', npc.buys ? 'Buys items' : 'Does not buy items', 'merchant-service');
     service.id = 'merchant-service'; service.dataset.buys = String(!!npc.buys); $('npc-name').append(service);
-    closeWarning(); $('npc-dialogue').querySelector('.merchant-tabs')?.remove(); container.replaceChildren(); container.className = 'merchant-workspace'; container.setAttribute('aria-busy', String(pending));
+    closeWarning(); closeQuantity(); $('npc-dialogue').querySelector('.merchant-tabs')?.remove(); container.replaceChildren(); container.className = 'merchant-workspace'; container.setAttribute('aria-busy', String(pending));
     const status = $('npc-notice');
     if (status.textContent !== lastNotice) status.textContent = lastNotice;
     if (tab === 'leftovers') {
@@ -129,11 +193,19 @@
         const detail = make('span','','merchant-item-detail'); { const price = make('small'); Money.set(price, cost); if (row?.quantity > 1) price.append(` ×${row.quantity}`); detail.append(make('b',item.name), price); }
         if (offer?.bag) detail.append(make('small', `+${item.bagSlots} slots · Lv ${item.requiredLevel}`));
         if (offer?.mount) detail.append(make('small', offer.label));
-        const fitted = packet.bags || [], growsBag = !offer?.bag || fitted.length < 4 || fitted.some(id => (Inventory.definition(id)?.bagSlots || 0) < item.bagSlots);
+        const maximum = offer && !offer.mount ? maximumPurchase(entry) : 1;
         const ownsMount = offer?.mount && Field.hero.mounts?.includes(offer.mount);
-        b.append(glyph, detail); b.disabled = pending || (data?.gold ?? packet.gold) < cost || (!row && ((packet.level || 1) < (item.requiredLevel || 1) || !growsBag || ownsMount || (offer?.needs && !Inventory.quantity(offer.needs))));
-        Inventory.attachTooltip(b, () => item, undefined, row ? () => ({copies:row.gear || [],count:row.quantity,in:'Buyback',hint:Money.text(row.paid)}) : undefined);
-        grid.append(b);
+        b.append(glyph, detail); b.disabled = pending || (data?.gold ?? packet.gold) < cost || (!row && ((packet.level || 1) < (item.requiredLevel || 1) || maximum < 1 || ownsMount || (offer?.needs && !Inventory.quantity(offer.needs))));
+        Inventory.attachTooltip(b, () => item, undefined, row ? () => ({copies:row.gear || [],count:row.quantity,in:'Buyback',hint:Money.text(row.paid)}) : undefined, offer ? () => null : undefined);
+        if (offer && !offer.mount) {
+          const cell = make('div', '', 'merchant-entry');
+          const quantity = button('Qty', () => chooseQuantity(entry, maximum));
+          quantity.className = 'merchant-quantity'; quantity.dataset.bulkOffer = offer.id;
+          const label = Locale.translate(`Buy quantity: ${item.name}`);
+          quantity.setAttribute('aria-label', label); quantity.title = label;
+          quantity.disabled = b.disabled || maximum < 2;
+          cell.append(b, quantity); grid.append(cell);
+        } else grid.append(b);
       }
       while (grid.childElementCount < 10) grid.append(make('div','','merchant-empty'));
       const nav = make('div','','merchant-pages');
@@ -199,8 +271,8 @@
       if (!npc) return;
       const merchant = City.npcs.find(n => n.id === npc.id);
       if (!c || c.dead || c.sparkTravel || (c.zone || 0) !== zone || !merchant || Math.hypot(c.x - merchant.x, c.y - merchant.y) > 3.2) { close(); City.close(); return; }
-      const nextKey = JSON.stringify([c.inventory, c.gearInstances, c.equipment, c.gold, c.rebirthTiers, c.quests, c.abandonedQuests]);
-      if (npc.buys && nextKey !== snapshotKey && !pending && !warning) { snapshotKey = nextKey; request(); }
+      const nextKey = JSON.stringify([c.inventory, c.gearInstances, c.equipment, c.gold, c.level, c.rebirthTiers, c.quests, c.abandonedQuests]);
+      if (npc.buys && nextKey !== snapshotKey && !pending && !warning && !quantityDialog) { snapshotKey = nextKey; request(); }
     },
   };
 })();

@@ -1,4 +1,4 @@
-//! Atomic merchant sales and connection-local buy-back (docs/shop-selling.md).
+//! Atomic merchant purchases and sales, and connection-local buy-back (docs/shop-selling.md).
 use super::*;
 use crate::items::{GearInstance, is_gear};
 use crate::model::SaleLine;
@@ -19,9 +19,71 @@ struct Sold {
 }
 pub(super) enum Request {
     Open,
+    Buy(String, u32),
     Sell(Vec<SaleLine>),
     Discard(String, u32),
     BuyBack(u64),
+}
+
+fn item_offer(c: &Character, offer: &Offer) -> Option<(&'static Item, u32)> {
+    let base = offer.item.as_deref().and_then(item)?;
+    let stock = if offer.tiered {
+        base.family
+            .as_deref()
+            .and_then(|family| best_tier(family, c.level))
+            .unwrap_or(base)
+    } else {
+        base
+    };
+    let price = if offer.tiered { stock.price } else { offer.cost };
+    Some((stock, c.npc_price(price)))
+}
+
+pub(super) fn stock_prices<'a>(c: &Character, npc: &'a Npc) -> BTreeMap<&'a str, u32> {
+    npc.offers.iter().filter_map(|offer| {
+        let price = if let Some(id) = &offer.bag {
+            c.npc_price(item(id)?.price)
+        } else if offer.mount.is_some() {
+            c.npc_price(offer.cost)
+        } else {
+            item_offer(c, offer)?.1
+        };
+        Some((offer.id.as_str(), price))
+    }).collect()
+}
+
+pub(super) fn purchase_items(
+    c: &mut Character,
+    offer: &Offer,
+    quantity: u32,
+) -> Result<&'static Item, String> {
+    let (stock, price) = item_offer(c, offer).ok_or("That item is not for sale.")?;
+    if stock.kind == "weapon" && stock.class.is_some_and(|class| class != c.look.class) {
+        return Err("This weapon is for another class.".into());
+    }
+    if stock.kind == "weapon" && c.level < stock.required_level {
+        return Err(format!("Requires level {}.", stock.required_level));
+    }
+    if quantity == 0 {
+        return Err("Enter a positive purchase quantity.".into());
+    }
+    let cost = price
+        .checked_mul(quantity)
+        .ok_or("That purchase costs too much.")?;
+    if c.gold < cost {
+        return Err(format!("You need {} for this purchase.", money_text(cost)));
+    }
+    if !c.can_collect(&stock.id)
+        || (is_gear(stock) && quantity as usize > c.bag_capacity().saturating_sub(c.bag_used()))
+    {
+        return Err("Your bags are full. Make room first.".into());
+    }
+    c.quantity(&stock.id)
+        .checked_add(quantity)
+        .ok_or("That stack is too large for your bags.")?;
+    c.gold -= cost;
+    c.add_item(&stock.id, quantity);
+    Ok(stock)
 }
 
 fn needed(c: &Character, maps: &[Map], id: &str) -> bool {
@@ -211,20 +273,26 @@ impl World {
         let Some(p) = self.players.get_mut(&session) else {
             return;
         };
-        let valid = p.character.hp > 0.
-            && p.character.spark_travel.is_none()
-            && self.maps[p.character.zone].npcs.iter().any(|n| {
-                n.id == npc
-                    && n.buys
-                    && p.character.point().distance(n.position_at(self.time)) <= 2.8
-            });
-        if !valid {
+        let buying = matches!(request, Request::Buy(..));
+        let merchant = self.maps[p.character.zone].npcs.iter().find(|n| {
+            n.id == npc
+                && (n.buys || buying)
+                && p.character.hp > 0.
+                && p.character.spark_travel.is_none()
+                && p.character.point().distance(n.position_at(self.time)) <= 2.8
+        });
+        let Some(merchant) = merchant else {
+            let notice = if buying {
+                "Walk closer to the seller."
+            } else {
+                "Walk closer to a merchant who buys items."
+            };
             let _ = p
                 .peer
                 .try_send(json!({"type":"shop","npc":npc,"ok":false,"closed":true,
-                "notice":"Walk closer to a merchant who buys items."}));
+                "notice":notice}));
             return;
-        }
+        };
         p.stop();
         p.attack = 0.;
         let mut next = p.character.clone();
@@ -233,16 +301,42 @@ impl World {
         let mut paid = 0;
         let mut spent = 0;
         let mut changed = false;
+        let mut purchase_notice = None;
         let discarding = matches!(request, Request::Discard(..));
-        let result: Result<(), &'static str> = (|| {
+        let result: Result<(), String> = (|| {
             if !matches!(request, Request::Open) {
                 if self.time - p.service_at < 0.5 {
-                    return Err("Please wait a moment before trying again.");
+                    return Err("Please wait a moment before trying again.".into());
                 }
                 p.service_at = self.time;
             }
             match request {
                 Request::Open => {}
+                Request::Buy(id, quantity) => {
+                    let offer = merchant
+                        .offers
+                        .iter()
+                        .find(|offer| offer.id == id && offer.mount.is_none())
+                        .ok_or("That item is not for sale.")?;
+                    purchase_notice = Some(if let Some(bag) = &offer.bag {
+                        if !(1..=4).contains(&quantity) {
+                            return Err("Choose between one and four expansion bags.".into());
+                        }
+                        let name = &item(bag).ok_or("Unknown bag.")?.name;
+                        for _ in 0..quantity {
+                            next.purchase_bag(bag)?;
+                        }
+                        let capacity = next.bag_capacity();
+                        format!("Fitted {quantity} × {name}. You now have {capacity} bag slots.")
+                    } else {
+                        let stock = purchase_items(&mut next, offer, quantity)?;
+                        format!("Bought {quantity} × {}.", stock.name)
+                    });
+                    spent = p.character.gold - next.gold;
+                    sync_progression(&mut next, &self.maps);
+                    next.materialize_gear_instances();
+                    changed = true;
+                }
                 Request::Sell(lines) => {
                     let (gold, sold) = sell_lines(&mut next, &lines, &self.maps)?;
                     remember(&mut shop, npc, sold);
@@ -255,7 +349,7 @@ impl World {
                         || !discardable(&next, &self.maps, &id)
                     {
                         return Err(
-                            "Only leftovers from completed or abandoned quests can be discarded. Active quest items and keys are protected.",
+                            "Only leftovers from completed or abandoned quests can be discarded. Active quest items and keys are protected.".into(),
                         );
                     }
                     next.consume_item(&id, quantity);
@@ -275,13 +369,13 @@ impl World {
                     let row = &rows[at];
                     let catalog = item(&row.item).ok_or("Unknown item.")?;
                     if next.gold < row.paid {
-                        return Err("You do not have enough gold to buy that back.");
+                        return Err("You do not have enough gold to buy that back.".into());
                     }
                     if !next.has_room_for(catalog) {
-                        return Err("Your bags are full. Make room first.");
+                        return Err("Your bags are full. Make room first.".into());
                     }
                     if next.quantity(&row.item).checked_add(row.quantity).is_none() {
-                        return Err("That stack is too large for your bags.");
+                        return Err("That stack is too large for your bags.".into());
                     }
                     if row.gear.iter().any(|g| {
                         next.gear_instances
@@ -289,7 +383,7 @@ impl World {
                             .chain(&next.bank.gear)
                             .any(|held| held.id == g.id)
                     }) {
-                        return Err("That gear copy is not available to buy back.");
+                        return Err("That gear copy is not available to buy back.".into());
                     }
                     next.gold -= row.paid;
                     next.add_item(&row.item, row.quantity);
@@ -312,7 +406,9 @@ impl World {
             Ok(()) => {
                 p.character = next;
                 p.shop = shop;
-                if changed && discarding {
+                if let Some(notice) = purchase_notice {
+                    notice
+                } else if changed && discarding {
                     "Quest leftovers discarded. No gold was paid.".into()
                 } else if changed && spent > 0 {
                     format!("Bought back for {}.", money_text(spent))
@@ -322,11 +418,11 @@ impl World {
                     String::new()
                 }
             }
-            Err(text) => text.to_owned(),
+            Err(text) => text,
         };
         let c = &p.character;
         let mut available = vec![];
-        for stack in &c.inventory {
+        for stack in c.inventory.iter().filter(|_| merchant.buys) {
             let Some(i) =
                 item(&stack.item).filter(|i| sellable(i) && !needed(c, &self.maps, &i.id))
             else {
@@ -356,19 +452,23 @@ impl World {
                     .push(json!({"item":i.id,"quantity":quantity,"base":i.sell,"rarity":i.rarity}));
             }
         }
-        let discardable: Vec<_> = c
-            .inventory
-            .iter()
-            .filter(|s| s.quantity > 0 && discardable(c, &self.maps, &s.item))
-            .map(|s| json!({"item":s.item,"quantity":s.quantity}))
-            .collect();
-        let _ = p
-            .peer
-            .try_send(json!({"type":"shop","npc":npc,"ok":ok,"notice":notice,
+        let discardable = merchant.buys.then(|| {
+            c.inventory
+                .iter()
+                .filter(|s| s.quantity > 0 && discardable(c, &self.maps, &s.item))
+                .map(|s| json!({"item":s.item,"quantity":s.quantity}))
+                .collect::<Vec<_>>()
+        });
+        let mut reply = json!({"type":"shop","npc":npc,"ok":ok,"notice":notice,
             "paid":if ok {paid} else {0},"spent":if ok {spent} else {0},"changed":ok && changed,
             "available":available,"discardable":discardable,"buyBack":p.shop.merchants.get(npc).cloned().unwrap_or_default(),
             "goldPercent":c.rebirth_gold_percent(),"gold":c.gold,"inventory":c.inventory,
-            "gearInstances":c.gear_instances,"equipment":c.equipment,"bags":c.bags}));
+            "gearInstances":c.gear_instances,"equipment":c.equipment,"bags":c.bags,
+            "bagCapacity":c.bag_capacity(),"bagUsed":c.bag_used(),"level":c.level});
+        if c.look.race == Race::Gnome {
+            reply["stockPrices"] = json!(stock_prices(c, merchant));
+        }
+        let _ = p.peer.try_send(reply);
     }
 }
 
@@ -476,9 +576,17 @@ mod tests {
         }
     }
     fn message(w: &mut World, rx: &mut mpsc::Receiver<Value>, request: Request) -> Value {
+        merchant_message(w, rx, "smith", request)
+    }
+    fn merchant_message(
+        w: &mut World,
+        rx: &mut mpsc::Receiver<Value>,
+        npc: &str,
+        request: Request,
+    ) -> Value {
         while rx.try_recv().is_ok() {}
         w.time += 1.;
-        w.shop(1, "smith", request);
+        w.shop(1, npc, request);
         std::iter::from_fn(|| rx.try_recv().ok())
             .find(|v| v["type"] == "shop")
             .unwrap()
@@ -494,6 +602,136 @@ mod tests {
             .filter(|g| g.item == PIECE)
             .cloned()
             .collect()
+    }
+
+    #[test]
+    fn racial_gnome_shop_quotes_match_single_stock_bulk_bags_and_buyback() {
+        let (mut w, mut rx, token) = fixture();
+        let smith = w.maps[0].npcs.iter().find(|n| n.id == "smith").unwrap();
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        c.look.race = Race::Gnome;
+        c.level = 20;
+        let sword = "buy_green_weapon_warrior";
+        let offer = smith.offers.iter().find(|offer| offer.id == sword).unwrap();
+        let (stock, quote) = item_offer(c, offer).unwrap();
+        let discounted = (f64::from(stock.price) * 0.9).round() as u32;
+        assert!(discounted < stock.price);
+        assert_eq!(quote, discounted);
+        let reply = message(&mut w, &mut rx, Request::Buy(sword.into(), 2));
+        assert_eq!(reply["ok"], true, "{reply}");
+        assert_eq!(reply["stockPrices"][sword], discounted);
+        assert_eq!(reply["spent"], 2 * discounted);
+
+        let sale = message(&mut w, &mut rx, Request::Sell(vec![line("slime_gel", 1, None)]));
+        let paid = item("slime_gel").unwrap().sell;
+        assert_eq!(sale["paid"], paid);
+        let id = sale["buyBack"][0]["id"].as_u64().unwrap();
+        let back = message(&mut w, &mut rx, Request::BuyBack(id));
+        assert_eq!(back["spent"], paid);
+
+        let merchant = w.maps[0].npcs.iter().find(|n| n.id == "merchant").unwrap();
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        (c.x, c.y) = (merchant.x, merchant.y);
+        let bags = merchant_message(&mut w, &mut rx, "merchant", Request::Buy("satchel".into(), 2));
+        assert_eq!(bags["stockPrices"]["satchel"], 450);
+        assert_eq!(bags["spent"], 900);
+        let saved = w.store.load(&token).unwrap().unwrap();
+        assert_eq!(saved.gold, 10000 - 2 * discounted - 900);
+        assert_eq!(saved.bags, ["linen_satchel", "linen_satchel"]);
+
+        let at = w.maps[0].npcs.iter().find(|n| n.id == "apothecary").unwrap().position_at(w.time);
+        let p = w.players.get_mut(&1).unwrap();
+        (p.character.x, p.character.y) = (at.x, at.y);
+        p.character.level = 1;
+        let gold = p.character.gold;
+        w.time += 1.;
+        w.interact(1, "apothecary", Some("buy_health_potion"));
+        let dialogue = std::iter::from_fn(|| rx.try_recv().ok()).find(|v| v["type"] == "dialogue").unwrap();
+        let unit = (f64::from(item("health_potion").unwrap().price) * 0.9).round() as u32;
+        assert_eq!(dialogue["stockPrices"]["buy_health_potion"], unit);
+        assert_eq!(dialogue["gold"], gold - unit);
+    }
+
+    #[test]
+    fn shop_stock_purchases_stack_and_save_at_a_seller_only() {
+        let (mut w, mut rx, token) = fixture();
+        let npc = w.maps[0]
+            .npcs
+            .iter()
+            .find(|n| n.id == "apothecary")
+            .unwrap();
+        assert!(!npc.buys);
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        (c.x, c.y) = (npc.x, npc.y);
+        let price = item("health_potion").unwrap().price;
+        let before = c.quantity("health_potion");
+        let reply = merchant_message(
+            &mut w,
+            &mut rx,
+            "apothecary",
+            Request::Buy("buy_health_potion".into(), 25),
+        );
+        assert_eq!(reply["ok"], true, "{reply}");
+        assert_eq!(reply["spent"], price * 25);
+        assert_eq!(reply["available"], json!([]));
+        let saved = w.store.load(&token).unwrap().unwrap();
+        assert_eq!(saved.gold, 10000 - price * 25);
+        assert_eq!(saved.quantity("health_potion"), before + 25);
+    }
+
+    #[test]
+    fn shop_stock_purchases_gear_copies_and_rejects_incomplete_orders() {
+        let (mut w, mut rx, token) = fixture();
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        c.level = 20;
+        c.gold = 100_000;
+        let stock = best_tier("vendor_weapon_warrior", c.level).unwrap();
+        let buy = |quantity| Request::Buy("buy_green_weapon_warrior".into(), quantity);
+        let before = state(&w);
+        let too_many = message(&mut w, &mut rx, buy(17));
+        assert_eq!(too_many["notice"], "Your bags are full. Make room first.");
+        assert_eq!(state(&w), before);
+        for request in [buy(0), buy(u32::MAX), Request::Buy("repair".into(), 2)] {
+            assert_eq!(message(&mut w, &mut rx, request)["ok"], false);
+            assert_eq!(state(&w), before);
+        }
+        let reply = message(&mut w, &mut rx, buy(2));
+        assert_eq!(reply["ok"], true, "{reply}");
+        assert_eq!(reply["spent"], 2 * stock.price);
+        let saved = w.store.load(&token).unwrap().unwrap();
+        assert_eq!(saved.quantity(&stock.id), 2);
+        let gear: Vec<_> = saved
+            .gear_instances
+            .iter()
+            .filter(|g| g.item == stock.id)
+            .collect();
+        assert_eq!(gear.len(), 2);
+        assert_ne!(gear[0].id, gear[1].id);
+        w.store.conn().execute_batch("CREATE TRIGGER fail_purchase BEFORE UPDATE ON characters BEGIN SELECT RAISE(FAIL, 'test storage failure'); END;").unwrap();
+        let before = state(&w);
+        assert_eq!(message(&mut w, &mut rx, buy(2))["ok"], false);
+        assert_eq!(state(&w), before);
+    }
+
+    #[test]
+    fn shop_stock_purchases_multiple_bag_upgrades_as_one_order() {
+        let (mut w, mut rx, token) = fixture();
+        let npc = w.maps[0].npcs.iter().find(|n| n.id == "merchant").unwrap();
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        (c.x, c.y) = (npc.x, npc.y);
+        c.bags = vec!["linen_satchel".into(); 2];
+        let before = state(&w);
+        let buy = |quantity| Request::Buy("satchel".into(), quantity);
+        assert_eq!(
+            merchant_message(&mut w, &mut rx, "merchant", buy(3))["ok"],
+            false
+        );
+        assert_eq!(state(&w), before);
+        let reply = merchant_message(&mut w, &mut rx, "merchant", buy(2));
+        assert_eq!(reply["ok"], true, "{reply}");
+        let saved = w.store.load(&token).unwrap().unwrap();
+        assert_eq!(saved.bags, vec!["linen_satchel"; 4]);
+        assert_eq!(saved.gold, 9000);
     }
 
     #[test]

@@ -1,3 +1,4 @@
+const soundtrack = require('./lib/soundtrack.cjs');
 // One new dungeon only: real client travel, readable art, sign, music and controls.
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
@@ -49,7 +50,7 @@ const call=async(name,args={})=>{const r=await client.callTool({name,arguments:a
   await page.waitForFunction(()=>Field.zone===43,null,{timeout:15000});
   await page.evaluate(()=>Online.send({type:'stop'}));
   await page.waitForFunction(()=>valhalla.longshipMusic?.running&&valhalla.longshipMusic.loaded,null,{timeout:30000});
-  assert.ok(await page.evaluate(()=>Math.abs(valhalla.longshipMusic.duration-32*3*60/78)<.05),'The new 6/8 music decodes at the correct loop length');
+  assert.ok(await page.evaluate(seconds=>Math.abs(valhalla.longshipMusic.duration-seconds)<.05, soundtrack('longship')),'The new 6/8 music decodes at the replacement recording length');
   assert.ok(await page.evaluate(()=>DayNight.nightMix<.01),'Dungeon keeps indoor light and its own score');
   assert.ok(await page.evaluate(()=>WORLD_MAP.zones[42].name==='The Drowned Longship'&&WORLD_MAP.zones[7].portals.some(p=>p.to===43)),'Correct Rán’s Deep entrance and stable zone ID');
   if(!STUB)assert.equal(await page.evaluate(async()=>{

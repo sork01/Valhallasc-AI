@@ -1,3 +1,4 @@
+const soundtrack = require('./lib/soundtrack.cjs');
 // Focused private-world playback check for the Frostwake Shelf's night remix.
 const assert = require('node:assert/strict');
 const path = require('node:path');
@@ -8,7 +9,7 @@ const { StdioClientTransport, getDefaultEnvironment } = require('@modelcontextpr
 const root = path.resolve(__dirname, '..');
 const client = new Client({ name: 'valhallasc-frostwake-night-music', version: '1.0.0' });
 const songs = [
-  { zone: 26, x: 14, y: 128, key: 'frostwakeNightMusic', day: 'fwMusic', seconds: 32 * 4 * 60 / 84 },
+  { zone: 26, x: 14, y: 128, key: 'frostwakeNightMusic', day: 'fwMusic', seconds: soundtrack('frostwake_night') },
 ];
 let browser, started = false;
 async function call(name, args = {}) {
@@ -50,8 +51,8 @@ const debug = (page, command) => page.evaluate(c => Online.send({ type: 'debug',
   await page.keyboard.press('n');
   await page.waitForFunction(() => Math.abs(valhalla.frostwakeNightMusic.output.gain.value - .64) < .03, null, { timeout: 10000 });
 
-  await debug(page, { op: 'teleport', zone: 8, x: 80, y: 160 });
-  await page.waitForFunction(() => Field.zone === 8 && DayNight.nightMix === 0 && valhalla.activeNightMusic === valhalla.nightMusic && !valhalla.nightMusic.running && !valhalla.frostwakeNightMusic.running, null, { timeout: 15000 });
+  await debug(page, { op: 'teleport', zone: 5, x: 36, y: 52 });
+  await page.waitForFunction(() => Field.zone === 5 && DayNight.nightMix === 0 && valhalla.activeNightMusic === valhalla.nightMusic && !valhalla.nightMusic.running && !valhalla.frostwakeNightMusic.running, null, { timeout: 15000 });
   await debug(page, { op: 'teleport', zone: 24, x: 48, y: 80 });
   await page.waitForFunction(() => Field.zone === 24 && DayNight.nightMix === 0 && !valhalla.nightMusic.running, null, { timeout: 15000 });
   await debug(page, { op: 'teleport', zone: 26, x: 14, y: 128 });

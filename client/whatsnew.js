@@ -19,7 +19,7 @@
   }
   function welcome() {
     const body = document.createDocumentFragment();
-    body.append(node('h3', 'Welcome to Valhalla Rumble!'), node('p', 'Explore a shared world, help people with their quests, and grow stronger with friends or hired fighters.'));
+    body.append(node('h3', 'Welcome to Valhalla Saga!'), node('p', 'Explore a shared world, help people with their quests, and grow stronger with friends or hired fighters.'));
     const list = document.createElement('ul');
     const key = action => { const label = Keys.label(action, false); return node('kbd', label === 'unbound' ? 'no key set' : label); };
     const line = (...parts) => { const li = document.createElement('li'); li.append(...parts); list.append(li); };

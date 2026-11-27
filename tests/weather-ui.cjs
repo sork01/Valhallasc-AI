@@ -54,10 +54,11 @@ async function call(name, args = {}) {
   });
   check(still, 'reduced motion keeps rain particles still');
   await page.evaluate(() => Prefs.set({weather:0}));
-  await page.keyboard.press('Escape'); await page.locator('#p-settings').click();
+  await page.keyboard.press('Escape'); await page.locator('#p-settings').click(); await page.locator('#set-tab-video').click();
   check(await page.locator('#set-weather').inputValue() === '0', 'settings reads the saved weather intensity');
   await page.locator('#set-weather').fill('50');
   check(await page.evaluate(() => JSON.parse(localStorage.getItem('valhallasc.save.v1')).weather) === .5, 'weather setting persists');
+  await page.locator('#set-tab-sound').click();
   await page.locator('#set-weather-audio').fill('25');
   check(await page.evaluate(() => JSON.parse(localStorage.getItem('valhallasc.save.v1')).weatherAudio) === .25, 'weather sound slider persists independently');
   await page.keyboard.press('Escape'); await page.keyboard.press('Escape');

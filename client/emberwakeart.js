@@ -231,16 +231,29 @@
   }
   function ground(x,y,tone,alt,z,dirt,k){return dirt?`hsl(28,17%,${40+tone*5+alt*.08}%)`:k?classGround(k,tone,alt):`hsl(${22+tone*8},8%,${25+tone*8+alt*.12}%)`;}
   // Scenery of the authored caldera: a lodge of basalt slabs, volcano cones, obsidian shards, cooled slag, burnt trees and half-buried chain links.
-  City.art.ew_hut={box:[340,325,170,287],draw(g){
-    oval(g,0,5,80,17,'rgba(10,6,10,.42)',null);
-    poly(g,[[-75,0],[-75,-69],[75,-69],[75,0]],'#5a5560',C.ink,3);
-    poly(g,[[-75,0],[-75,-69],[-22,-69],[-22,0]],'#4a4650',null,0);
-    poly(g,[[-88,-68],[-37,-108],[31,-108],[88,-68]],'#34323d',C.ink,3);
-    poly(g,[[-88,-68],[0,-104],[88,-68]],'#6d6671',C.ink,2);
-    for(const x of [-54,-27,0,27,54])line(g,[[x,-70],[x*.9,-98]],C.iron,3);
-    line(g,[[-82,-70],[0,-106],[82,-70]],C.hot,2);
-    poly(g,[[-14,0],[-14,-49],[14,-49],[14,0]],'#1d1a25',C.pale,2);
-    oval(g,-46,-43,10,12,'#e59a52',C.ink);oval(g,46,-43,10,12,'#e59a52',C.ink);
+  // A hut on its w x d footprint in the game's 2:1 projection: walls, a gabled roof (ridge along x), a door and windows on the +y wall and a window on the +x wall.
+  const hut=(g,o,P)=>{
+    const K=City.kit,{iso,poly,prism,wallPlane}=K,w=o.width||4.5,d=o.depth||3.5,z0=8,zt=z0+P.h;
+    const fill=(x,y,rx,ry,c)=>{g.beginPath();g.ellipse(x,y,rx,ry,0,0,6.2832);g.fillStyle=c;g.fill();};
+    fill(0,6,(w+d)*25,(w+d)*10,'rgba(5,16,30,.38)');
+    prism(g,w+.3,d+.3,z0,...P.base);
+    prism(g,w,d,P.h,...P.wall,z0);
+    const onWall=(side,fn)=>{g.save();wallPlane(g,...(side==='y'?iso(0,d/2+.02,z0):iso(w/2+.02,0,z0)),side);fn();g.restore();};
+    onWall('y',()=>{
+      poly(g,[[-24,0],[-24,-P.h*.74],[24,-P.h*.74],[24,0]],P.door,P.trim,3);
+      for(const x of [-w*13,w*13]){fill(x,-P.h*.58,12,15,P.glow);}
+    });
+    onWall('x',()=>fill(0,-P.h*.58,12,15,P.glow));
+    const rw=w+.7,rd=d+.7,rise=P.rise;
+    const a=iso(-rw/2,-rd/2,zt),b=iso(rw/2,-rd/2,zt),c=iso(rw/2,rd/2,zt),e=iso(-rw/2,rd/2,zt),r0=iso(-rw/2,0,zt+rise),r1=iso(rw/2,0,zt+rise);
+    poly(g,[a,b,r1,r0],P.roof,P.line,3);
+    poly(g,[b,c,r1],P.gable,P.line,3);
+    poly(g,[r0,r1,c,e],P.roof,P.line,3);
+    for(let row=1;row<6;row++){const t=row/6;K.line(g,[iso(-rw/2,rd/2*t,zt+rise*(1-t)),iso(rw/2,rd/2*t,zt+rise*(1-t))],P.course,1.6);}
+    K.line(g,[r0,r1],P.ridge||P.line,5);
+  };
+  City.art.ew_hut={box:[440,320,220,200],draw(g,o){
+    hut(g,o,{h:70,rise:45,base:['#77717a','#58545f','#3f3c48'],wall:['#77717a','#484552','#393843'],door:'#1d1a25',trim:C.hot,glow:'#e59a52',roof:'#3b4350',gable:'#2b2f3a',line:C.ink,course:'rgba(241,128,60,.35)',ridge:C.hot});
   }};
   const CONE=[4.6,5.2,6.1];
   City.art.ew_cone={box:[820,840,410,630],occludes:true,draw(g,o){

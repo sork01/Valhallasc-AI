@@ -156,3 +156,16 @@ streak, proves that upward Swing/Cleave actually overlap the body without
 occlusion, and checks visible near-side pixels and draw order on downward Swing/Cleave,
 for both local and remote fighters. Setting
 `MUTATE=1` restores a single foreground pass and must fail the body-pixel check.
+
+## Floating text preferences
+
+Settings → Floating Text has eleven independent, saved categories: damage dealt,
+damage taken, healing/resources, misses/dodges, items/coins, XP, profession gains,
+combat entry/exit, skill names/set bonuses, levels/rebirth, and other notices.
+All on and All off change the whole selection. Existing saves default to showing
+all categories. These choices filter text at `Field`'s shared floater entry point;
+combat effects, sound, rewards and System log entries remain independent.
+Profession receipts reuse the System log's baseline/deduplication. Combat status
+comes from changes in authoritative snapshots, excluding login and zone changes.
+Equipment pickups use the rolled rarity before the catalog rarity and match the
+inventory's rarity colors; bags retain their existing bag colors.

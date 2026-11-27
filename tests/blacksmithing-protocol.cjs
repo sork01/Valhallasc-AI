@@ -1,5 +1,6 @@
 // Two normal WebSocket guests on a private world and disposable SQLite database.
 const assert = require('node:assert/strict');
+const {execFileSync} = require('node:child_process');
 const fs = require('node:fs');
 const path = require('node:path');
 const {TestWorld} = require('../scripts/testing/driver.cjs');
@@ -30,13 +31,18 @@ const warp = (bot, point) => w.debug(bot,{op:'teleport',zone:0,x:point.x,y:point
   await w.start();
   for (const bot of ['Minerone','Minertwo']) {
     await w.connect({bot,class:'warrior'});
+    assert.equal(w.player(bot).gathering,undefined,'an untrained character has no gathering flags');
     assert.equal((await smithing(bot,'train')).ok,false,'training requires the real nearby smith');
     await warp(bot,smith);
     assert.equal((await dialogue(bot)).blacksmithing.trainer,true);
     assert.equal((await smithing(bot,'train')).skill,1);
     assert.equal((await smithing(bot,'train')).ok,false,'starter pick cannot be granted twice');
     await wait(() => have(bot,'smith_pick_1') === 1,'starter pick in bags');
+    assert.deepEqual(w.player(bot).gathering,{ore:true,flowers:false},'training exposes ore tracking to the owner');
   }
+  const other = w.bots.get('Minertwo').id;
+  await wait(() => w.views.get('Minerone').players.some(p => p.id === other),'the second miner is visible');
+  assert.equal(w.views.get('Minerone').players.find(p => p.id === other).gathering,undefined,'gathering flags stay private');
 
   const view = w.views.get('Minerone');
   const safe = v => Math.min(...map.slimes.map(s => Math.hypot(s.x-v.x,s.y-v.y)));
@@ -47,12 +53,15 @@ const warp = (bot, point) => w.debug(bot,{op:'teleport',zone:0,x:point.x,y:point
   const interrupted = next('Minerone','mining',e => e.state === 'error');
   send('Minerone',{type:'input',dx:1,dy:0});
   assert.equal((await interrupted).text,'Mining interrupted.');
+  await w.action('Minerone',{type:'stop'});
   await warp('Minerone',vein);
   await warp('Minertwo',vein);
   const pulls = await Promise.all(['Minerone','Minertwo'].map(async bot => {
-    const done = next(bot,'mining',p => p.state === 'done');
+    const done = next(bot,'mining',p => p.state !== 'started');
     await start(bot);
-    return done;
+    const result = await done;
+    assert.equal(result.state,'done',bot + ': ' + result.text);
+    return result;
   }));
   assert(pulls.every(p => p.item === 'smith_ore_tin' && p.quantity >= 1 && p.quantity <= 2));
   assert.equal(pulls[0].vein,pulls[1].vein);
@@ -85,6 +94,7 @@ const warp = (bot, point) => w.debug(bot,{op:'teleport',zone:0,x:point.x,y:point
   const copy = w.player('Minerone').gearInstances.find(g => g.item === staple);
   assert(copy && copy.rarity === 'uncommon');
   await w.restart();
+  assert.deepEqual(w.player('Minerone').gathering,{ore:true,flowers:false},'saved training enables tracking after reconnect');
   assert.equal(w.player('Minerone').gearInstances.find(g => g.item === staple).id,copy.id);
   assert.equal(w.player('Minerone').equipment.gloves,staple);
   assert.equal(have('Minerone','smith_pick_1'),1);
@@ -93,7 +103,69 @@ const warp = (bot, point) => w.debug(bot,{op:'teleport',zone:0,x:point.x,y:point
   assert.equal(saved.blacksmithing.skill,made.skill);
   assert(saved.blacksmithing.recipes.includes(staple));
   assert.equal(saved.gold,76);
-  console.log('Blacksmithing protocol passed two miners, interruption, ordinary shop stock, smelting, forging, equipping and restart persistence.');
+
+  // Rejoin from a disposable save at the previous cap. The saved misses
+  // make one actual expert pull sufficient to test the next skill point.
+  const id = w.bots.get('Minerone').id;
+  await w.stop();
+  execFileSync('python3', ['-c', `
+import json, sqlite3, sys
+with sqlite3.connect(sys.argv[1]) as db:
+    raw, = db.execute("SELECT state FROM characters WHERE id=?", (sys.argv[2],)).fetchone()
+    state = json.loads(raw)
+    state["blacksmithing"]["proficiency"] = {"skill": 300, "misses": 2}
+    db.execute("UPDATE characters SET state=? WHERE id=?", (json.dumps(state), sys.argv[2]))
+  `, w.db, id]);
+  await w.launch();
+  await w.connect({bot:'Minerone'});
+  await wait(() => w.player('Minerone')?.professions?.blacksmithing?.skill === 300, 'old cap loads unchanged');
+  assert.deepEqual(w.player('Minerone').professions.blacksmithing, {skill:300, maxSkill:600});
+  await warp('Minerone',smith);
+  const expert = (await dialogue('Minerone')).blacksmithing;
+  assert.deepEqual(expert.training, {cap:330, ore:'smith_ore_stormsilver', zones:[16],pick:'smith_pick_6'});
+  const expertZone = expert.training.zones[0];
+  const expertMap = map.zones[expertZone-1];
+  // Use a veteran with a seeded profession level so expert-zone enemies do not
+  // interrupt the mining fixture from outside their ordinary awareness radius.
+  await w.debug('Minerone',{op:'set_level',level:99});
+  await w.debug('Minerone',{op:'give_item',item:'smith_pick_5'});
+  await w.debug('Minerone',{op:'teleport',zone:expertZone,...expertMap.spawn});
+  const veins = await wait(() => w.views.get('Minerone').miningVeins, 'expert veins are active');
+  const distance = vein => Math.min(...expertMap.slimes.map(enemy => Math.hypot(vein.x-enemy.x, vein.y-enemy.y)));
+  const expertVein = [...veins].sort((a,b) => distance(b)-distance(a))[0];
+  const pullExpert = async () => {
+    await w.debug('Minerone',{op:'teleport',zone:expertZone,x:expertVein.x,y:expertVein.y});
+    return request('Minerone','mining',{type:'mine',id:expertVein.id}, event => event.state !== 'started');
+  };
+  const legacyPull = await pullExpert();
+  assert.equal(legacyPull.state,'done',legacyPull.text);
+  assert.equal(legacyPull.item,'smith_ore_stormsilver');
+  assert.equal(legacyPull.skill,300);
+  assert.equal(legacyPull.requiredPick,'smith_pick_6');
+  await warp('Minerone',smith);
+  await w.debug('Minerone',{op:'set_gold',gold:4000});
+  await w.debug('Minerone',{op:'give_item',item:'smith_bar_stormsilver',quantity:4});
+  await w.debug('Minerone',{op:'give_item',item:'smith_hardwood',quantity:2});
+  const pick = await smithing('Minerone','craft',{recipe:'smith_pick_6'});
+  assert(pick.ok && pick.output === 'smith_pick_6' && pick.skill === 300,pick.text);
+  assert(!pick.inventory.some(stack => stack.item === 'smith_pick_5'));
+  const expertPull = await pullExpert();
+  assert.equal(expertPull.state,'done',expertPull.text);
+  assert.equal(expertPull.skill,301);
+  assert(expertPull.skillUp && !expertPull.requiredPick);
+  await warp('Minerone',smith);
+  const expertRecipe = 'smith_gear_moonspore_pendant';
+  assert.equal((await smithing('Minerone','learn',{recipe:expertRecipe})).ok,true);
+  await w.debug('Minerone',{op:'give_item',item:'smith_bar_stormsilver',quantity:4});
+  await w.debug('Minerone',{op:'give_item',item:'smith_bar_steel',quantity:1});
+  const expertCraft = await smithing('Minerone','craft',{recipe:expertRecipe});
+  assert(expertCraft.ok && expertCraft.output === expertRecipe);
+  assert.equal(expertCraft.maxSkill,600);
+  await w.restart();
+  await wait(() => w.player('Minerone')?.professions?.blacksmithing?.skill === expertCraft.skill, 'expert progress survives restart');
+  assert.equal(have('Minerone','smith_pick_6'),1);
+  assert.equal(have('Minerone',expertRecipe),1);
+  console.log('Blacksmithing protocol passed shared mining, crafting, expert pick training and saving new equipment through restart.');
 })().catch(error => {
   console.error(error); process.exitCode = 1;
 }).finally(() => w.stop());

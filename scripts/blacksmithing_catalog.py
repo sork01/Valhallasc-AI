@@ -67,14 +67,17 @@ def candidates(area):
 
 
 def apply(catalog, world, items):
+    # Replace the Blacksmithing block in place, preserving later profession overlays.
+    start = next((i for i, item in enumerate(items) if item.get('source') == SOURCE), len(items))
     items[:] = [i for i in items if i.get('source') != SOURCE]
     original = {i['id']: i for i in items}
+    entries = []
     picks = {p['item'] for p in catalog['picks']}
     stock = []
     for material in catalog['materials']:
         entry = dict(id=material['id'], name=material['name'], source=SOURCE, rarity='common',
                      sell=material.get('sell', 0), kind='mining_pick' if material['id'] in picks else 'material')
-        items.append(entry)
+        entries.append(entry)
         if 'price' in material:
             stock.append(dict(id='buy_' + entry['id'], label='Buy ' + entry['name'],
                               item=entry['id'], cost=material['price']))
@@ -89,13 +92,14 @@ def apply(catalog, world, items):
             entry['bonusStats'] = {key: int(value * factor) for key, value in entry['bonusStats'].items()}
         entry.update(id=spec['id'], name=spec['name'], source=SOURCE, sell=template['sell'],
                      requiredLevel=spec['level'], variant=spec['id'], art=template.get('art', template['variant']))
-        items.append(entry)
-    by_id = {i['id']: i for i in items}
+        entries.append(entry)
+    by_id = original | {i['id']: i for i in entries}
     for recipe in catalog['recipes']:
         if recipe.get('plan'):
             gear = by_id[recipe['item']]
-            items.append(dict(id=recipe['plan'], name='Blueprint: ' + gear['name'], kind='smith_blueprint',
+            entries.append(dict(id=recipe['plan'], name='Blueprint: ' + gear['name'], kind='smith_blueprint',
                               rarity=gear['rarity'], sell=gear['sell'] // 2, source=SOURCE))
+    items[start:start] = entries
 
     regions = [world, *world['zones']]
     for zone, area in enumerate(regions):

@@ -8,6 +8,7 @@ const read = name => fs.readFileSync(path.join(root, name), 'utf8');
 const items = JSON.parse(read('world/items.txt')), map = JSON.parse(read('world/map.txt'));
 const candidates = JSON.parse(read('world/fishing-spots.txt'));
 const skillWaters = JSON.parse(read('world/fishing-skill.txt'));
+const waters = JSON.parse(read('world/fishing-waters.txt'));
 let checks = 0;
 function check(value, message) { checks++; assert(value, message); }
 class Element {
@@ -23,12 +24,15 @@ class Element {
 }
 function fixture() {
   const els = new Map(), events = {}, cues = [], sent = [], errors = [], ops = [];
-  let time = 0, reduced = false;
+  let time = 0, reduced = false, touch = false;
   const el = id => { if (!els.has(id)) els.set(id, new Element()); return els.get(id); };
   const ctx = {performance:{now:() => time},Date:class extends Date {static now(){return 100000 + time;}},
     document:{getElementById:el,createElement:tag => new Element(tag),addEventListener(name,fn){events[name]=fn;}},
     WORLD_ITEMS:items, WORLD_MAP:map, Prefs:{keys:{}}, navigator:{},
-    Locale:{language:'en',translate:t=>t},matchMedia:()=>({get matches(){return reduced;}}),
+    Locale:{language:'en',translate:t=>t},matchMedia:query=>({
+      get matches(){return query === '(pointer: coarse)' ? touch : reduced;},
+      addEventListener(name,fn){events[query + name]=fn;},
+    }),
     addEventListener(name,fn){events[name]=fn;},MutationObserver:class{observe(){}},
     Inventory:{definition:id=>items.find(i=>i.id===id),icon:i=>i ? `<i data-icon="${i.id}"></i>` : ''},
     Field:{canAct:true,hero:null,clearInput(){this.clears=(this.clears||0)+1;},setPaused(on){this.paused=on; this.canAct=!on;}},
@@ -39,6 +43,7 @@ function fixture() {
   vm.runInContext(read('client/keymap.js'),ctx);
   vm.runInContext(read('client/fishing-skill-data.js'),ctx);
   assert.equal(JSON.stringify(ctx.FISHING_SKILL_WATERS), JSON.stringify(skillWaters), 'browser and world use the same training waters');
+  assert.deepEqual(JSON.parse(JSON.stringify(ctx.FISHING_WATERS)), waters, 'browser and world use the same habitat data');
   check(ctx.Keys.holders('KeyR','fish').length===0, 'default fishing key is free');
   let src=read('client/fishing.js');
   if(process.env.MUTATE==='hint')src=src.replace(".replace(/‹fish›/g, tr(Keys.label('fish', false)))",'');
@@ -48,7 +53,8 @@ function fixture() {
   if(process.env.MUTATE==='records')src=src.replace('log = hero.fishingLog || {}','log = {}');
   if(process.env.MUTATE==='skill-card')src=src.replace('if (result.skillUp) el.append', 'if (false) el.append');
   if(process.env.MUTATE==='skill-log')src=src.replace("log.skill || 1", "1");
-  if(process.env.MUTATE==='skill-bands')src=src.replace('Math.floor(skill / 30)]', 'Math.floor((skill - 1) / 30)]');
+  if(process.env.MUTATE==='skill-bands')src=src.replace('Math.floor(skill / SKILL_BAND)]', 'Math.floor((skill - 1) / SKILL_BAND)]');
+  if(process.env.MUTATE==='expert-waters')src=src.replace('window.FISHING_SKILL_WATERS?.[Math.floor(skill / SKILL_BAND)]', 'skill < 300 && window.FISHING_SKILL_WATERS?.[Math.floor(skill / SKILL_BAND)]');
   if(process.env.MUTATE==='deadline')src=src.replace(' / 1200)', ' / 120000)');
   if(process.env.MUTATE==='privacy')src=src.replace("if (e.actor !== self || !e.kind?.startsWith('fish_'))", "if (!e.kind?.startsWith('fish_'))");
   if(process.env.MUTATE==='cleanup')src=src.replace('lines.clear(); $(\'fishing-panel\')', '$(\'fishing-panel\')');
@@ -59,22 +65,43 @@ function fixture() {
   const project=(x,y)=>[x*10,y*10];
   const draw=(ground=false)=>ctx.Fishing.drawFishing(g,project,1600,900,ground,reduced);
   const sync=(hero,spots=[],z=map,others=[])=>{ctx.Field.hero={...hero};ctx.Fishing.sync({players:[hero,...others],fishingSpots:spots,fishingTime:(100000+time)/1000},hero,z,c=>cues.push(c));};
-  return {ctx,el,events,cues,sent,errors,ops,g,draw,sync,setTime:t=>{time=t;},reduce:on=>{reduced=on;}};
+  return {ctx,el,events,cues,sent,errors,ops,g,draw,sync,setTime:t=>{time=t;},reduce:on=>{reduced=on;},
+    touch:on=>{touch=on;events['(pointer: coarse)change']();}};
 }
 const f=fixture(), {ctx,el,cues,sent,errors}=f, fishing=ctx.Fishing;
+const shipped = { window: {} };
+vm.runInNewContext(read('client/items.js'), shipped);
+ctx.WORLD_ITEMS = shipped.window.WORLD_ITEMS;
+if (process.env.MUTATE === 'wyrdwood-rod') {
+  ctx.WORLD_ITEMS.find(item => item.id === 'rod_emberline_rod').fishing.zones = [1];
+  ctx.WORLD_ITEMS.find(item => item.id === 'rod_willow_rod').fishing.zones = [6];
+}
+check(fishing.requirement(6) === 'Requires Platinum Rod · level 5' &&
+  fishing.requirement(6, true) === 'Requires Platinum Rod · level 5', 'Wyrdwood shores and rich spots name the Platinum Rod');
+check(fishing.requirement(3, true) === 'Requires Willow Rod · level 10', 'Gloamfen rich spots still name the Willow Rod');
 const areas = [map, ...map.zones];
-const routes = [0], reachable = new Set(routes);
-for (const zone of routes) {
-  for (const gate of areas[zone].portals) {
-    const next = areas[gate.to];
-    if (!next || reachable.has(gate.to) || next.copies || next.sealedTemplate ||
-        (next.min_level || 0) > 50 || gate.needs_quest || gate.needs_boss || gate.after_clear) continue;
-    reachable.add(gate.to); routes.push(gate.to);
+function reachableZones(level) {
+  const routes = [0], visited = new Set(routes);
+  for (const zone of routes) {
+    for (const gate of areas[zone].portals) {
+      const next = areas[gate.to];
+      if (!next || visited.has(gate.to) || next.copies || next.sealedTemplate ||
+          (next.min_level || 0) > level || gate.needs_quest || gate.needs_boss || gate.after_clear) continue;
+      visited.add(gate.to); routes.push(gate.to);
+    }
+  }
+  return visited;
+}
+check(skillWaters.length === 20, 'the route has twenty 30-point bands');
+for (const [band, zones] of skillWaters.entries()) {
+  for (const zone of zones) {
+    const level = areas[zone].levels?.[0] ?? (zone === 17 ? 60 : 1);
+    check(reachableZones(level).has(zone) &&
+      items.some(rod => rod.kind === 'rod' && rod.requiredLevel <= level && rod.fishing.zones.includes(zone)),
+    `Fishing band ${band} opens in ${areas[zone].name} by level ${level}`);
   }
 }
-check(skillWaters.length === 10 && skillWaters.every(band => band.some(zone => reachable.has(zone)
-  && items.some(rod => rod.kind === 'rod' && rod.requiredLevel <= 50 && rod.fishing.zones.includes(zone)))),
-'Every fishing band has an accessible zone with a rod usable at level 50');
+
 const twig=items.find(i=>i.kind==='rod'&&!i.fishing.lava), lava=items.find(i=>i.kind==='rod'&&i.fishing.lava), allRods=items.filter(i=>i.kind==='rod').map(i=>({item:i.id,quantity:1}));
 const hero={id:'self',x:map.dock.start.x,y:map.dock.start.y,zone:0,level:99,fx:1,fy:0,inventory:allRods};
 check(el('fishing-hint').textContent.includes('press R to cast')&&!el('fishing-hint').textContent.includes('‹fish›'),'log hint resolves the initial fishing key');
@@ -85,7 +112,7 @@ check(ctx.Keys.label('fish')==='V','bite hint follows rebind');f.events['keymap-
 // Exercise Field's real key routing and action dispatcher, including typing/repeat guards.
 const field=read('client/field.js');
 ctx.running=true;ctx.paused=false;ctx.hero={...hero};ctx.heldDirection=()=>null;
-ctx.Field.action=vm.runInContext('(function(action) {'+field.split('    action(action) {')[1].split('\n    clearInput()')[0].replace(/},\s*$/, '}')+')',ctx);
+ctx.Field.action=vm.runInContext('(function('+field.split('    action(')[1].split('\n    clearInput()')[0].replace(/},\s*$/, '}')+')',ctx);
 vm.runInContext('function onKeyDown(e) {'+field.split('  function onKeyDown(e) {')[1].split('\n  function onKeyUp')[0],ctx);
 const key=(code,extra={})=>ctx.onKeyDown({code,key:code.slice(-1).toLowerCase(),preventDefault(){},...extra});
 f.sync(hero);f.setTime(50);key('KeyR',{target:{tagName:'INPUT'}});key('KeyR',{repeat:true});
@@ -96,14 +123,26 @@ delete ctx.Prefs.keys.fish;sent.length=0;f.setTime(500);
 
 // The real touch button uses pointerdown for a quick hook and suppresses its synthetic click.
 const touch=read('client/touch.js');ctx.arc=new Element();ctx.tr=text=>ctx.Locale.translate(text);
-ctx.Keys.register('fish',()=>ctx.Field.action('fish'));
-vm.runInContext('function button('+touch.split('  function button(')[1].split("\n  Keys.register('attack'")[0]+"\nthis.touchFish=button('Cast','fish',arc);",ctx);
+const fishRegistration = touch.split('\n').find(line => line.includes("Keys.register('fish'"));
+vm.runInContext('function button('+touch.split('  function button(')[1].split("\n  Keys.register('attack'")[0]+fishRegistration+"\nthis.touchFish=button('Cast','fish',arc);",ctx);
+const dry = {...hero,x:10000};
+f.sync(dry);
+ctx.coarse={matches:true};ctx.fish=ctx.touchFish;ctx.mine=new Element();
+let touchUpdate = touch.split('  function update() {')[1].split('    const ids = assignments()')[0];
+if (process.env.MUTATE === 'touch-hide') touchUpdate = touchUpdate.replace('!fishing?.touchAvailable()', '!fishing?.available()');
+if (process.env.MUTATE === 'touch-wait') touchUpdate = touchUpdate.replace(' || waiting;', ';');
+vm.runInContext('function fishTouchUpdate() {'+touchUpdate+'}',ctx);
+ctx.fishTouchUpdate();
+check(!ctx.fish.hidden && ctx.fish.textContent === 'Go fishing','touch fishing stays discoverable inland');
 ctx.touchFish.events.pointerdown({pointerType:'touch',preventDefault(){}});
 ctx.touchFish.events.click({detail:1});
-check(sent.length===1,'one touch produces one fishing input');sent.length=0;f.setTime(1000);
-ctx.coarse={matches:true};ctx.fish=ctx.touchFish;
-vm.runInContext('function fishTouchUpdate() {'+touch.split('  function update() {')[1].split('    const ids = assignments()')[0]+'}',ctx);
+check(JSON.stringify(sent)==='[{"type":"fish","auto_aim":true}]','one touch produces one assisted cast with no position');
+sent.length=0;f.setTime(1000);
+f.sync({...hero,zone:4},[],map.zones[3]);ctx.fishTouchUpdate();check(ctx.fish.hidden,'non-fishing zone hides fishing control');
+f.sync(hero);
 ctx.fishTouchUpdate();check(!ctx.fish.hidden&&ctx.fish.textContent==='Cast','contextual touch Cast button uses real update path');
+f.touch(true);check(el('fishing-hint').textContent.includes('tap Go fishing')&&!el('fishing-hint').textContent.includes('press R'),'touch log explains touch actions');
+f.touch(false);
 check(fishing.shore(hero,map),'Saltby sea mask is fishable');
 check(!fishing.shore({...hero,inventory:[]},map),'no rod hides shore control');
 check(fishing.shore({...hero,inventory:[{item:lava.id,quantity:1}]},map),'Platinum line also fishes ordinary water');
@@ -137,10 +176,15 @@ f.setTime(1500);f.draw();f.draw();check(cues.join(',')==='cast,plop','plop once 
 const remote={id:'other',x:24,y:30,zone:0,fishing:{...line,x:28,state:'waiting'}};
 f.sync({...hero,fishing:{...line,state:'waiting'}},[],map,[remote]);f.ops.length=0;f.draw();
 check(f.ops.filter(o=>o[0]==='quadraticCurveTo').length===4,'own and other player each draw rod and line');
+ctx.fishTouchUpdate();
+check(ctx.fish.disabled && ctx.fish.textContent === 'Fishing…','touch button prevents premature hooks and shows waiting state');
+check(!fishing.press(true),'touch dispatch also ignores an early hook');
 fishing.event({actor:'other',kind:'fish_catch',item:'fish_pier_sprat'},'self');check(cues.length===2,'remote events cannot show private catch UI or sound');
 f.setTime(2000);f.sync({...hero,fishing:{...line,state:'bite'},fishDeadline:103.2},[],map,[remote]);
 fishing.event({actor:'self',kind:'fish_bite',deadline:103.2},'self');check(fishing.phase==='bite'&&cues.at(-1)==='bite','bite phase and cue');
-ctx.fishTouchUpdate();check(ctx.fish.textContent==='Hook!'&&ctx.fish.dataset.bite==='true','touch button becomes Hook on bite');
+ctx.fishTouchUpdate();check(!ctx.fish.disabled&&ctx.fish.textContent==='Hook!'&&ctx.fish.dataset.bite==='true','touch button becomes Hook on bite');
+ctx.touchFish.events.pointerdown({pointerType:'touch',preventDefault(){}});
+check(JSON.stringify(sent.at(-1))==='{"type":"fish"}','touch hook uses the standard hook request');
 f.draw();f.ops.length=0;f.setTime(2600);f.draw();
 const arc=f.ops.find(o=>o[0]==='arc');check(arc&&Math.abs(arc[5]-Math.PI/2)<.001,'deadline ring drains using server clock');
 const fish=items.find(i=>i.kind==='fish'&&i.rarity==='legendary');
@@ -162,12 +206,20 @@ f.setTime(6200);f.draw();check(el('fishing-catch').hidden&&!el('stage').classLis
 check(fishing.open()&&ctx.Field.paused,'collection window pauses inputs');
 check(el('fishing-species').children.filter(r=>r.dataset.item).length===items.filter(i=>i.kind==='fish').length,'log includes complete species catalogue');
 check(el('fishing-records').textContent.includes('Caught: 1')&&el('fishing-records').textContent.includes('Legendary: 1'),'log uses saved counters');
-check(el('fishing-records').textContent.includes('Fishing skill 78 / 300'),'fishing log shows the skill and cap');
+check(el('fishing-records').textContent.includes('Fishing skill 78 / 600'),'fishing log shows the skill and cap');
 f.sync({...hero,fishingLog:{skill:29}});
 check(el('fishing-training').textContent === 'Fish in Greenmeadow to reach skill 30.', 'first band starts in Greenmeadow');
 f.sync({...hero,fishingLog:{skill:30}});
 check(el('fishing-training').textContent === 'Fish in Emberfall Crags to reach skill 60.', 'skill 30 sends the angler to the Crags');
-f.sync({...hero,fishingLog:{skill:300}});
+f.sync({...hero,fishingLog:{skill:120}});
+check(el('fishing-training').textContent === 'Fish in Wyrdwood to reach skill 150.', 'Wyrdwood is the band before Bifrost');
+f.sync({...hero,fishingLog:{skill:150}});
+check(el('fishing-training').textContent === 'Fish in Bifrost Reach · Stormcatch Basins to reach skill 180.', 'skill 150 sends the angler to Bifrost Reach');
+f.sync({...hero,fishingLog:{skill:540}});
+check(el('fishing-training').textContent === 'Fish in The Cairnspine · Boulderwatch Tarns to reach skill 570.', 'the Cairnspine pools train before the level 95 waters');
+f.sync({...hero,fishingLog:{skill:570}});
+check(el('fishing-training').textContent === 'Fish in The Yearwheel / Emberwake Caldera to reach skill 600.', 'the final training band names both level 95 zones');
+f.sync({...hero,fishingLog:{skill:600}});
 check(el('fishing-training').hidden, 'training hint hides at maximum skill');
 f.sync({...hero,fishingLog:{skill:78,total:1,legendary:1,longestStreak:1,species:{[fish.id]:{count:1,bestKg:22}}}});
 const caughtRow=el('fishing-species').children.find(r=>r.dataset.item===fish.id), unknown=el('fishing-species').children.find(r=>r.dataset.item&&r.dataset.item!==fish.id);
@@ -195,7 +247,7 @@ const sv={window:null,localStorage:{getItem:()=>JSON.stringify({lang:'sv'})},nav
 for(const name of ['sv-data.js','locale.js'])vm.runInContext(read('client/'+name),sv);
 ctx.Locale=sv.Locale;el('fishing-filter').value='';f.sync({...hero,fishingLog:{skill:79,total:2,legendary:1,longestStreak:2,species:{[fish.id]:{count:2,bestKg:22}}}});fishing.open();
 check(el('fishing-records').textContent.includes('Fångster: 2'),'Swedish collection records');
-check(el('fishing-records').textContent.includes('Fiskenivå 79 / 300'),'Swedish fishing skill display');
+check(el('fishing-records').textContent.includes('Fiskenivå 79 / 600'),'Swedish fishing skill display');
 check(el('fishing-species').children.find(r=>r.dataset.item===fish.id).textContent.includes('Rekord: ca 22 kg'),'Swedish per-species record');
 check(sv.Locale.translate(`Forest caught ${fish.name} (ca 22 kg)!`).startsWith('Forest fångade '),'legendary announcement preserves player name');
 check(sv.Locale.translate(`You catch ${fish.name} (ca 22 kg) ×3.`).startsWith('Du fångar '),'Swedish catch line');

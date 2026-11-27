@@ -86,6 +86,13 @@ fn place(w: &mut World, session: u64, zone: usize, at: Point) {
     c.y = at.y;
     c.hp = c.max_hp();
 }
+fn at_repair_smith(w: &mut World, session: u64) {
+    let zone = zone_of(w, session);
+    let smith = w.maps[zone].npcs.iter().find(|n| n.id == "dungeon_repair_5").unwrap();
+    let point = Point { x: smith.x, y: smith.y - 1. };
+    place(w, session, zone, point);
+}
+
 fn first(w: &World, zone: usize, kind: &str) -> usize {
     w.slimes
         .iter()
@@ -674,38 +681,23 @@ fn mercs_of(w: &World) -> Vec<&Player> {
 }
 
 #[test]
-fn the_meeting_stone_hires_fighters_for_any_party_of_up_to_five_with_no_quest_and_for_gold() {
+fn the_dungeon_smith_hires_fighters_for_any_party_of_up_to_five_with_no_quest_and_for_gold() {
     let mut w = world();
     let mut rx = join(&mut w, 1, Class::Warrior);
-    let stone = w.maps[SKALD]
-        .npcs
-        .iter()
-        .find(|n| n.id == "city_meetingstone")
-        .unwrap()
-        .clone();
-    assert_eq!(stone.offers.len(), 6, "five classes and a dismissal");
-    assert!(
-        stone
-            .offers
-            .iter()
-            .filter(|o| o.merc.as_deref() != Some("dismiss"))
-            .all(|o| o.open && o.cost == 250)
-    );
-    let at = |w: &mut World, x: f64, y: f64| {
-        let c = &mut w.players.get_mut(&1).unwrap().character;
-        (c.zone, c.x, c.y) = (SKALD, x, y);
-    };
+    take_the_stairs(&mut w, 1);
+    let smith = w.maps[VAULT].npcs.iter().find(|n| n.id == "dungeon_repair_5").unwrap();
+    assert_eq!(smith.offers.iter().filter(|o| o.merc.is_some()).count(), 6);
     let hire = |w: &mut World, rx: &mut mpsc::Receiver<Value>, class: &str| {
         w.time += 0.6;
-        w.interact(1, "city_meetingstone", Some(&format!("merc_{class}")));
+        w.interact(1, "dungeon_repair_5", Some(&format!("merc_{class}")));
         dialogue_notice(rx)
     };
     // Far away: refused. Close, without gold: refused with the price.
-    at(&mut w, 60., 100.);
+    place(&mut w, 1, VAULT, Point { x: 60., y: 100. });
     w.time += 0.6;
-    w.interact(1, "city_meetingstone", Some("merc_mage"));
+    w.interact(1, "dungeon_repair_5", Some("merc_mage"));
     assert!(drain(&mut rx).iter().any(|v| v["type"] == "error"));
-    at(&mut w, stone.x, stone.y + 1.);
+    at_repair_smith(&mut w, 1);
     w.players.get_mut(&1).unwrap().character.level = 20;
     assert!(hire(&mut w, &mut rx, "mage").contains("12 silver"));
     // With gold: no quest needed, one seat at a time up to a party of five.
@@ -722,21 +714,10 @@ fn the_meeting_stone_hires_fighters_for_any_party_of_up_to_five_with_no_quest_an
     let text = hire(&mut w, &mut rx, "assassin");
     assert!(text.contains("already has 5"), "{text}");
     assert_eq!(w.players[&1].character.gold, 100, "nothing was charged");
-    // A mercenary is the hirer's level and follows through the stairs into the dungeon.
-    assert!(mercs_of(&w).iter().all(|m| m.character.level == 20));
-    take_the_stairs(&mut w, 1);
-    assert_eq!(zone_of(&w, 1), VAULT);
-    for _ in 0..5 {
-        w.step();
-    }
-    assert!(
-        mercs_of(&w).iter().all(|m| m.character.zone == VAULT),
-        "the party arrives together"
-    );
-    // They can be sent away again, anywhere the Stone listens.
-    at(&mut w, stone.x, stone.y + 1.);
+    assert!(mercs_of(&w).iter().all(|m| m.character.level == 20 && m.character.zone == VAULT));
+    at_repair_smith(&mut w, 1);
     w.time += 0.6;
-    w.interact(1, "city_meetingstone", Some("merc_dismiss"));
+    w.interact(1, "dungeon_repair_5", Some("merc_dismiss"));
     assert!(dialogue_notice(&mut rx).contains("ended"));
     assert!(mercs_of(&w).is_empty());
 }
@@ -917,25 +898,11 @@ fn a_mercenarys_boss_kill_starts_one_shared_roll_with_the_hirer() {
         c.level = 20;
         c.gold = mercs::merc_price(20) * 2;
     }
-    let stone = w.maps[SKALD]
-        .npcs
-        .iter()
-        .find(|n| n.id == "city_meetingstone")
-        .unwrap()
-        .clone();
-    place(
-        &mut w,
-        1,
-        SKALD,
-        Point {
-            x: stone.x,
-            y: stone.y + 1.,
-        },
-    );
-    w.time += 0.6;
-    w.interact(1, "city_meetingstone", Some("merc_priest"));
-    let merc = *w.players.iter().find(|(_, p)| p.merc.is_some()).unwrap().0;
     take_the_stairs(&mut w, 1);
+    at_repair_smith(&mut w, 1);
+    w.time += 0.6;
+    w.interact(1, "dungeon_repair_5", Some("merc_priest"));
+    let merc = *w.players.iter().find(|(_, p)| p.merc.is_some()).unwrap().0;
     let boss = first(&w, VAULT, "gatewarden");
     for _ in 0..3 {
         w.step();
@@ -1099,27 +1066,13 @@ fn fight(classes: &[&str], ids: &[usize], from: Point, limit: f64, seed: u64) ->
         c.attributes.accuracy = 7;
         c.add_item("health_potion_l20", 3);
     }
-    let stone = w.maps[SKALD]
-        .npcs
-        .iter()
-        .find(|n| n.id == "city_meetingstone")
-        .unwrap()
-        .clone();
-    place(
-        &mut w,
-        1,
-        SKALD,
-        Point {
-            x: stone.x,
-            y: stone.y + 1.,
-        },
-    );
+    take_the_stairs(&mut w, 1);
+    at_repair_smith(&mut w, 1);
     for class in classes {
         w.time += 0.6;
-        w.interact(1, "city_meetingstone", Some(&format!("merc_{class}")));
+        w.interact(1, "dungeon_repair_5", Some(&format!("merc_{class}")));
     }
     assert_eq!(mercs_of(&w).len(), classes.len());
-    take_the_stairs(&mut w, 1);
     for s in w
         .slimes
         .iter_mut()
@@ -1568,26 +1521,12 @@ fn a_cleared_instance_dismisses_its_mercenaries_after_the_final_kills_loot_is_cr
     let mut rx = join(&mut w, 1, Class::Warrior);
     let _rx2 = join(&mut w, 2, Class::Warrior);
     w.god_mode = true;
-    let stone = w.maps[SKALD]
-        .npcs
-        .iter()
-        .find(|n| n.id == "city_meetingstone")
-        .unwrap()
-        .clone();
     for session in [1, 2] {
-        place(
-            &mut w,
-            session,
-            SKALD,
-            Point {
-                x: stone.x,
-                y: stone.y + 1.,
-            },
-        );
-        w.players.get_mut(&session).unwrap().character.gold = 1000;
-        w.time += 0.6;
-        w.interact(session, "city_meetingstone", Some("merc_priest"));
         take_the_stairs(&mut w, session);
+        at_repair_smith(&mut w, session);
+        w.players.get_mut(&session).unwrap().character.gold = 2400;
+        w.time += 0.6;
+        w.interact(session, "dungeon_repair_5", Some("merc_priest"));
         w.update_mercenaries();
     }
     assert_eq!(zone_of(&w, 1), VAULT);
@@ -1599,7 +1538,7 @@ fn a_cleared_instance_dismisses_its_mercenaries_after_the_final_kills_loot_is_cr
         .find(|(_, p)| p.merc.as_ref() == Some(&owner))
         .unwrap()
         .0;
-    // A completed unrelated quest must not end a Meeting Stone contract.
+    // A completed unrelated quest must not end a dungeon contract.
     w.players
         .get_mut(&1)
         .unwrap()

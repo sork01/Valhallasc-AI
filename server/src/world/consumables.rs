@@ -26,6 +26,22 @@ pub(super) fn health_amount(it: &Item, c: &Character) -> f64 {
 }
 
 impl World {
+    pub(super) fn equip_inventory_bag(&mut self, session: u64, id: &str, slot: Option<usize>) {
+        let Some(p) = self.players.get_mut(&session) else {
+            return;
+        };
+        match p.character.equip_inventory_bag(id, slot) {
+            Ok(capacity) => {
+                let text = format!("Bag fitted! You now have {capacity} bag slots.");
+                let _ = p.peer.try_send(json!({"type":"notice","ok":true,"text":text}));
+                self.save();
+            }
+            Err(text) => {
+                let _ = p.peer.try_send(json!({"type":"error","text":text}));
+            }
+        }
+    }
+
     pub(super) fn use_item(&mut self, session: u64, id: &str) {
         if let Some(recipe) = crate::alchemy::CATALOG.recipe(id) {
             return self.use_brew(session, recipe);

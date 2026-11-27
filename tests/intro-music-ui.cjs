@@ -1,3 +1,4 @@
+const soundtrack = require('./lib/soundtrack.cjs');
 // Only the new finite intro score: actual MP3/WebAudio in a bounded private world.
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const {chromium}=require('./lib/playwright.cjs'),{TestWorld}=require('../scripts/testing/driver.cjs');
@@ -9,7 +10,7 @@ const check=(v,s)=>{assert.ok(v,s);console.log(`${++checks}: ${s}`);};
  const page=await browser.newPage({viewport:{width:960,height:600}}),errors=[];
  page.on('pageerror',e=>errors.push(e.message));
  await page.addInitScript(()=>localStorage.setItem('valhallasc.save.v1',JSON.stringify({lang:'en',sound:true,musicVol:.8,sfxVol:.4,weatherAudio:0,combatSounds:'synthesized'})));
- if(process.env.MUTATE==='score')await page.route('**/intro.js*',route=>route.fulfill({contentType:'text/javascript',body:fs.readFileSync('client/intro.js','utf8').replace("music: 'assets/music_intro.mp3',",'')}));
+ if(process.env.MUTATE==='score')await page.route('**/intro.js*',route=>route.fulfill({contentType:'text/javascript',body:fs.readFileSync('client/intro.js','utf8').replace(/music: 'assets\/music_intro\.mp3[^']*',/,'')}));
  await page.goto(world.url);await page.locator('#start').click();await page.locator('#login-guest').click();await page.locator('#cls-warrior').click();await page.locator('#name').fill('StringScore');await page.locator('#go').click({timeout:60000});
  await page.waitForFunction(()=>Online.connected&&Field.hero?.hp>0);
  if(await page.locator('#low-gfx-dismiss').isVisible())await page.locator('#low-gfx-dismiss').click();
@@ -17,7 +18,7 @@ const check=(v,s)=>{assert.ok(v,s);console.log(`${++checks}: ${s}`);};
  await page.evaluate(()=>Cutscene.play(['intro'],{skippable:false}));
  await page.waitForFunction(()=>CutsceneAudio.score?.playing,null,{timeout:20000});
  const first=await page.evaluate(()=>({duration:CutsceneAudio.score.duration,offset:CutsceneAudio.score.offset,elapsed:Cutscene.state.el,level:CutsceneAudio.score.output.gain.value}));
- check(Math.abs(first.duration-62)<.1,'The actual score decodes to 62 seconds');
+ check(Math.abs(first.duration-soundtrack('intro'))<.1,'The replacement score decodes at its full length');
  check(first.offset>=0&&first.offset<=first.elapsed&&first.elapsed-first.offset<3,'Playback follows the intro clock');
  await page.waitForTimeout(3500);
  check(await page.evaluate(()=>CutsceneAudio.narrating&&CutsceneAudio.score.playing),'Recorded narration and the new score play together');
@@ -57,12 +58,12 @@ const check=(v,s)=>{assert.ok(v,s);console.log(`${++checks}: ${s}`);};
   const p=createCutsceneMusic(valhalla.ctx,'assets/music_intro.mp3?late=1',()=>0);p.setLevel(1,0);p.start();p.stop();for(let i=0;i<200&&!p.loaded;i++)await new Promise(r=>setTimeout(r,50));return{loaded:p.loaded,playing:p.playing,running:p.running};
  });
  check(late.loaded&&!late.playing&&!late.running,'A delayed score cannot start after cancellation');
- const seek=await page.evaluate(async()=>{
-  const p=createCutsceneMusic(valhalla.ctx,'assets/music_intro.mp3',()=>61);p.setLevel(.3,0);p.start();
+ const seek=await page.evaluate(async nearEnd=>{
+  const p=createCutsceneMusic(valhalla.ctx,'assets/music_intro.mp3',()=>nearEnd);p.setLevel(.3,0);p.start();
   for(let i=0;i<200&&!p.playing;i++)await new Promise(r=>setTimeout(r,50));
   const offset=p.offset;for(let i=0;i<100&&p.playing;i++)await new Promise(r=>setTimeout(r,50));const ended=!p.playing;p.stop();return{offset,ended};
- });
- check(seek.offset===61&&seek.ended,'A late start seeks correctly and the score ends without looping');
+ },soundtrack('intro')-1);
+ check(Math.abs(seek.offset-(soundtrack('intro')-1))<.001&&seek.ended,'A late start seeks correctly and the score ends without looping');
  check(errors.length===0,`No browser errors: ${errors.join('; ')}`);
  fs.writeFileSync(path.join(world.runDir,'intro-music.json'),JSON.stringify({checks,late,seek,errors},null,2)+'\n');console.log(JSON.stringify({checks,runDir:world.runDir}));
 }finally{await browser?.close();await world.stop();}})().catch(e=>{console.error(e);process.exitCode=1;});

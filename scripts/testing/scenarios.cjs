@@ -7,6 +7,8 @@ const kit = require('./tools.cjs');
 const map = JSON.parse(fs.readFileSync(path.join(root, 'world/map.txt'), 'utf8'));
 const items = JSON.parse(fs.readFileSync(path.join(root, 'world/items.txt'), 'utf8'));
 const distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+// These quest scenarios join as unreborn Humans.
+const humanQuestCoin = quest => Math.floor((quest.rewardGold * 105 + 50) / 100);
 // Where a walker starts and steps toward to cross a gate: a walk gate fires only moving out through its side; a seam
 // fires only within its reach on its own side of the border line (Seam.crossing), so start 2 tiles on that side.
 // The claim offer for a quest with class reward choices: the rewardItem is automatic, the warrior's first choice is picked.
@@ -739,7 +741,7 @@ const scenarios = {
       await w.connect({ bot: 'Gm', class: 'warrior' });
       check(w.player('Gm').level === 1 && w.player('Gm').gold === 0, 'A new character starts at level 1 with no gold');
       const finished = ['slime_patrol', 'ironhide_hunt', 'king_challenge'];
-      const rewardGold = kit.quests.filter(q => finished.includes(q.id)).reduce((sum, q) => sum + q.rewardGold, 0);
+      const rewardGold = kit.quests.filter(q => finished.includes(q.id)).reduce((sum, q) => sum + humanQuestCoin(q), 0);
       const setup = await kit.setupCharacter(w, 'Gm', { level: 20, gold: 1000, items: [{ item: 'slime_gel', quantity: 12 }], finishQuests: ['king_challenge'], teleportTo: { spawn: 1 } });
       const me = () => w.player('Gm');
       check(me().level === 20 && me().hp === me().maxHp && setup.player.statPoints === 57, 'set_level reaches level 20 at full health with 57 stat points');
@@ -1048,9 +1050,9 @@ const scenarios = {
         const before = { gold: w.player(bot).gold, xp: totalXp(w.player(bot)) };
         await kit.talkTo(w, bot, q.npc, `quest:claim:${q.id}`);
         await w.waitFor(() => quest(w, bot, q.id).claimed);
-        check(w.player(bot).gold === before.gold + q.rewardGold && totalXp(w.player(bot)) === before.xp + q.rewardXp, `${q.title}: exact XP and gold reward`);
+        check(w.player(bot).gold === before.gold + humanQuestCoin(q) && totalXp(w.player(bot)) === before.xp + q.rewardXp, `${q.title}: exact XP and gold reward`);
         await kit.talkTo(w, bot, q.npc, `quest:claim:${q.id}`);
-        check(w.player(bot).gold === before.gold + q.rewardGold && quest(w, bot, q.id).completions === 1, `${q.title}: duplicate turn-in pays nothing`);
+        check(w.player(bot).gold === before.gold + humanQuestCoin(q) && quest(w, bot, q.id).completions === 1, `${q.title}: duplicate turn-in pays nothing`);
       }
       for (const q of pursued(crags.quests).filter(q => q.repeatable)) {
         await kit.teleport(w, bot, { npc: q.npc });
@@ -1213,9 +1215,9 @@ const scenarios = {
         const before = { gold: w.player(bot).gold, xp: totalXp(w.player(bot)) };
         await kit.talkTo(w, bot, q.npc, `quest:claim:${q.id}`);
         await w.waitFor(() => quest(w, bot, q.id).claimed);
-        check(w.player(bot).gold === before.gold + q.rewardGold && totalXp(w.player(bot)) === before.xp + q.rewardXp, `${q.title}: exact XP and gold reward`);
+        check(w.player(bot).gold === before.gold + humanQuestCoin(q) && totalXp(w.player(bot)) === before.xp + q.rewardXp, `${q.title}: exact XP and gold reward`);
         await kit.talkTo(w, bot, q.npc, `quest:claim:${q.id}`);
-        check(w.player(bot).gold === before.gold + q.rewardGold && quest(w, bot, q.id).completions === 1, `${q.title}: duplicate turn-in pays nothing`);
+        check(w.player(bot).gold === before.gold + humanQuestCoin(q) && quest(w, bot, q.id).completions === 1, `${q.title}: duplicate turn-in pays nothing`);
       }
       for (const q of pursued(rime.quests).filter(q => q.repeatable)) {
         await kit.teleport(w, bot, { npc: q.npc });
@@ -1470,10 +1472,10 @@ const scenarios = {
         const before = { gold: w.player(bot).gold, xp: totalXp(w.player(bot)), bag: Object.fromEntries(bring.map(o => [o.target, bag(o.target)])) };
         await kit.talkTo(w, bot, x.npc, `quest:claim:${x.id}`);
         await w.waitFor(() => q(x.id).claimed);
-        check(w.player(bot).gold === before.gold + x.rewardGold && totalXp(w.player(bot)) === before.xp + x.rewardXp, `${x.title}: exact XP and gold reward`);
+        check(w.player(bot).gold === before.gold + humanQuestCoin(x) && totalXp(w.player(bot)) === before.xp + x.rewardXp, `${x.title}: exact XP and gold reward`);
         check(bring.every(o => bag(o.target) === before.bag[o.target] - o.count), `${x.title}: exactly the handed-in items leave the bag`);
         await kit.talkTo(w, bot, x.npc, `quest:claim:${x.id}`);
-        check(w.player(bot).gold === before.gold + x.rewardGold && q(x.id).completions === 1, `${x.title}: duplicate turn-in pays nothing`);
+        check(w.player(bot).gold === before.gold + humanQuestCoin(x) && q(x.id).completions === 1, `${x.title}: duplicate turn-in pays nothing`);
       }
       // The repeatable standing order pays again after another hand-in.
       const standing = city.quests.find(x => x.repeatable && !x.season);
@@ -1486,7 +1488,7 @@ const scenarios = {
       const gold = w.player(bot).gold;
       await kit.talkTo(w, bot, standing.npc, `quest:claim:${standing.id}`);
       await w.waitFor(() => q(standing.id).completions === 2);
-      check(w.player(bot).gold === gold + standing.rewardGold, `${standing.title}: the second hand-in pays again`);
+      check(w.player(bot).gold === gold + humanQuestCoin(standing), `${standing.title}: the second hand-in pays again`);
       // Unclaimed hand-in materials are protected from merchant sales (they are quest items with sell 0), so selling the bag's
       // materials leaves the progress in place. The plain Magma Fang that the old check sold is not the standing order's item.
       await kit.talkTo(w, bot, standing.npc, `quest:accept:${standing.id}`);
@@ -1552,9 +1554,9 @@ const scenarios = {
         const before = { gold: w.player(bot).gold, xp: totalXp(w.player(bot)) };
         await kit.talkTo(w, bot, q.npc, `quest:claim:${q.id}`);
         await w.waitFor(() => quest(w, bot, q.id).claimed);
-        check(w.player(bot).gold === before.gold + q.rewardGold && totalXp(w.player(bot)) === before.xp + q.rewardXp, `${q.title}: exact XP and gold reward`);
+        check(w.player(bot).gold === before.gold + humanQuestCoin(q) && totalXp(w.player(bot)) === before.xp + q.rewardXp, `${q.title}: exact XP and gold reward`);
         await kit.talkTo(w, bot, q.npc, `quest:claim:${q.id}`);
-        check(w.player(bot).gold === before.gold + q.rewardGold && quest(w, bot, q.id).completions === 1, `${q.title}: duplicate turn-in pays nothing`);
+        check(w.player(bot).gold === before.gold + humanQuestCoin(q) && quest(w, bot, q.id).completions === 1, `${q.title}: duplicate turn-in pays nothing`);
       }
       for (const q of pursued(fen.quests).filter(q => q.repeatable)) {
         await kit.teleport(w, bot, { npc: q.npc });
@@ -2025,7 +2027,7 @@ const scenarios = {
     },
   },
   undervault: {
-    description: 'The dungeon under Skaldholm: the stairs beside the Meeting Stone refuse level 19 and take level 20 in; the Stone hires a full party that follows in; every group gets a private copy (an unrelated hero sees none of it); archers shoot real missiles; each boss drops random cross-class Undervault gear shared through party rolls; the exit portal opens only when the last boss falls and returns to Skaldholm; the dungeon resets when empty; a hero who logs out inside wakes at the stairs.',
+    description: 'The dungeon under Skaldholm: the stairs beside the Meeting Stone refuse level 19 and take level 20 in; the dungeon smith hires a full party; every group gets a private copy (an unrelated hero sees none of it); archers shoot real missiles; each boss drops random cross-class Undervault gear shared through party rolls; the exit portal opens only when the last boss falls and returns to Skaldholm; the dungeon resets when empty; a hero who logs out inside wakes at the stairs.',
     startLevel: 20, godMode: true, levelSpread: 0,
     async run(w, check) {
       const vault = map.zones[4], stairs = city.portals.find(p => p.id === 'undervault_stairs'), exit = vault.portals.find(p => p.after_clear), ret = { x: vault.portals[0].tx, y: vault.portals[0].ty };
@@ -2043,25 +2045,24 @@ const scenarios = {
       const refusal = await w.waitFor(() => w.events.find(e => !earlier.has(e) && e.bot === bot && e.type === 'error' && /level 20/.test(e.text)), 20000, 'The door refuses level 19');
       await w.action(bot, { type: 'stop' });
       check(w.player(bot).zone === 4 && /level 19/.test(refusal.text), 'A level-19 hero is told to come back at level 20 and stays in Skaldholm');
-      await kit.teleport(w, bot, { npc: 'city_meetingstone' });       // beside the Stone, 3.5 tiles from the stairs: standing still never enters the door
       await kit.setupCharacter(w, bot, { level: 20 });
       await w.debug(bot, { op: 'set_gold', gold: 6000 });
       for (let i = 0; i < 3; i++) await w.debug(bot, { op: 'give_item', item: 'linen_satchel', quantity: 1 });   // room for five pieces
-      // The Meeting Stone hires a full party for 1200 gold each at level 20, with no quest.
-      let reply = await kit.talkTo(w, bot, 'city_meetingstone', 'merc_priest');
-      await w.waitFor(() => w.player(bot).gold === 4800, 5000, 'The 1200 gold is paid');
-      check(/Merc Priest joins your party/.test(reply.notice) && w.player(bot).gold === 4800, 'The Stone hires a Priest for 1200 gold with no quest');
-      for (const c of ['warrior', 'mage', 'hunter']) await kit.talkTo(w, bot, 'city_meetingstone', 'merc_' + c);
-      await w.waitFor(() => mercs().length === 4, 10000, 'Four mercenaries');
-      reply = await kit.talkTo(w, bot, 'city_meetingstone', 'merc_assassin');
-      check(/already has 5/.test(reply.notice) && mercs().length === 4, 'A party of five is full');
-      // Walk down the stairs with real moves; the mercenaries follow into the same copy.
+      // Walk down the stairs with real moves before hiring.
       await kit.teleport(w, bot, { zone: 4, x: ret.x, y: ret.y });
       await w.action(bot, { type: 'move', x: stairs.x, y: stairs.y });
       await w.waitFor(() => w.player(bot).zone === 5, 20000, 'Down the stairs');
       await w.action(bot, { type: 'stop' });
       check(distance(w.player(bot), vault.spawn) < 1.5, 'The stairs set the hero down at the dungeon\'s start');
-      await w.waitFor(() => mercs().length === 4 && mercs().every(m => m.zone === 5 && distance(m, w.player(bot)) < 12), 15000, 'The party arrives together');
+      await kit.teleport(w, bot, { npc: 'dungeon_repair_5' });
+      // The Repair Smith hires a full party for 1200 gold each at level 20, with no quest.
+      let reply = await kit.talkTo(w, bot, 'dungeon_repair_5', 'merc_priest');
+      await w.waitFor(() => w.player(bot).gold === 4800, 5000, 'The 1200 gold is paid');
+      check(/Merc Priest joins your party/.test(reply.notice) && w.player(bot).gold === 4800, 'The smith hires a Priest for 1200 gold with no quest');
+      for (const c of ['warrior', 'mage', 'hunter']) await kit.talkTo(w, bot, 'dungeon_repair_5', 'merc_' + c);
+      await w.waitFor(() => mercs().length === 4, 10000, 'Four mercenaries');
+      reply = await kit.talkTo(w, bot, 'dungeon_repair_5', 'merc_assassin');
+      check(/already has 5/.test(reply.notice) && mercs().length === 4, 'A party of five is full');
       check(view(bot).slimes.length === 50 && view(bot).slimes.every(s => s.zone === 5) && view(bot).instance.cleared === false, 'The client is sent the fifty enemies of its own copy, labelled zone 5, not yet cleared');
       check(w.snapshot.online === 1, 'Mercenaries never count as players online');
       // A stranger gets a copy of their own and sees nothing of ours.
@@ -2077,8 +2078,8 @@ const scenarios = {
       check(mirror && mirror.id !== thrall.id && !mirror.dead && mirror.hp === mirror.maxHp, 'Its twin in the other copy (another enemy id) is untouched');
       await w.disconnect(rival);
       // Stage a clear shot without mercenaries intercepting the archer at melee range between snapshots.
-      await kit.teleport(w, bot, { npc: 'city_meetingstone' });
-      await kit.talkTo(w, bot, 'city_meetingstone', 'merc_dismiss');
+      await kit.teleport(w, bot, { npc: 'dungeon_repair_5' });
+      await kit.talkTo(w, bot, 'dungeon_repair_5', 'merc_dismiss');
       await kit.teleport(w, bot, { zone: 5, x: vault.spawn.x, y: vault.spawn.y });
       await kit.spawnEnemy(w, bot, { kind: 'archer', x: vault.spawn.x + 7, y: vault.spawn.y });
       await w.waitFor(() => (view(bot).ebolts || []).some(b => b.kind === 'archer'), 20000, 'An arrow is in the air');
@@ -2229,9 +2230,9 @@ const scenarios = {
       await w.waitFor(() => distance(enemy(), w.player(bot)) < 4, 30000, 'The enemy follows through the entry corridors into the room');
       check(!enemy().dead && distance(enemy(), from) > 25, 'The living enemy reaches the distant hero through the dungeon');
       await w.debug(bot, { op: 'kill_enemy', id });
-      // Hire a fighter for this run; completed unrelated objectives do not end Stone contracts.
-      await kit.setupCharacter(w, bot, { gold: 1000, finishQuests: ['crags_cinderlord'], teleportTo: { npc: 'city_meetingstone' } });
-      await kit.talkTo(w, bot, 'city_meetingstone', 'merc_priest');
+      // Hire a fighter for this run; completed unrelated objectives do not end dungeon contracts.
+      await kit.setupCharacter(w, bot, { gold: 2500, finishQuests: ['crags_cinderlord'], teleportTo: { npc: 'dungeon_repair_5' } });
+      await kit.talkTo(w, bot, 'dungeon_repair_5', 'merc_priest');
       await kit.teleport(w, bot, { zone: 5, ...vault.spawn });
       await w.waitFor(() => mercs().length === 1, 5000, 'The hired mercenary follows into the copy');
       check(mercs().length === 1, 'An unrelated completed objective leaves the instance contract active');
@@ -2414,7 +2415,7 @@ const scenarios = {
         await kit.talkTo(w, bot, q.npc, `quest:claim:${id}`);
         await w.waitFor(() => state(id).claimed, 5000, `Claim ${id}`);
         for (const [item, count, had] of bringing) check(held(item) === had - count, `${id}: the hand-in took exactly ${count} ${item}`);
-        check(w.player(bot).gold === before.gold + q.rewardGold && totalXp(w.player(bot)) === before.xp + levelXp[q.level - 1] / 10, `${id}: the claim pays ${q.rewardGold} gold and a tenth of level ${q.level}'s XP`);
+        check(w.player(bot).gold === before.gold + humanQuestCoin(q) && totalXp(w.player(bot)) === before.xp + levelXp[q.level - 1] / 10, `${id}: the claim pays ${humanQuestCoin(q)} gold and a tenth of level ${q.level}'s XP`);
         return q;
       }
       // Dependency order: every ordinary quest, none of the group quests, the escort or the progression quest (it arrives by itself).
@@ -2444,7 +2445,7 @@ const scenarios = {
         await kit.teleport(w, bot, { npc: rep.npc });
         await kit.talkTo(w, bot, rep.npc, 'quest:claim:wyrd_patrol');
         await w.waitFor(() => state('wyrd_patrol').completions === before.completions + 1, 5000, 'Patrol paid');
-        check(w.player(bot).gold === before.gold + rep.rewardGold, `The repeatable patrol pays ${rep.rewardGold} gold again (round ${round + 1})`);
+        check(w.player(bot).gold === before.gold + humanQuestCoin(rep), `The repeatable patrol pays ${humanQuestCoin(rep)} gold again (round ${round + 1})`);
       }
       // The group quests: the giver hires exactly the missing fighters, up to the quest's party size.
       const mercs = () => w.snapshot.players.filter(p => /^Merc /.test(p.look.name)).length;
@@ -2512,7 +2513,7 @@ const scenarios = {
       const gold = w.player(bot).gold;
       await kit.talkTo(w, bot, 'wyrd_loremaster', 'quest:claim:wyrd_escort');
       await w.waitFor(() => state('wyrd_escort').claimed, 5000, 'Claim the escort quest');
-      check(w.player(bot).gold === gold + q.rewardGold, `Vigdis pays ${q.rewardGold} gold once`);
+      check(w.player(bot).gold === gold + humanQuestCoin(q), `Vigdis pays ${humanQuestCoin(q)} gold once`);
       // A second hero fails it: if the hero falls the quest fails, the escort is gone and the quest can be started again at the mill.
       const loser = 'Failer';
       await w.connect({ bot: loser, class: 'mage' });
@@ -2764,7 +2765,7 @@ const scenarios = {
         await kit.talkTo(w, bot, q.npc, `quest:claim:${id}`);
         await w.waitFor(() => state(id).claimed, 5000, `Claim ${id}`);
         for (const [item, count, had] of bringing) check(held(item) === had - count, `${id}: the hand-in took exactly ${count} ${item}`);
-        check(w.player(bot).gold === before.gold + q.rewardGold && totalXp(w.player(bot)) === before.xp + levelXp[q.level - 1] / 10, `${id}: the claim pays ${q.rewardGold} gold and a tenth of level ${q.level}'s XP`);
+        check(w.player(bot).gold === before.gold + humanQuestCoin(q) && totalXp(w.player(bot)) === before.xp + levelXp[q.level - 1] / 10, `${id}: the claim pays ${humanQuestCoin(q)} gold and a tenth of level ${q.level}'s XP`);
         return q;
       }
       // Dependency order: every ordinary quest, none of the group quest or the progression quest (it arrives by itself).
@@ -2796,7 +2797,7 @@ const scenarios = {
         before.gold = w.player(bot).gold;
         await kit.talkTo(w, bot, rep.npc, 'quest:claim:sky_patrol');
         await w.waitFor(() => state('sky_patrol').completions === before.completions + 1, 5000, 'Patrol paid');
-        check(w.player(bot).gold === before.gold + rep.rewardGold, `The repeatable patrol pays ${rep.rewardGold} gold again (round ${round + 1})`);
+        check(w.player(bot).gold === before.gold + humanQuestCoin(rep), `The repeatable patrol pays ${humanQuestCoin(rep)} gold again (round ${round + 1})`);
       }
       // The group quest: the giver hires exactly the missing fighters, up to the quest's party size.
       const mercs = () => w.snapshot.players.filter(p => /^Merc /.test(p.look.name)).length;
@@ -3035,7 +3036,7 @@ const scenarios = {
         await kit.talkTo(w, bot, q.npc, `quest:claim:${id}`);
         await w.waitFor(() => state(id).claimed, 5000, `Claim ${id}`);
         for (const [item, count, had] of bringing) check(held(item) === had - count, `${id}: the hand-in took exactly ${count} ${item}`);
-        check(w.player(bot).gold === before.gold + q.rewardGold && totalXp(w.player(bot)) === before.xp + levelXp[q.level - 1] / 10, `${id}: the claim pays ${q.rewardGold} gold and a tenth of level ${q.level}'s XP`);
+        check(w.player(bot).gold === before.gold + humanQuestCoin(q) && totalXp(w.player(bot)) === before.xp + levelXp[q.level - 1] / 10, `${id}: the claim pays ${humanQuestCoin(q)} gold and a tenth of level ${q.level}'s XP`);
         return q;
       }
       // Dependency order: every ordinary quest, none of the elite quests, the capstone or the progression quest.
@@ -3066,7 +3067,7 @@ const scenarios = {
         before.gold = w.player(bot).gold;
         await kit.talkTo(w, bot, rep.npc, 'quest:claim:deep_patrol');
         await w.waitFor(() => state('deep_patrol').completions === before.completions + 1, 5000, 'Patrol paid');
-        check(w.player(bot).gold === before.gold + rep.rewardGold, `The repeatable patrol pays ${rep.rewardGold} gold again (round ${round + 1})`);
+        check(w.player(bot).gold === before.gold + humanQuestCoin(rep), `The repeatable patrol pays ${humanQuestCoin(rep)} gold again (round ${round + 1})`);
       }
       // The three group quests: the giver hires exactly the missing fighters, up to the quest's party size.
       const mercs = () => w.snapshot.players.filter(p => /^Merc /.test(p.look.name)).length;
@@ -3091,7 +3092,7 @@ const scenarios = {
   },
 
   nacrehold: {
-    description: 'Nacrehold: real paired Tideway entries, safe houses and authoritative collision, local view isolation, merfolk dialogue, services, Meeting Stone hire/dismiss, Spark discovery and flight, persisted city and quests after Rust restart.',
+    description: 'Nacrehold: real paired Tideway entries, safe houses and authoritative collision, local view isolation, merfolk dialogue, services, Meeting Stone summons, Spark discovery and flight, persisted city and quests after Rust restart.',
     startLevel: 40,
     async run(w, check) {
       const bot = 'Pearlwalker', watcher = 'Surface';
@@ -3134,14 +3135,8 @@ const scenarios = {
       await w.waitFor(() => w.player(bot).gold === gold - 500);
       check(w.player(bot).gold === gold - 500 && w.player(bot).bagCapacity === 22, 'The market sells the authoritative six-slot satchel for 500 gold');
       await kit.teleport(w, bot, { npc: 'nacre_stone' });
-      await w.debug(bot, { op: 'set_gold', gold: 10000 });
-      const g = w.player(bot).gold;
-      await kit.talkTo(w, bot, 'nacre_stone', 'merc_priest');
-      await w.waitFor(() => view(bot).players.some(p => /^Merc /.test(p.look.name)) && w.player(bot).gold === g - 5000);
-      check(w.player(bot).gold === g - 5000 && view(bot).players.some(p => /^Merc /.test(p.look.name) && p.look.class === 'priest'), 'The Meeting Stone hires a level-40 priest for 5000 gold');
-      await kit.talkTo(w, bot, 'nacre_stone', 'merc_dismiss');
-      await w.waitFor(() => !view(bot).players.some(p => /^Merc /.test(p.look.name)));
-      check(!view(bot).players.some(p => /^Merc /.test(p.look.name)), 'The stone dismisses hired companions');
+      const meeting = await kit.talkTo(w, bot, 'nacre_stone');
+      check(meeting.offers.join() === 'summon_party', 'The Meeting Stone offers party summons');
       await kit.teleport(w, bot, { npc: 'travel_nacrehold' });
       await kit.talkTo(w, bot, 'travel_nacrehold');
       await w.waitFor(() => w.player(bot).travelStops.includes('travel_nacrehold'));
@@ -3203,10 +3198,10 @@ const scenarios = {
         const handed = q.objectives.filter(o => o.kind === 'bring').map(o => [o, bag(o.target)]);
         await kit.talkTo(w, bot, q.npc, `quest:claim:${q.id}`);
         await w.waitFor(() => quest(w, bot, q.id).claimed);
-        check(w.player(bot).gold === before + q.rewardGold && totalXp(w.player(bot)) === xp + q.rewardXp, `${q.title}: exact level-table XP and gold`);
+        check(w.player(bot).gold === before + humanQuestCoin(q) && totalXp(w.player(bot)) === xp + q.rewardXp, `${q.title}: exact level-table XP and gold`);
         check(handed.every(([o, n]) => bag(o.target) === n - o.count), `${q.title}: hand-in consumes exactly the requested items`);
         await kit.talkTo(w, bot, q.npc, `quest:claim:${q.id}`);
-        check(w.player(bot).gold === before + q.rewardGold, `${q.title}: duplicate claim pays nothing`);
+        check(w.player(bot).gold === before + humanQuestCoin(q), `${q.title}: duplicate claim pays nothing`);
       }
       const repeat = ordinary.find(q => q.repeatable);
       await kit.talkTo(w, bot, repeat.npc, `quest:accept:${repeat.id}`);
@@ -3251,7 +3246,7 @@ const scenarios = {
       const before = w.player(bot).gold;
       await kit.talkTo(w, bot, 'astral_steward', `quest:claim:astral_welcome:${area.quests[0].rewardChoices.warrior[0]}`);
       await w.waitFor(() => quest(w, bot, 'astral_welcome').claimed);
-      check(w.player(bot).gold === before + area.quests[0].rewardGold, 'The steward pays the quest reward exactly once');
+      check(w.player(bot).gold === before + humanQuestCoin(area.quests[0]), 'The steward pays the quest reward exactly once');
       await kit.teleport(w, bot, { npc: 'travel_astralhollow' });
       await kit.talkTo(w, bot, 'travel_astralhollow');
       await w.waitFor(() => w.player(bot).travelStops.includes('travel_astralhollow'));
@@ -3565,14 +3560,9 @@ const scenarios = {
       await kit.teleport(w,bot,{npc:'travel_breakwater'});
       const travel=await kit.talkTo(w,bot,'travel_breakwater');
       check(travel.travelStops?.includes('travel_breakwater') && area.npcs.find(n=>n.id==='travel_breakwater').travelLinks.includes('travel_asterion') && map.zones[16].npcs.find(n=>n.id==='travel_asterion').travelLinks.includes('travel_breakwater'),'Spark Travel links Breakwater and Asterion');
-      await w.debug(bot,{op:'set_gold',gold:40000});
-      await kit.teleport(w,bot,{npc:'stormglass_stone'});
-      const hire=await kit.talkTo(w,bot,'stormglass_stone','merc_priest');
-      await w.waitFor(()=>w.views.get(bot).players.some(p=>p.look.name==='Merc Priest'),5000,'Meeting Stone hires a fighter');
-      check(/Merc Priest joins your party/.test(hire.notice) && w.player(bot).gold===7000,'The Meeting Stone hires a level-65 Priest for 33000 gold without opening the dungeon');
-      await w.advance(700);
-      await kit.talkTo(w,bot,'stormglass_stone','merc_dismiss');
-      await w.waitFor(()=>!w.views.get(bot).players.some(p=>p.look.name==='Merc Priest'),5000,'Dismiss Meeting Stone hire');
+      await kit.teleport(w, bot, { npc: 'stormglass_stone' });
+      const meeting = await kit.talkTo(w, bot, 'stormglass_stone');
+      check(meeting.offers.join() === 'summon_party', 'The Meeting Stone offers party summons');
       await kit.teleport(w,bot,{npc:'stormglass_warden'});
       await kit.talkTo(w,bot,'stormglass_warden','quest:accept:stormglass_welcome');
       await w.waitFor(()=>!!quest(w,bot,'stormglass_welcome'),5000,'Accept camp introductions');
@@ -3650,12 +3640,9 @@ const scenarios = {
       await kit.teleport(w,bot,{npc:'travel_millbridge'});
       const travel=await kit.talkTo(w,bot,'travel_millbridge');
       check(travel.travelStops?.includes('travel_millbridge')&&area.npcs.find(n=>n.id==='travel_millbridge').travelLinks.includes('travel_breakwater')&&map.zones[18].npcs.find(n=>n.id==='travel_breakwater').travelLinks.includes('travel_millbridge'),'Spark stops link Millbridge and Breakwater');
-      await w.debug(bot,{op:'set_gold',gold:45000});
-      await kit.teleport(w,bot,{npc:'sun_stone'});
-      const hire=await kit.talkTo(w,bot,'sun_stone','merc_priest');
-      await w.waitFor(()=>w.views.get(bot).players.some(p=>p.look.name==='Merc Priest'),5000,'Meeting Stone hire');
-      check(/Merc Priest joins your party/.test(hire.notice)&&w.player(bot).gold===7000,'Meeting Stone hires a level-70 fighter for 38000 gold');
-      await kit.talkTo(w,bot,'sun_stone','merc_dismiss');
+      await kit.teleport(w, bot, { npc: 'sun_stone' });
+      const meeting = await kit.talkTo(w, bot, 'sun_stone');
+      check(meeting.offers.join() === 'summon_party', 'The Meeting Stone offers party summons');
       await kit.teleport(w,bot,{npc:'sun_miller'});
       await kit.talkTo(w,bot,'sun_miller','quest:accept:sun_welcome');
       await w.waitFor(()=>!!quest(w,bot,'sun_welcome'),5000,'Accept introductions');

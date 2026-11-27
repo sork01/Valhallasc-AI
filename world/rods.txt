@@ -21,7 +21,8 @@
     "level": 5,
     "sell": 10,
     "zones": [
-      1
+      1,
+      6
     ],
     "richZones": []
   },
@@ -32,9 +33,7 @@
     "name": "Willow Rod",
     "level": 10,
     "sell": 10,
-    "zones": [
-      6
-    ],
+    "zones": [],
     "richZones": [
       2,
       3
@@ -49,7 +48,8 @@
     "sell": 10,
     "zones": [
       20,
-      22
+      22,
+      7
     ],
     "richZones": []
   },
@@ -62,7 +62,8 @@
     "sell": 10,
     "zones": [
       19,
-      25
+      25,
+      13
     ],
     "richZones": []
   },
@@ -74,7 +75,9 @@
     "level": 45,
     "sell": 10,
     "zones": [
-      45
+      45,
+      14,
+      15
     ],
     "richZones": []
   },
@@ -83,10 +86,12 @@
     "tier": 7,
     "lava": true,
     "name": "Starcatch Rod",
-    "level": 60,
+    "level": 55,
     "sell": 10,
     "zones": [
-      26
+      26,
+      16,
+      17
     ],
     "richZones": []
   },
@@ -95,10 +100,36 @@
     "tier": 8,
     "lava": true,
     "name": "Worldwire Rod",
+    "level": 70,
+    "sell": 10,
+    "zones": [
+      28,
+      21
+    ],
+    "richZones": []
+  },
+  {
+    "item": "rod_rootbraid_rod",
+    "tier": 9,
+    "lava": true,
+    "name": "Rootbraid Rod",
     "level": 80,
     "sell": 10,
     "zones": [
-      28
+      23,
+      24
+    ],
+    "richZones": []
+  },
+  {
+    "item": "rod_cairnsteel_rod",
+    "tier": 10,
+    "lava": true,
+    "name": "Cairnsteel Rod",
+    "level": 90,
+    "sell": 10,
+    "zones": [
+      27
     ],
     "richZones": []
   }

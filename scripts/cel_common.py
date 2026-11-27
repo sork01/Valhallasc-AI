@@ -37,6 +37,8 @@ import make_warrior_sprites as rig  # noqa: E402
 FEMALE = '--female' in sys.argv
 if FEMALE:
     sys.argv.remove('--female')
+# HAT_HAIR=1 (export_character_body.py --hat-hair) leaves out the female's long hair: the body variant drawn under headgear.
+HAT_HAIR = FEMALE and os.environ.get('HAT_HAIR') == '1'
 SHOULDER_X, HIP_X = (7.2, 4.7) if FEMALE else (8, 4.2)
 
 V, unit = rig.V, rig.unit
@@ -312,6 +314,7 @@ def revision_of(sheet_sources, *objects):
     for obj in objects:
         h.update((obj if isinstance(obj, str) else inspect.getsource(obj)).encode())
     h.update(b'female' if FEMALE else b'male')      # a male and a female frame must never be taken for each other
+    if HAT_HAIR: h.update(b'hat-hair')
     h.update(Path(__file__).read_bytes())
     h.update(Path(rig.__file__).read_bytes())
     return h.hexdigest()
@@ -349,7 +352,7 @@ class Sheet:
             if f'{generic_slot}_{generic_variant}' in self.all_parts:
                 piece, defense = gg.NAMES[generic_slot]
                 self.gear.setdefault(generic_slot, {'none': {'name': 'Nothing', 'defense': 0}})[generic_variant] = {'name': piece, 'defense': defense}
-        self.cache = Path(__file__).resolve().parent / f'{name}_raw'
+        self.cache = Path(__file__).resolve().parent / (f'{name}_raw' + ('_hat' if HAT_HAIR else ''))
         self.revision, self.meta, self.default_equip, self.combos = revision, meta, default_equip, combos
         self.pal = np.array([[int(c[j:j + 2], 16) for j in (1, 3, 5)] + [0 if i == 0 else 255] for i, c in enumerate(self.palette)], np.uint8)
 

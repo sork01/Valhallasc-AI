@@ -108,7 +108,8 @@ fn halloween_kill_rolls_once_and_daily_claim_is_shared_across_all_cities() {
     w.time += 1.;
     let gold = w.players[&1].character.gold;
     w.interact(1, &n.id, Some("quest:claim:halloween_hunt"));
-    assert_eq!(w.players[&1].character.gold, gold + q.reward_gold);
+    let c = &w.players[&1].character;
+    assert_eq!(c.gold, gold + c.quest_gold(q.reward_gold));
     accept(&mut w, 1, "asterion_singer");
     assert!(
         w.players[&1]

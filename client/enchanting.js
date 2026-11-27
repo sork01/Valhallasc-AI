@@ -38,12 +38,15 @@
     return true;
   }
   function visible() { return !$('enchanting-panel').hidden; }
+  function selectingDisenchant() { return visible() && mode === 'disenchant'; }
   function close() {
+    const restoreDetails = selectingDisenchant();
     $('enchanting-panel').hidden = true;
     $('enchanting-toggle').setAttribute('aria-expanded', 'false');
-    $('enchanting-panel').parentElement.classList.remove('enchanting-open');
+    $('enchanting-panel').parentElement.classList.remove('enchanting-open', 'enchanting-disenchant');
     confirmation = null;
     refresh = false;
+    if (restoreDetails) Inventory.renderDetails();
   }
   function open(item) {
     const row = rowForItem(Inventory.definition(item));
@@ -80,6 +83,7 @@
     field.append(select);
     return field;
   }
+  const gearRarities = ['rare', 'epic', 'legendary'];
   function enchantInfo(container, enchant) {
     const recipe = byId.get(enchant);
     if (!recipe) return;
@@ -87,6 +91,7 @@
     container.append(el('strong', tr(recipe.name), 'enchanting-name'),
       el('p', tr(recipe.effect)),
       el('small', tr('{0} · {1} or higher · {2} s cooldown', tr(slots[recipe.kind]), rarity(tier.rarity), recipe.cooldown)));
+    if (tier.minGearLevel) container.append(el('small', tr('Requires equipment level {0} or higher.', tier.minGearLevel)));
   }
   const copies = () => (packet?.copies || []).filter(({gear}) => Inventory.definition(gear.item));
   function copyLabel({gear, worn}) {
@@ -94,8 +99,9 @@
       + (worn ? ' · ' + tr('Equipped') : '') + (gear.enchant ? ' · ' + tr(byId.get(gear.enchant)?.name || '') : '');
   }
   function fits({gear}, recipe) {
-    return Inventory.definition(gear.item).kind === recipe.kind
-      && tiers.findIndex(tier => tier.rarity === gear.rarity) >= recipe.tier;
+    const item = Inventory.definition(gear.item), tier = tiers[recipe.tier];
+    return item.kind === recipe.kind && (item.requiredLevel || 1) >= (tier.minGearLevel || 1)
+      && gearRarities.indexOf(gear.rarity) >= gearRarities.indexOf(tier.rarity);
   }
   function selectedCopy(panel, rows) {
     panel.append(picker('Equipment copy', rows.map(row => [String(row.gear.id), copyLabel(row)]), copyId, value => {
@@ -111,8 +117,42 @@
   function confirmAction(label, request, disabled = pending) {
     return action(label, () => { notice = ''; if (send(request)) render(); }, disabled);
   }
+  function renderDisenchant(container, item, copy) {
+    if (!selectingDisenchant()) return false;
+    const target = copy && packet?.skill
+      ? copies().find(({gear, worn}) => !worn && gear.id === copy.id && gear.rarity === copy.rarity
+        && (gear.enchant ?? null) === (copy.enchant ?? null))
+      : undefined;
+    if (confirmation !== target?.gear.id) confirmation = null;
+    if (!target) {
+      const message = item && packet && !pending
+        ? 'This item cannot be disenchanted.' : 'Select gear in your bags to disenchant.';
+      container.append(el('p', tr(message), 'bag-empty-note'));
+      return true;
+    }
+
+    const {gear} = target;
+    const material = materials.find(row => row.rarity === gear.rarity);
+    const title = el('b', copyLabel(target), 'item-name');
+    title.dataset.rarity = gear.rarity;
+    container.append(title, el('p', tr('Destroys this copy. You receive {0} × {1}.', material.yield, tr(material.name))));
+    const control = confirmation === gear.id
+      ? confirmAction('Confirm disenchant', {op:'disenchant', copy:gear.id, expected:gear.enchant ?? null})
+      : action('Disenchant this copy', () => {
+        confirmation = gear.id;
+        Inventory.renderDetails();
+        container.querySelector('button')?.focus({preventScroll:true});
+      });
+    container.append(control);
+    trainingNote(container, packet.skill, target.skillCap);
+    return true;
+  }
   function render() {
     const root = $('enchanting-panel');
+    const selecting = selectingDisenchant();
+    const updateBag = selecting || root.parentElement.classList.contains('enchanting-disenchant');
+    root.parentElement.classList.toggle('enchanting-disenchant', selecting);
+    if (updateBag) Inventory.renderDetails();
     const heading = el('h4', tr('Enchanting'));
     const status = el('p', notice ? tr(notice) : pending ? tr('Waiting for Enchanting…') : '', 'enchanting-status');
     status.setAttribute('role', 'status');
@@ -123,7 +163,12 @@
     }
     const { skill, maxSkill, recipes, trainingGearLevel, craftSkillCaps } = packet;
     root.append(el('p', skill ? tr('Enchanting skill {0} / {1}', skill, maxSkill) : tr('An Enchanting Master can teach you. In Alderhaven, find one near the apothecary.')));
-    if (trainingGearLevel) root.append(el('small', tr('Use level {0} or higher gear for your next skill point.', trainingGearLevel)));
+    if (trainingGearLevel) {
+      root.append(el('small', tr('Use level {0} or higher gear for your next skill point.', trainingGearLevel)));
+      const finalRecipe = enchants.find(recipe => craftSkillCaps?.[recipe.tier] === maxSkill &&
+        skill >= tiers[recipe.tier].skill);
+      if (finalRecipe) root.append(el('small', tr('Craft {0} to reach skill {1}.', tr(finalRecipe.name), maxSkill)));
+    }
     const nav = el('div', '', 'enchanting-modes');
     for (const [key, label] of modes) {
       const tab = action(label, () => { mode = key; copyId = ''; confirmation = null; notice = ''; render(); }, pending || (!skill && key !== 'apply'));
@@ -133,21 +178,9 @@
     root.append(nav);
     if (!skill && mode !== 'apply') return;
 
+    if (selecting) return;
     const panel = el('div', '', 'enchanting-form');
     root.append(panel);
-    if (mode === 'disenchant') {
-      const target = selectedCopy(panel, copies().filter(row => !row.worn));
-      if (!target) return;
-      const {gear} = target;
-      const material = materials.find(row => row.rarity === gear.rarity);
-      enchantInfo(panel, gear.enchant);
-      panel.append(el('p', tr('Destroys this copy. You receive {0} × {1}.', material.yield, tr(material.name))));
-      trainingNote(panel, skill, target.skillCap);
-      panel.append(confirmation === gear.id
-        ? confirmAction('Confirm disenchant', {op:'disenchant', copy:gear.id, expected:gear.enchant ?? null})
-        : action('Disenchant this copy', () => { confirmation = gear.id; render(); root.querySelector('.enchanting-form button')?.focus(); }));
-      return;
-    }
     const owned = new Map(packet.inventory.map(stack => [stack.item, stack.quantity]));
     const options = enchants.filter(row => {
       if (mode === 'craft') return recipes.includes(row.id);
@@ -180,7 +213,12 @@
       });
       panel.append(costs);
       trainingNote(panel, skill, craftSkillCaps?.[recipe.tier]);
-      panel.append(confirmAction('Craft one scroll', {op:'craft', enchant:recipe.id}, pending || !canCraft));
+      const actions = el('div', '', 'recipe-actions');
+      actions.append(
+        confirmAction('Craft one scroll', {op:'craft', enchant:recipe.id}, pending || !canCraft),
+        confirmAction('Craft All', {op:'craft', enchant:recipe.id, all:true}, pending || !canCraft),
+      );
+      panel.append(actions);
     } else {
       const target = selectedCopy(panel, copies().filter(row => fits(row, recipe) && row.gear.enchant !== recipe.id));
       panel.append(el('p', tr('Cost · One crafted scroll')));
@@ -240,7 +278,8 @@
     }
   }
   window.Enchanting = {
-    open, close, tooltip, drawFields, name: id => byId.has(id) ? tr(byId.get(id).name) : '', isScroll: item => !!rowForItem(item),
+    open, close, tooltip, drawFields, selectingDisenchant, renderDisenchant, name: id => byId.has(id) ? tr(byId.get(id).name) : '', isScroll: item => !!rowForItem(item),
+    recipeKnown: (item, learned) => item.kind === 'enchant_recipe' && learned?.includes(rowForItem(item)?.id),
     onPacket(answer) {
       pending = false;
       clearTimeout(requestAt);

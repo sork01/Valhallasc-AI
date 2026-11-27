@@ -159,10 +159,14 @@
   };
 
   // ---- the beacons -----------------------------------------------------------------------------------------------------
+  const beaconScale = o => o.great ? 1.5 : 1;
+  const beaconFlameBase = o => -106 * beaconScale(o);
+  const beaconLight = o => [0, beaconFlameBase(o) - 10];
   City.art.beacon = {
+    lightAnchor: beaconLight,
     box: [300, 360, 150, 290],
     draw(g, o) {
-      const big = !!o.great, R = big ? 1.5 : 1, rng = rngf(big ? 31 : 17);
+      const big = !!o.great, R = beaconScale(o), rng = rngf(big ? 31 : 17);
       g.lineJoin = 'round';
       g.fillStyle = 'rgba(20,16,10,.3)'; g.beginPath(); g.ellipse(6, 8, 74 * R, 26 * R, 0, 0, 6.283); g.fill();
       for (let tier = 0; tier < 3; tier++) {                                                      // a cairn of stacked stones
@@ -179,12 +183,13 @@
       void rng;
     },
     animate(g, o, sx, sy, t) {
-      const big = !!o.great, R = big ? 1.5 : 1, on = big || lit(o.place), bx = sx, by = sy - 106 * R;
+      const R = beaconScale(o), on = o.great || lit(o.place), bx = sx, by = sy + beaconFlameBase(o);
       if (!on) {                                                                                   // dark: a wisp of cold smoke and an ember or two
         g.save(); g.globalAlpha = .35; g.fillStyle = '#8a8a96'; for (let i = 0; i < 3; i++) { const ph = (t * .4 + i * .33) % 1; g.beginPath(); g.ellipse(bx + Math.sin(t + i) * 3, by - ph * 34, 5 + ph * 5, 3 + ph * 3, 0, 0, 6.283); g.fill(); } g.restore(); return;
       }
       g.save(); g.globalCompositeOperation = 'lighter';
-      const gl = g.createRadialGradient(bx, by - 10, 6, bx, by - 10, 140 * R); gl.addColorStop(0, 'rgba(255,170,70,.5)'); gl.addColorStop(1, 'rgba(255,120,40,0)'); g.fillStyle = gl; g.fillRect(bx - 150 * R, by - 150 * R, 300 * R, 300 * R);
+      const [dx, dy] = beaconLight(o), lx = sx + dx, ly = sy + dy;
+      const gl = g.createRadialGradient(lx, ly, 6, lx, ly, 140 * R); gl.addColorStop(0, 'rgba(255,170,70,.5)'); gl.addColorStop(1, 'rgba(255,120,40,0)'); g.fillStyle = gl; g.fillRect(bx - 150 * R, by - 150 * R, 300 * R, 300 * R);
       g.restore();
       for (let i = 0; i < 6; i++) {
         const ph = (t * (1.3 + i * .12) + i * .17) % 1, w = (20 - i * 2.5) * R * (1 - ph * .55), h = (34 + i * 7) * R * (.7 + .3 * Math.sin(t * 9 + i * 2)), ox = Math.sin(t * 5 + i * 1.7) * 3 * R;

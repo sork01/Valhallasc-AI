@@ -1019,37 +1019,13 @@ fn seat_near_boss(w: &World, zone: usize, boss: Point) -> Option<Point> {
     None
 }
 
-/// Rents `mercs` for the hirer (session 1) at the Meeting Stone, then sets the hirer at `start` in `zone` with the hired
-/// fighters on free ground beside them.
+/// Places the test hirer's crew in the encounter zone.
 pub(super) fn hire_mercenaries(w: &mut World, mercs: &[Class], zone: usize, start: Point) {
     let raid = w.maps[zone].raid;
-    let stone_id = if raid {
-        "cf_quartermaster"
-    } else {
-        "city_meetingstone"
-    };
-    let stone_zone = w
-        .maps
-        .iter()
-        .position(|m| m.npcs.iter().any(|n| n.id == stone_id))
-        .expect("a Meeting Stone");
-    let stone = w.maps[stone_zone]
-        .npcs
-        .iter()
-        .find(|n| n.id == stone_id)
-        .unwrap()
-        .clone();
-    {
-        let c = &mut w.players.get_mut(&1).unwrap().character;
-        c.gold = super::mercs::merc_price(c.level) * mercs.len() as u32 + 1000;
-        c.zone = stone_zone;
-        c.x = stone.x;
-        c.y = stone.y + 1.;
-    }
-    for class in mercs {
-        w.time += 0.6;
-        let name = format!("{class:?}").to_lowercase();
-        w.interact(1, stone_id, Some(&format!("merc_{name}")));
+    let owner = w.players[&1].character.id.clone();
+    let level = w.players[&1].character.level;
+    for &class in mercs {
+        w.place_mercenary(&owner, class, level, zone, start, raid, None).unwrap();
     }
     assert_eq!(
         w.players.values().filter(|p| p.merc.is_some()).count(),

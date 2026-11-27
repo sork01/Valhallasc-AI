@@ -55,7 +55,7 @@ let browser;
     await page.evaluate(id => Online.send({type:'interact',npc:id}),trainer.id);
     await use(page.locator('#npc-offers [data-view="alchemy"]'));
   }
-  const brew = page.locator(`[data-recipe="${potion}"] button`);
+  const brew = page.locator(`[data-alchemy-action="${potion}"]`);
   await warp(trainer);
   await interact();
   await use(page.getByRole('button',{name:touch ? 'Lär dig alkemi' : 'Learn Alchemy',exact:true}));
@@ -66,21 +66,23 @@ let browser;
   assert.match(plants,touch ? /Wyrdklöver.*120.*Månslöjeorkidé.*150/ : /Wyrd Clover.*120.*Moonveil Orchid.*150/);
   await use(page.locator('[data-alchemy-action="recipes"]'));
   await use(brew);
-  await brew.filter({hasText:touch ? 'Brygg' : 'Brew'}).waitFor();
+  await brew.waitFor();
   assert(await brew.isDisabled());
   await use(page.locator('#npc-x'));
 
   const c = map.city;
   const patch = view.flowerPatches.find(p => p.x > c.x0 && p.x < c.x1 && p.y > c.y0 && p.y < c.y1);
   await warp(patch);
-  await page.evaluate(patch => {
-    const draw = Alchemy.draw;
-    Alchemy.draw = (g,project,width,height) => {
-      const [x,y] = project(patch.x,patch.y);
-      if (x > 80 && x < width-80 && y > 90 && y < height-60) window.testFlower = {x,y,width,height};
-      draw(g,project,width,height);
+  await page.evaluate(id => {
+    const draw = Alchemy.drawPatch;
+    Alchemy.drawPatch = (g,patch,x,y) => {
+      if (patch.id === id) {
+        const scale = g.getTransform().a;
+        window.testFlower = {x,y,width:g.canvas.width/scale,height:g.canvas.height/scale};
+      }
+      draw(g,patch,x,y);
     };
-  },patch);
+  },patch.id);
   await page.waitForFunction(() => window.testFlower);
   await page.waitForTimeout(600);
   const target = await page.evaluate(() => {

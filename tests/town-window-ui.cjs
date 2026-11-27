@@ -41,7 +41,7 @@ const suite = {
       [() => Skillbar.show(), 'skills-panel', '#skills-title'],
       [() => Quests.show(), 'quest-journal', '#quest-title'],
       [() => Social.show(), 'social-panel', '#social-title'],
-      [() => document.getElementById('p-settings').click(), 'settings-panel', '#set-language'],
+      [() => document.getElementById('p-settings').click(), 'settings-panel', '#set-master'],
     ]) {
       await page.evaluate(open); await page.locator(inside).tap();
       check(await page.locator('#' + root).isVisible(), `${root} stays open inside`);

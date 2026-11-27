@@ -72,6 +72,10 @@ pub fn catalog() -> &'static [Achievement] {
                     | "fish_legendary"
                     | "fish_set"
                     | "fish_weight"
+                    | "fishing_skill"
+                    | "enchanting_skill"
+                    | "blacksmithing_skill"
+                    | "alchemy_skill"
             ));
             if matches!(a.metric.as_str(), "boss_set" | "quest_set") {
                 assert_eq!(a.target as usize, a.members.len());
@@ -129,6 +133,10 @@ impl Character {
             // Clamp u64 counters before conversion so long-lived logs cannot wrap.
             "fish_catches" => self.fishing.total.min(u64::from(a.target)) as u32,
             "fish_legendary" => self.fishing.legendary.min(u64::from(a.target)) as u32,
+            "fishing_skill" => self.fishing.proficiency.skill.into(),
+            "enchanting_skill" => self.enchanting.proficiency.skill.into(),
+            "blacksmithing_skill" => self.blacksmithing.proficiency.skill.into(),
+            "alchemy_skill" => self.alchemy.proficiency.skill.into(),
             "fish_set" => a
                 .members
                 .iter()
@@ -304,12 +312,12 @@ mod tests {
     }
     #[test]
     fn achievements_catalog_has_positive_points_and_correct_atlas_and_rewards() {
-        assert_eq!(catalog().len(), 154);
+        assert_eq!(catalog().len(), 166);
         assert_eq!(regions().len(), 23);
         assert_eq!(regions().iter().collect::<BTreeSet<_>>().len(), 23);
         let c = hero();
         let view = c.achievement_view();
-        assert_eq!(view["maximum"], 4090);
+        assert_eq!(view["maximum"], 4370);
         for a in catalog() {
             if a.metric == "fog" {
                 assert!(regions().contains(&a.zone.unwrap()));
@@ -487,7 +495,7 @@ mod tests {
         assert_eq!(c.achievement_points(), 685);
         assert!(c.sync_achievements().is_empty());
         assert_eq!(c.achievement_points(), 685);
-        assert_eq!(c.achievement_view()["maximum"], 4090);
+        assert_eq!(c.achievement_view()["maximum"], 4370);
         assert_eq!(c.achievement_title(), "The Explorer");
         assert_eq!(c.mounts, ["gryphon"]);
     }

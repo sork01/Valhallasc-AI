@@ -75,7 +75,7 @@
     if (zdef.shapeFloor) paintShape(zdef.shapeFloor, zdef.shapeEdge);
     paintVault();
     objects = zdef.objects.map(o => ({ ...o }));
-    nightLights = objects.filter(o => ['lamp', 'brazier', 'torch', 'campfire', 'lantern', 'house', 'inn', 'shop', 'meadow_cottage', 'meadow_mill'].some(k => o.kind.includes(k)));
+    nightLights = objects.filter(o => (o.kind === 'beacon' && o.great) || ['lamp', 'brazier', 'torch', 'campfire', 'lantern', 'house', 'inn', 'shop', 'meadow_cottage', 'meadow_mill'].some(k => o.kind.includes(k)));
   }
   // Skaldholm's ground: the zone lists its streets (type 1 cobbles), plazas and squares (2 marble, 3 brick) as rectangles, discs and rings.
   function paintRoads(roads) {
@@ -454,7 +454,7 @@
       const G = chunkGeom(bx, by), dx = G.ox - (shx - shy) * TW / 2 - cx + VW / 2 + sxo, dy = G.oy - (shx + shy) * TH / 2 - cy + VH / 2 + syo;
       if (dx > VW || dy > VH || dx + G.w < 0 || dy + G.h < 0) continue;
       if (wanted && !wanted(bx, by)) continue;      // a clipped region: never render a chunk nothing of it will show
-      const ch = neighbourChunk(c, bx, by); if (ch) { g.drawImage(ch.c, dx, dy, G.w, G.h); c.usedAt = performance.now(); }
+      const ch = neighbourChunk(c, bx, by); if (ch) { drawGroundChunk(g, ch.c, dx, dy, G); c.usedAt = performance.now(); }
     }
   }
   // A chunk drawn before a seam neighbour's context existed holds a generic stand-in for the ground beyond the line. Seen as a neighbour from across the line, such a chunk
@@ -489,7 +489,7 @@
     window.DayNight?.setZone(zdef);
     window.Weather?.setZone(zdef);
     if (mini) buildMini();
-    if (hero) { pendingNpc = null; pendingChest = null; cityRoute = []; hero.target = null; hero.pvpTargetId = null; hero.goal = null; }
+    if (hero) { pendingNpc = null; pendingChest = null; pendingGather = null; cityRoute = []; hero.target = null; hero.pvpTargetId = null; hero.goal = null; }
     floaters = []; parts = []; effects = []; bolts = []; ebolts = []; drops = []; chests = []; signs = []; marker = null; slimes = []; farDots = []; remotePlayers.clear(); guards.clear(); ghostSlimes.clear(); ghostPlayers.clear(); bubbles.clear();
     instanceCleared = false; clearedAt = -99;
   }
@@ -816,6 +816,11 @@
   }
   const CLIFF = 120, PADX = 10, PADTOP = 40;
   function chunkGeom(cx, cy) { const x0 = cx * CH, y0 = cy * CH; return { x0, y0, ox: (x0 - (y0 + CH)) * TW / 2 - TW / 2 - PADX, oy: (x0 + y0) * TH / 2 - PADTOP, w: CH * TW + TW + PADX * 2, h: CH * TH + TH + PADTOP + CLIFF }; }
+  function drawGroundChunk(g, c, dx, dy, G) {
+    // canvasOf rounds the backing size up. Sample only the painted extent so
+    // the padding cannot turn a 1:1 blit into a rescale on every scrolling frame.
+    g.drawImage(c, 0, 0, G.w * chunkScale, G.h * chunkScale, dx, dy, G.w, G.h);
+  }
   let stand_in = new Set();
   function renderChunk(cx, cy) {
     const G = chunkGeom(cx, cy), [c, g] = canvasOf(G.w, G.h, chunkScale);
@@ -1114,7 +1119,7 @@
   const bagColor = item => BAG_COLORS[Math.max(0, Math.min(9, Math.floor((item.requiredLevel || 1) / 10)))];
   let ebolts = [], instanceCleared = false, clearedAt = -99;   // missiles shot by ranged enemies; the dungeon's exit opens when its last boss falls
   let mageSpr = null, spriteGeneration = 0;
-  let pendingNpc = null, pendingChest = null, cityRoute = [], routeTime = 0;
+  let pendingNpc = null, pendingChest = null, pendingGather = null, cityRoute = [], routeTime = 0;
   // A townsperson picked by clicking: shown in the target frame (portrait, name, level) until something else is picked or the hero walks off.
   let npcTarget = null;
   const npcLevel = n => { const q = window.Quests?.npcLevel?.(n.id), top = zdef.levels?.[1]; return Number.isFinite(top) ? top : Number.isFinite(q) ? q : 99; };
@@ -1363,8 +1368,8 @@
   }
   let corpses = []; const corpseSprites = new Map();
   function reset() {
-    pendingNpc = null; pendingChest = null; cityRoute = [];
-    window.Quests?.reset(); window.WorldMap?.reset(); explored = [];
+    pendingNpc = null; pendingChest = null; pendingGather = null; cityRoute = [];
+    window.Quests?.reset(); window.WorldMap?.reset(); window.GatheringMap?.reset(); explored = [];
     hero = newHero(); drops = []; chests = []; signs = []; corpses = []; corpseSprites.clear(); floaters = []; parts = []; effects = []; bolts = []; marker = null; shake = 0; msg = null; hudT = 0; tAll = 0;
     touchDirection = [0, 0]; keys = new Set(); pointer = { down: false, x: 0, y: 0 };
     cam = { x: hero.x, y: hero.y };
@@ -1411,7 +1416,11 @@
     const code = Keys.codeOf(e);
     for (const [action, step] of [['minimapIn', 1], ['minimapOut', -1]]) if (Keys.is(e, action)) { e.preventDefault(); if (!e.repeat) Field.minimapZoom(step); return; }
     for (const action of ['interact', 'talk', 'mount', 'fish']) if (Keys.is(e, action) && !e.repeat) { e.preventDefault(); Field.action(action); return; }
-    if (!e.ctrlKey && !e.altKey && !e.metaKey && heldDirection(code)) { pendingNpc = null; cityRoute = []; keys.add(code); hero.target = null; hero.goal = null; npcTarget = null; emitHud(); e.preventDefault(); }
+    if (!e.ctrlKey && !e.altKey && !e.metaKey && heldDirection(code)) {
+      pendingNpc = null; pendingGather = null; cityRoute = []; keys.add(code);
+      if (autoAttackTarget === hero.pvpTargetId) autoAttackTarget = null;
+      hero.target = null; hero.goal = null; npcTarget = null; emitHud(); e.preventDefault();
+    }
     if (Keys.is(e, 'attack') && !(code === 'Space' && e.target?.tagName === 'BUTTON')) { e.preventDefault(); if (!e.repeat) Field.action('attack'); }
     if (Keys.is(e, 'dash') && isAssassin()) { e.preventDefault(); if (!e.repeat) Field.action('dash'); }
   }
@@ -1448,28 +1457,57 @@
     marker = {x:portal.x,y:portal.y,t:0}; emitHud();
   }
   const SIGN_W = 28, SIGN_TOP = 70;   // the clickable body of a boss sign, in screen pixels
+  const gatherOrigin = () => ({ x: hero.nx ?? hero.x, y: hero.ny ?? hero.y });
+  const withinGatherReach = (point, target) =>
+    Math.hypot(point.x - target.x, point.y - target.y) <= 2.3 && segmentFree(point, target, .05);
+
+  function startGathering(target, source, list) {
+    hero.target = null;
+    hero.goal = null;
+    hero.pvpTargetId = null;
+    npcTarget = null;
+    Field.stopMoving();
+    emitHud();
+    const origin = gatherOrigin();
+    if (withinGatherReach(origin, target)) {
+      source.start(target);
+      return;
+    }
+    cityRoute = routeTo(target, true, origin, 2.15, point => withinGatherReach(point, target));
+    if (!cityRoute.length) {
+      Field.error('That gathering spot is out of reach.');
+      return;
+    }
+    pendingGather = { id: target.id, source, list, until: tAll + Math.max(20, cityRoute.length * .6) };
+    routeTime = tAll;
+    Online.send({ type:'move', ...cityRoute[0] });
+  }
+
+  function followGathering() {
+    const { id, source, list, until } = pendingGather;
+    const target = source[list].find(entry => entry.id === id);
+    if (hero.dead || !target) {
+      Field.stopMoving();
+    } else if (withinGatherReach(gatherOrigin(), target)) {
+      Field.stopMoving();
+      source.start(target);
+    } else if (!cityRoute.length || tAll >= until) {
+      Field.stopMoving();
+      Field.error('That gathering spot is out of reach.');
+    }
+  }
   function onPointerDown(e) {
     window.WorldFeedback?.leave();
     const ghostWalking = !!(hero.dead && hero.ghost);
     if (!running || paused || !Online.connected || (hero.dead && !ghostWalking) || hero.sparkTravel) return;
-    pendingNpc = null; pendingChest = null; cityRoute = [];
+    pendingNpc = null; pendingChest = null; pendingGather = null; cityRoute = [];
     const r = cv.getBoundingClientRect(), mx=(e.clientX-r.left)/r.width*VW, my=(e.clientY-r.top)/r.height*VH;
     if (!ghostWalking) {
       if (window.RaidKey?.click(mx,my,w2s)) return;
       const vein = window.Blacksmithing?.pick(mx,my,w2s);
       const flower = window.Alchemy?.hit(mx,my,w2s);
-      if (vein || flower) {
-        hero.target = null;
-        hero.goal = null;
-        Field.stopMoving();
-        pointer.down = false;
-        hero.pvpTargetId = null;
-        npcTarget = null;
-        if (flower) window.Alchemy.start(flower);
-        else window.Blacksmithing.start(vein);
-        emitHud();
-        return;
-      }
+      if (flower) { startGathering(flower, window.Alchemy, 'patches'); return; }
+      if (vein) { startGathering(vein, window.Blacksmithing, 'veins'); return; }
     }
     const npc = City.npcs.find(n => {
       if (ghostWalking && n.art !== 'spirit_guide') return false;
@@ -1489,13 +1527,14 @@
     const s = ghostWalking ? null : pickSlime(mx, my, wx, wy);
     const rival = !ghostWalking && !s && window.Pvp?.available && [...remotePlayers.values()].filter(p => !p.dead).sort((a,b) => b.x+b.y-a.x-a.y).find(p => { const [x,y]=w2s(p.x,p.y); return Math.abs(mx-x)<34 && my>y-150 && my<y+12; });
     if (s) Field.targetEnemy(s.id);
-    else if (rival) { pointer.down = false; hero.pvpTargetId = rival.id; hero.target = null; hero.goal = null; }
-    else { hero.pvpTargetId = null; hero.target = null; npcTarget = null; hero.goal = { x: wx, y: wy }; Online.send({ type: 'move', x: wx, y: wy }); marker = { x: clamp(wx, .8, MAP - .8), y: clamp(wy, .8, MAP - .8), t: 0 }; }
+    else if (rival) { pointer.down = false; Field.targetPlayer(rival.id, true); }
+    else { autoAttackTarget = null; hero.pvpTargetId = null; hero.target = null; npcTarget = null; hero.goal = { x: wx, y: wy }; Online.send({ type: 'move', x: wx, y: wy }); marker = { x: clamp(wx, .8, MAP - .8), y: clamp(wy, .8, MAP - .8), t: 0 }; }
     emitHud();
   }
   // A boss sign is read with its own message; every townsperson is spoken to with `interact`.
   const askNpc = npc => Online.send(npc.sign ? {type:'sign_read',sign:npc.id} : {type:'interact',npc:npc.id});
   function talkTo(npc) {
+    pendingGather = null;
     keys.clear(); pointer.down = false; hero.target = null; hero.pvpTargetId = null; hero.goal = null; cityRoute = [];
     npcTarget = npc.sign ? null : { npc, zone }; emitHud();
     if (Math.hypot(hero.x-npc.x,hero.y-npc.y) <= 2.5) askNpc(npc);
@@ -1513,6 +1552,7 @@
   }
   function askForChest(chest) { Online.send({type:'stop'}); Online.send({type:'open_chest',id:chest.id}); }
   function openChest(chest) {
+    pendingGather = null;
     keys.clear(); pointer.down = false; hero.target = null; hero.pvpTargetId = null; hero.goal = null; cityRoute = []; emitHud();
     if (Math.hypot(hero.x-chest.x,hero.y-chest.y) <= 1.95) { askForChest(chest); pendingChest = {id:chest.id, until:tAll+4, sentAt:tAll}; }
     else { cityRoute = chestRoute(chest, false); pendingChest = {id:chest.id, until:tAll+Math.max(20,cityRoute.length*.6)}; routeTime = 0; }
@@ -1541,28 +1581,31 @@
     }
     return true;
   }
-  function routeTo(goal, approach = false, origin = hero, approachRange = 2) {
+  function routeTo(goal, approach = false, origin = hero, approachRange = 2, canReach = null) {
     const free = (x,y) => x>=1 && y>=1 && x<MAP-1 && y<MAP-1 && nearObjects(x,y).every(o => o.width ? Math.abs(x-o.x)>o.width/2+.55 || Math.abs(y-o.y)>o.depth/2+.55 : Math.hypot(x-o.x,y-o.y)>o.r+.55);
     // Loot can leave a player against a tree, with its rounded cell blocked.
     // Connect the real position to a nearby clear cell before searching the grid.
     const sources=[];
     for(let x=Math.floor(origin.x)-3;x<=Math.ceil(origin.x)+3;x++) for(let y=Math.floor(origin.y)-3;y<=Math.ceil(origin.y)+3;y++) {
-      if(free(x,y) && segmentFree(origin,{x,y})) sources.push([x,y]);
+      if(free(x,y) && segmentFree(origin,{x,y},canReach ? .45 : .3)) sources.push([x,y]);
     }
     sources.sort((a,b)=>Math.hypot(a[0]-origin.x,a[1]-origin.y)-Math.hypot(b[0]-origin.x,b[1]-origin.y));
     if(!sources.length)return [];
     const start=sources[0], key=([x,y])=>y*MAP+x;
-    let end=[Math.round(goal.x),Math.round(goal.y)];
+    let end=[Math.round(goal.x),Math.round(goal.y)], alternatives;
     if(approach) {
       const candidates=[];
       for(let x=Math.floor(goal.x)-2;x<=Math.ceil(goal.x)+2;x++) for(let y=Math.floor(goal.y)-2;y<=Math.ceil(goal.y)+2;y++) {
         const distance=Math.hypot(x-goal.x,y-goal.y);
-        if(distance<=approachRange && free(x,y))candidates.push({point:[x,y],score:distance+Math.hypot(x-origin.x,y-origin.y)*.1});
+        if(distance<=approachRange && free(x,y) && (!canReach || canReach({x,y})))candidates.push({point:[x,y],score:distance+Math.hypot(x-origin.x,y-origin.y)*.1});
       }
       candidates.sort((a,b)=>a.score-b.score);if(!candidates.length)return [];end=candidates[0].point;
+      if (canReach) alternatives = new Set(candidates.map(candidate => key(candidate.point)));
     }
     const queue=[start], prev=new Map([[key(start),null]]);
-    for(let i=0;i<queue.length;i++) { const p=queue[i]; if(key(p)===key(end))break;
+    for(let i=0;i<queue.length;i++) {
+      const p=queue[i];
+      if (alternatives ? alternatives.has(key(p)) : key(p)===key(end)) { end=p; break; }
       for(const [dx,dy] of [[0,1],[0,-1],[1,0],[-1,0]]) {const q=[p[0]+dx,p[1]+dy];if(free(...q)&&!prev.has(key(q))&&segmentFree({x:p[0],y:p[1]},{x:q[0],y:q[1]})){prev.set(key(q),p);queue.push(q);}}
     }
     if(!prev.has(key(end)))return [];
@@ -1600,8 +1643,9 @@
     return sx > -100 && sx < VW + 100 && sy > -160 && sy < VH + 160;
   }
   // kind: hit, crit, hurt, heal, miss, pickup, xp, banner (names and notices), level; `head` overrides the start height (px).
-  function floater(x, y, text, color, big, kind = big ? 'level' : 'banner', head) {
-    if (!numberAnchorVisible(x, y)) return;
+  function floater(x, y, text, color, big, kind = big ? 'level' : 'banner', head, category) {
+    category ||= { hit: 'damage', crit: 'damage', hurt: 'incoming', heal: 'healing', miss: 'misses', pickup: 'loot', xp: 'xp', level: 'levels', banner: 'notices' }[kind] || 'notices';
+    if (window.Prefs?.floatingText?.[category] === false || !numberAnchorVisible(x, y)) return;
     DamageNumbers.spawn(floaters, { x, y, text, color, kind, head: head ?? (['hit', 'crit', 'hurt', 'heal', 'miss'].includes(kind) ? headAt(x, y, kind === 'hit' || kind === 'crit' ? currentHitKind : null) : 60) });
   }
   let currentHitKind = null;
@@ -1731,8 +1775,12 @@
     if(SLIME.ember_firelord) SLIME.ember_firelord.name=zdef.crosses?.[0]?.bossName || 'Firelord';
     const selectedTarget = own.danceT != null ? null : hero.target?.id;
     if (own.danceT != null && hero.danceT == null) { Field.clearInput(); hero.goal = null; hero.pvpTargetId = null; }
+    const previousCombat = hero.inCombat;
     const wasDead = hero.dead, wasGhost = !!(hero.dead && hero.ghost), wasFallen = !!hero.fallen, oldSets = hero.setCounts || {};
     applyActor(hero, own, initial || (moved && !seamShift) || !!hero.sparkTravel !== !!own.sparkTravel);
+    if (!initial && !moved && previousCombat !== undefined && !!previousCombat !== !!own.inCombat) {
+      floater(hero.x, hero.y, own.inCombat ? '+Combat' : '-Combat', own.inCombat ? '#ff8b9b' : '#7dff9a', false, 'banner', 118, 'combat');
+    }
     hero.raidSupport = own.raidSupport || null;
     if (!initial && !moved) for (const source of new Set([...Object.keys(oldSets), ...Object.keys(own.setCounts || {})])) {
       const before = oldSets[source] || 0, after = own.setCounts?.[source] || 0;
@@ -1740,18 +1788,23 @@
         say('setTier', { name: source.replaceAll('_', ' '), tier, active: after >= tier });
     }
     window.Weather?.sync(packet.weather, own.x, own.y, !!own.inside);
-    if(hero.sparkTravel){City.close();keys.clear();pointer.down=false;cityRoute=[];pendingNpc=null;pendingChest=null;hero.target=null;hero.goal=null;}
+    if(hero.sparkTravel){City.close();keys.clear();pointer.down=false;cityRoute=[];pendingNpc=null;pendingChest=null;pendingGather=null;hero.target=null;hero.goal=null;}
     window.RaidKey?.sync(packet, own, zone);
     window.EmptySeat?.sync(own, zone);
     window.Fishing?.sync(packet, own, zdef, cue => say('fishingSound', cue));
     window.Blacksmithing?.sync(packet, own, cue => say('smithSound', cue));
     window.Alchemy?.sync(packet, cue => say('alchemySound', cue));
+    window.GatheringMap?.sync(packet, own);
     window.Attributes?.update(own);
     window.Mounts?.update(own); window.MountArt?.preload(own.mount);
     window.Rebirth?.update(own);
     window.Achievements?.update(own);
+    hero.professions = own.professions;
+    hero.learnedRecipes = own.learnedRecipes;
+    window.CharacterPane?.updateProfessions?.(own.professions);
     window.Inventory?.update(own.inventory || [], own.equippedLook || own.look, own.equipment || {}, own.bags || [], own.gearInstances || [], own.setCounts || {}, own.transmogs || {});
     window.Quests?.setBells(own.bells || []);
+    hero.questGoldPercent = own.questGoldPercent ?? 0;
     window.Quests?.update(own.quests || [], own.abandonedQuests || []);
     if(seasonChanged)window.City?.refresh();
     const isGhost = !!(hero.dead && hero.ghost);
@@ -1901,7 +1954,7 @@
     if (event.kind === 'miss' || event.kind === 'dodge') floater(event.x, event.y, event.kind === 'miss' ? 'Miss' : 'Dodge', '#c9c9bd', false, 'miss');
     if (event.kind === 'itemPickup') {
       const item = WORLD_ITEMS.find(i => i.id === event.item), rarity = event.rarity || item?.rarity;
-      floater(event.x, event.y, item?.kind === 'bag' ? `${item.name} · +${item.bagSlots} slots` : `+${event.quantity} ${event.name}`, item?.kind === 'bag' ? bagColor(item) : '#64b5ff', false, 'pickup');
+      floater(event.x, event.y, `+${event.quantity} ${event.name}`, item?.kind === 'bag' ? bagColor(item) : ({ common: '#c4c4c4', uncommon: '#4ad66d', rare: '#64b5ff', epic: '#b45cff', legendary: '#ff9a2e', hierloom: '#ffd24a', gm: '#ffd24a' }[rarity] || '#64b5ff'), false, 'pickup');
       if (event.actor === Online.id) {
         say('pickup'); say('rarePickup', event);
         const tier = { uncommon: 1, rare: 2, epic: 3, legendary: 4, hierloom: 5 }[rarity] || 0;
@@ -1915,7 +1968,11 @@
     if (event.kind === 'chestOpen') { if (pendingChest) { pendingChest = null; cityRoute = []; } effects.push({kind:'ring',x:event.x,y:event.y,t:0,life:.65,grow:1.1,col:'#ffe292'}); effects.push({kind:'chestOpen',x:event.x,y:event.y,t:0,life:1.3}); burst(event.x,event.y,24,18,['#ffe292','#fff6cf','#d89543'],4,5); }
     if (event.kind === 'levelup') levelUpFx(event);
     if (event.kind === 'rebirth') rebirthFx(event);
-    if (event.kind === 'slam') { effects.push({ kind: 'slam', x: event.x, y: event.y, r: event.value, t: 0, life: .7 }); burst(event.x, event.y, 6, 26, ['#e8dcc0', '#a9a08a', '#ffb060'], 5, 10); kick(event.value > 4 ? 14 : 9, .45); }
+    if (event.kind === 'slam') {
+      effects.push({ kind: 'slam', x: event.x, y: event.y, r: event.value, t: 0, life: .7 });
+      burst(event.x, event.y, 6, 26, ['#e8dcc0', '#a9a08a', '#ffb060'], 5, 10);
+      if (Math.hypot(event.x - hero.x, event.y - hero.y) <= 50) kick(event.value > 4 ? 14 : 9, .45);
+    }
     if (event.kind === 'cleared') { clearedAt = performance.now() / 1000; instanceCleared = true; if (mini) buildMini(); burst(event.x, event.y, 20, 40, ['#d4ffc8', '#9cff8f', '#ffffff'], 6, 4); effects.push({ kind: 'ring', x: event.x, y: event.y, t: 0, life: 1.6, grow: 2.4, col: '#9cff8f' }); }
     // Food and potions: a potion lands at once with a ring and its number; a meal shows its share every second.
     if (event.kind === 'consume') {
@@ -1968,6 +2025,7 @@
   function skillFx(ev) {
     const def = SKILL_BY_ID[ev.skill]; if (!def) return;
     const [core, glow] = SKILL_COL[ev.skill] || ['#ffffff', '#9fd0ff'], kind = def.effect.effect, own = ev.actor === Online.id, a = Math.atan2(ev.fy, ev.fx);
+    floater(ev.x, ev.y, def.name, glow, false, 'banner', undefined, 'skills');
     const base = { actor: ev.actor, x: ev.x, y: ev.y, core, glow, a, t: 0 }, pts = (ev.points || []).map(([x, y]) => ({ x, y }));
     if (kind === 'cone') {
       effects.push({ ...base, kind: ev.skill === 'cleave' ? 'skCleave' : ev.skill === 'earthshatter' ? 'skWarFissure' : ev.skill === 'thousandcuts' ? 'skAssassinFan' : 'skCone', r: def.effect.reach,
@@ -2044,7 +2102,7 @@
       const hunterBuff = def.class === 'hunter';
       effects.push({ ...base, kind: hunterBuff ? 'skHunterBuff' : priestBuff ? 'skPriestBuff' : warriorBuff || (ev.skill === 'arcaneward' ? 'skMageWard' : assassinBuff ? 'skAssassinBuff' : 'skAura'),
         style: hunterBuff || priestBuff ? ev.skill : assassinBuff, targets: pts, r: def.effect.range, col, life: hunterBuff || priestBuff ? 1.2 : warriorBuff || ev.skill === 'arcaneward' || assassinBuff ? 1.15 : 1 });
-      spark(ev.x, ev.y, 22, [core, col], 12, 1.2, 1); floater(ev.x, ev.y, def.name, col, false);
+      spark(ev.x, ev.y, 22, [core, col], 12, 1.2, 1);
     } else if (kind === 'heal') { effects.push({ ...base, kind: ev.skill === 'secondwind' ? 'skWarHeal' : ev.skill === 'guardianlight' ? 'skPriestSanctuary' : 'skAura', col: glow, life: 1.15 }); spark(ev.x, ev.y, 26, [core, glow], 12, 1.2, 1.1); }
     else if (kind === 'mend') {
       effects.push({ ...base, kind: ev.skill === 'mend' ? 'skPriestMend' : ev.skill === 'prayer' ? 'skPriestPrayer' : 'skPriestHymn',
@@ -2081,7 +2139,7 @@
       const col = '#' + base.map(v => Math.round((v + .43) * 255).toString(16).padStart(2, '0')).join('');
       effects.push({ ...base, kind: 'skAura', col, life: 1.2 });
       spark(ev.x, ev.y, 30, [col, '#ffffff'], 10, 2.6, 1);
-      floater(ev.x, ev.y, WORLD_SET_BONUSES.signatures[ev.setSignature]?.name || 'Set bonus', col, true);
+      floater(ev.x, ev.y, WORLD_SET_BONUSES.signatures[ev.setSignature]?.name || 'Set bonus', col, true, 'banner', undefined, 'skills');
     }
   }
   // Canvas-built stand-in mount, only for an actor whose mount art has not loaded (or in test mode): the horse body in the
@@ -3238,6 +3296,7 @@
     tAll += dt;
     window.Skillbar?.update();
     if (Online.connected) {
+      window.Blacksmithing?.updateMining();
       inputT -= dt;
       if (inputT <= 0) {
         const [dx, dy] = paused || hero.sparkTravel ? [0, 0] : keyboardDirection();
@@ -3274,6 +3333,7 @@
           pendingChest.until = Math.max(pendingChest.until, tAll + 8);
         }
       }
+      if (!paused && pendingGather) followGathering();
       if(!paused && cityRoute.length) {
         if(hero.dead && !hero.ghost)cityRoute=[];
         else {
@@ -3286,7 +3346,8 @@
           const sx=Number.isFinite(hero.nx)?hero.nx:hero.x, sy=Number.isFinite(hero.ny)?hero.ny:hero.y, m=routeMotion;
           if(tAll-m.t>=.25){const moved=Math.hypot(sx-m.x,sy-m.y);if(moved>0)m.v=clamp(moved/(tAll-m.t),3,30);m.x=sx;m.y=sy;m.t=tAll;}
           const ahead=clamp(m.v*.45,.9,6);let advanced=false;
-          while(cityRoute.length>1&&Math.hypot(sx-cityRoute[0].x,sy-cityRoute[0].y)<ahead&&(segmentFree({x:sx,y:sy},cityRoute[1],.45)||Math.hypot(sx-cityRoute[0].x,sy-cityRoute[0].y)<m.v*.15)){cityRoute.shift();advanced=true;}
+          // A gathering route must reach the safe side of a corner before aiming for the next leg.
+          while(cityRoute.length>1&&Math.hypot(sx-cityRoute[0].x,sy-cityRoute[0].y)<ahead&&(segmentFree({x:sx,y:sy},cityRoute[1],.45)||(!pendingGather&&Math.hypot(sx-cityRoute[0].x,sy-cityRoute[0].y)<m.v*.15))){cityRoute.shift();advanced=true;}
           if(cityRoute.length===1&&(Math.hypot(sx-cityRoute[0].x,sy-cityRoute[0].y)<.32||Math.hypot(hero.x-cityRoute[0].x,hero.y-cityRoute[0].y)<.32)){cityRoute.shift();advanced=true;}
           if(cityRoute.length&&(advanced||tAll-routeTime>.35)){Online.send({type:'move',...cityRoute[0]});routeTime=tAll;}
         }
@@ -3592,7 +3653,12 @@
     if (target.npc) { const n = City.npcs.find(n => n.id === target.id); return n ? City.portraitTo(n, canvas) : false; }
     if (target.player) {
       const g=canvas.getContext('2d'), remote=remotePlayers.get(target.id); g.clearRect(0,0,96,96);
-      if (remote?.sprite) { const sprite=remote.sprite, frame=sprite.frame('idle',MageSprite.direction(remote.fx,remote.fy),0); g.imageSmoothingEnabled=false; g.drawImage(frame,...(sprite.meta.portrait||[56,18,48,48]),0,0,96,96); return true; }
+      if (remote?.sprite) {
+        const sprite = remote.sprite, frame = sprite.frame('idle', 0, 0); // direction 0 faces the camera
+        g.imageSmoothingEnabled = false;
+        g.drawImage(frame, ...(sprite.meta.portrait || [56, 18, 48, 48]), 0, 0, 96, 96);
+        return true;
+      }
       g.fillStyle='#352c49'; g.fillRect(0,0,96,96); g.fillStyle='#f8e0a4'; g.font='bold 50px sans-serif'; g.textAlign='center'; g.fillText(target.name.slice(0,1).toUpperCase(),48,65); return false;
     }
     const g = canvas.getContext('2d'), s = { kind: target.kind, d: SLIME[target.kind] }, src = enemySource(s), img = src?.img[target.kind];
@@ -4180,16 +4246,17 @@
     const pass = (grow, fill) => { for (const [o, sx, sy] of rows) { g.fillStyle = typeof fill === 'function' ? fill(o) : fill; g.beginPath(); g.ellipse(sx, sy + (grow < 0 ? 1 : 0), ex(o) * grow, ey(o) * grow, 0, 0, 6.283); g.fill(); } };
     const shimmer = o => .5 + .5 * Math.sin(t * .8 + o.x * .45 + o.y * .33);
     const river = !ghost && zdef.theme === 'wyrd', frost = !ghost && zdef.theme === 'frost', meadow = ghost || zone === 0 || zdef.theme === 'sunward';
-    pass(1.36, meadow ? '#a1ad65' : frost ? '#e8f3fb' : river ? '#3c2c1c' : '#2c2a1c');
-    pass(1.2, meadow ? '#74a57b' : frost ? '#a9d2ec' : river ? '#6a7a3a' : '#3c5a30');
-    pass(1.04, o => meadow ? `hsl(${192 + shimmer(o) * 7}, 58%, ${46 + shimmer(o) * 5}%)` : frost ? `hsl(${204 + shimmer(o) * 8}, 66%, ${48 + shimmer(o) * 6}%)` : river ? `hsl(${200 + shimmer(o) * 8}, 46%, ${30 + shimmer(o) * 5}%)` : `hsl(${176 + shimmer(o) * 8}, 34%, ${14 + shimmer(o) * 3}%)`);
-    pass(.8, o => meadow ? `hsl(${199 + shimmer(o) * 7}, 60%, ${36 + shimmer(o) * 5}%)` : frost ? `hsl(${213 + shimmer(o) * 8}, 74%, ${30 + shimmer(o) * 5}%)` : river ? `hsl(${206 + shimmer(o) * 10}, 52%, ${24 + shimmer(o) * 5}%)` : `hsl(${184 + shimmer(o) * 10}, 40%, ${10 + shimmer(o) * 3}%)`);
+    const hue = !ghost ? window.FISHING_WATERS?.[zone]?.hue : undefined;
+    pass(1.36, hue != null ? `hsl(${hue}, 23%, 24%)` : meadow ? '#a1ad65' : frost ? '#e8f3fb' : river ? '#3c2c1c' : '#2c2a1c');
+    pass(1.2, hue != null ? `hsl(${hue}, 39%, 43%)` : meadow ? '#74a57b' : frost ? '#a9d2ec' : river ? '#6a7a3a' : '#3c5a30');
+    pass(1.04, o => hue != null ? `hsl(${hue + shimmer(o) * 6}, 58%, 48%)` : meadow ? `hsl(${192 + shimmer(o) * 7}, 58%, ${46 + shimmer(o) * 5}%)` : frost ? `hsl(${204 + shimmer(o) * 8}, 66%, ${48 + shimmer(o) * 6}%)` : river ? `hsl(${200 + shimmer(o) * 8}, 46%, ${30 + shimmer(o) * 5}%)` : `hsl(${176 + shimmer(o) * 8}, 34%, ${14 + shimmer(o) * 3}%)`);
+    pass(.8, o => hue != null ? `hsl(${hue + shimmer(o) * 6}, 61%, 30%)` : meadow ? `hsl(${199 + shimmer(o) * 7}, 60%, ${36 + shimmer(o) * 5}%)` : frost ? `hsl(${213 + shimmer(o) * 8}, 74%, ${30 + shimmer(o) * 5}%)` : river ? `hsl(${206 + shimmer(o) * 10}, 52%, ${24 + shimmer(o) * 5}%)` : `hsl(${184 + shimmer(o) * 10}, 40%, ${10 + shimmer(o) * 3}%)`);
     for (const [o, sx, sy] of rows) {
       const k = (o.x * 7 + o.y * 13) | 0;
       if (k % 3 === 0 && !frost) {                                                  // an expanding ripple ring
         const ph = (t * .35 + (k % 7) * .13) % 1; g.strokeStyle = `rgba(150,210,210,${.38 * (1 - ph)})`; g.lineWidth = 1.4; g.beginPath(); g.ellipse(sx + Math.sin(k) * 10, sy + Math.cos(k) * 4, 6 + ph * 26, 2.6 + ph * 11, 0, 0, 6.283); g.stroke();
       }
-      if (meadow) {
+      if (meadow || hue != null) {
         const gl = .35 + .22 * Math.sin(t * 1.3 + k);
         g.strokeStyle = `rgba(235,255,255,${gl})`; g.lineWidth = 1.5; g.beginPath();
         g.moveTo(sx - ex(o) * .4, sy - ey(o) * .1); g.lineTo(sx + ex(o) * .12, sy - ey(o) * .1); g.stroke();
@@ -4290,15 +4357,17 @@
     for (let i = 0; i < 26; i++) { const a = Math.max(0, Math.sin(t * 1.7 + i * 2.3)); if (a < .2) continue; const x = (i * 211.7 + Math.sin(t * .3 + i) * 30) % VW, y = (i * 97.3 + t * 12) % VH; g.fillStyle = `hsla(${(i * 47 + t * 30) % 360}, 100%, 80%, ${a * .6})`; g.fillRect(x, y, 2, 2); }
     g.restore();
   }
-  // A ward's rune circle on the ground. Dim blue when you have no use for it, amber while you are holding it (with an arc for the
-  // progress), gold once it holds. The circle is as wide as the place the server checks.
+  // Active hold objectives show the same boundary the server checks. Bifrost's wardstones also show idle and completed circles.
   function drawWardRings(g, t) {
-    for (const o of objects) {
-      if (o.kind !== 'wardstone') continue;
-      const place = (zdef.places || []).find(p => p.id === o.place); if (!place) continue;
-      const [sx, sy] = w2s(place.x, place.y); if (sx < -300 || sx > VW + 300 || sy < -200 || sy > VH + 200) continue;
-      const h = window.Quests?.hold?.(o.place) || { state: 'none', have: 0, need: 1 }, inside = Math.hypot(hero.x - place.x, hero.y - place.y) <= place.r;
-      const rx = place.r * TW * .7071, ry = place.r * TH * .7071, col = h.state === 'done' ? '255,215,90' : h.state === 'active' ? (inside ? '255,170,60' : '255,200,120') : '110,200,255';
+    for (const place of zdef.places || []) {
+      if (!place.holdRadius || place.ring) continue;  // Empty Seat draws its own stone circles.
+      const radius = place.holdRadius, rx = radius * TW / Math.SQRT2, ry = radius * TH / Math.SQRT2;
+      const [sx, sy] = w2s(place.x, place.y);
+      if (sx + rx * 1.04 + 10 < 0 || sx - rx * 1.04 - 10 > VW || sy + ry * 1.04 + 50 < 0 || sy - ry * 1.04 - 10 > VH) continue;
+      const h = window.Quests?.hold?.(place.id) || { state: 'none', have: 0, need: 1 };
+      if (h.state !== 'active' && !(zdef.theme === 'sky' && objects.some(o => o.kind === 'wardstone' && o.place === place.id))) continue;
+      const inside = Math.hypot(hero.x - place.x, hero.y - place.y) <= radius;
+      const col = h.state === 'done' ? '255,215,90' : h.state === 'active' ? (inside ? '255,170,60' : '255,200,120') : '110,200,255';
       g.save(); g.translate(sx, sy);
       const fill = g.createRadialGradient(0, 0, 4, 0, 0, rx); fill.addColorStop(0, `rgba(${col},${h.state === 'active' && inside ? .26 : .1})`); fill.addColorStop(1, `rgba(${col},.02)`);
       g.fillStyle = fill; g.beginPath(); g.ellipse(0, 0, rx, ry, 0, 0, 6.283); g.fill();
@@ -4943,7 +5012,7 @@
     for (const [chx, chy] of groundChunks) {
       const G = chunkGeom(chx, chy), dx = G.ox - cx + VW / 2 + sxo, dy = G.oy - cy + VH / 2 + syo;
       if (dx > VW || dy > VH || dx + G.w < 0 || dy + G.h < 0) continue;      // the world box of the screen is much bigger than the screen itself
-      g.drawImage(getChunk(chx, chy).c, dx, dy, G.w, G.h);
+      drawGroundChunk(g, getChunk(chx, chy).c, dx, dy, G);
     }
     for (const p of zdef.portals) if (p.seam) { const nc = ctxs.get(p.to); if (nc) drawNeighbourGround(g, nc, p.seam.shift, cx, cy, sxo, syo); }
     for (const R of map.vregs || []) {      // what the other zone owns beyond the wall line: its ground, clipped to that region (never over our own land)
@@ -4969,7 +5038,6 @@
       EmberwakeArt.moltenMotion(g,VW,VH,t,zdef,cx-sxo,cy-syo,TW,TH,reducedMotion());
     }
     City.drawPlaza(g, w2s);
-    window.ExitPaths?.floor(g,zdef,w2s,hero);      // (a vault has no road marking: it is a doorway, not a signposted exit)
     window.Halloween?.drawFloor(g,zone,w2s);
     window.Christmas?.drawFloor(g,zone,w2s);
     window.Easter?.drawFloor(g,zone,w2s);
@@ -4984,12 +5052,12 @@
       City.animateObject(g, o, sx, sy, t);
     }
     if (zdef.dock) window.MeadowDock?.draw(g, zdef, w2s, t);      // Greenmeadow's landing pier and its ship (meadowdock.js)
-    if (zone === 0 || zdef.theme === 'fen' || zdef.theme === 'wyrd' || zdef.theme === 'sunward' || zdef.theme === 'frost') drawWater(g, t);
+    if (zone === 0 || zdef.theme === 'fen' || zdef.theme === 'wyrd' || zdef.theme === 'sunward' || zdef.theme === 'frost' || window.FISHING_WATERS?.[zone]?.ponds) drawWater(g, t);
     if (map.ghostWater?.length) drawWater(g, t, true);
     window.Enchanting?.drawFields(g, enchantFields, w2s, TW, TH, VW, VH);
     drawFishing(g, true);      // rich markers must be above the painted water, below people
     if (zdef.theme === 'wyrd') drawBridges(g, t);
-    if (zdef.theme === 'sky') drawWardRings(g, t);
+    drawWardRings(g, t);
     if (zdef.theme === 'deep') drawChimeRings(g, t);
     window.EmptySeat?.drawFloor(g, w2s);
     window.BossMech?.drawFloor(g, t, bossMechView());
@@ -5031,6 +5099,14 @@
     for (const chest of chests) if (chest.expiresAt > tAll) { const [sx, sy] = w2s(chest.x, chest.y); if (onScreen(sx, sy, Math.round(70 * CHEST_SCALE))) { shadow(g,chest.x,chest.y,27 * CHEST_SCALE,9 * CHEST_SCALE,.35); list.push({d:chest.x+chest.y,chest,sx,sy}); } }
     for (const sign of signs) { const [sx, sy] = w2s(sign.x, sign.y); if (onScreen(sx, sy, 90)) { shadow(g, sign.x, sign.y, 22, 8, .3); list.push({ d: sign.x + sign.y, sign, sx, sy }); } }
     for (const d of drops) { const [sx, sy] = w2s(d.x, d.y); if (onScreen(sx, sy, 165)) list.push({ d: d.x + d.y, drop: d, sx, sy }); }
+    for (const vein of window.Blacksmithing?.veins || []) {
+      const [sx, sy] = w2s(vein.x, vein.y);
+      if (onScreen(sx, sy, 100)) list.push({ d: vein.x + vein.y, vein, sx, sy });
+    }
+    for (const patch of window.Alchemy?.patches || []) {
+      const [sx, sy] = w2s(patch.x, patch.y);
+      if (onScreen(sx, sy, 60)) list.push({ d: patch.x + patch.y, patch, sx, sy });
+    }
     { const [sx, sy] = w2s(hero.x, hero.y); shadow(g, hero.x, hero.y, 30, 12, hero.ghost ? .15 : .32); list.push({ d: hero.sparkTravel ? Infinity : hero.x + hero.y + .001, hero, sx, sy }); }
     for (const body of corpses) {
       const [sx, sy] = w2s(body.x, body.y);
@@ -5057,6 +5133,8 @@
       if (it.arch) { ExitPaths.arch(g,it.arch,w2s); continue; }
       if (it.stone) { EmptySeat.drawStone(g, it); continue; }
       if (it.fx) { drawMeleeFx(g, it.fx, it.back); continue; }
+      if (it.vein) { Blacksmithing.drawVein(g, it.vein, it.sx, it.sy); continue; }
+      if (it.patch) { Alchemy.drawPatch(g, it.patch, it.sx, it.sy); continue; }
       if (it.o) {
         const o = it.o;
         const oset = o.ghostSet || set;
@@ -5196,7 +5274,8 @@
     for (const e of effects) if (e.kind === 'slash' || e.kind === 'dualSlash') continue; else if (e.kind === 'shadow' && mageSpr && isAssassin()) {
       const [sx, sy] = w2s(e.x, e.y), [ax, ay] = mageSpr.meta.anchor;
       g.save(); g.globalAlpha = Math.max(0, .35 * (1 - e.t / .32)); g.imageSmoothingEnabled = false;
-      g.drawImage(mageSpr.frame('walk', e.dir, e.frame), sx - ax * 1.3, sy - ay * 1.3, 160 * 1.3, 160 * 1.3); g.restore();
+      g.translate(sx, sy); g.scale(1.3, 1.3); g.scale(...mageSpr.bodyScale);
+      g.drawImage(mageSpr.frame('walk', e.dir, e.frame), -ax, -ay); g.restore();
     } else if (e.kind === 'chestOpen') {
       if (!chestSrc) continue;
       const [sx, sy] = w2s(e.x, e.y), fade = Math.min(1, (e.life - e.t) / .4);   // the lid swings back, the pile shimmers, then it is gone
@@ -5310,8 +5389,7 @@
     if (zdef.theme === 'moonwell') drawBossBar(g);
     window.NewYear?.drawFireworks(g,zone,hero,t,VW,VH,reducedMotion());
     drawFishing(g);
-    window.Blacksmithing?.draw(g, w2s, VW, VH, reducedMotion() || !!window.Prefs?.lowGraphics);
-    window.Alchemy?.draw(g, w2s, VW, VH);
+    window.Blacksmithing?.drawMiners(g, w2s, VW, VH, reducedMotion() || !!window.Prefs?.lowGraphics);
     window.BossMech?.drawForeground(g, t, bossMechView());
     window.BossMech?.drawHud(g, VW, VH, t, bossMechView());
     window.Halloween?.drawLabel(g,zone,w2s);
@@ -5448,6 +5526,7 @@
     }
     for (const o of objects) {
       if (o.kind === 'post' || o.kind === 'void') continue;
+      if (o.fishingWater) { g.fillStyle = '#65cce8'; g.beginPath(); g.arc(o.x * k, o.y * k, Math.max(2.5, o.r * k), 0, Math.PI * 2); g.fill(); continue; }
       if (o.kind === 'ew_lava') {g.fillStyle='#ed864a';g.beginPath();g.arc(o.x*k,o.y*k,o.r*k,0,Math.PI*2);g.fill();continue;}
       if (moonwell) {g.fillStyle=o.kind==='moonmirror'?'#f8e8ad':o.kind==='moonlily'?'#c6e4d6':'#9af2d7';g.fillRect(o.x*k-.7,o.y*k-.7,1.4,1.4);continue;}
       if (orrery) { g.fillStyle = o.kind === 'clockwall' ? '#c8aa80' : o.kind === 'blackspire' ? '#778399' : o.kind === 'stillpoint' ? '#d3b683' : '#9b8693'; g.fillRect(o.x*k-.7,o.y*k-.7,1.4,1.4); continue; }
@@ -5683,6 +5762,7 @@
     for (const sl of slimes) if (!sl.dead && seen(zone, sl.x, sl.y)) { mctx.fillStyle = sl.kind === 'big' ? '#c8b5ff' : '#ff6b8a'; mctx.beginPath(); mctx.arc(sl.x * s, sl.y * s, 2, 0, 6.283); mctx.fill(); }
     farLayer(farDots, zone, 0, 0, inA);
     if (miniFade) { const [fx, fy] = miniFade.shift; farLayer(miniFade.far, miniFade.zone, fx, fy, outA); if (!wmode) sparkLayer(miniFade.sparks, fx, fy, outA); }
+    window.GatheringMap?.draw(mctx, s, vx, vy, W);
     // Quest guidance stays above fog and actors, and changes independently of the cached ground.
     const questLayer = (list, dx, dy, a, pin = true) => {
       mctx.save(); mctx.globalAlpha = a; mctx.textAlign = 'center'; mctx.textBaseline = 'middle'; mctx.lineJoin = 'round';
@@ -5777,13 +5857,13 @@
       running = true; paused = false; last = 0; cancelAnimationFrame(raf); raf = requestAnimationFrame(loop);
     },
     // A crossing cutscene starts: let go of everything the hero was doing, so nothing carries on underneath it.
-    cutsceneBegin() { City.close(false); keys.clear(); pointer.down = false; cityRoute = []; pendingNpc = null; pendingChest = null; hero.target = null; hero.pvpTargetId = null; hero.goal = null; emitHud(); },
+    cutsceneBegin() { City.close(false); keys.clear(); pointer.down = false; cityRoute = []; pendingNpc = null; pendingChest = null; pendingGather = null; hero.target = null; hero.pvpTargetId = null; hero.goal = null; emitHud(); },
     stop() { window.WorldFeedback?.reset(); window.ZoneJourney?.clear(); window.Cutscene?.reset(); window.Inventory?.hideTooltip(); window.Skillbar?.close(false); window.Quests?.close(false); City.close(false); Online.stop(); running = false; spriteGeneration++; remotePlayers.clear(); guards.clear(); cancelAnimationFrame(raf); },
     setTouchDirection(x, y) {
       if (!running || paused || !Online.connected || (hero.dead && !hero.ghost) || hero.sparkTravel) { x = 0; y = 0; }
       if ((x || y) && !touchDirection.some(Boolean)) {
-        pendingNpc = null; pendingChest = null; cityRoute = []; pointer.down = false;
-        hero.target = null; hero.pvpTargetId = null; hero.goal = null; emitHud();
+        pendingNpc = null; pendingChest = null; pendingGather = null; cityRoute = []; pointer.down = false;
+        autoAttackTarget = null; hero.target = null; hero.pvpTargetId = null; hero.goal = null; emitHud();
       }
       const wasMoving = touchDirection.some(Boolean);
       const n = Math.hypot(x, y) || 1; touchDirection = [x / n, y / n];
@@ -5810,25 +5890,30 @@
       if (z !== miniZoom) { miniZoom = z; window.Prefs?.set({ minimapZoom: z }); }
       miniZoomButtons(); return miniZoom;
     },
-    action(action) {
+    action(action, autoAim = false) {
       if (action === 'talk' && running && !paused && Online.connected && !hero.sparkTravel && (!hero.dead || hero.ghost)) {
         const list = hero.dead && hero.ghost ? City.npcs.filter(n => n.art === 'spirit_guide') : [...City.npcs.filter(n => n.art !== 'spirit_guide'), ...signs];
         const npc = list.filter(n => Math.hypot(n.x-hero.x,n.y-hero.y)<2.8).sort((a,b)=>Math.hypot(a.x-hero.x,a.y-hero.y)-Math.hypot(b.x-hero.x,b.y-hero.y))[0];
         if (npc) talkTo(npc); return !!npc;
       }
       if (!Field.canAct || hero.sparkTravel) return false;
-      if (action === 'fish') return !!window.Fishing?.press();
+      if (action === 'fish') return !!window.Fishing?.press(autoAim);
+      if (action === 'mine') {
+        const smithing = window.Blacksmithing, vein = smithing?.nearbyVein;
+        if (!vein || smithing.isMining) return false;
+        startGathering(vein, smithing, 'veins');
+        return true;
+      }
       if (action === 'attack') return Field.useSkill('attack');
       if (action === 'dash') return isAssassin() && Field.useSkill('shadowstep');
       if (action === 'mount') { Field.toggleMount(); return true; }
       if (action === 'interact') return !!window.RaidKey?.interact();
       return false;
     },
-    clearInput() { autoAttackTarget = null; blockedAttack = null; touchDirection = [0, 0]; inputT = 0; window.TouchControls?.resetStick(); pendingNpc=null; pendingChest=null; cityRoute=[]; keys?.clear(); if (pointer) pointer.down = false; },
-    // Opening or closing a window (or focusing the chat) halts held movement, but a selected monster stays selected: the server keeps
-    // attacking it (an input of zero stops walking and clears nothing else; `stop` would also drop the target).
+    clearInput() { autoAttackTarget = null; blockedAttack = null; touchDirection = [0, 0]; inputT = 0; window.TouchControls?.resetStick(); pendingNpc=null; pendingChest=null; pendingGather=null; cityRoute=[]; keys?.clear(); if (pointer) pointer.down = false; },
+    // Windows and chat halt held movement while keeping a selected autoattack target.
     stopMoving() {
-      const id = autoAttackTarget, keepAttack = id !== null && hero.target?.id === id && !hero.dead;
+      const id = autoAttackTarget, keepAttack = id !== null && (hero.target?.id === id || hero.pvpTargetId === id) && !hero.dead;
       Field.clearInput();
       if (keepAttack) { autoAttackTarget = id; Online.send({ type: 'input', dx: 0, dy: 0 }); } else Online.send({ type: 'stop' });
     },
@@ -5859,16 +5944,16 @@
       if (id === 'attack' && hero.atkCd <= 0 && hero.dashT <= 0) { swing(); return true; }
       if (id === 'shadowstep' && isAssassin() && hero.dashCd <= 0 && hero.dashT <= 0 && hero.resource >= 20) { shadowstep(); return true; }
       const def = SKILL_BY_ID[id];
-      if (def && def.class === hero.look.class && hero.level >= def.level && !(hero.skillCd?.[id] > 0) && hero.dashT <= 0 && hero.resource >= def.cost) { castSkill(def); return true; }
+      if (def && def.class === hero.look.class && hero.level >= def.level && !(hero.skillCd?.[id] > 0) && hero.dashT <= 0 && hero.resource >= (window.Skillbar?.price(def) ?? def.cost)) { castSkill(def); return true; }
       return false;
     },
     get canAct() { return running && !paused && Online.connected && !hero.dead; },
     // The server checks ownership, health, the meal and the potion cooldown; this only sends the request.
-    useItem(id) {
+    useItem(id, bagSlot) {
       if (!running || !Online.connected || hero.dead) return false;
-      return Online.send({ type: 'use_item', item: id });
+      return Online.send({ type: 'use_item', item: id, bag_slot: bagSlot });
     },
-    floatHero(text, color = '#ffe066') { if (running && !hero.dead) floater(hero.x, hero.y, text, color, false, 'banner', 118); },
+    floatHero(text, color = '#ffe066', category = 'notices') { if (running && !hero.dead) floater(hero.x, hero.y, text, color, false, 'banner', 118, category); },
     error(text) { if (running) window.WorldFeedback?.error(text); },
     equipSlot(slot, item) {
       if (!running || !Online.connected || hero.dead) return false;
@@ -5882,7 +5967,19 @@
       autoAttackTarget = id; hero.pvpTargetId = null; hero.target = target; hero.goal = null; npcTarget = null;
       Online.send({ type: 'target', id }); emitHud(); return true;
     },
-    targetPlayer(id) { if (!remotePlayers.has(id)) return false; npcTarget = null; hero.pvpTargetId = id; hero.target = null; hero.goal = null; emitHud(); return true; },
+    targetPlayer(id, attack = false) {
+      const target = remotePlayers.get(id);
+      if (!target) return false;
+      if (attack && Field.canAct && target.hp > 1 && window.Pvp?.canAutoattack(id)) {
+        Field.clearInput();
+        if (Online.send({ type: 'pvp', command: { op: 'arena_target', id } })) autoAttackTarget = id;
+      } else if (autoAttackTarget != null && autoAttackTarget === hero.pvpTargetId && id !== hero.pvpTargetId) {
+        autoAttackTarget = null;
+        Online.send({ type: 'stop' });
+      }
+      npcTarget = null; hero.pvpTargetId = id; hero.target = null; hero.goal = null;
+      emitHud(); return true;
+    },
     // Shows `text` in a speech bubble over the character `id` for a few seconds (longer for longer messages).
     bubble(id, text, party = false) {
       text = String(text || '').trim(); if (!id || !text) return;
@@ -5908,6 +6005,7 @@
     get explored() { return explored; }, fog: { grid: FOG, seen, paint: paintFog, cell: fogCell },
     get beetleSprites() { return beetleSrc; }, get cragSprites() { return cragSrc; }, get rimeSprites() { return rimeSrc; }, get fenSprites() { return fenSrc; }, get wyrdSprites() { return wyrdSrc; }, get skySprites() { return skySrc; }, get deepSprites() { return deepSrc; }, get astralSprites() { return astralSrc; }, get prismSprites() { return prismSrc; }, get orrerySprites() { return orrerySrc; }, get moonsporeSprites() { return moonsporeSrc; }, get stormglassSprites() { return stormglassSrc; }, get sunwardSprites() { return sunwardSrc; }, get ribbonwildSprites() { return ribbonwildSrc; }, get tanglecrownSprites() { return tanglecrownSrc; }, get worldheartSprites() { return worldheartSrc; }, get lapisSprites() { return lapisSrc; }, get frostwakeSprites() { return frostwakeSrc; }, get cairnSprites() { return cairnSrc; }, get bankSprites() { return bankSrc; }, get yearSprites() { return yearSrc; }, get moonwellSprites() { return moonwellSrc; }, get moonwellGardenSprites() { return moonwellGardenSrc; }, get cathedralSprites() { return cathedralSrc; }, get vaultSprites() { return vaultSrc; },
     get instanceCleared() { return instanceCleared; },
+    get inInstance() { return !!(zdef.copies > 0 || zdef.raid); },
     get zone() { return zone; }, get zoneName() { return zdef.name; }, get areaName() { return areaName(); }, get seamless() { return performance.now() < seamlessUntil; }, get exitArches() { return zdef.exitArches || []; }, get vaultView() { return (map.vregs || []).length ? (map.ghosts || []).length : 0; }, get vaultRegions() { return map.vregs || []; }, get ghostNpcIds() { return (map.vregs || []).flatMap(R => City.npcsOf(R.to).filter(n => inRegion(R, n.x - R.shift[0], n.y - R.shift[1])).map(n => n.id)); }, get wallGhosts() { return (map.ghosts || []).filter(o => o.kind === 'rampart' || o.kind === 'tower').map(o => [o.kind, +o.x.toFixed(1), +o.y.toFixed(1)]); }, get cityIntrusion() { const c = zdef.city; if (!c || !(map.vregs || []).some(r => r.hide)) return null; const inside = zdef.shapeFloor ? o => inSquare(o.x, o.y) : o => o.x >= c.x0 - 1.5 && o.x <= c.x1 + 1.5 && o.y >= c.y0 - 1.5 && o.y <= c.y1 + 1.5; return { hidden: objects.filter(o => inside(o) && ownHidden(o)).length, ghosts: (map.ghosts || []).filter(inside).length, season: (map.vregs || []).reduce((n, R) => n + vaultSeason(R).filter(inside).length, 0) }; }, screenOf(x, y) { const [sx, sy] = w2s(x, y); return [sx / VW, sy / VH]; },
     sceneAround(x, y, r) {      // every scenery object this frame draws near a point, in this frame's coordinates (own, ghosts, seasonal): what must match across a vault
       const skip = o => o.kind === 'ew_lava' || o.kind === 'lava' || o.kind === 'water' || o.kind === 'post' || o.kind === 'void' || City.art[o.kind]?.ground, out = [];

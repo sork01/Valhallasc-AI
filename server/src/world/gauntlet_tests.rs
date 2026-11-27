@@ -393,6 +393,52 @@ fn an_opponent_hurts_only_its_own_hero_and_runs_do_not_share_a_ring() {
 }
 
 #[test]
+fn arena_autoattack_closes_in_and_repeats_from_one_selection() {
+    let mut w = world();
+    let mut rx = hero(&mut w, 1, Class::Warrior, 20, SKALD, "city_steward");
+    offer(&mut w, 1, "city_steward", "quest:accept:arena_skald_20");
+    offer(&mut w, 1, "city_steward", "gauntlet");
+    w.time = w.gauntlets[0].until;
+    let opponent = until_opponent(&mut w, &mut rx, 1);
+    let foe = w.players[&opponent].character.point();
+    let hp = w.players[&opponent].character.hp;
+    assert!(w.players[&1].character.point().distance(foe) > 10.);
+    let id = w.players[&opponent].character.id.clone();
+    let select = |w: &mut World| {
+        w.message(1, ClientMessage::Pvp {
+            command: PvpCommand::ArenaTarget { id: id.clone() },
+        });
+    };
+    select(&mut w);
+    assert_eq!(w.players[&1].arena_target, Some(opponent));
+    w.players.get_mut(&1).unwrap().stun = 2. * TICK;
+    w.update_player(1);
+    assert_eq!(w.players[&1].arena_target, Some(opponent));
+    let mut swings = 0;
+    for _ in 0..240 {
+        w.time += TICK;
+        let cooldown = w.players[&1].cooldown;
+        w.update_player(1);
+        if w.players[&1].cooldown > cooldown {
+            swings += 1;
+            if swings == 3 {
+                break;
+            }
+        }
+    }
+    assert_eq!(swings, 3, "one selection keeps attacking through cooldowns");
+    assert!(w.players[&1].character.point().distance(foe) <= pvp::attack_range(Class::Warrior));
+    assert!(w.players[&opponent].character.hp < hp, "the attacks hit the opponent");
+
+    w.message(1, ClientMessage::Input { dx: 1., dy: 0. });
+    assert_eq!(w.players[&1].arena_target, None, "manual movement cancels");
+    select(&mut w);
+    w.players.get_mut(&opponent).unwrap().character.hp = 1.;
+    w.update_player(1);
+    assert_eq!(w.players[&1].arena_target, None, "a fallen opponent ends autoattack");
+}
+
+#[test]
 fn an_opponent_closes_in_and_fights_back() {
     let mut w = world();
     let mut rx = hero(&mut w, 1, Class::Warrior, 20, SKALD, "city_steward");

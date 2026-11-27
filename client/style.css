@@ -145,12 +145,10 @@ body { font-family: var(--cute); color: #eaf6ff; touch-action: manipulation; use
 .cc-turn .arrow { min-width: 3.3cqw; height: 3.3cqw; font-size: 2cqw; touch-action: manipulation; }
 #create-facing { min-width: 6cqw; text-align: center; white-space: nowrap; }
 .cc-no-gear { width: 100%; margin-top: .5cqw; }
-@media (pointer: coarse) {
-  .cc-turn .arrow, .cc-no-gear { min-width: 44px; min-height: 44px; }
-  .cc-turn { font-size: max(12px, 1.1cqw); }
-}
 .runeglow { animation: pulse 2.4s ease-in-out infinite; }
 .tip { margin: .9cqw 0 0; font-size: 1cqw; text-align: center; opacity: .8; color: #fff3c4; }
+#create-racial-passive { margin: .4cqw 0 .65cqw; font-size: max(11px, 1.05cqw); }
+.racial-passive strong { color: #ffda84; }
 
 .cc-desc { left: 50%; top: 40.6cqw; width: 42cqw; transform: translateX(-50%); display: flex; align-items: center; gap: 1.6cqw; padding: .8cqw 1.4cqw; }
 .cc-desc-text { flex: 1; }
@@ -199,6 +197,52 @@ body { font-family: var(--cute); color: #eaf6ff; touch-action: manipulation; use
 .confirm:hover { filter: brightness(1.1); } .confirm:active { transform: translateX(-50%) translateY(.2cqw); }
 .confirm:focus-visible { outline: 3px solid var(--cyan); outline-offset: 4px; }
 @keyframes confirm { 0%, 100% { box-shadow: 0 .3cqw 0 #5c3f08, 0 0 1.2cqw rgba(255, 210, 90, .4); } 50% { box-shadow: 0 .3cqw 0 #5c3f08, 0 0 2.6cqw rgba(255, 210, 90, .9); } }
+
+@media (pointer: coarse) {
+  #scene-create {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+    align-content: start;
+    align-items: start;
+    gap: 10px;
+    padding: 10px max(10px, calc((100% - 860px) / 2));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scroll-padding-block: 10px;
+    touch-action: pan-y;
+  }
+  #scene-create :is(.cc-title, .panel, .cc-back, .confirm) { position: static; transform: none; width: auto; }
+  #scene-create :is(.cc-title, .cc-classes) { grid-column: 1 / -1; }
+  #scene-create .cc-title { font-size: clamp(24px, 4cqw, 38px); text-align: center; white-space: normal; }
+  #scene-create .panel { padding: 8px 10px; }
+  #scene-create .ph { margin-bottom: 6px; }
+  #scene-create .ph b { font-size: 16px; }
+  #scene-create .ph span { font-size: 12px; }
+  #scene-create .class-list { flex-flow: row wrap; justify-content: center; gap: 10px; }
+  #scene-create .class-ico { width: 44px; height: 44px; }
+
+  #scene-create .cc-showcase { display: grid; gap: 8px; }
+  #scene-create .cc-desc { grid-row: 1; display: grid; gap: 6px; }
+  #scene-create .cc-desc h3 { font-size: 17px; }
+  #scene-create .cc-desc p { font-size: 13px; }
+  #scene-create .stats { grid-template-columns: auto minmax(0, 1fr); font-size: 12px; }
+  #scene-create .cc-preview { position: relative; inset: auto; transform: none; width: min(100%, 190px); justify-self: center; }
+  #scene-create .cc-turn { position: static; transform: none; gap: 6px; font-size: 13px; }
+  #scene-create #create-facing { flex: 1; min-width: 0; white-space: normal; }
+
+  #scene-create .row { gap: 8px; margin: 5px 0; }
+  #scene-create .lab { width: 5.5em; font-size: 14px; }
+  #scene-create :is(.field, .segb, .gear-pick) { font-size: 16px; }
+  #scene-create :is(.btn, .confirm, .arrow, .field, .segb, .gear-pick) { min-height: 44px; }
+  #scene-create .arrow { min-width: 44px; font-size: 19px; }
+  #scene-create .swatches { gap: 6px; }
+  #scene-create .sw { width: 30px; height: 30px; }
+  #scene-create .tip { font-size: 12px; }
+  #scene-create .cc-back { justify-self: start; }
+  #scene-create .confirm { justify-self: end; padding: 6px 16px; }
+  #scene-create .confirm b { font-size: 17px; }
+  #scene-create .confirm span { font-size: 12px; }
+}
 
 .toast { position: absolute; left: 1.4cqw; bottom: calc(1.2cqw + 11.5cqw * var(--ui, .8)); margin: 0; padding: .4cqw 1.1cqw; font-size: 1.25cqw; color: #fff; border-radius: 999px; background: rgba(8, 16, 42, .85);
   border: .15cqw solid rgba(245, 197, 66, .6); opacity: 0; transform: translateY(.6cqw); transition: opacity .25s, transform .25s; pointer-events: none; z-index: 6; }

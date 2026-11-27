@@ -51,7 +51,10 @@ const suite = {
     }
     await page.evaluate(() => Keys.invoke('menu')); await audit('#pause .pause-panel', 'menu'); await clear();
     await page.evaluate(() => { Field.setPaused(true); Settings.show(); }); await audit('#settings-panel .settings-panel', 'settings');
-    await page.locator('#set-keys').click(); await audit('#keys-panel .keys-panel', 'keyboard'); await clear();
+    for (const [tab, name] of [['#set-tab-video', 'video'], ['#set-keys', 'keybinds'], ['#set-tab-interface', 'interface'], ['#set-tab-general', 'general']]) {
+      await page.locator(tab).click(); await audit('#settings-panel .settings-panel', `settings-${name}`);
+    }
+    await clear();
     await page.evaluate(() => Skillbar.show()); await audit('#skills-panel .skills-panel', 'skills'); await clear();
     await page.evaluate(() => Quests.show()); await audit('#quest-journal .quest-panel', 'quests'); await clear();
     await debug(page, { op: 'explore_all' }); await page.waitForFunction(() => Object.values(Field.explored || {}).filter(Boolean).length > 20);
@@ -105,9 +108,9 @@ const suite = {
     await page.evaluate(() => Social.show('party')); await audit('#social-panel .social-panel', 'raid-members'); await clear();
     await other.context().close();
     await debug(page, { op: 'set_level', level: 99 });
-    await debug(page, { op: 'teleport', zone: 46, x: 36, y: 303 });
+    await debug(page, { op: 'teleport', zone: 46, x: 30, y: 305 });
     await page.waitForFunction(() => Field.zone === 46 || Field.zoneTheme === 'chained_forge'); await sleep(550);
-    await page.evaluate(() => Online.send({ type: 'interact', npc: 'cf_quartermaster' })); await audit('#npc-dialogue .gossip-window', 'raid-hiring'); await clear();
+    await page.evaluate(() => Online.send({ type: 'interact', npc: 'dungeon_repair_46' })); await audit('#npc-dialogue .gossip-window', 'raid-hiring'); await clear();
     await debug(page, { op: 'teleport', zone: 41, x: 56, y: 99 });
     await page.waitForFunction(() => Field.zoneTheme === 'nornroot');
     const sign = await page.evaluate(() => Field.signs[0]);

@@ -1,3 +1,4 @@
+const soundtrack = require('./lib/soundtrack.cjs');
 // One new dungeon only: real client travel, readable art, sign, music and controls.
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
@@ -53,7 +54,7 @@ const call=async(name,args={})=>{const r=await client.callTool({name,arguments:a
   await page.waitForFunction(()=>Field.zone===44,null,{timeout:15000});
   await page.evaluate(()=>Online.send({type:'stop'}));
   await page.waitForFunction(()=>valhalla.blackhourMusic?.running&&valhalla.blackhourMusic.loaded,null,{timeout:30000});
-  assert.ok(await page.evaluate(()=>Math.abs(valhalla.blackhourMusic.duration-64*4*60/132)<.05),'The new 4/4 music decodes at the correct loop length');
+  assert.ok(await page.evaluate(seconds=>Math.abs(valhalla.blackhourMusic.duration-seconds)<.05, soundtrack('blackhour')),'The new 4/4 music decodes at the replacement recording length');
   assert.ok(await page.evaluate(()=>DayNight.nightMix<.01),'Dungeon keeps indoor light and its own score');
   assert.ok(await page.evaluate(()=>CSS.supports('color',BlackhourArt.ground(80,143,.5,0,WORLD_MAP.zones[43]))),'Foundry floor colors are valid independently of prior canvas state');
   assert.ok(await page.evaluate(()=>Field.slimes.filter(s=>s.kind.startsWith('null_')).length===15&&Field.slimes.filter(s=>s.kind.startsWith('null_')).every(s=>s.d.scale>1.8&&s.d.scale<=2.6)),'All fifteen enemies are giant without a screen-filling visual multiplier');

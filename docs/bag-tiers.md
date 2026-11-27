@@ -55,26 +55,19 @@ enemy drops the level-30 Ranger Pack. The catalog's `sell` value equals that
 tier's vendor price and never exceeds it.
 
 The bag is a common shared ground drop. A party makes one roll for the kill,
-then the existing round-robin pickup chooses the next member who can fit it.
+then the existing round-robin pickup chooses the next member with inventory room.
 Hired mercenaries keep their ordinary loot turn and forfeit a bag if selected.
-The recipient fits the bag automatically on pickup; the same minimum level,
-four-slot limit and smallest-smaller replacement rule apply. If nobody can fit
-it, it stays on the ground until its normal expiry. Fitted bags are bound to
-their recipient and cannot be traded or sold as loose items. This avoids a
-separate bag-inventory state while preserving the existing save format.
+Looted bags enter inventory as ordinary stacks. A bag can be collected above
+the hero's level and with all four expansion slots occupied.
 
-## Refused ground pickups (Beta 1.32.8)
+Select a bag in inventory to fit it into an empty expansion slot or choose a
+specific fitted bag to replace. The old bag goes back into inventory. The server
+checks level and resulting capacity before it applies the exchange. Fitted bags
+stay in the saved bag slots and loose bags use the existing inventory format.
 
-The loot magnet now checks the actual party's pickup eligibility before moving
-an item. If nobody nearby can fit a dropped bag, its world coordinates remain
-fixed, including when the picker walks away. A throttled notice explains that
-bag slots or level prevent fitting. Collection is not attempted while nobody
-can take it, and this read-only preflight consumes no round-robin turn. Room is
-rechecked so a party member who becomes eligible can still pick it up. Existing
-larger-bag replacement, level, raid-human-only and mercenary-forfeit rules stay
-in the shared collection path.
+## Refused ground pickups
 
-The regression check covers solo and real party piles with four fitted bags
-and a full inventory, fixed coordinates across movement, unchanged loot turns,
-and recovery when a second party member has a free bag slot. The private browser
-check also observes a real refused pile while the hero walks away.
+The loot magnet checks actual inventory capacity. A bag stays at its ground
+position if every eligible recipient lacks both a free cell and a matching stack.
+A throttled notice explains why it stays there. The preflight leaves the next
+round-robin turn available when someone makes room.

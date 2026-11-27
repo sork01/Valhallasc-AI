@@ -1,3 +1,4 @@
+const soundtrack = require('./lib/soundtrack.cjs');
 // One new dungeon only: real client travel, readable art, sign, music and controls.
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -20,7 +21,7 @@ const call = async (name, args = {}) => {
     args: [path.join(root, 'scripts/test-mcp.cjs')],
     cwd: root,
     stderr: 'pipe',
-    env: { ...getDefaultEnvironment(), VALHALLA_BINARY: process.env.VALHALLA_BINARY || path.join(root, 'target/debug/valhalla-server') }
+    env: { ...getDefaultEnvironment(), ...(process.env.NODE_PATH ? { NODE_PATH: process.env.NODE_PATH } : {}), VALHALLA_BINARY: process.env.VALHALLA_BINARY || path.join(root, 'target/debug/valhalla-server') }
   }));
   const world = await call('start_world', { godMode: true, levelSpread: 0 });
   started = true;
@@ -52,18 +53,22 @@ const call = async (name, args = {}) => {
 
   await debug({ op: 'set_level', level: 30 });
   await debug({ op: 'explore_all' });
+  await debug({ op: 'enable_cutscenes' });
 
-  // Bifrost Reach gate
-  // The Bifrost gate is the sky_shattered_span portal at (165,186) (moved by the shaped Bifrost); approach it from 5 tiles south.
-  await teleport(7, 165, 191);
+  const door = await page.evaluate(() => WORLD_MAP.zones[6].portals.find(p => p.id === 'sky_shattered_span'));
+  assert.ok(Math.hypot(door.x - 187, door.y - 194) > 100, 'The Span is away from the Perch');
+  await teleport(7, door.x, door.y + 5);
   await shot('entrance');
-  await page.evaluate(() => Online.send({ type: 'move', x: 165, y: 186 }));
+  assert.ok(await page.evaluate(() => !Cutscene.active));
+  await page.evaluate(({ x, y }) => Online.send({ type: 'move', x, y }), door);
   await page.waitForFunction(() => Field.zone === 42, null, { timeout: 15000 });
   await page.evaluate(() => Online.send({ type: 'stop' }));
+  assert.ok(await page.evaluate(() => !Cutscene.active && document.getElementById('zone-journey').hidden),
+    'Entering the Span plays neither a descent cutscene nor a descent notice');
 
   // Background music
   await page.waitForFunction(() => valhalla.skybridgeMusic?.running && valhalla.skybridgeMusic.loaded, null, { timeout: 30000 });
-  assert.ok(await page.evaluate(() => Math.abs(valhalla.skybridgeMusic.duration - 24 * 3 * 60 / 96) < .05), 'The new 3/4 music decodes at the correct loop length (45s)');
+  assert.ok(await page.evaluate(seconds => Math.abs(valhalla.skybridgeMusic.duration - seconds) < .05, soundtrack('skybridge')), 'The new 3/4 music decodes at the replacement recording length');
   assert.ok(await page.evaluate(() => DayNight.nightMix < .01), 'Dungeon keeps indoor light and its own score');
   assert.ok(await page.evaluate(() => WORLD_MAP.zones[41].name === 'The Shattered Span' && WORLD_MAP.zones[6].portals.some(p => p.to === 42)), 'Correct Bifrost Reach entrance and stable zone ID');
 

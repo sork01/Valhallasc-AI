@@ -1,5 +1,516 @@
 [
   {
+    "version": "1.15.11",
+    "date": "2026-11-27",
+    "new": [
+      "Party and raid frames show each member’s mana, energy or rage below their health, including hired mercenaries."
+    ],
+    "changed": [
+      "Dungeon bosses have 25% less health. Their damage is unchanged; raid bosses are unchanged."
+    ],
+    "removed": []
+  },
+  {
+    "version": "1.15.10",
+    "date": "2026-11-27",
+    "new": [
+      "Each of a priest's normal hits on a monster has a 10% chance to ready Mend and make it cost no mana for 4 seconds. Mend lights up on the skill bar while it is free. Hired priests benefit too. This does not happen in fights between players."
+    ],
+    "changed": [],
+    "removed": []
+  },
+  {
+    "version": "1.15.9",
+    "date": "2026-11-27",
+    "new": [],
+    "changed": [
+      "Dungeon monsters and bosses have 25% less health and deal 25% less damage than before."
+    ],
+    "removed": []
+  },
+  {
+    "version": "1.15.8",
+    "date": "2026-11-27",
+    "new": [],
+    "changed": [
+      "Dungeon and raid mercenaries stay with you after deaths and party wipes, until the final boss is defeated or you leave the instance."
+    ],
+    "removed": []
+  },
+  {
+    "version": "1.15.7",
+    "date": "2026-11-27",
+    "new": [],
+    "changed": [
+      "World scrolling draws cached ground more efficiently, improving Firefox performance, including in Low Graphics mode."
+    ],
+    "removed": []
+  },
+  {
+    "version": "1.15.6",
+    "date": "2026-11-26",
+    "new": [],
+    "changed": [
+      "The final remade tracks are here: Asterion by day and night, Eldmarr, and the shared nighttime theme."
+    ],
+    "removed": []
+  },
+  {
+    "version": "1.15.5",
+    "date": "2026-11-26",
+    "new": [],
+    "changed": [
+      "Dungeon monsters and bosses now have 100% more health and deal 100% more damage."
+    ],
+    "removed": []
+  },
+  {
+    "version": "1.15.4",
+    "date": "2026-11-26",
+    "new": [
+      "The Moonwell now has its own soundtrack."
+    ],
+    "changed": [
+      "The remaining remade music now plays across the world, at night, in dungeons and the Chained Forge raid, and on the title and story screens."
+    ],
+    "removed": []
+  },
+  {
+    "version": "1.15.3",
+    "date": "2026-11-26",
+    "new": [],
+    "changed": [
+      "Valhalla Rumble is now Valhalla Saga, with the new name on the title screen and welcome."
+    ],
+    "removed": []
+  },
+  {
+    "version": "1.15.2",
+    "date": "2026-11-26",
+    "new": [
+      "Quest objective progress appears in yellow near the top-center of the screen."
+    ],
+    "changed": [
+      "The quest tracker groups quests by zone, with your current zone and its dungeons first. Updated quests rise to the top of their group."
+    ],
+    "removed": []
+  },
+  {
+    "version": "1.15.1",
+    "date": "2026-11-26",
+    "new": [],
+    "changed": ["Monsters need a clear view to spot you or keep you in combat. Enemies behind walls no longer block mining indefinitely."],
+    "removed": []
+  },
+  {
+    "version": "1.15.0",
+    "date": "2026-11-26",
+    "new": ["Choose which floating text you see in Settings: damage, healing, loot, experience, profession gains, combat status, skills, and more."],
+    "changed": ["Floating equipment pickup text now matches the item's rarity color."],
+    "removed": []
+  },
+  {
+    "version": "1.14.7",
+    "date": "2026-11-26",
+    "new": [],
+    "changed": ["Day and night music now fades out completely before the next score fades in, preventing clashing songs."],
+    "removed": []
+  },
+  {
+    "version": "1.14.6",
+    "date": "2026-11-26",
+    "new": [
+      "Master volume controls music, sound effects, weather sounds, and narration."
+    ],
+    "changed": [
+      "Settings are grouped into Sound, Video, Keybinds, Interface, and General.",
+      "Sell all junk keeps gathered flowers in your bags."
+    ],
+    "removed": []
+  },
+  {
+    "version": "1.14.5",
+    "date": "2026-11-26",
+    "new": [],
+    "changed": [
+      "Music volume now defaults to 35%."
+    ],
+    "removed": []
+  },
+  {
+    "version": "1.14.4",
+    "date": "2026-11-26",
+    "new": [],
+    "changed": [
+      "Ranged enemies that back away from nearby attackers now do so only below 20% health."
+    ],
+    "removed": []
+  },
+  {
+    "version": "1.14.3",
+    "date": "2026-11-26",
+    "new": [],
+    "changed": [
+      "Mining plays three pickaxe clangs as your pick strikes the vein."
+    ],
+    "removed": []
+  },
+  {
+    "version": "1.14.2",
+    "date": "2026-11-26",
+    "new": [],
+    "changed": [
+      "Critical hit numbers pop up quickly and stay still for about a second before fading."
+    ],
+    "removed": []
+  },
+  {
+    "version": "1.14.1",
+    "date": "2026-11-25",
+    "new": [
+      "Rán’s Deep and the Obsidian Orrery now have their own nighttime themes."
+    ],
+    "changed": [
+      "Updated the soundtrack for Greenmeadow, Emberfall Crags, Rimeveil Glacier, Gloamfen, Skaldholm, the Undervault, Wyrdwood, Bifrost Reach, Rán’s Deep, Nacrehold, Astralhollow, the Obsidian Orrery, the Moonspore Canopy, and Emberwake Caldera."
+    ],
+    "removed": []
+  },
+  {
+    "version": "1.14.0",
+    "date": "2026-11-25",
+    "new": [
+      "Filter the System log or create your own chat tabs. The log includes profession skill gains, gathering, catches, and items received."
+    ],
+    "changed": [
+      "Dropped bags go into your inventory, even with all four expansion slots occupied. Fit one from inventory or choose which bag to replace. The replaced bag goes back into inventory.",
+      "Tooltips mark Enchanting recipes, Blacksmithing blueprints and Alchemy formulas you have already learned.",
+      "You can have up to 20 active quests. Turn in or abandon one to make room when your quest log is full.",
+      "The Shattered Span entrance is near the Lightning Spire in the Shardfields. The dungeon crossing plays no Bifrost ascent or descent.",
+      "Dungeon Meeting Stones are now outside the entrances.",
+      "Fishing and mining training follow the order of the zones. Bifrost Reach opens at skill 150 for both.",
+      "The Skuldwatch beacon lights the plaza from its flame.",
+      "Ore and flower tracking turns on when you learn the profession. Use Settings to turn either one off.",
+      "Click an ore vein or flower patch to walk into range and gather when you arrive."
+    ],
+    "removed": []
+  },
+  {
+    "version": "1.13.8",
+    "date": "2026-11-25",
+    "new": [],
+    "changed": [
+      "Removed the white dots that appeared across the top of the view at night."
+    ],
+    "removed": []
+  },
+  {
+    "version": "1.13.7",
+    "date": "2026-11-25",
+    "new": [],
+    "changed": [
+      "Rain, thunderstorms and snow tint the whole view evenly, removing the band of color at the bottom."
+    ],
+    "removed": []
+  },
+  {
+    "version": "1.13.6",
+    "date": "2026-11-25",
+    "new": [],
+    "changed": [
+      "Spark Travel shows the \"You are here\" card when you hover over your current station.",
+      "Target portraits for players and adventurers always face forward."
+    ],
+    "removed": []
+  },
+  {
+    "version": "1.13.5",
+    "date": "2026-11-25",
+    "new": [],
+    "changed": [
+      "Wyrdweavers are easier to hit, and autoattacks move into range before swinging. When scenery blocks a Wyrdweaver, autoattacks look for a clear approach.",
+      "Skuldwatch's central beacon lights more of the plaza at night."
+    ],
+    "removed": []
+  },
+  {
+    "version": "1.13.4",
+    "date": "2026-11-25",
+    "new": [],
+    "changed": [
+      "Enemy ground slams shake your screen only within 50 tiles of the impact."
+    ],
+    "removed": []
+  },
+  {
+    "version": "1.13.3",
+    "date": "2026-11-25",
+    "new": [],
+    "changed": [
+      "Fishing quests name the rod you need to catch the requested fish in local waters. Greenmeadow's Glass Eel quests point you to the Saltby pier."
+    ],
+    "removed": []
+  },
+  {
+    "version": "1.13.2",
+    "date": "2026-11-25",
+    "new": [],
+    "changed": [
+      "Fishing waters open when you reach their minimum Fishing skill. A blocked cast tells you where to train next. Earlier waters stay open for catches."
+    ],
+    "removed": []
+  },
+  {
+    "version": "1.13.1",
+    "date": "2026-11-25",
+    "new": [],
+    "changed": [
+      "The Platinum Rod now works at Wyrdwood shores, including rich fishing spots.",
+      "Wyrdweavers hold their ground when you move in close."
+    ],
+    "removed": []
+  },
+  {
+    "version": "1.13.0",
+    "date": "2026-11-25",
+    "new": [
+      "Use Meeting Stones to summon party members. Every dungeon and raid has one near its entrance, and summoned players can accept once they meet the destination's level requirement."
+    ],
+    "changed": [
+      "Hire dungeon and raid mercenaries from the Repair Smith inside. Their contracts end when you leave or clear the instance.",
+      "Nornroot Barrow's entrance and guides now stand in a clearing off the main trail north of Skuldwatch."
+    ],
+    "removed": []
+  },
+  {
+    "version": "1.12.8",
+    "date": "2026-11-24",
+    "new": [],
+    "changed": [
+      "Mercenaries hired for a dungeon stay with the party when a boss quest is completed and finish their contract when the dungeon is cleared."
+    ],
+    "removed": []
+  },
+  {
+    "version": "1.12.7",
+    "date": "2026-11-24",
+    "new": [],
+    "changed": [
+      "Dungeon gear auras, including the Gravewalker Claws effect, now turn with your character."
+    ],
+    "removed": []
+  },
+  {
+    "version": "1.12.6",
+    "date": "2026-11-24",
+    "new": [
+      "Blacksmiths can forge six expert mining picks, from the Moonspore Mining Pick at skill 300 to the Masterwork Mining Pick at skill 600.",
+      "Discover thirteen new equipment blueprints, including three level-99 epic plans that take Blacksmithing 600 to forge."
+    ],
+    "changed": [
+      "Expert mining skill gains require a pick suited to the current training region. Older picks can still gather the same ore.",
+      "The Blacksmithing Workshop shows the pick needed for the current training band and where to look for expert blueprints."
+    ],
+    "removed": []
+  },
+  {
+    "version": "1.12.5",
+    "date": "2026-11-24",
+    "new": [
+      "Hover over a Need or Greed drop to compare its stats with what you are wearing."
+    ],
+    "changed": [
+      "Sell All Junk keeps mined ore in your bags.",
+      "You can resize the Alchemy Workshop. It remembers its size separately from Blacksmithing.",
+      "On phones, the quest tracker leaves room for your active effects."
+    ],
+    "removed": []
+  },
+  {
+    "version": "1.12.4",
+    "date": "2026-11-24",
+    "new": [],
+    "changed": [
+      "Clicking or tapping an Arena opponent now closes the distance and keeps attacking. Move manually to cancel."
+    ],
+    "removed": []
+  },
+  {
+    "version": "1.12.3",
+    "date": "2026-11-24",
+    "new": [],
+    "changed": [
+      "Quests and monster kills above your level give up to 15% extra experience. Those below your level give less, down to 30% of the usual reward.",
+      "Quest rewards show the experience for your current level before personal bonuses."
+    ],
+    "removed": []
+  },
+  {
+    "version": "1.12.2",
+    "date": "2026-11-24",
+    "new": [],
+    "changed": [
+      "On touch screens, all five classes are visible when you open character creation. Scroll through customization to reach the create button."
+    ],
+    "removed": []
+  },
+  {
+    "version": "1.12.1",
+    "date": "2026-11-24",
+    "new": [],
+    "changed": [
+      "Blacksmithing now trains to 600. Follow the workshop's expert mining route or forge equipment with the ore for your current band."
+    ],
+    "removed": []
+  },
+  {
+    "version": "1.12.0",
+    "date": "2026-11-23",
+    "new": [
+      "Train Fishing and Enchanting to 600. Find new fishing waters in ten regions, 35 new fish, five dishes, two rod upgrades, and eight expert enchants."
+    ],
+    "changed": [
+      "Dying in a dungeon or raid now brings you back to life at the entrance or an unlocked checkpoint.",
+      "Long hair tucks under headgear on female characters.",
+      "Emberwake's basalt huts now have isometric artwork."
+    ],
+    "removed": [
+      "Removed Spirit Guides from dungeons and raids because heroes revive at the entrance or a checkpoint."
+    ]
+  },
+  {
+    "version": "1.11.1",
+    "date": "2026-11-23",
+    "new": [],
+    "changed": [
+      "Type /dance to see your character's dance. Each race has a different dance for female and male characters."
+    ],
+    "removed": []
+  },
+  {
+    "version": "1.11.0",
+    "date": "2026-11-23",
+    "new": [
+      "Every race has a passive ability. Humans earn 5% more quest coin, Mothkin gather flowers 15% faster at night, and Tidekin wait 10% less for bites in water. Gnomes pay 10% less for shop stock, repairs, and Spark Travel."
+    ],
+    "changed": [],
+    "removed": []
+  },
+  {
+    "version": "1.10.0",
+    "date": "2026-11-23",
+    "new": [
+      "Play as a Gnome from the Obsidian Orrery. Gnomes are 67% as tall and 76% as wide as Humans, and all their equipment fits their smaller frame."
+    ],
+    "changed": [],
+    "removed": []
+  },
+  {
+    "version": "1.9.0",
+    "date": "2026-11-23",
+    "new": [
+      "Play as Tidekin from Rán's Deep, with sea-green skin, finned ears and pearlescent gill markings. Choose Tidekin when creating a character of any class."
+    ],
+    "changed": [],
+    "removed": []
+  },
+  {
+    "version": "1.8.0",
+    "date": "2026-11-23",
+    "new": [
+      "Play as a Mothkin from the Moonspore Canopy, with dusky skin, pale markings and feathered antennae. Choose Mothkin when creating a character of any class."
+    ],
+    "changed": [],
+    "removed": []
+  },
+  {
+    "version": "1.7.6",
+    "date": "2026-11-23",
+    "new": [],
+    "changed": [
+      "Hold quests give you two and a half extra tiles of room in every direction. The ground marker shows the wider boundary."
+    ],
+    "removed": []
+  },
+  {
+    "version": "1.7.5",
+    "date": "2026-11-23",
+    "new": [
+      "Use Qty beside a shop item to choose how many to buy and see the total before paying.",
+      "Hover over gear in your bags to compare it with the piece you are wearing. Each stat shows the gain or loss in parentheses."
+    ],
+    "changed": [],
+    "removed": []
+  },
+  {
+    "version": "1.7.4",
+    "date": "2026-11-23",
+    "new": [
+      "Open the Professions tab in the Character pane to see your Fishing, Blacksmithing and Mining, Enchanting, and Alchemy skills."
+    ],
+    "changed": [],
+    "removed": []
+  },
+  {
+    "version": "1.7.3",
+    "date": "2026-11-23",
+    "new": [],
+    "changed": [
+      "The Blacksmithing workshop opens with more room. Drag the corner control to resize it and save that size for next time."
+    ],
+    "removed": []
+  },
+  {
+    "version": "1.7.2",
+    "date": "2026-11-23",
+    "new": [],
+    "changed": [
+      "Select gear directly from your bags when disenchanting."
+    ],
+    "removed": []
+  },
+  {
+    "version": "1.7.1",
+    "date": "2026-11-23",
+    "new": [
+      "Cook, smelt, forge, brew or craft as many of a selected recipe as your materials, money and bag space allow."
+    ],
+    "changed": [],
+    "removed": []
+  },
+  {
+    "version": "1.7.0",
+    "date": "2026-11-22",
+    "new": [
+      "Earn 34 new achievements for combat, quests, rebirths, mounts and fishing. Saved progress counts toward the new goals.",
+      "Earn skill milestones for Fishing, Blacksmithing, Enchanting and Alchemy under Professions in the Achievements tab.",
+      "Find the new Profession guide in Settings and see first-time tutorial tips near trainers and at workshops."
+    ],
+    "changed": [
+      "On touch, Go fishing turns you toward nearby water. Mine ore appears when a vein is within reach.",
+      "Use Track beside the minimap to find active ore veins or flower patches after training."
+    ],
+    "removed": []
+  },
+  {
+    "version": "1.6.2",
+    "date": "2026-11-22",
+    "new": [
+      "Use Track beside the minimap after learning Blacksmithing or Alchemy. Track active ore veins or flower patches, with an edge arrow pointing toward the nearest one when none are in view."
+    ],
+    "changed": [],
+    "removed": []
+  },
+  {
+    "version": "1.6.1",
+    "date": "2026-11-22",
+    "new": [],
+    "changed": [
+      "On phones and tablets, tap Go fishing near the shore to turn toward the water and cast. The button lights up when it is time to hook.",
+      "Use the Mine ore button when you are close to a vein, or tap the vein itself."
+    ],
+    "removed": []
+  },
+  {
     "version": "1.6.0",
     "date": "2026-11-22",
     "new": [

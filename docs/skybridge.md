@@ -1,11 +1,11 @@
 # The Shattered Span — level 30
 
-The second of the three requested progression dungeons. Its entrance is in
-**Bifrost Reach (zone 7), at (58, 128)**, on the western floating platform below
-Heimdall's Perch. The return arrival is (58, 133), outside the entrance disc.
-Sigrid the Gatewarden and Hakon the Chronicler stand beside the approach; Sigrid
-offers the existing five-class mercenary service. Public zone **42** is appended
-after Nornroot Barrow (41).
+The entrance is in **Bifrost Reach (zone 7), at (236.5, 309.5)**, off the
+Lightning Spire trail in the Shardfields. Both exits return to **(236.5, 314.5)**,
+outside the door's activation radius. Astrid Bridgeward, Soren Shardkeeper and
+the Meeting Stone stand outside. The Repair Smith handles hires just inside.
+The Span remains in the sky, so the crossing plays no Bifrost ascent or descent.
+Public zone **42** follows Nornroot Barrow (41).
 
 The 112 × 112 private interior has four party copies, a level-30 access gate
 and a recommended party size of five. A western toll-gate gallery and an eastern

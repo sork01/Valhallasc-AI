@@ -19,6 +19,13 @@ Already killed enemies stay dead. Other pulls/copies are untouched. Ending a
 pull never restarts or delays a hire's respawn timer.
 Boss mechanic fights retain their existing fallen and rally rules.
 
+Dungeon and raid hires keep their contracts through the hirer's death and full
+party wipes. The outdoor hirer-death doom never applies to instance contracts.
+Survivors continue fighting normally; fallen hires use the existing respawn
+rules. They still depart on final-boss completion or when the hirer leaves the
+copy, and explicit dismissal, party departure and logout still end contracts.
+See [mercenary-gear.md](mercenary-gear.md).
+
 `world/packs.rs` runs before mercenary navigation and player respawn each tick.
 `mercs.rs` suppresses catch-up during a tracked pull; ordinary catch-up requires
 both owner and hire out of combat and a living owner. Enemy targeting drops dead,

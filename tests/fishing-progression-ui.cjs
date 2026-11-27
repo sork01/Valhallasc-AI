@@ -23,10 +23,10 @@ const w=new TestWorld();w.startLevel=99;w.levelSpread=0;let browser,page;const e
  await page.evaluate(()=>Fishing.open());const progression=page.locator('.fishing-progression');
  assert((await progression.innerText()).includes('Current rod: Platinum Rod'));assert((await progression.innerText()).includes('Next upgrade: Willow Rod'));
  await progression.locator('summary').click();const rows=progression.locator('details > div');
- assert.equal(await rows.count(),rods.length,'complete eight-rod ladder is rendered');
+ assert.equal(await rows.count(),rods.length,'complete ten-rod ladder is rendered');
  assert.deepEqual(await rows.locator('b').allTextContents(),rods.map(r=>r.name));
  assert((await rows.nth(1).innerText()).includes('Crags lava'));assert((await rows.nth(5).innerText()).includes('Emberwake lava'));
- assert((await rows.last().innerText()).includes('42% shorter waits'));assert((await rows.last().innerText()).includes('+70% rare catch bonus'));
+ assert((await rows.last().innerText()).includes('54% shorter waits'));assert((await rows.last().innerText()).includes('+90% rare catch bonus'));
  assert(await page.locator('.fishing-window').evaluate(e=>e.scrollWidth<=e.clientWidth+1));
  await page.screenshot({path:path.join(w.runDir,'progression-desktop.png')});
  await page.setViewportSize({width:600,height:390});await rows.last().scrollIntoViewIfNeeded();

@@ -1,8 +1,9 @@
-//! Shared 1–300 progression for secondary professions.
+//! Shared 1–600 progression for secondary professions.
 use serde::{Deserialize, Serialize};
 
-pub const MAX_SKILL: u16 = 300;
+pub const MAX_SKILL: u16 = 600;
 pub const SKILL_BAND: u16 = 30;
+pub(crate) const EXPERT_ODDS_FLOOR_AT: u16 = 300;
 const GEAR_LEVELS_PER_BAND: u16 = 5;
 
 pub fn gear_skill_cap(level: u32) -> u16 {
@@ -45,15 +46,44 @@ impl Skill {
     /// Only eligible actions affect the streak. Two eligible attempts without a point
     /// guarantee one on the next attempt, and better materials or fish improve the odds.
     pub fn try_gain(&mut self, quality: u8, cap: u16, roll: f64) -> bool {
-        self.try_gain_to(quality, cap, MAX_SKILL, roll)
+        self.try_gain_with_floor(quality, cap, MAX_SKILL, EXPERT_ODDS_FLOOR_AT, roll)
+    }
+
+    pub(crate) fn train_batch(
+        &mut self,
+        attempts: u32,
+        quality: u8,
+        cap: u16,
+        max_skill: u16,
+        odds_floor_at: u16,
+        mut roll: impl FnMut() -> f64,
+    ) {
+        for _ in 0..attempts {
+            if self.skill == 0 || self.skill >= cap.min(max_skill) {
+                break;
+            }
+            self.try_gain_with_floor(quality, cap, max_skill, odds_floor_at, roll());
+        }
     }
 
     pub fn try_gain_to(&mut self, quality: u8, cap: u16, max_skill: u16, roll: f64) -> bool {
+        self.try_gain_with_floor(quality, cap, max_skill, max_skill, roll)
+    }
+
+    fn try_gain_with_floor(
+        &mut self,
+        quality: u8,
+        cap: u16,
+        max_skill: u16,
+        odds_floor_at: u16,
+        roll: f64,
+    ) -> bool {
         if !(1..cap.min(max_skill)).contains(&self.skill) {
             return false;
         }
-        let chance = 0.9 - 0.3 * f64::from(self.skill - 1) / f64::from(max_skill - 1)
-            + 0.05 * f64::from(quality.min(3));
+        // Fishing and Enchanting reach the same base odds floor at 300 as before.
+        let progress = f64::from(self.skill.min(odds_floor_at) - 1) / f64::from(odds_floor_at - 1);
+        let chance = 0.9 - 0.3 * progress + 0.05 * f64::from(quality.min(3));
         if self.misses >= 2 || roll < chance.min(1.) {
             self.skill += 1;
             self.misses = 0;
@@ -70,7 +100,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn profession_skill_eligible_actions_reach_300_even_with_the_worst_rolls() {
+    fn profession_skill_eligible_actions_reach_600_even_with_the_worst_rolls() {
         let mut skill = Skill::default();
         assert!(!skill.try_gain(3, MAX_SKILL, 0.));
         skill.initialize(1);
@@ -95,13 +125,20 @@ mod tests {
             (45, 270),
             (46, 300),
             (50, 300),
-            (99, 300),
+            (51, 330),
+            (55, 330),
+            (56, 360),
+            (95, 570),
+            (96, 600),
+            (99, 600),
         ] {
             assert_eq!(gear_skill_cap(level), cap, "item level {level}");
         }
         assert_eq!(training_gear_level(30), Some(6));
         assert_eq!(training_gear_level(270), Some(46));
-        assert_eq!(training_gear_level(300), None);
+        assert_eq!(training_gear_level(300), Some(51));
+        assert_eq!(training_gear_level(570), Some(96));
+        assert_eq!(training_gear_level(600), None);
         let mut skill = Skill::default();
         skill.initialize(30);
         for _ in 0..3 {
@@ -113,9 +150,20 @@ mod tests {
     }
 
     #[test]
+    fn profession_skill_expert_batches_keep_alchemy_odds() {
+        let mut enchant = Skill::default();
+        enchant.initialize(330);
+        let mut alchemy = enchant.clone();
+        enchant.train_batch(1, 0, 360, MAX_SKILL, EXPERT_ODDS_FLOOR_AT, || 0.7);
+        alchemy.train_batch(1, 0, 360, MAX_SKILL, MAX_SKILL, || 0.7);
+        assert_eq!(enchant.skill, 330);
+        assert_eq!(alchemy.skill, 331);
+    }
+
+    #[test]
     fn profession_skill_quality_improves_odds_and_misses_survive_reload() {
         let mut basic = Skill::default();
-        basic.initialize(299);
+        basic.initialize(599);
         let mut better = basic.clone();
         assert!(!basic.try_gain(0, MAX_SKILL, 0.7));
         assert!(better.try_gain(3, MAX_SKILL, 0.7));
@@ -123,6 +171,6 @@ mod tests {
         let mut restored: Skill =
             serde_json::from_value(serde_json::to_value(basic).unwrap()).unwrap();
         assert!(restored.try_gain(0, MAX_SKILL, 0.999));
-        assert_eq!(restored.skill, 300);
+        assert_eq!(restored.skill, 600);
     }
 }

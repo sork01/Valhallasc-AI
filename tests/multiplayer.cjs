@@ -269,7 +269,15 @@ async function stageAt(page, point) {
   await warrior.waitForFunction(id=>Field.slimes.find(s=>s.id===id)?.dead,beetle.id);passed++;
   // The city block walks the warrior across the map, so it starts only once the warrior has seen the beetle die.
   const city = cityBlock(); city.catch(() => {});   // an early failure is reported where it is awaited
-  check(await mage.evaluate(before=>Field.hero.kills>=before.kills+1&&(()=>{const total=before.xp+Math.ceil((45+5*before.enemy.level)/2);return before.level===Field.hero.level&&Field.hero.xp>=total||Field.hero.level===before.level+1&&Field.hero.xp>=total-before.xpNeed;})()&&Field.hero.hp>0,beetleState),'Beetle combat awards at least its half-XP share (45 + 5 per enemy level, halved in Greenmeadow); the staged crowd can add other kills to the same window');
+  check(await mage.evaluate(before => {
+    const gap = before.enemy.level - before.level;
+    const rate = gap < 0 ? Math.max(30, 100 + 10 * gap) : Math.min(115, 100 + 3 * gap);
+    const base = Math.ceil((45 + 5 * before.enemy.level) / 2);
+    const total = before.xp + Math.round(base * rate / 100);
+    const earned = before.level === Field.hero.level && Field.hero.xp >= total
+      || Field.hero.level === before.level + 1 && Field.hero.xp >= total - before.xpNeed;
+    return Field.hero.kills >= before.kills + 1 && earned && Field.hero.hp > 0;
+  }, beetleState), 'Beetle combat awards at least its level-adjusted Greenmeadow XP. Other kills can add XP in the same window');
   const beetleDrop=await mage.evaluate(id=>{const s=Field.slimes.find(s=>s.id===id);return {x:s.x,y:s.y};},beetle.id);
   await mage.evaluate(p=>Online.send({type:'move',...p}),beetleDrop);
   // Enemy gold is halved at the kill (server mob_gold, MOB_GOLD_SCALE 0.5, owner 2026-10-21): the authored level-scaled amount, halved, never below 1.

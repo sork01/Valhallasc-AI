@@ -1,7 +1,7 @@
 //! Rebirth perks (docs/rebirth.md, REBIRTH-PERKS). Every perk is derived from `Character::rebirth_tiers` and the table in
 //! `world/rebirth.txt`, so a rebalance needs no save migration and a save can never hold more than the cap. None of
 //! them touches attack, defense, health, damage taken or skill power.
-use crate::model::Character;
+use crate::model::{Character, Race};
 use serde::Deserialize;
 use std::sync::LazyLock;
 
@@ -138,8 +138,21 @@ impl Character {
     pub fn boosted_gold(&self, gold: u32) -> u32 {
         plus_percent(gold, self.rebirth_gold_percent())
     }
+    pub fn quest_gold_percent(&self) -> u32 {
+        self.rebirth_gold_percent() + if self.look.race == Race::Human { 5 } else { 0 }
+    }
+    pub fn quest_gold(&self, gold: u32) -> u32 {
+        plus_percent(gold, self.quest_gold_percent())
+    }
+    pub fn npc_discount_percent(&self) -> u32 {
+        if self.look.race == Race::Gnome { 10 } else { 0 }
+    }
+    /// Gnome pricing applies only where a seller or service explicitly uses it.
+    pub fn npc_price(&self, price: u32) -> u32 {
+        minus_percent(price, self.npc_discount_percent())
+    }
     pub fn spark_fare(&self, fare: u32) -> u32 {
-        minus_percent(fare, self.rebirth_fare_percent())
+        self.npc_price(minus_percent(fare, self.rebirth_fare_percent()))
     }
 }
 

@@ -39,6 +39,17 @@ pub enum Gender {
     Female,
 }
 
+/// Race affects appearance only. Characters saved before race selection are human.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Deserialize, Serialize)]
+#[serde(rename_all = "lowercase")]
+pub enum Race {
+    #[default]
+    Human,
+    Mothkin,
+    Tidekin,
+    Gnome,
+}
+
 #[derive(Clone, Copy, Debug, Default, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "lowercase")]
 pub enum Class {
@@ -123,6 +134,7 @@ pub struct Look {
     pub name: String,
     pub class: Class,
     pub gender: Gender,
+    pub race: Race,
     pub hair_color: u8,
     pub skin: u8,
     pub warrior_armor: String,
@@ -156,6 +168,7 @@ impl Default for Look {
             name: "Adventurer".into(),
             class: Class::Warrior,
             gender: Gender::Male,
+            race: Race::Human,
             hair_color: 0,
             skin: 0,
             warrior_armor: "crimson".into(),
@@ -513,9 +526,14 @@ pub const TUTORIAL_MILESTONES: &[&str] = &[
     "bags_full",
     "mail_bank",
     "party_mercs",
+    "profession_fishing",
+    "profession_blacksmithing",
+    "profession_enchanting",
+    "profession_alchemy",
 ];
-/// How many of the milestones above existed in `tutorial_version` 1; the rest came with version 2.
+/// The first two onboarding migrations skip only the steps they originally introduced.
 pub const TUTORIAL_V1_COUNT: usize = 6;
+pub const TUTORIAL_V2_COUNT: usize = 18;
 pub const TUTORIAL_VETERAN_LEVEL: u32 = 5;
 /// An amount of money as the player reads it. Every stored amount is whole copper: 100 copper = 1 silver, 100 silver = 1 gold
 /// (`COIN-DENOMINATIONS`). Zero parts are left out, and nothing is "0 copper".
@@ -557,7 +575,7 @@ impl Character {
         }
         if self.tutorial_version == 1 {
             if self.level > TUTORIAL_VETERAN_LEVEL {
-                mark(self, &TUTORIAL_MILESTONES[TUTORIAL_V1_COUNT..]);
+                mark(self, &TUTORIAL_MILESTONES[TUTORIAL_V1_COUNT..TUTORIAL_V2_COUNT]);
             }
             self.tutorial_version = 2;
         }
@@ -862,6 +880,21 @@ pub fn xp_to_level(level: u32) -> u32 {
 pub fn enemy_xp(level: u32) -> u32 {
     45 + 5 * level.max(1)
 }
+pub const XP_LEVEL_MIN_GAP: i64 = -7;
+pub const XP_LEVEL_RATES: [u32; 13] = [30, 40, 50, 60, 70, 80, 90, 100, 103, 106, 109, 112, 115];
+
+/// Scale a quest or kill's base XP by its level relative to the recipient.
+/// Round to the nearest XP and keep at least one XP for a positive reward.
+pub fn level_adjusted_xp(base: u32, recipient_level: u32, reward_level: u32) -> u32 {
+    if base == 0 {
+        return 0;
+    }
+    let gap = i64::from(reward_level) - i64::from(recipient_level);
+    let index = (gap - XP_LEVEL_MIN_GAP).clamp(0, XP_LEVEL_RATES.len() as i64 - 1) as usize;
+    let scaled = (u64::from(base) * u64::from(XP_LEVEL_RATES[index]) + 50) / 100;
+    scaled.clamp(1, u64::from(u32::MAX)) as u32
+}
+
 impl Character {
     pub fn stat_scale(&self) -> f64 {
         if self.resurrection_sickness > 0. {
@@ -1184,6 +1217,11 @@ impl Character {
             self.hp = self.hp.min(self.max_hp());
         }
     }
+
+    pub(crate) fn quest_slots_left(&self) -> usize {
+        const ACTIVE_QUEST_LIMIT: usize = 20;
+        ACTIVE_QUEST_LIMIT.saturating_sub(self.quests.iter().filter(|quest| !quest.claimed).count())
+    }
 }
 
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
@@ -1203,9 +1241,7 @@ pub struct Quest {
     pub npc: String,
     pub requires: Option<String>,
     pub repeatable: bool,
-    /// Recommended character level; the XP reward is a tenth of what that level needs. Clients read it
-    /// from client/world.js and a world test checks the reward, so the server itself never uses it.
-    #[cfg_attr(not(test), allow(dead_code))]
+    /// Recommended character level, used to scale the authored XP at turn-in.
     pub level: u32,
     pub reward_xp: u32,
     pub reward_gold: u32,
@@ -1377,7 +1413,11 @@ pub fn sync_visits(character: &mut Character, maps: &[Map]) -> Vec<String> {
 /// just arrived. Cheap enough for every tick: it only walks the quest list.
 pub fn sync_progression(character: &mut Character, maps: &[Map]) -> Vec<String> {
     let mut arrived = Vec::new();
+    let room = character.quest_slots_left();
     for quest in maps.iter().flat_map(|m| &m.quests) {
+        if arrived.len() == room {
+            break;
+        }
         if quest
             .auto_level
             .is_some_and(|level| character.level >= level)
@@ -1483,7 +1523,10 @@ pub enum ClientMessage {
         npc: String,
         changes: std::collections::BTreeMap<String, String>,
     },
-    Fish {},
+    Fish {
+        #[serde(default)]
+        auto_aim: bool,
+    },
     ShopPresence { open: bool },
     Join {
         version: u32,
@@ -1525,6 +1568,8 @@ pub enum ClientMessage {
     },
     UseItem {
         item: String,
+        #[serde(default)]
+        bag_slot: Option<usize>,
     },
     Mount {
         mounted: bool,
@@ -1581,6 +1626,11 @@ pub enum ClientMessage {
     Resurrect,
     ShopOpen {
         npc: String,
+    },
+    BuyStock {
+        npc: String,
+        offer: String,
+        quantity: u32,
     },
     SellBatch {
         npc: String,
@@ -1725,6 +1775,12 @@ pub enum SocialCommand {
     PartyDecline {
         id: String,
     },
+    SummonAccept {
+        id: String,
+    },
+    SummonDecline {
+        id: String,
+    },
     PartyLeave,
     PartyKick {
         id: String,
@@ -1776,6 +1832,7 @@ pub enum PvpCommand {
     DuelCancel,
     ArenaQueue { size: usize },
     ArenaLeave,
+    ArenaTarget { id: String },
     Attack { id: String },
     Refresh,
 }
@@ -1977,7 +2034,7 @@ pub struct Offer {
     pub gear: bool,
     #[serde(default)]
     pub bag: Option<String>,
-    /// An item the offer sells (one per purchase).
+    /// An item the offer sells.
     #[serde(default)]
     pub item: Option<String>,
     /// A mercenary the offer rents: a class name, or "dismiss" to send them all away (see world/mercs.rs).
@@ -2069,6 +2126,9 @@ pub struct Place {
     pub x: f64,
     pub y: f64,
     pub r: f64,
+    /// The larger channeling radius for a hold objective.
+    #[serde(default, rename = "holdRadius")]
+    hold_radius: Option<f64>,
     /// A ward a `hold` objective names: when the hero's own progress reaches `at` seconds, every sleeping enemy
     /// tagged `tag` attacks (world/hold.rs).
     #[serde(default)]
@@ -2079,6 +2139,11 @@ pub struct Place {
     pub chain: String,
     #[serde(default)]
     pub burn: f64,
+}
+impl Place {
+    pub fn hold_radius(&self) -> f64 {
+        self.hold_radius.unwrap_or(self.r)
+    }
 }
 #[derive(Clone, Deserialize)]
 pub struct Wave {
@@ -2755,6 +2820,18 @@ mod tests {
         );
         assert_eq!(xp_to_level(0), 100);
         assert_eq!([1, 2, 5, 10, 98].map(enemy_xp), [50, 55, 70, 95, 535]);
+    }
+
+    #[test]
+    fn xp_level_curve_covers_each_step_and_both_bounds() {
+        let expected = [30, 30, 30, 30, 40, 50, 60, 70, 80, 90, 100, 103, 106, 109, 112, 115, 115];
+        for (level, xp) in (10..=26).zip(expected) {
+            assert_eq!(level_adjusted_xp(100, 20, level), xp, "reward level {level}");
+        }
+        assert_eq!(level_adjusted_xp(25, 20, 10), 8, "round half up");
+        assert_eq!(level_adjusted_xp(1, 20, 10), 1, "keep positive rewards");
+        assert_eq!(level_adjusted_xp(0, 20, 30), 0);
+        assert_eq!(level_adjusted_xp(u32::MAX, 1, u32::MAX), u32::MAX);
     }
 
     #[test]

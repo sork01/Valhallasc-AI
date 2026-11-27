@@ -148,6 +148,7 @@ fn a_licence_grants_its_mount_once_and_is_kept_when_it_would_do_nothing() {
         1,
         ClientMessage::UseItem {
             item: "sabertooth_whistle".into(),
+            bag_slot: None,
         },
     );
     assert!(!owns(&w, "sabertooth"), "below level 95 the whistle waits");
@@ -157,6 +158,7 @@ fn a_licence_grants_its_mount_once_and_is_kept_when_it_would_do_nothing() {
         1,
         ClientMessage::UseItem {
             item: "sabertooth_whistle".into(),
+            bag_slot: None,
         },
     );
     assert!(owns(&w, "sabertooth"));
@@ -165,6 +167,7 @@ fn a_licence_grants_its_mount_once_and_is_kept_when_it_would_do_nothing() {
         1,
         ClientMessage::UseItem {
             item: "sabertooth_whistle".into(),
+            bag_slot: None,
         },
     );
     assert_eq!(

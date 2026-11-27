@@ -111,7 +111,7 @@ After the reset every quest can be accepted and claimed again with its XP, gold,
 
 Checks, with the numbers from the code:
 
-- **Low quests stay worth doing.** A quest pays a tenth of the XP its recommended level needs (`levels.txt`: 100 XP to leave level 1, 32,000 at level 49), and the XP bonus applies to it; gold is raised by the gold bonus. The reward for a given quest is exactly what it was on the first run, never less.
+- **Quest rewards after rebirth.** A standard quest's base reward is a tenth of the XP its recommended level needs. At turn-in, the quest's level relative to yours sets the XP rate. Same-level quests pay 100%, higher-level quests add 3 percentage points per level up to 115%, and lower-level quests lose 10 points per level down to 30%. The rebirth XP bonus applies after that adjustment. The gold bonus applies as before.
 - **Gear cannot be farmed faster than the quests allow.** Each quest pays once per rebirth, and a rebirth needs level 50 again, at least 580,100 XP of play at base rates (about 386,700 with the full +50% bonus). Quest gear is therefore bounded by the time of a full climb, no faster than the first time and slower than farming kills.
 - **The drop multiplier does not touch quests** (above), and the bag-space check in the claim path still refuses a reward the bags cannot hold.
 

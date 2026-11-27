@@ -2,6 +2,7 @@
 const assert = require('node:assert/strict');
 const { TestWorld } = require('../scripts/testing/driver.cjs');
 const { route } = require('../scripts/testing/route.cjs');
+const kit = require('../scripts/testing/tools.cjs');
 const fs = require('node:fs');
 const map = JSON.parse(fs.readFileSync(require('node:path').join(__dirname, '../world/map.txt'))).zones[3];
 const distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
@@ -15,12 +16,14 @@ const mercs = () => (w.snapshot?.players || []).filter(p => p.look.name.startsWi
 (async () => {
   w.startLevel = 20; w.levelSpread = 0;
   await w.start(); await w.connect({ bot: 'hirer', class: 'warrior' });
+  // Use an outdoor quest contract while exercising outdoor pathfinding.
+  await w.debug('hirer', { op: 'quest', id: 'fen_hydra', action: 'finish' });
+  await kit.teleport(w, 'hirer', { npc: 'fen_reeve' });
+  await kit.talkTo(w, 'hirer', 'fen_reeve', 'quest:accept:fen_gloomroot');
   await w.debug('hirer', { op: 'set_gold', gold: 10000 });
-  // Beside the Meeting Stone (zones[3] NPC city_meetingstone at 81.2,122.7); interact range is 2.8 tiles.
-  await w.debug('hirer', { op: 'teleport', zone: 4, x: 81.2, y: 123.7 });
   for (const cls of ['mage', 'assassin', 'priest', 'hunter']) {
     await w.advance(600);
-    await w.action('hirer', { type: 'interact', npc: 'city_meetingstone', offer: `merc_${cls}` });
+    await w.action('hirer', { type: 'interact', npc: 'fen_reeve', offer: `merc_${cls}` });
     await w.waitFor(() => mercs().some(p => p.look.class === cls), 5000, `Hire ${cls}`);
   }
   assert.equal(mercs().length, 4);

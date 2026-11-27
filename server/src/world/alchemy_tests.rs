@@ -68,6 +68,36 @@ fn pick(w: &mut World, session: u64, patch: FlowerPatch) {
 }
 
 #[test]
+fn racial_mothkin_pick_speed_uses_night_at_the_start_and_the_actual_channel() {
+    let (mut w, _) = fixture();
+    train(&mut w, 1);
+    w.ensure_flowers(0);
+    let patch = w.flower_patches[&0][0];
+    for (race, hour, time) in [
+        (Race::Human, 20., 1.5),
+        (Race::Mothkin, 19.99, 1.5),
+        (Race::Mothkin, 5., 1.5),
+        (Race::Mothkin, 20., 1.5 / 1.15),
+    ] {
+        w.world_clock.set(Some(hour), true).unwrap();
+        let p = w.players.get_mut(&1).unwrap();
+        p.character.look.race = race;
+        p.picking = None;
+        pick(&mut w, 1, patch);
+        let until = w.players[&1].picking.unwrap().until;
+        assert!((until - w.time - time).abs() < 1e-9, "{race:?} at {hour}");
+    }
+    w.world_clock.set(Some(5.), true).unwrap();
+    let until = w.players[&1].picking.unwrap().until;
+    w.time = until - 0.01;
+    w.update_picking(1);
+    assert_eq!(w.players[&1].character.quantity(MEADOW), 0);
+    w.time = until;
+    w.update_picking(1);
+    assert!(w.players[&1].character.quantity(MEADOW) > 0);
+}
+
+#[test]
 fn alchemy_environment_pools_have_walkable_replacements_and_workshops() {
     let (mut w, _) = fixture();
     assert_eq!(PATCHES.len(), 25);
@@ -213,6 +243,7 @@ fn alchemy_harvest_and_staple_brews_independently_can_award_the_last_point_of_ev
 
         c.alchemy.recipes.insert(recipe.item.clone());
         let brew = Command::Brew {
+            all: false,
             npc: TRAINER.into(),
             recipe: recipe.item.clone(),
         };
@@ -223,7 +254,7 @@ fn alchemy_harvest_and_staple_brews_independently_can_award_the_last_point_of_ev
                     c.add_item(&ids[n as usize % ids.len()], 1);
                 }
             }
-            assert!(workshop_action(&mut c, &brew, 0.999).is_ok());
+            assert!(workshop_action(&mut c, &brew, || 0.999).is_ok());
             assert_eq!(c.alchemy.proficiency.skill, expected);
         }
     }
@@ -238,6 +269,7 @@ fn alchemy_workshop_and_gathering_roll_back_on_failed_save_and_missing_ingredien
         recipe: POTION.into(),
     };
     let brew = Command::Brew {
+        all: false,
         npc: TRAINER.into(),
         recipe: POTION.into(),
     };
@@ -461,4 +493,34 @@ fn alchemy_healing_bonus_belongs_to_the_caster_and_only_benefits_pve_targets() {
     ally.pvp_flag = true;
     w.heal_players(1, &[2], mult);
     assert_eq!(w.players[&2].character.hp, 41.);
+}
+
+#[test]
+fn alchemy_bulk_brews_mixed_flowers_and_rolls_once_per_item_through_the_cap() {
+    let (mut w, token) = fixture();
+    train(&mut w, 1);
+    let recipe = CATALOG.recipe("alchemy_deepbloom_flask").unwrap();
+    let c = &mut w.players.get_mut(&1).unwrap().character;
+    c.alchemy.proficiency.skill = 508;
+    c.alchemy.recipes.insert(recipe.item.clone());
+    let (flowers, count) = &recipe.ingredients[0];
+    assert!(flowers.len() > 1);
+    c.add_item(&flowers[0], count + 1);
+    c.add_item(&flowers[1], count * 2);
+    for (ids, quantity) in &recipe.ingredients[1..] {
+        c.add_item(&ids[0], quantity * 3);
+    }
+    let request: Command = serde_json::from_value(json!({
+        "op":"brew","npc":TRAINER,"recipe":recipe.item,"all":true,
+    })).unwrap();
+    let mut staged = c.clone();
+    let mut rolls = 0;
+    workshop_action(&mut staged, &request, || { rolls += 1; 0. }).unwrap();
+    assert_eq!(rolls, 2, "two brews reach the skill cap and the third gives no skill");
+    assert_eq!(staged.alchemy.proficiency.skill, 510);
+    w.alchemy_command(1, request);
+    let saved = w.store.load(&token).unwrap().unwrap();
+    assert_eq!(saved.quantity(&recipe.item), 3);
+    assert_eq!(saved.quantity(&flowers[0]), 0);
+    assert_eq!(saved.quantity(&flowers[1]), 1);
 }

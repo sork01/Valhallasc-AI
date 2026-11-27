@@ -252,32 +252,26 @@ fn nacre_welcome_uses_real_talks_requires_acceptance_and_claims_once() {
     let before = w.players[&1].character.gold;
     stand(&mut w, "nacre_envoy");
     w.interact(1, "nacre_envoy", Some("quest:claim:nacre_welcome"));
-    assert_eq!(w.players[&1].character.gold, before + def.reward_gold);
+    let reward = w.players[&1].character.quest_gold(def.reward_gold);
+    assert_eq!(w.players[&1].character.gold, before + reward);
     stand(&mut w, "nacre_envoy");
     w.interact(1, "nacre_envoy", Some("quest:claim:nacre_welcome"));
-    assert_eq!(w.players[&1].character.gold, before + def.reward_gold);
+    assert_eq!(w.players[&1].character.gold, before + reward);
     assert!(drain(&mut rx).iter().any(|v| v["type"] == "dialogue"));
 }
 
 #[test]
-fn nacre_meetingstone_hires_for_gold_and_refuses_remote_requests() {
+fn nacre_meetingstone_keeps_its_summon_service_and_cannot_hire() {
     let mut w = world();
     let _rx = join(&mut w, 1, Class::Warrior);
     w.players.get_mut(&1).unwrap().character.gold = 500;
-    let spawn = w.maps[NACRE].spawn;
-    place(&mut w, 1, NACRE, spawn);
+    stand(&mut w, "nacre_stone");
+    let stone = w.maps[NACRE].npcs.iter().find(|n| n.id == "nacre_stone").unwrap();
+    assert_eq!(stone.offers.len(), 1);
+    assert_eq!(stone.offers[0].id, "summon_party");
     w.interact(1, "nacre_stone", Some("merc_priest"));
     assert!(!w.players.values().any(|p| p.merc.is_some()));
     assert_eq!(w.players[&1].character.gold, 500);
-    stand(&mut w, "nacre_stone");
-    w.interact(1, "nacre_stone", Some("merc_priest"));
-    assert_eq!(w.players[&1].character.gold, 250);
-    let m = w.players.values().find(|p| p.merc.is_some()).unwrap();
-    assert_eq!(m.character.zone, NACRE);
-    assert_eq!(m.character.look.class, Class::Priest);
-    stand(&mut w, "nacre_stone");
-    w.interact(1, "nacre_stone", Some("merc_dismiss"));
-    assert!(!w.players.values().any(|p| p.merc.is_some()));
 }
 
 #[test]

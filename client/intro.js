@@ -287,7 +287,7 @@
 
   // ---- the scene -------------------------------------------------------------------------------------------------------------------------
   CS.register('intro', {
-    dur: DUR, captions: LINES, music: 'assets/music_intro.mp3',
+    dur: DUR, captions: LINES, music: 'assets/music_intro.mp3?v=saga-1.15.4',
     narration: LINES.map((_, i) => `assets/intro-narration-${i + 1}.mp3`), noZoom: true, fadeIn: 1.2, fadeOut: 2.2,
     sounds: [[0, 'sea_bed'], [2.5, 'creak'], [9, 'creak'], [12, 'ember'], [19, 'creak'], [28, 'creak'], [46.8, 'chord'], [53, 'creak'], [57, 'thud']],
     shoes: () => false,

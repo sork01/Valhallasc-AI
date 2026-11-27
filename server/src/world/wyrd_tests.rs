@@ -520,7 +520,7 @@ fn every_wyrdwood_monster_has_its_own_stats_attacks_materials_and_rewards() {
         );
         assert!(w.drops.iter().all(|d| d.zone == WYRD));
     }
-    // how each one fights: the crow shoots two feathers and backs away, the weaver three thread bolts, the troll pounds the ground
+    // The crow shoots two feathers, the weaver shoots three thread bolts, and the troll pounds the ground.
     let crow = Slime::ranged("crow").unwrap();
     assert_eq!((crow.shots, crow.range), (2, 11.));
     let weaver = Slime::ranged("weaver").unwrap();
@@ -1440,7 +1440,7 @@ fn reaching_skuldwatch_completes_the_objective_wakes_the_ambushes_on_the_way_and
     let before = (c.gold, c.level, c.xp);
     let (text, _, changed) = quest_action(c, &q, "claim");
     assert!(changed, "{text}");
-    assert_eq!(c.gold, before.0 + q.reward_gold);
+    assert_eq!(c.gold, before.0 + c.quest_gold(q.reward_gold));
     assert!(!quest_action(c, &q, "claim").2);
     assert_eq!(q.npc, "wyrd_loremaster");
 }

@@ -193,18 +193,18 @@ impl World {
             .collect()
     }
     /// The offer this NPC makes that rents or dismisses mercenaries, if `offer_id` is one.
-    pub(super) fn merc_offer(&self, session: u64, npc_id: &str, offer_id: &str) -> Option<String> {
+    pub(super) fn merc_offer(&self, session: u64, npc_id: &str, offer_id: &str) -> Option<Offer> {
         let zone = self.players.get(&session)?.character.zone;
         let npc = self.maps[zone].npcs.iter().find(|n| n.id == npc_id)?;
         npc.offers
             .iter()
-            .find(|o| o.id == offer_id)
-            .and_then(|o| o.merc.clone())
+            .find(|o| o.id == offer_id && o.merc.is_some())
+            .cloned()
     }
 
     /// Handles a mercenary offer from a quest giver: checks the player is at the NPC, runs the hire or dismissal and
     /// answers with the usual dialogue packet carrying the result as its notice.
-    pub(super) fn merc_interact(&mut self, session: u64, npc_id: &str, what: &str) {
+    pub(super) fn merc_interact(&mut self, session: u64, npc_id: &str, offer: &Offer) {
         let Some(p) = self.players.get(&session) else {
             return;
         };
@@ -223,10 +223,10 @@ impl World {
             "Please wait a moment before trying again.".to_owned()
         } else {
             self.players.get_mut(&session).unwrap().service_at = self.time;
-            let result = if what == "dismiss" {
+            let result = if offer.merc.as_deref() == Some("dismiss") {
                 self.dismiss_mercenaries(session)
             } else {
-                self.hire_mercenary(session, what, npc_id)
+                self.hire_mercenary(session, offer, npc_id)
             };
             match result {
                 Ok(text) | Err(text) => text,
@@ -235,7 +235,8 @@ impl World {
         let Some(p) = self.players.get(&session) else {
             return;
         };
-        let _ = p.peer.try_send(json!({"type":"dialogue","npc":npc_json,"notice":notice,"gold":p.character.gold,"level":p.character.level,"mercPrice":merc_price(p.character.level),"quests":p.character.quests,"inventory":p.character.inventory,"equipment":p.character.equipment,"bags":p.character.bags,"bagCapacity":p.character.bag_capacity(),"look":p.character.look}));
+        let repair_multiplier = if self.is_instance(zone) { 4 } else { 1 };
+        let _ = p.peer.try_send(json!({"type":"dialogue","npc":npc_json,"notice":notice,"gold":p.character.gold,"level":p.character.level,"mercPrice":merc_price(p.character.level),"quests":p.character.quests,"abandonedQuests":p.character.abandoned_quests,"inventory":p.character.inventory,"equipment":p.character.equipment,"gearInstances":p.character.gear_instances,"repairQuote":p.character.repair_quote(repair_multiplier),"repairMultiplier":repair_multiplier,"bags":p.character.bags,"bagCapacity":p.character.bag_capacity(),"look":p.character.look}));
         self.save();
     }
 
@@ -262,6 +263,7 @@ impl World {
             name = format!("{name} {}", same + 1);
         }
         let mut character = Character::mercenary(class, level, &name);
+        character.look.race = self.roll_adventurer_race();
         if self.merc_mirror_gear
             && let Some(hirer) = self.players.values().find(|p| p.character.id == owner)
         {
@@ -279,7 +281,7 @@ impl World {
         let mut merc = Player::new(character, tx);
         merc.merc = Some(owner.to_owned());
         merc.merc_quest = contract;
-        merc.merc_raid = raid_contract.then_some(zone);
+        merc.merc_instance = self.is_instance(zone).then_some(zone);
         self.players.insert(merc_session, merc);
         Ok(name)
     }
@@ -287,67 +289,62 @@ impl World {
     fn hire_mercenary(
         &mut self,
         session: u64,
-        class: &str,
+        offer: &Offer,
         npc_id: &str,
     ) -> Result<String, String> {
-        let class = class_named(class).ok_or("There is no such fighter for hire.")?;
+        let class = offer
+            .merc
+            .as_deref()
+            .and_then(class_named)
+            .ok_or("There is no such fighter for hire.")?;
         let p = self.players.get(&session).ok_or("Unknown session.")?;
         let c = &p.character;
-        // A group-quest giver rents fighters for that quest; the Meeting Stone rents them to anyone, for any party of up to five.
-        let seasons = self.seasonal.active();
-        let quest = self
-            .maps
-            .iter()
-            .flat_map(|m| &m.quests)
-            .find(|q| {
-                q.group
-                    && (q.npc == npc_id || crate::seasonal::giver(&q.id, npc_id))
-                    && c.quests.iter().any(|g| g.id == q.id && !g.claimed)
-                    && (crate::seasonal::quest_event(&q.id).is_none()
-                        || crate::seasonal::period(&q.id, &seasons)
-                            == c.seasonal_started.get(&q.id).copied())
-            })
-            .map(|q| {
-                (
-                    q.recommended_players as usize,
-                    q.title.clone(),
-                    q.id.clone(),
-                    q.ready(c.quests.iter().find(|g| g.id == q.id).unwrap()),
-                )
-            });
-        let open = self.maps[c.zone]
-            .npcs
-            .iter()
-            .find(|n| n.id == npc_id)
-            .is_some_and(|n| {
-                n.offers.iter().any(|o| {
-                    o.open && o.merc.as_deref() == Some(class_title(class).to_lowercase().as_str())
+        // The selected offer determines the contract, even when its NPC also gives a group quest.
+        let raid_contract = offer.raid;
+        if (raid_contract || offer.open) && !self.is_instance(c.zone) {
+            return Err("Hire dungeon mercenaries at the Repair Smith inside the dungeon.".into());
+        }
+        if self.instance_cleared(c.zone) {
+            return Err("This instance is already cleared.".into());
+        }
+        let (wanted, title, contract) = if raid_contract {
+            (social::RAID_MAX, "The raid contract".to_owned(), None)
+        } else if offer.open {
+            (social::PARTY_MAX, "The dungeon contract".to_owned(), None)
+        } else {
+            let seasons = self.seasonal.active();
+            let quest = self
+                .maps
+                .iter()
+                .flat_map(|m| &m.quests)
+                .filter(|q| {
+                    q.group
+                        && (q.npc == npc_id || crate::seasonal::giver(&q.id, npc_id))
+                        && (crate::seasonal::quest_event(&q.id).is_none()
+                            || crate::seasonal::period(&q.id, &seasons)
+                                == c.seasonal_started.get(&q.id).copied())
                 })
-            });
-        // The quartermaster at a raid door: hires every free seat of a raid group, no quest asked.
-        let raid_contract = self.maps[c.zone]
-            .npcs
-            .iter()
-            .find(|n| n.id == npc_id)
-            .is_some_and(|n| {
-                n.offers.iter().any(|o| {
-                    o.raid && o.merc.as_deref() == Some(class_title(class).to_lowercase().as_str())
-                })
-            });
-        let (wanted, title, contract) = match quest {
-            Some((_, _, _, true)) => {
+                .find_map(|q| {
+                    c.quests
+                        .iter()
+                        .find(|progress| progress.id == q.id && !progress.claimed)
+                        .map(|progress| (q, progress))
+                });
+            let Some((quest, progress)) = quest else {
+                return Err(
+                    "Take this elite quest first; I hire out fighters for the job itself.".into(),
+                );
+            };
+            if quest.ready(progress) {
                 return Err(
                     "This objective is already complete. Your mercenaries' work is done.".into(),
                 );
             }
-            Some((wanted, title, id, false)) => (wanted, title, Some(id)),
-            None if raid_contract => (social::RAID_MAX, "The raid contract".to_owned(), None),
-            None if open => (social::PARTY_MAX, "The Meeting Stone".to_owned(), None),
-            None => {
-                return Err(
-                    "Take this elite quest first; I hire out fighters for the job itself.".into(),
-                );
-            }
+            (
+                quest.recommended_players as usize,
+                quest.title.clone(),
+                Some(quest.id.clone()),
+            )
         };
         let owner = c.id.clone();
         // A raid contract turns the leader's (or a lone hirer's) group into a raid; a member signs only for a raid.
@@ -436,15 +433,18 @@ impl World {
                                 .is_none_or(|q| q.ready(progress))
                     })
             });
-            // A raid contract's fighters follow their hirer only to the raid: anywhere else they are let go.
-            let left_raid = p
-                .merc_raid
-                .is_some_and(|door| hirer.zone != door && !self.maps[hirer.zone].raid);
-            if left_raid {
+            let out_of_scope = match p.merc_instance {
+                Some(copy) => hirer.zone != copy,
+                None => self.is_instance(hirer.zone),
+            };
+            if out_of_scope {
                 let name = p.character.look.name.clone();
-                let _ = self.players[&owner].peer.try_send(
-                    json!({"type":"system","text":format!("{name} departs: the raid contract ends outside the raid.")}),
-                );
+                let text = if p.merc_instance.is_some() {
+                    format!("{name} departs after you leave the instance.")
+                } else {
+                    format!("{name} departs: outdoor contracts end at the dungeon door.")
+                };
+                let _ = self.players[&owner].peer.try_send(json!({"type":"system","text":text}));
                 self.remove_mercenary(session);
                 continue;
             }
@@ -463,8 +463,11 @@ impl World {
                 self.remove_mercenary(session);
                 continue;
             }
-            // The hirer falling dooms the contract: the fighter fights on, but badly (see `merc_doom`), and is dead within 30 seconds.
-            if self.players[&owner].character.hp <= 0. && self.players[&session].merc_doom.is_none()
+            // Only outdoor hires are doomed by their hirer's death. Instance
+            // contracts survive deaths and wipes until completion or departure.
+            if self.players[&session].merc_instance.is_none()
+                && self.players[&owner].character.hp <= 0.
+                && self.players[&session].merc_doom.is_none()
             {
                 let deadline = self.time + 12. + 18. * self.random();
                 self.players.get_mut(&session).unwrap().merc_doom = Some(deadline);
@@ -782,7 +785,7 @@ impl World {
             }
             let p = &self.players[&session];
             if p.skill_cd.contains_key(&skill.id)
-                || p.character.resource() < skill.cost
+                || p.character.resource() < self.skill_price(session, &skill)
                 || p.dash > 0.
                 || p.stun > 0.
             {
@@ -1130,6 +1133,117 @@ mod follow_tests {
             w.update_player(merc);
         }
         assert!(!w.players.contains_key(&merc), "the fighter died and left");
+    }
+}
+
+#[cfg(test)]
+mod instance_contract_tests {
+    use super::*;
+    use crate::world::wyrd_tests::{calm, join, place, world};
+
+    #[test]
+    fn dungeon_hires_survive_the_hirers_death_in_every_instance_copy() {
+        let mut w = world();
+        calm(&mut w);
+        let _rx = join(&mut w, 1, Class::Warrior);
+        let owner = w.players[&1].character.id.clone();
+        let zones: Vec<_> = w.instances.iter().map(|i| i.zone).collect();
+        assert!(zones.iter().any(|&z| w.maps[z].raid));
+        assert!(zones.iter().any(|&z| w.maps[z].template.is_some()));
+        for zone in zones {
+            let point = w.maps[zone].spawn;
+            place(&mut w, 1, zone, point);
+            w.enter_instance(zone);
+            w.players.get_mut(&1).unwrap().character.hp = 100.;
+            w.place_mercenary(
+                &owner,
+                Class::Priest,
+                w.dungeon_level(zone),
+                zone,
+                point,
+                w.maps[zone].raid,
+                None,
+            )
+            .unwrap();
+            let merc = w.mercenaries_of(&owner)[0];
+            assert_eq!(w.players[&merc].merc_instance, Some(zone));
+
+            w.players.get_mut(&1).unwrap().character.hp = 0.;
+            w.update_mercenaries();
+            assert!(
+                w.players[&merc].merc_doom.is_none(),
+                "copy {zone} doomed its hire"
+            );
+            w.time += 35.;
+            w.update_mercenaries();
+            assert!(
+                w.players[&merc].character.hp > 0.,
+                "copy {zone} killed its hire"
+            );
+            w.players.get_mut(&1).unwrap().character.hp = 100.;
+            w.time += 35.;
+            w.update_mercenaries();
+            assert!(w.players[&merc].merc_doom.is_none());
+            assert_eq!(w.players[&merc].merc_instance, Some(zone));
+            assert!(
+                w.party_mates(&owner)
+                    .contains(&w.players[&merc].character.id)
+            );
+
+            // The same contract still ends when the hirer actually leaves.
+            let outside = w.maps[0].spawn;
+            place(&mut w, 1, 0, outside);
+            w.update_mercenaries();
+            assert!(
+                !w.players.contains_key(&merc),
+                "copy {zone} kept a departed hire"
+            );
+        }
+    }
+
+    #[test]
+    fn dungeon_hires_still_depart_on_final_boss_completion_after_a_death() {
+        let mut w = world();
+        calm(&mut w);
+        let _rx = join(&mut w, 1, Class::Warrior);
+        let owner = w.players[&1].character.id.clone();
+        let zones: Vec<_> = w.instances.iter().map(|i| i.zone).collect();
+        for zone in zones {
+            let point = w.maps[zone].spawn;
+            place(&mut w, 1, zone, point);
+            w.enter_instance(zone);
+            w.players.get_mut(&1).unwrap().character.hp = 100.;
+            w.place_mercenary(
+                &owner,
+                Class::Mage,
+                w.dungeon_level(zone),
+                zone,
+                point,
+                w.maps[zone].raid,
+                None,
+            )
+            .unwrap();
+            let merc = w.mercenaries_of(&owner)[0];
+            w.players.get_mut(&1).unwrap().character.hp = 0.;
+            w.update_mercenaries();
+            w.players.get_mut(&1).unwrap().character.hp = 100.;
+            w.time += 35.;
+            w.update_mercenaries();
+            assert!(
+                w.players[&merc].character.hp > 0.,
+                "copy {zone} lost its hire before completion"
+            );
+            w.instances
+                .iter_mut()
+                .find(|i| i.zone == zone)
+                .unwrap()
+                .cleared = true;
+            w.update_mercenaries();
+            assert!(
+                !w.players.contains_key(&merc),
+                "copy {zone} kept a completed hire"
+            );
+        }
     }
 }
 

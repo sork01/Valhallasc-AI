@@ -896,11 +896,15 @@ fn a_ward_counts_one_second_per_second_inside_the_circle_and_pauses_outside() {
     assert!(told.iter().any(|t| t.contains("begin to hold")), "{told:?}");
     run(&mut w, &mut rx, 40);
     assert_eq!(held(&w), 3);
-    // the edge of the circle counts, a step past it does not
-    place(&mut w, 1, SKY, at(ward.x + ward.r - 0.3, ward.y));
+    // The wider circle counts time on walkable ground beyond the old boundary.
+    let edge = at(ward.x, ward.y + 7.);
+    let mut collision = edge;
+    w.maps[SKY].collide(&mut collision, PLAYER_RADIUS);
+    assert_eq!(collision.distance(edge), 0.);
+    place(&mut w, 1, SKY, edge);
     run(&mut w, &mut rx, 20);
-    assert_eq!(held(&w), 4, "inside by a hair");
-    place(&mut w, 1, SKY, at(ward.x + ward.r + 0.4, ward.y));
+    assert_eq!(held(&w), 4, "the expanded boundary counts");
+    place(&mut w, 1, SKY, at(ward.x, ward.y + 7.4));
     run(&mut w, &mut rx, 200);
     assert_eq!(held(&w), 4, "outside only pauses the count");
     place(&mut w, 1, SKY, at(ward.x, ward.y + 1.));
@@ -1123,9 +1127,9 @@ fn a_held_ward_pays_its_reward_through_the_giver_and_a_hero_cannot_claim_it_earl
     run(&mut w, &mut rx, 1);
     let c = &w.players[&1].character;
     assert!(c.quests[0].claimed && c.quests[0].completions == 1);
-    assert_eq!(c.gold, gold + q.reward_gold);
+    assert_eq!(c.gold, gold + c.quest_gold(q.reward_gold));
     let paid: u32 = (level..c.level).map(xp_to_level).sum::<u32>() + c.xp - xp;
-    assert_eq!(paid, q.reward_xp);
+    assert_eq!(paid, level_adjusted_xp(q.reward_xp, level, q.level));
 }
 
 // ---- the gates and the flight ----------------------------------------------------------------------------------------------------------
@@ -1363,7 +1367,7 @@ fn ward_fight(quest_id: &str, pre: &[&str], level: u32, classes: &[&str], limit:
         }
         // a hero pulled out of the circle by the chase is put back (a player would step back in)
         let c = &mut w.players.get_mut(&1).unwrap().character;
-        if c.point().distance(at(ward.x, ward.y)) > ward.r - 0.5 && c.hp > 0. {
+        if c.point().distance(at(ward.x, ward.y)) > ward.hold_radius() - 0.5 && c.hp > 0. {
             c.x = home.x;
             c.y = home.y;
         }

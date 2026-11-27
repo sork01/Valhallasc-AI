@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Place a Spirit Guide close to every ghost respawn anchor (zone spawn, camps, raid checkpoints).
+"""Place a Spirit Guide close to every ghost respawn anchor (zone outdoor spawns and camps).
 
 Run by sync-world.cjs after zone_shapes.py apply so coordinates match the live geometry.
 Idempotent: replaces existing spirit_guide NPCs in place.
@@ -94,7 +94,7 @@ def main():
     total = 0
     for zi, z in enumerate([world, *world['zones']]):
         z['npcs'] = [n for n in z.get('npcs', []) if n.get('art') != 'spirit_guide']
-        if z.get('name') == 'The Arena':
+        if z.get('name') == 'The Arena' or z.get('copies', 0) > 0 or z.get('raid'):
             continue
         for ai, (_, anchor) in enumerate(anchors_for(z)):
             x, y = place(z, anchor)

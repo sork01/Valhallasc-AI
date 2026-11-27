@@ -14,12 +14,14 @@ fn hire_nine(w: &mut World) {
     let c = &mut w.players.get_mut(&1).unwrap().character;
     c.level = 99;
     c.gold = 2_000_000;
-    place(w, 1, ZONE, at(35., 303.));
+    let smith = w.maps[ZONE].npcs.iter().find(|n| n.id == "dungeon_repair_46").unwrap();
+    let point = at(smith.x, smith.y - 1.);
+    place(w, 1, ZONE, point);
     for class in [
         "warrior", "warrior", "mage", "mage", "assassin", "assassin", "priest", "priest", "hunter",
     ] {
         w.time += 1.;
-        w.interact(1, "cf_quartermaster", Some(&format!("merc_{class}")));
+        w.interact(1, "dungeon_repair_46", Some(&format!("merc_{class}")));
     }
 }
 #[test]

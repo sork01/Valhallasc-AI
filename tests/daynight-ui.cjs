@@ -77,7 +77,7 @@ async function call(name, args = {}) {
   await page.evaluate(() => Prefs.set({ night: 0 }));            // the slider check below starts from the state the sample block left
   for (const o of orbs) check(o.worst < 22, `no sun or moon disc at ${o.hour}:00 (pixel difference ${o.worst})`);
 
-  await page.keyboard.press('Escape'); await page.locator('#p-settings').click();
+  await page.keyboard.press('Escape'); await page.locator('#p-settings').click(); await page.locator('#set-tab-video').click();
   check(await page.locator('#set-night').inputValue() === '0', 'the settings panel reads the saved night slider');
   await page.locator('#set-night').fill('50');
   check(await page.locator('#set-night-out').textContent() === '50%' && await page.evaluate(() => JSON.parse(localStorage.getItem('valhallasc.save.v1')).night) === .5, 'the slider saves a reduced tint');

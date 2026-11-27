@@ -67,7 +67,8 @@
     "zones": [
       2,
       3,
-      6
+      6,
+      7
     ]
   },
   {
@@ -80,15 +81,17 @@
         1
       ],
       [
-        "fish_alder_trout",
+        "fish_cloud_minnow",
         5
       ],
       [
-        "mosshide_scrap",
+        "gale_fang",
         1
       ]
     ],
     "zones": [
+      7,
+      13,
       6,
       20,
       22
@@ -104,15 +107,17 @@
         1
       ],
       [
-        "fish_cinder_fry",
+        "fish_star_dace",
         5
       ],
       [
-        "ember_core",
+        "astral_scale",
         1
       ]
     ],
     "zones": [
+      13,
+      14,
       1,
       19,
       22,
@@ -131,15 +136,18 @@
         1
       ],
       [
-        "fish_copper_mackerel",
+        "fish_clockwork_chub",
         5
       ],
       [
-        "glassfin",
+        "gearling_tooth",
         1
       ]
     ],
     "zones": [
+      15,
+      16,
+      17,
       19,
       22,
       25,
@@ -156,18 +164,68 @@
         1
       ],
       [
-        "fish_sand_tilapia",
+        "fish_alder_trout",
         5
       ],
       [
-        "scorpion_glass",
+        "sunback_shell",
         1
       ]
     ],
     "zones": [
+      20,
+      21,
       25,
       26,
       28
+    ]
+  },
+  {
+    "id": "rod:rootbraid",
+    "item": "rod_rootbraid_rod",
+    "cost": 50000,
+    "ingredients": [
+      [
+        "rod_worldwire_rod",
+        1
+      ],
+      [
+        "fish_ribbon_shiner",
+        5
+      ],
+      [
+        "ribbon_tail",
+        1
+      ]
+    ],
+    "zones": [
+      21,
+      23,
+      24
+    ]
+  },
+  {
+    "id": "rod:cairnsteel",
+    "item": "rod_cairnsteel_rod",
+    "cost": 75000,
+    "ingredients": [
+      [
+        "rod_rootbraid_rod",
+        1
+      ],
+      [
+        "fish_heartwood_whitefish",
+        5
+      ],
+      [
+        "hornet_amber",
+        1
+      ]
+    ],
+    "zones": [
+      23,
+      24,
+      27
     ]
   },
   {
@@ -995,6 +1053,531 @@
     "zones": [
       1,
       45
+    ]
+  },
+  {
+    "id": "cook:fish_cloud_minnow",
+    "item": "dish_cloudwater_grill",
+    "cost": 30,
+    "ingredients": [
+      [
+        "fish_cloud_minnow",
+        1
+      ]
+    ],
+    "zones": [
+      7,
+      13
+    ]
+  },
+  {
+    "id": "cook:fish_storm_barb",
+    "item": "dish_cloudwater_grill",
+    "cost": 45,
+    "ingredients": [
+      [
+        "fish_storm_barb",
+        1
+      ]
+    ],
+    "zones": [
+      7,
+      13
+    ]
+  },
+  {
+    "id": "cook:fish_gale_eel",
+    "item": "dish_cloudwater_grill",
+    "cost": 65,
+    "ingredients": [
+      [
+        "fish_gale_eel",
+        1
+      ]
+    ],
+    "zones": [
+      7,
+      13
+    ]
+  },
+  {
+    "id": "cook:fish_thundercrest_ray",
+    "item": "dish_cloudwater_grill",
+    "cost": 100,
+    "ingredients": [
+      [
+        "fish_thundercrest_ray",
+        1
+      ]
+    ],
+    "zones": [
+      7,
+      13
+    ]
+  },
+  {
+    "id": "cook:fish_star_dace",
+    "item": "dish_cloudwater_grill",
+    "cost": 30,
+    "ingredients": [
+      [
+        "fish_star_dace",
+        1
+      ]
+    ],
+    "zones": [
+      7,
+      13
+    ]
+  },
+  {
+    "id": "cook:fish_comet_perch",
+    "item": "dish_cloudwater_grill",
+    "cost": 45,
+    "ingredients": [
+      [
+        "fish_comet_perch",
+        1
+      ]
+    ],
+    "zones": [
+      7,
+      13
+    ]
+  },
+  {
+    "id": "cook:fish_nebula_gar",
+    "item": "dish_cloudwater_grill",
+    "cost": 65,
+    "ingredients": [
+      [
+        "fish_nebula_gar",
+        1
+      ]
+    ],
+    "zones": [
+      7,
+      13
+    ]
+  },
+  {
+    "id": "cook:fish_prism_gudgeon",
+    "item": "dish_glasswater_grill",
+    "cost": 30,
+    "ingredients": [
+      [
+        "fish_prism_gudgeon",
+        1
+      ]
+    ],
+    "zones": [
+      14,
+      15
+    ]
+  },
+  {
+    "id": "cook:fish_glass_spindlefish",
+    "item": "dish_glasswater_grill",
+    "cost": 45,
+    "ingredients": [
+      [
+        "fish_glass_spindlefish",
+        1
+      ]
+    ],
+    "zones": [
+      14,
+      15
+    ]
+  },
+  {
+    "id": "cook:fish_suncut_carp",
+    "item": "dish_glasswater_grill",
+    "cost": 65,
+    "ingredients": [
+      [
+        "fish_suncut_carp",
+        1
+      ]
+    ],
+    "zones": [
+      14,
+      15
+    ]
+  },
+  {
+    "id": "cook:fish_prismatic_mirrorfish",
+    "item": "dish_glasswater_grill",
+    "cost": 100,
+    "ingredients": [
+      [
+        "fish_prismatic_mirrorfish",
+        1
+      ]
+    ],
+    "zones": [
+      14,
+      15
+    ]
+  },
+  {
+    "id": "cook:fish_clockwork_chub",
+    "item": "dish_glasswater_grill",
+    "cost": 30,
+    "ingredients": [
+      [
+        "fish_clockwork_chub",
+        1
+      ]
+    ],
+    "zones": [
+      14,
+      15
+    ]
+  },
+  {
+    "id": "cook:fish_obsidian_bream",
+    "item": "dish_glasswater_grill",
+    "cost": 45,
+    "ingredients": [
+      [
+        "fish_obsidian_bream",
+        1
+      ]
+    ],
+    "zones": [
+      14,
+      15
+    ]
+  },
+  {
+    "id": "cook:fish_orrery_sturgeon",
+    "item": "dish_glasswater_grill",
+    "cost": 65,
+    "ingredients": [
+      [
+        "fish_orrery_sturgeon",
+        1
+      ]
+    ],
+    "zones": [
+      14,
+      15
+    ]
+  },
+  {
+    "id": "cook:fish_spore_rasbora",
+    "item": "dish_moonwater_grill",
+    "cost": 30,
+    "ingredients": [
+      [
+        "fish_spore_rasbora",
+        1
+      ]
+    ],
+    "zones": [
+      16,
+      17
+    ]
+  },
+  {
+    "id": "cook:fish_veil_catfish",
+    "item": "dish_moonwater_grill",
+    "cost": 45,
+    "ingredients": [
+      [
+        "fish_veil_catfish",
+        1
+      ]
+    ],
+    "zones": [
+      16,
+      17
+    ]
+  },
+  {
+    "id": "cook:fish_dreamfin_pike",
+    "item": "dish_moonwater_grill",
+    "cost": 65,
+    "ingredients": [
+      [
+        "fish_dreamfin_pike",
+        1
+      ]
+    ],
+    "zones": [
+      16,
+      17
+    ]
+  },
+  {
+    "id": "cook:fish_moonwake_dragonfish",
+    "item": "dish_moonwater_grill",
+    "cost": 100,
+    "ingredients": [
+      [
+        "fish_moonwake_dragonfish",
+        1
+      ]
+    ],
+    "zones": [
+      16,
+      17
+    ]
+  },
+  {
+    "id": "cook:fish_crescent_bleak",
+    "item": "dish_moonwater_grill",
+    "cost": 30,
+    "ingredients": [
+      [
+        "fish_crescent_bleak",
+        1
+      ]
+    ],
+    "zones": [
+      16,
+      17
+    ]
+  },
+  {
+    "id": "cook:fish_silver_crescent_eel",
+    "item": "dish_moonwater_grill",
+    "cost": 45,
+    "ingredients": [
+      [
+        "fish_silver_crescent_eel",
+        1
+      ]
+    ],
+    "zones": [
+      16,
+      17
+    ]
+  },
+  {
+    "id": "cook:fish_ringwater_koi",
+    "item": "dish_moonwater_grill",
+    "cost": 65,
+    "ingredients": [
+      [
+        "fish_ringwater_koi",
+        1
+      ]
+    ],
+    "zones": [
+      16,
+      17
+    ]
+  },
+  {
+    "id": "cook:fish_ribbon_shiner",
+    "item": "dish_greenwater_grill",
+    "cost": 30,
+    "ingredients": [
+      [
+        "fish_ribbon_shiner",
+        1
+      ]
+    ],
+    "zones": [
+      21,
+      23
+    ]
+  },
+  {
+    "id": "cook:fish_jubilee_guppy",
+    "item": "dish_greenwater_grill",
+    "cost": 45,
+    "ingredients": [
+      [
+        "fish_jubilee_guppy",
+        1
+      ]
+    ],
+    "zones": [
+      21,
+      23
+    ]
+  },
+  {
+    "id": "cook:fish_parade_gourami",
+    "item": "dish_greenwater_grill",
+    "cost": 65,
+    "ingredients": [
+      [
+        "fish_parade_gourami",
+        1
+      ]
+    ],
+    "zones": [
+      21,
+      23
+    ]
+  },
+  {
+    "id": "cook:fish_festival_crownfin",
+    "item": "dish_greenwater_grill",
+    "cost": 100,
+    "ingredients": [
+      [
+        "fish_festival_crownfin",
+        1
+      ]
+    ],
+    "zones": [
+      21,
+      23
+    ]
+  },
+  {
+    "id": "cook:fish_rootfoot_dace",
+    "item": "dish_greenwater_grill",
+    "cost": 30,
+    "ingredients": [
+      [
+        "fish_rootfoot_dace",
+        1
+      ]
+    ],
+    "zones": [
+      21,
+      23
+    ]
+  },
+  {
+    "id": "cook:fish_nectar_perch",
+    "item": "dish_greenwater_grill",
+    "cost": 45,
+    "ingredients": [
+      [
+        "fish_nectar_perch",
+        1
+      ]
+    ],
+    "zones": [
+      21,
+      23
+    ]
+  },
+  {
+    "id": "cook:fish_canopy_lungfish",
+    "item": "dish_greenwater_grill",
+    "cost": 65,
+    "ingredients": [
+      [
+        "fish_canopy_lungfish",
+        1
+      ]
+    ],
+    "zones": [
+      21,
+      23
+    ]
+  },
+  {
+    "id": "cook:fish_heartwood_whitefish",
+    "item": "dish_deep_springs_grill",
+    "cost": 30,
+    "ingredients": [
+      [
+        "fish_heartwood_whitefish",
+        1
+      ]
+    ],
+    "zones": [
+      24,
+      27
+    ]
+  },
+  {
+    "id": "cook:fish_pithscale_char",
+    "item": "dish_deep_springs_grill",
+    "cost": 45,
+    "ingredients": [
+      [
+        "fish_pithscale_char",
+        1
+      ]
+    ],
+    "zones": [
+      24,
+      27
+    ]
+  },
+  {
+    "id": "cook:fish_amberroot_gar",
+    "item": "dish_deep_springs_grill",
+    "cost": 65,
+    "ingredients": [
+      [
+        "fish_amberroot_gar",
+        1
+      ]
+    ],
+    "zones": [
+      24,
+      27
+    ]
+  },
+  {
+    "id": "cook:fish_mountainheart_paddlefish",
+    "item": "dish_deep_springs_grill",
+    "cost": 100,
+    "ingredients": [
+      [
+        "fish_mountainheart_paddlefish",
+        1
+      ]
+    ],
+    "zones": [
+      24,
+      27
+    ]
+  },
+  {
+    "id": "cook:fish_cairn_minnow",
+    "item": "dish_deep_springs_grill",
+    "cost": 30,
+    "ingredients": [
+      [
+        "fish_cairn_minnow",
+        1
+      ]
+    ],
+    "zones": [
+      24,
+      27
+    ]
+  },
+  {
+    "id": "cook:fish_tarn_grayling",
+    "item": "dish_deep_springs_grill",
+    "cost": 45,
+    "ingredients": [
+      [
+        "fish_tarn_grayling",
+        1
+      ]
+    ],
+    "zones": [
+      24,
+      27
+    ]
+  },
+  {
+    "id": "cook:fish_graniteback_sturgeon",
+    "item": "dish_deep_springs_grill",
+    "cost": 65,
+    "ingredients": [
+      [
+        "fish_graniteback_sturgeon",
+        1
+      ]
+    ],
+    "zones": [
+      24,
+      27
     ]
   }
 ]

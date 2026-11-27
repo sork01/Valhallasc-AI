@@ -1,3 +1,4 @@
+const soundtrack = require('./lib/soundtrack.cjs');
 const { playGuest } = require('./lib/guest.cjs');
 // RAID-MUSIC only. Real private travel/audio; future Eldmarr snapshots are replayed
 // at the WebSocket boundary because RAID-BOSS-FINAL has not built the boss yet.
@@ -104,13 +105,13 @@ const call = async (name, args = {}) => {
   await travel(46, 35, 303); await selected(false);
   check(await page.evaluate(() => Field.slimes.some(s => s.kind === 'cf_eldmarr' && !s.dead)), 'Dormant final boss is present in the replay');
   check(await page.evaluate(() => !valhalla.eldmarrMusic.running), 'Proximity to the dormant final boss keeps the dungeon score');
-  check(await page.evaluate(() => Math.abs(valhalla.raidMusic.duration - 64 * 4 * 60 / 152) < .04), 'Forge loop decodes at 152 BPM / 64 bars');
+  check(await page.evaluate(seconds => Math.abs(valhalla.raidMusic.duration - seconds) < .04, soundtrack('chained_forge')), 'Forge replacement decodes at its musical loop length');
   check(await audible('raidMusic') > .0001, 'Forge score produces actual audio');
   check(await page.evaluate(() => DayNight.nightMix === 0 && !valhalla.nightMusic.running && !valhalla.emberwakeNightMusic.running), 'The indoor raid keeps its score at night');
   fixture = 'warden'; await page.waitForFunction(() => BossMech.active); await selected(false);
   check(await page.evaluate(() => !valhalla.eldmarrMusic.running), 'An ordinary Warden fight keeps the dungeon score');
   fixture = 'engaged'; await selected(true);
-  check(await page.evaluate(() => Math.abs(valhalla.eldmarrMusic.duration - 96) < .04), 'Eldmarr loop decodes at 160 BPM / 64 bars');
+  check(await page.evaluate(seconds => Math.abs(valhalla.eldmarrMusic.duration - seconds) < .04, soundtrack('eldmarr')), 'Remade Eldmarr loop decodes at its pinned musical length');
   check(await audible('eldmarrMusic') > .0001, 'Final-boss score produces actual audio');
   fixture = 'fallen'; await page.waitForFunction(() => !!Field.hero.fallen); await selected(true);
   check(await page.evaluate(() => valhalla.eldmarrMusic.running), 'A fallen fighter keeps hearing the ongoing boss fight');

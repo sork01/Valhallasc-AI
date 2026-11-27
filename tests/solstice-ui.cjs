@@ -42,7 +42,7 @@ const check=(v,s)=>{assert.ok(v,s);console.log(++checks+': '+s);};
   await npc(q.npc);const gold=await p.evaluate(()=>__self().gold);await interact(q.npc,'quest:accept:'+q.id);await wait(id=>__self().quests.some(q=>q.id===id&&!q.claimed),q.id);
   for(const o of q.objectives){if(o.kind==='talk'){await npc(o.target);await interact(o.target);}else{const place=a.places.find(v=>v.id===o.target);await stand(z,place.x,place.y);}}
   await wait(id=>__self().quests.find(q=>q.id===id).counts.every(n=>n>=1),q.id);await npc(q.npc);await interact(q.npc,'quest:claim:'+q.id);await wait(id=>__self().seasonalClaims[id]===2027,q.id);
-  check(await p.evaluate(([g,r])=>__self().gold===g+r,[gold,q.rewardGold]),`${name}: real talk/visit objectives pay the exact annual reward`);
+  check(await p.evaluate(([g,r])=>__self().gold===g+r,[gold,Math.floor((q.rewardGold * 105 + 50) / 100)]),`${name}: real talk/visit objectives pay the exact annual reward`);
   await interact(q.npc,'quest:accept:'+q.id);check(await p.evaluate(([id,host])=>!Quests.offered(host).some(q=>q.id===id),[q.id,q.npc]),`${name}: annual errand cannot pay twice`);
   const pole=a.npcs.find(n=>n.id==='festival_dance_solstice_'+z&&n.festivalArt==='solsticePole');await stand(z,pole.x+2,pole.y+2);
   check(await p.evaluate(([px,py])=>((zone,px,py)=>{const n=[WORLD_MAP,...WORLD_MAP.zones][zone].npcs.find(n=>n.id==='festival_dance_solstice_'+zone);return !!n&&n.festivalArt==='solsticePole'&&n.x===px&&n.y===py&&Math.hypot(Field.hero.nx-px,Field.hero.ny-py)<4;})(Field.zone,px,py),[pole.x,pole.y]),`${name}: the real Midsummer Pole dance centrepiece stands in the city with the hero beside it`);

@@ -1,11 +1,12 @@
 //! Saved profession state and the shared client/server recipe catalog.
 use crate::items::{is_boss, is_elite};
 use crate::model::{Map, Point};
-use crate::profession::{SKILL_BAND, Skill};
+use crate::profession::{self, SKILL_BAND, Skill};
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeSet;
 use std::sync::LazyLock;
 
+pub const MAX_SKILL: u16 = profession::MAX_SKILL;
 pub const WORKSHOP: &str = "blacksmithing_workshop";
 pub const TRAINER: &str = "smith";
 pub const STARTER_PICK: &str = "smith_pick_1";
@@ -27,7 +28,12 @@ impl Progress {
 pub enum Command {
     Train { npc: String },
     Learn { npc: String, recipe: String },
-    Craft { npc: String, recipe: String },
+    Craft {
+        npc: String,
+        recipe: String,
+        #[serde(default)]
+        all: bool,
+    },
     Study { plan: String },
 }
 
@@ -51,6 +57,7 @@ pub struct Recipe {
     pub cost: u32,
     pub ingredients: Vec<(String, u32)>,
     pub plan: Option<String>,
+    pub drop_zone: Option<usize>,
 }
 
 pub fn training_cap(tier: usize) -> u16 {
@@ -64,9 +71,14 @@ pub struct Tier {
 }
 
 #[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Pick {
     pub item: String,
     pub reaches: usize,
+    #[serde(default)]
+    pub expert_cap: u16,
+    #[serde(default)]
+    pub bonus_ore: u32,
 }
 
 #[derive(Deserialize)]
@@ -75,7 +87,14 @@ pub struct Catalog {
     pub tiers: Vec<Tier>,
     pub picks: Vec<Pick>,
     pub recipes: Vec<Recipe>,
+    pub training_zones: Vec<Vec<usize>>,
     epic_bosses: Vec<String>,
+}
+
+pub(crate) struct TrainingBand<'a> {
+    pub tier: usize,
+    pub zones: &'a [usize],
+    pub cap: u16,
 }
 
 impl Catalog {
@@ -89,10 +108,42 @@ impl Catalog {
         self.recipes.iter().find(|recipe| recipe.item == id)
     }
 
+    pub(crate) fn training(&self, skill: u16) -> Option<TrainingBand<'_>> {
+        if !(1..MAX_SKILL).contains(&skill) {
+            return None;
+        }
+        let band = usize::from(skill / SKILL_BAND);
+        let zones = self.training_zones.get(band)?;
+        let tier = self.tier(*zones.first()?)?;
+        Some(TrainingBand {
+            tier,
+            zones,
+            cap: training_cap(band),
+        })
+    }
+
+    pub(crate) fn forging_cap(&self, skill: u16, tier: usize) -> u16 {
+        let mut cap = skill;
+        // Forge All can continue through consecutive bands using the same ore.
+        while let Some(band) = self.training(cap) {
+            if band.tier != tier {
+                break;
+            }
+            cap = band.cap;
+        }
+        cap
+    }
+
     pub fn plan(&self, id: &str) -> Option<&Recipe> {
         self.recipes
             .iter()
             .find(|recipe| recipe.plan.as_deref() == Some(id))
+    }
+
+    pub(crate) fn expert_pick(&self, cap: u16) -> Option<&Pick> {
+        (cap > training_cap(self.tiers.len() - 1))
+            .then(|| self.picks.iter().find(|pick| pick.expert_cap >= cap))
+            .flatten()
     }
 
     /// Rare plans use the outdoor region's ore tier and its normal level range.
@@ -106,39 +157,41 @@ impl Catalog {
         rolls: (f64, f64),
     ) -> Option<&str> {
         let (chance, choice) = rolls;
-        if map.final_boss == kind && level == 99 && self.epic_bosses.iter().any(|boss| boss == kind)
+        let eligible = if map.final_boss == kind
+            && level == 99
+            && self.epic_bosses.iter().any(|boss| boss == kind)
         {
             if chance >= 0.20 {
                 return None;
             }
-            let pool: Vec<_> = self
-                .recipes
-                .iter()
-                .filter(|r| r.method == Method::Epic)
-                .collect();
-            return pool
-                .get((choice * pool.len() as f64) as usize)?
-                .plan
-                .as_deref();
-        }
-        let tier = self.tier(zone)?;
-        let [min, max] = map.levels.unwrap_or([1, 5]);
-        if level < min.saturating_sub(2)
-            || level > max + 2
-            || chance
-                >= if is_elite(kind) || is_boss(kind) {
-                    0.045
-                } else {
-                    0.015
-                }
-        {
-            return None;
-        }
-        self.recipes
+            (Method::Epic, None)
+        } else {
+            let tier = self.tier(zone)?;
+            let [min, max] = map.levels.unwrap_or([1, 5]);
+            let rate = if is_elite(kind) || is_boss(kind) {
+                0.045
+            } else {
+                0.015
+            };
+            if level < min.saturating_sub(2) || level > max + 2 || chance >= rate {
+                return None;
+            }
+            (Method::Rare, Some(tier))
+        };
+        let (method, tier) = eligible;
+        let pool: Vec<_> = self
+            .recipes
             .iter()
-            .find(|r| r.method == Method::Rare && r.tier == tier)?
-            .plan
-            .as_deref()
+            .filter(|recipe| {
+                recipe.method == method
+                    && recipe.drop_zone.map_or_else(
+                        || tier.is_none_or(|tier| recipe.tier == tier),
+                        |source| source == zone,
+                    )
+            })
+            .filter_map(|recipe| recipe.plan.as_deref())
+            .collect();
+        pool.get((choice * pool.len() as f64) as usize).copied()
     }
 }
 

@@ -44,6 +44,20 @@
   const equippedCount = i => !i ? 0 : Object.values(gearSlots).filter(id => id === i.id).length + Number(legacyPiece(i.kind, look)?.id === i.id);
   const bagQuantity = id => Math.max(0, quantity(id) - equippedCount(definition(id)));
   const professionKind = i => ({mining_pick:'Mining pick', smith_blueprint:'Blacksmithing blueprint', alchemy_formula:'Alchemy formula'})[i.kind];
+  function recipeKnown(i) {
+    const learned = Field.hero?.learnedRecipes;
+    if (!learned) return false;
+    if (i.kind === 'enchant_recipe') return window.Enchanting?.recipeKnown?.(i, learned.enchanting);
+    if (i.kind === 'smith_blueprint') {
+      const recipe = window.BLACKSMITHING_DATA?.recipes.find(row => row.plan === i.id);
+      return learned.blacksmithing?.includes(recipe?.item);
+    }
+    if (i.kind === 'alchemy_formula') {
+      const recipe = window.ALCHEMY_DATA?.recipes.find(row => row.formula === i.id);
+      return learned.alchemy?.includes(recipe?.item);
+    }
+    return false;
+  }
   const licence = i => i?.kind === 'mount_licence';
   const spare = s => licence(definition(s.item)) ? 0 : bagQuantity(s.item);
   const consumable = i => i && ['food', 'potion', 'fish', 'alchemy_flask'].includes(i.kind);
@@ -57,7 +71,9 @@
   };
   const rodDetails = i => {
     const tier = i.fishing?.tier || 1;
-    const unlock = ({1:'Ordinary Greenmeadow, Rimeveil and Gloamfen waters',2:'Crags lava',3:'Wyrdwood and rich Rimeveil/Gloamfen spots',4:'Sunward, Tanglecrown and rare water fish',5:'Stormglass and Lapis Erg',6:'Emberwake lava',7:'Frostwake',8:'Yearwheel and all water legendary fish'})[tier];
+    const unlock = ({1:'Ordinary Greenmeadow, Rimeveil and Gloamfen waters',2:'Crags lava',3:'Wyrdwood and rich Rimeveil/Gloamfen spots',4:'Sunward, Tanglecrown and rare water fish',5:'Stormglass and Lapis Erg',6:'Emberwake lava, Bifrost Reach, Astralhollow, Prismwaste and the Orrery',
+      7:'Frostwake, Moonspore Canopy and Asterion',8:'Yearwheel and the Ribbonwild',
+      9:'Veyrroot Canopy and Heartwood',10:'The Cairnspine'})[tier];
     return [tr(i.fishing?.lava ? 'For water and lava fishing' : 'For water fishing'), tr('Fishing tier {0} · Requires level {1}').replace('{0}',tier).replace('{1}',levelOf(i)), tr('{0}% shorter waits · +{1}% rare catch bonus').replace('{0}',(tier-1)*6).replace('{1}',(tier-1)*10), tr('Unlocks: {0}').replace('{0}',tr(unlock)), tr('Keeps every earlier fishing unlock. Upgrading consumes the previous rod.')];
   };
   const effect = i => {
@@ -79,10 +95,18 @@
     }
   }
   const useItem = i => (consumable(i) || licence(i)) && canEquip() && bagQuantity(i.id) > 0 && Field.useItem(i.id);
+  const equipBag = (i, slot) => canEquip() && !tooLow(i) && bagQuantity(i.id) > 0 && Field.useItem(i.id, slot);
   // The server wears the first loose copy of an item: name the one in the chosen cell first (ordered messages, so it lands before the equip).
   const preferCopy = key => { const id = key == null ? null : cellCopyId(key); if (id != null && canEquip()) Online.send({ type: 'prefer_copy', copy: id }); };
   const activate = (i, key) => {
+    if (window.Enchanting?.selectingDisenchant?.()) return;
     if (window.Enchanting?.isScroll(i)) return window.Enchanting.open(i.id);
+    if (i.kind === 'bag') {
+      if (bags.length < 4) return equipBag(i);
+      selected = key;
+      renderDetails();
+      return;
+    }
     return consumable(i) || licence(i) ? useItem(i) : equip(i, undefined, key);
   };
   const num = n => Number(n.toFixed(1));
@@ -228,60 +252,88 @@
   function tooltip() {
     let t = $('item-tooltip'); if (!t) { t = node('div', '', 'item-tooltip'); t.id = 'item-tooltip'; t.role = 'tooltip'; t.hidden = true; document.body.append(t); } return t;
   }
-  function hideTooltip() { if ($('item-tooltip')) $('item-tooltip').hidden = true; }
-  // `where` is set for the bank window: the item's copies and count there replace the bag lookups and the sale line.
+  let tooltipAnchor = null;
+  function hideTooltip() {
+    tooltipAnchor?.removeAttribute('aria-describedby');
+    tooltipAnchor = null;
+    if ($('item-tooltip')) $('item-tooltip').hidden = true;
+  }
+  function compareEquipment(i, copy) {
+    const slot = equipTarget(i), current = itemAtSlot(slot);
+    const worn = current && wornCopy(slot, current);
+    const table = node('table', '', 'item-comparison');
+    const head = table.createTHead().insertRow();
+    const labels = ['Stat', 'This item', 'Equipped'];
+    for (const label of labels) {
+      const heading = node('th', label); heading.scope = 'col'; head.append(heading);
+    }
+    const body = table.createTBody(), names = body.insertRow();
+    names.insertCell().append(node('small', slots.find(([key]) => key === slot)[1]));
+    const heldName = names.insertCell();
+    if (conditionState(copy) === 'broken') heldName.append(node('small', 'Broken'));
+    const wornName = names.insertCell(); wornName.append(node('strong', current?.name || 'Empty slot'));
+    if (conditionState(worn) === 'broken') wornName.append(node('small', 'Broken'));
+    const candidateStats = comparisonStats(i, copy), wornStats = comparisonStats(current, worn);
+    const entries = [['attack', 'Attack'], ['defense', 'Defense'], ['strength', 'Strength'], ['agility', 'Agility'],
+      ['intellect', 'Intellect'], ['stamina', 'Stamina'], ['dexterity', 'Dexterity'], ['accuracy', 'Accuracy']];
+    for (const [stat, label] of entries) {
+      const value = piece => num(piece[stat] ?? piece.bonusStats?.[stat] ?? 0);
+      const candidate = value(candidateStats), equipped = value(wornStats);
+      if (!candidate && !equipped) continue;
+      const delta = num(candidate - equipped), row = body.insertRow();
+      const name = node('th', label); name.scope = 'row'; row.append(name);
+      const change = node('span', `(${delta > 0 ? '+' : ''}${delta})`, delta > 0 ? 'stat-gain' : delta < 0 ? 'stat-loss' : 'stat-unchanged');
+      row.dataset.stat = stat;
+      row.insertCell().append(String(candidate), ' ', change);
+      row.insertCell().textContent = equipped;
+    }
+    if (copy?.enchant || worn?.enchant) {
+      const row = body.insertRow();
+      const heading = node('th', 'Enchantment'); heading.scope = 'row'; row.append(heading);
+      const left = row.insertCell(), right = row.insertCell();
+      if (!window.Enchanting?.tooltip(left, i, copy)) left.textContent = '—';
+      if (!current || !window.Enchanting?.tooltip(right, current, worn)) right.textContent = '—';
+    }
+    return table;
+  }
+  // External items use the supplied copy and context for the tooltip footer.
   function showTooltip(anchor, i, slot, where, cellCopy) {
     if (!i) return;
-    const copy = where ? where.copies[0] : cellCopy || displayCopy(i, slot), rarity = where ? bestRarity(i, where.copies) : cellCopy?.rarity || displayRarity(i, slot);
+    const copy = cellCopy !== undefined ? cellCopy : where ? where.copies[0] : displayCopy(i, slot);
+    const rarity = cellCopy !== undefined ? copy?.rarity || i.rarity : where ? bestRarity(i, where.copies) : displayRarity(i, slot);
+    const compare = !slot && gearItem(i);
+    const roll = where?.roll;
     const t = tooltip(); t.replaceChildren(node('b', i.name, 'item-name'), node('small', `${rarityName({rarity})} · ${i.class || professionKind(i) || (i.kind === 'rod' ? 'Fishing rod' : i.kind === 'fish' ? 'Fish' : i.kind === 'material' ? 'Material' : consumable(i) ? 'Consumable' : licence(i) ? 'Mount licence' : 'All classes')}`)); t.dataset.rarity = rarity;
-    const appearance = window.Transmog?.description(slot ? transmogs[slot] : appearanceForItem(i));
+    t.classList.toggle('item-tooltip-comparing', compare);
+    const appearance = !roll && window.Transmog?.description(slot ? transmogs[slot] : appearanceForItem(i));
     if (appearance) t.append(node('p', appearance, 'transmog-note'));
     const scroll = window.Enchanting?.isScroll(i);
-    window.Enchanting?.tooltip(t, i, (where || slot || cellCopy) ? copy : undefined);
+    if (!compare) window.Enchanting?.tooltip(t, i, (where || slot || cellCopy) ? copy : undefined);
+    if (recipeKnown(i)) t.append(node('p', 'Already learned', 'item-restriction'));
     if (i.kind === 'rod') t.append(...rodDetails(i).map(text => node('p', text)));
     else if (consumable(i)) t.append(node('p', effect(i)));
     else if (licence(i)) t.append(node('p', `Grants the ${i.mount} mount · bound to you, cannot be traded or sold · needs level ${i.requiredLevel}`));
     else if (i.kind === 'bag') t.append(node('p', `${i.bagSlots} extra slots · Requires level ${levelOf(i)}`));
     else if (i.kind === 'mining_pick') t.append(node('p', window.Blacksmithing?.pickDetails(i) || ''));
-    else if (i.kind !== 'material' && !scroll && !professionKind(i)) t.append(node('p', `${slot ? slots.find(s => s[0] === slot)?.[1] : i.kind === 'armor' ? 'Chest' : i.kind === 'weapon' ? 'Hands' : i.kind} · ${stats(copy ? copyStats(copy) : i)}`));
+    else if (compare) t.append(compareEquipment(i, copy));
+    else if (i.kind !== 'material' && !scroll && !professionKind(i)) t.append(node('p', `${slot ? slots.find(s => s[0] === slot)?.[1] : i.kind} · ${stats(copy ? copyStats(copy) : i)}`));
     if (i.class && i.class !== look?.class) t.append(node('p', `Requires ${i.class}`, 'item-restriction'));
     if ((compatible(i) || i.kind === 'rod') && levelOf(i) > 1) t.append(node('p', levelNote(i), tooLow(i) ? 'item-restriction' : 'item-level'));
     if (i.rarity === 'hierloom') t.append(node('p', '+100% XP while equipped'), node('p', 'Stats grow with your level'), node('p', 'Never loses durability'));
     if (setEntry(i)) t.append(...setLines(i.source));
     const weaponFeature = window.RaidRewards?.tooltip(i);
     if (weaponFeature) t.append(node('p', weaponFeature, 'weapon-feature'));
-    if (compatible(i) && !slot) {
-      const target = equipTarget(i), current = target && itemAtSlot(target);
-      if (target && current?.id !== i.id) {
-        const candidate = comparisonStats(i, copy), worn = comparisonStats(current, current && wornCopy(target, current));
-        const changes = ['attack', 'defense', ...statNames].map(stat => ({ stat, delta: num(
-          statNames.includes(stat) ? (candidate.bonusStats?.[stat] || 0) - (worn.bonusStats?.[stat] || 0) : (candidate[stat] || 0) - (worn[stat] || 0)
-        ) })).filter(({ stat, delta }) => delta || stat === 'attack' || stat === 'defense');
-        const line = node('p', '', 'item-comparison');
-        line.append(node('span', `Compared with ${current?.name || 'Empty slot'}:`), ' ');
-        changes.forEach(({ stat, delta }, index) => {
-          if (index) line.append(' · ');
-          const signed = `${delta >= 0 ? '+' : ''}${delta}`;
-          const text = { attack: `${signed} attack`, defense: `${signed} defense`, strength: `${signed} strength`, agility: `${signed} agility`,
-            intellect: `${signed} intellect`, stamina: `${signed} stamina`, dexterity: `${signed} dexterity`, accuracy: `${signed} accuracy` }[stat];
-          const change = node('span', text, delta > 0 ? 'stat-gain' : delta < 0 ? 'stat-loss' : 'stat-unchanged');
-          change.dataset.stat = stat;
-          line.append(change);
-        });
-        t.append(line);
-      }
-    }
-    if (classGear(i)) {
+    if (classGear(i) && !roll) {
       const left = Math.max(0, ...(where ? where.copies : copiesOf(i)).map(g => (g.tradeUntil || 0) - Date.now() / 1000)), minutes = Math.ceil(left / 60);
       const time = minutes >= 60 ? `${Math.floor(minutes / 60)} h ${minutes % 60} min` : `${minutes} min`;
       t.append(node('p', left > 0 ? `Bound on pickup · tradeable for ${time} with the party of the roll` : 'Bound on pickup · it can only be sold', 'item-bound'));
     }
-    const conditionCopy = where ? where.copies?.[0] : cellCopy || displayCopy(i, slot);
+    const conditionCopy = copy;
     if (conditionState(conditionCopy) !== 'new') {
       const line = node('p', conditionText(conditionCopy), 'item-durability'); line.dataset.state = conditionState(conditionCopy); t.append(line);
     }
-    if (where) t.append(node('p', `${where.count} ${where.in}`));
-    else t.append(node('p', `${bagQuantity(i.id)} in bags · ${equippedCount(i)} equipped`), node('small', questItem(i) ? 'Quest item · cannot be sold' : `Sells for ${Money.text(cellCopy ? copyValue(i, cellCopy) : saleValue(i))}${perCopy(cellCopy, copy)}`));
+    if (where && !roll) t.append(node('p', `${where.count} ${where.in}`));
+    else if (!where) t.append(node('p', `${bagQuantity(i.id)} in bags · ${equippedCount(i)} equipped`), node('small', questItem(i) ? 'Quest item · cannot be sold' : `Sells for ${Money.text(cellCopy ? copyValue(i, cellCopy) : saleValue(i))}${perCopy(cellCopy, copy)}`));
     if (compatible(i)) {
       const copies = where ? where.copies : gearInstances.filter(g=>g.item===i.id);
       for(const [index,g] of copies.entries()) {
@@ -290,11 +342,14 @@
       }
       if(i.source!=='orange_pool'&&copies.length>3)t.append(node('small',`and ${copies.length-3} more copies`));
     }
-    t.append(node('small', where ? where.hint : scroll ? 'Open Enchanting from your bags' : licence(i) ? 'Right-click or double-click to use' : consumable(i) ? `Right-click or double-click to use · ${keyOf('quickFood', false)} / ${keyOf('quickPotion', false)} on the quick slots` : slot ? 'Right-click to unequip · Drag into a bag' : compatible(i) ? 'Right-click to equip · Drag onto a gear slot' : questItem(i) ? 'Quest item · hand it in for its quest' : i.kind === 'material' ? 'Sell to Linden or Bram in Alderhaven' : 'Keep or sell to a merchant'));
+    const choosingDisenchant = !slot && !where && window.Enchanting?.selectingDisenchant?.();
+    if (!choosingDisenchant && !roll) t.append(node('small', where ? where.hint : scroll ? 'Open Enchanting from your bags' : licence(i) ? 'Right-click or double-click to use' : consumable(i) ? `Right-click or double-click to use · ${keyOf('quickFood', false)} / ${keyOf('quickPotion', false)} on the quick slots` : slot ? 'Right-click to unequip · Drag into a bag' : compatible(i) ? 'Right-click to equip · Drag onto a gear slot' : questItem(i) ? 'Quest item · hand it in for its quest' : i.kind === 'bag' ? 'Select to fit or replace a bag' : i.kind === 'material' ? 'Sell to Linden or Bram in Alderhaven' : 'Keep or sell to a merchant'));
     t.hidden = false;
     const r = anchor.getBoundingClientRect(), tr = t.getBoundingClientRect();
     t.style.left = Math.max(8, Math.min(innerWidth - tr.width - 8, r.right + 10)) + 'px';
     t.style.top = Math.max(8, Math.min(innerHeight - tr.height - 8, r.top)) + 'px';
+    if (tooltipAnchor !== anchor) tooltipAnchor?.removeAttribute('aria-describedby');
+    tooltipAnchor = anchor;
     anchor.setAttribute('aria-describedby', t.id);
   }
   function attachTooltip(anchor, getItem, slot, getWhere, getCopy) {
@@ -361,6 +416,7 @@
     const container = $('bag-details'); if (!container) return;
     const i = selected && definition(cellId(selected)), cellCopy = selected && keyCopy(selected);
     container.replaceChildren();
+    if (window.Enchanting?.renderDisenchant?.(container, i, cellCopy)) return;
     if (!i || !quantity(i.id)) { container.append(node('p', 'Select an item to inspect it.', 'bag-empty-note')); return; }
     const heading = node('b', i.name, 'item-name'); heading.dataset.rarity = cellCopy?.rarity || displayRarity(i);
     container.append(heading, node('small', summary(i, gearItem(i) ? 1 : quantity(i.id), cellCopy)));
@@ -382,6 +438,8 @@
         const b = button(i.kind === 'accessory' ? `Equip · ${label}` : 'Equip', () => equip(i, slot, selected), 'item-action'); b.dataset.action = 'equip'; b.disabled = !canEquip() || tooLow(i) || !bagQuantity(i.id); container.append(b);
       }
       if (levelOf(i) > 1) container.append(node('p', levelNote(i), tooLow(i) ? 'item-restriction' : 'bag-empty-note'));
+    } else if (i.kind === 'bag') {
+      renderBagActions(container, i);
     } else if (i.kind === 'rod') {
       container.append(...rodDetails(i).map(text => node('p', text)));
     } else if (i.kind === 'mining_pick') {
@@ -402,6 +460,34 @@
       container.append(node('p', effect(i), 'bag-empty-note'));
     } else if (i.class && i.class !== look?.class) container.append(node('p', `Requires ${i.class}`, 'item-restriction'));
     else container.append(node('p', 'Sell materials to Linden or Bram in Alderhaven.', 'bag-empty-note'));
+  }
+  function renderBagActions(container, i) {
+    container.append(node('p', `${i.bagSlots} extra slots · Requires level ${levelOf(i)}`, tooLow(i) ? 'item-restriction' : ''));
+    const disabled = !canEquip() || tooLow(i);
+    if (bags.length < 4) {
+      const fit = button('Fit Bag', () => equipBag(i), 'item-action');
+      fit.dataset.action = 'fit-bag';
+      fit.disabled = disabled;
+      container.append(fit);
+    }
+    if (!bags.some(id => id !== i.id)) return;
+    const pick = node('select', '', 'item-action');
+    pick.setAttribute('aria-label', 'Choose a bag to replace');
+    const placeholder = node('option', 'Choose a bag to replace');
+    placeholder.value = '';
+    pick.append(placeholder);
+    bags.forEach((id, slot) => {
+      if (id === i.id) return;
+      const option = node('option', `${slot + 1} · ${definition(id)?.name || id}`);
+      option.value = String(slot);
+      pick.append(option);
+    });
+    const replace = button('Replace Bag', () => { if (pick.value !== '') equipBag(i, Number(pick.value)); }, 'item-action');
+    replace.dataset.action = 'replace-bag';
+    pick.disabled = disabled;
+    replace.disabled = true;
+    pick.addEventListener('change', () => { replace.disabled = disabled || pick.value === ''; });
+    container.append(pick, replace);
   }
   function render(container) {
     if (!container) return;
@@ -425,7 +511,7 @@
         if (consumable(i)) b.append(node('span', '', 'item-cooldown'));
         b.append(node('b', i.name, 'sr-only'), node('small', summary(i, count, cellCopy), 'sr-only'));
         b.addEventListener('contextmenu', event => { event.preventDefault(); selected = key; activate(i, key); renderDetails(); });
-        b.addEventListener('dblclick', () => activate(i, key)); attachTooltip(b, () => definition(i.id), undefined, () => window.Shop?.bagTooltip(i.id), () => cellCopy);
+        b.addEventListener('dblclick', () => activate(i, key)); attachTooltip(b, () => definition(i.id), undefined, () => window.Shop?.bagTooltip(i.id), () => gear ? cellCopy ?? null : undefined);
         dragSource(b, () => ({ from: 'bag', item: i.id, key })); cell.append(b);
       } else {
         cell.classList.add('bag-cell-empty'); cell.setAttribute('aria-label', `Empty bag slot ${index - page.start + 1}`);
@@ -436,7 +522,7 @@
     if ($('bag-tabs')) {
       $('bag-tabs').replaceChildren(...Array.from({ length: 5 }, (_, index) => {
         const bag = pages[index], used = bag ? layout.slice(bag.start, bag.start + bag.size).filter(Boolean).length : 0;
-        const b = button('', () => { if (!bag) { $('bag-details').replaceChildren(node('b', 'Empty bag slot', 'item-name'), node('p', 'Buy a six-slot Linen Satchel for 5 silver from Linden in Alderhaven.', 'bag-empty-note')); return; } activeBag = index; search = ''; $('bag-search').value = ''; render(container); }, 'bag-tab');
+        const b = button('', () => { if (!bag) { $('bag-details').replaceChildren(node('b', 'Empty bag slot', 'item-name'), node('p', 'Fit a bag from your inventory to use this slot.', 'bag-empty-note')); return; } activeBag = index; search = ''; $('bag-search').value = ''; render(container); }, 'bag-tab');
         b.innerHTML = icon(null, 'bag'); b.append(node('span', bag ? `${used}/${bag.size}` : '+')); b.dataset.bag = index; b.dataset.locked = String(!bag);
         b.setAttribute('aria-label', bag ? `${bag.name}, ${used} of ${bag.size} slots` : `Empty expansion bag slot ${index}`); b.setAttribute('aria-pressed', String(index === activeBag));
         if(bag)b.title=`${bag.name} · ${bag.size} slots`;
@@ -514,9 +600,11 @@
   }
   $('bag-search')?.addEventListener('input', event => { search = event.target.value.trim().toLowerCase(); render($('inventory-list')); });
   $('bag-sort')?.addEventListener('click', () => { reconcile(); const ids = layout.filter(Boolean).sort((a, b) => definition(cellId(a)).kind.localeCompare(definition(cellId(b)).kind) || definition(cellId(a)).name.localeCompare(definition(cellId(b)).name)); layout = ids; while (layout.length < capacity()) layout.push(null); activeBag = 0; Online.saveBagLayout?.(layout); render($('inventory-list')); });
-  window.Inventory = { foodBonus, rodDetails, icon, cooldownLeft, tickCooldowns, quantity, bagQuantity, ownedItemIds, effect, render, renderEquipped, renderSets, hideTooltip, showTooltip,
+  window.Inventory = { foodBonus, rodDetails, icon, cooldownLeft, tickCooldowns, quantity, bagQuantity, ownedItemIds, effect, render, renderDetails, renderEquipped, renderSets, hideTooltip, showTooltip,
     gearPreview: i => tr(`Level ${levelOf(i)}`) + (i.class ? ` · ${tr(i.class)}` : '') + (stats(i) ? ` · ${tr(stats(i))}` : ''),
-    icon, definition, legacyPiece, attachTooltip, bestRarity, looseStacks, looseCopies, rarityName, copyLine: g => `${g.rarity} · rank ${g.rank} · ${stats(copyStats(g))}${wearNote(g)}`, durabilityOf, conditionState, wearNote,
+    icon, definition, legacyPiece, attachTooltip, bestRarity, looseStacks, looseCopies, isGear: gearItem,
+    usedCells: () => looseStacks().reduce((used, stack) => used + (gearItem(definition(stack.item)) ? stack.quantity : 1), 0),
+    rarityName, copyLine: g => `${g.rarity} · rank ${g.rank} · ${stats(copyStats(g))}${wearNote(g)}`, durabilityOf, conditionState, wearNote,
     // The bag side of a bank answer, which arrives before the next snapshot; the look and the set counts stay as they were.
     updateBags(next, nextSlots = {}, nextBags = [], nextInstances = []) {
       if (!look) return;

@@ -92,7 +92,7 @@ html, body { overscroll-behavior: none; }
   #stage .equipment-workspace .character-tabs {
     flex: 0 0 auto;
     display: flex;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     gap: calc(3px / var(--window-k, .8));
     margin: calc(2px / var(--window-k, .8)) 0 calc(4px / var(--window-k, .8));
   }
@@ -193,7 +193,7 @@ html, body { overscroll-behavior: none; }
     font-size: calc(11px / var(--window-k, .8));
     line-height: 1.35;
   }
-  #stage .equipment-workspace :is(.character-sets, .character-mounts, .character-rebirth, .character-achievements) {
+  #stage .equipment-workspace :is(.character-sets, .character-mounts, .character-rebirth, .character-achievements, .character-professions) {
     font-size: calc(12px / var(--window-k, .8));
     line-height: 1.35;
     padding: calc(6px / var(--window-k, .8));
@@ -311,18 +311,13 @@ html, body { overscroll-behavior: none; }
     width: calc(48px / var(--window-k, .8));
     height: calc(52px / var(--window-k, .8));
   }
-  #stage #keys-panel > .keys-panel {
-    display: flex;
-    flex-direction: column;
+  #stage #settings-panel > .settings-panel {
     width: min(calc(92cqw / var(--window-k, .8)), 820px);
     height: calc(var(--touch-stage-h, 94dvh) / var(--window-k, .8));
     overflow: hidden;
   }
-  #stage #keys-panel #keys-list {
-    flex: 1 1 0;
-    min-height: 0;
-    max-height: none;
-    overflow-y: auto;
+  #stage #settings-panel .key-row {
+    grid-template-columns: minmax(0, 1fr) repeat(3, minmax(var(--touch-target), 13%));
   }
   #stage #social-panel > .social-panel {
     width: min(calc(90cqw / var(--window-k, .8)), 780px);
@@ -366,7 +361,7 @@ html, body { overscroll-behavior: none; }
 
   /* HUD Quest Tracker (#quest-tracker): readable text and bounded height above #touch-stick */
   #stage #quest-tracker {
-    top: 96px;
+    top: max(96px, calc(10.8cqw + 3.6cqw * var(--ui, .8) + 4px));
     width: var(--pw, calc(205px / var(--ui, .8)));
     font-size: calc(11.5px / var(--ui, .8));
     line-height: 1.25;
@@ -384,7 +379,7 @@ html, body { overscroll-behavior: none; }
   .stick-disc { position: absolute; left: 50%; top: 50%; width: calc(112px / var(--ui, .8)); height: calc(112px / var(--ui, .8)); margin: calc(-56px / var(--ui, .8)); border-radius: 50%; border: 2px solid #f5c542; background: #101e4655; opacity: .45; pointer-events: none; }
   .stick-disc i { display: block; position: absolute; width: calc(44px / var(--ui, .8)); height: calc(44px / var(--ui, .8)); top: calc(34px / var(--ui, .8)); left: calc(34px / var(--ui, .8)); border-radius: 50%; background: #bfeeff99; border: 2px solid #f5c542; }
   #touch-stick.held .stick-disc { opacity: .8; }
-  #touch-skills { right: 8px; bottom: 8px; width: calc(270px / var(--ui, .8)); height: calc(176px / var(--ui, .8)); }
+  #touch-skills { right: 8px; bottom: 8px; width: calc(270px / var(--ui, .8)); height: calc(202px / var(--ui, .8)); }
   #touch-skills button, #touch-actions button, #touch-quickuse button, .touch-tray-open .skill-slot, .touch-tray-open .skills-open {
     min-width: calc(44px / var(--ui, .8)); min-height: calc(44px / var(--ui, .8)); pointer-events: auto; touch-action: manipulation;
     font-size: calc(12px / var(--ui, .8)); color: #ffe6a8; background: #101e46ec; border: 1px solid #c9ad73; border-radius: 10px;
@@ -396,10 +391,16 @@ html, body { overscroll-behavior: none; }
   #touch-skills [data-arc="1"] { bottom: calc(48px / var(--ui, .8)); right: calc(134px / var(--ui, .8)); }
   #touch-skills [data-arc="2"] { bottom: calc(110px / var(--ui, .8)); right: calc(90px / var(--ui, .8)); }
   #touch-skills [data-arc="3"] { bottom: calc(80px / var(--ui, .8)); right: calc(18px / var(--ui, .8)); }
+  #touch-skills :is(.touch-fish, .touch-mine) { width: calc(74px / var(--ui, .8)); height: calc(52px / var(--ui, .8)); font-size: calc(14px / var(--ui, .8)); }
+  #touch-skills .touch-fish { right: 0; bottom: calc(150px / var(--ui, .8)); background: #173c4d; }
+  #touch-skills .touch-fish[data-bite="true"] { color: #241808; background: #ffe07d; border: 3px solid #fff4c0; }
+  #touch-skills .touch-mine { right: calc(164px / var(--ui, .8)); bottom: calc(118px / var(--ui, .8)); background: #442b1b; }
   #touch-skills button > span:first-child:not(:last-child) { display: block; height: 55%; }
   #touch-skills svg { height: 100%; width: 100%; }
   #touch-skills small { position: absolute; top: 0; right: 0; background: #101e46; }
   #touch-skills button.cooling:disabled { opacity: 1; }
+  #touch-skills button.free-cast { border-color: #b9ffcf; box-shadow: 0 0 0 calc(3px / var(--ui, .8)) #6dff9d, 0 0 calc(12px / var(--ui, .8)) #4dff8a; }
+  #touch-skills .touch-free { position: absolute; left: 0; right: 0; top: calc(-6px / var(--ui, .8)); color: #c9ffd9; font: bold calc(14px / var(--ui, .8)) sans-serif; text-shadow: 0 1px 3px #000, 0 0 4px #000; pointer-events: none; }
   #touch-skills .touch-cooldown { inset: 0; display: grid; place-items: center; border-radius: inherit; background: #081126d9; color: #fff; font: bold calc(24px / var(--ui, .8)) sans-serif; text-shadow: 0 2px 3px #000; pointer-events: none; }
   #touch-actions { top: 8px; left: 34%; width: calc(300px / var(--ui, .8)); display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; }
   #touch-quickuse { left: 200px; bottom: 8px; display: flex; flex-direction: column; gap: 4px; max-width: calc(240px / var(--ui, .8)); }
@@ -435,8 +436,8 @@ html, body { overscroll-behavior: none; }
   #touch-actions { width: calc(320px / .8); display: grid; grid-auto-flow: column; grid-auto-columns: minmax(calc(60px / .8), 1fr); grid-template-columns: none; overflow-x: auto; padding: 2px; }
   #touch-quickuse { max-width: calc(240px / .8); }
   #touch-actions button, #touch-quickuse button { min-width: calc(44px / .6); min-height: calc(44px / .6); font-size: calc(12px / .8); }
-  #connection-overlay > .connection-panel, #sell-warning { --touch-target: calc(44px / var(--window-k, .8)); max-width: calc(94cqw / var(--window-k, .8)); max-height: calc(var(--touch-stage-h, 94dvh) / var(--window-k, .8)); overflow: auto; }
-  #sell-warning :is(button, input, select), #connection-overlay button { min-width: var(--touch-target); min-height: var(--touch-target); font-size: 16px; }
+  #connection-overlay > .connection-panel, :is(#sell-warning, #buy-quantity) { --touch-target: calc(44px / var(--window-k, .8)); max-width: calc(94cqw / var(--window-k, .8)); max-height: calc(var(--touch-stage-h, 94dvh) / var(--window-k, .8)); overflow: auto; }
+  :is(#sell-warning, #buy-quantity) :is(button, input, select), #connection-overlay button { min-width: var(--touch-target); min-height: var(--touch-target); font-size: 16px; }
   #touch-skills, #touch-stick { pointer-events: none; }
   #touch-stick { pointer-events: auto; }
   #touch-skills button { pointer-events: auto; }

@@ -1,5 +1,6 @@
 // Exercise the new catalog over real private WebSockets, including SQLite restarts.
 const assert = require('node:assert/strict');
+const {execFileSync} = require('node:child_process');
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
@@ -20,12 +21,13 @@ async function achievements() {
   await w.connect({ bot, class: 'warrior', gender: 'male' });
   await w.connect({ bot: observer, class: 'priest', gender: 'female' });
   let view = await achievements();
-  check(view.entries.length === 154 && view.maximum === 4090, 'real protocol exposes 154 goals / 4090 points');
-  const categories = Object.fromEntries(['Adventure', 'Combat', 'Quests', 'Exploration', 'Fishing'].map(c => [c, view.entries.filter(a => a.category === c).length]));
-  assert.deepEqual(categories, { Adventure: 23, Combat: 50, Quests: 23, Exploration: 32, Fishing: 26 }); checks++;
+  check(view.entries.length === 166 && view.maximum === 4370, 'real protocol exposes 166 goals / 4370 points');
+  const categories = Object.fromEntries(['Adventure', 'Combat', 'Quests', 'Exploration', 'Fishing', 'Professions'].map(c => [c, view.entries.filter(a => a.category === c).length]));
+  assert.deepEqual(categories, { Adventure: 23, Combat: 50, Quests: 23, Exploration: 32, Fishing: 26, Professions: 12 }); checks++;
   for (const a of catalog.slice(120)) {
     const entry = view.entries.find(e => e.id === a.id);
-    check(entry && !entry.complete && entry.progress === 0, `${a.id} starts with no invented progress`);
+    const startingSkill = a.metric === 'fishing_skill' ? 1 : 0;
+    check(entry && !entry.complete && entry.progress === startingSkill, `${a.id} starts with its actual saved progress`);
   }
   // Only fixture history is injected; ordinary reconciliation and title validation still run.
   const before = w.events.length;
@@ -55,6 +57,33 @@ async function achievements() {
   view = await achievements();
   check(view.points === totals.points && view.selected === totals.selected, 'points and selected new title survive process/SQLite restart');
   check(w.player(bot).achievementTitle === 'The Everlasting', 'restored snapshot exposes the selected new title');
+  // Seed an old save in the disposable database, then use the regular login reconciliation.
+  const savedId = w.player(bot).id;
+  await w.stop();
+  execFileSync('python3', ['-c', `
+import json, sqlite3, sys
+database, hero, fish_skill = sys.argv[1:]
+with sqlite3.connect(database) as db:
+    raw, = db.execute('SELECT state FROM characters WHERE id=?', (hero,)).fetchone()
+    state = json.loads(raw)
+    state.setdefault('fishing', {'total':0,'legendary':0,'longestStreak':0,'species':{}})['skill'] = int(fish_skill)
+    state.setdefault('enchanting', {'recipes':[]})['skill'] = 150
+    state.setdefault('blacksmithing', {'recipes':[]}).setdefault('proficiency', {})['skill'] = 300
+    state.setdefault('alchemy', {}).setdefault('proficiency', {})['skill'] = 600
+    db.execute('UPDATE characters SET state=? WHERE id=?', (json.dumps(state), hero))
+  `, w.db, savedId, process.env.MUTATE === 'profession-boundary' ? '30' : '29']);
+  await w.launch();
+  await w.connect({bot});
+  view = await achievements();
+  const skills = {fishing_skill:29,enchanting_skill:150,blacksmithing_skill:300,alchemy_skill:600};
+  for (const goal of catalog.filter(row => row.category === 'Professions')) {
+    const entry = view.entries.find(row => row.id === goal.id), skill = skills[goal.metric];
+    check(entry.progress === Math.min(skill, goal.target) && entry.complete === (skill >= goal.target), `${goal.id} uses its saved skill`);
+  }
+  check(view.points === totals.points + 170, 'saved profession milestones award their points once');
+  await w.disconnect(bot); await w.connect({bot});
+  view = await achievements();
+  check(view.points === totals.points + 170, 'profession milestone credit survives without duplication');
   // Production locale code translates every new card, requirement and reward.
   const context = {
     localStorage: { getItem: () => JSON.stringify({ lang: 'sv' }) }, navigator: { language: 'sv' },

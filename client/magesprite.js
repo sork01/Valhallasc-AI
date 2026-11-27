@@ -95,6 +95,48 @@
   }
   const bytesOf = text => { const raw = atob(text), out = new Uint8Array(raw.length); for (let i = 0; i < raw.length; i++) out[i] = raw.charCodeAt(i); return out; };
   const loadImages = files => Promise.all([bitmap('assets/' + files.png), bitmap('assets/' + files.depth)]);
+  const RACE_APPEARANCE = {
+    mothkin: { skin: ['#776183', '#676b92', '#906d93', '#54526e'], portraitAbove: 39 },
+    tidekin: { skin: ['#559d86', '#448c91', '#82ad8d', '#426c70'], portraitAbove: 29 },
+    gnome: { scale: [.76, .67], portraitAbove: 29 },
+  };
+  const NORMAL_BODY_SCALE = [1, 1];
+  const RACIAL_ART = Object.keys(RACE_APPEARANCE);
+  const TRAIT_CELL = 48, TRAIT_X = 24, TRAIT_Y = 36;
+  const TRAIT_REACH = Math.ceil(Math.hypot(TRAIT_X, TRAIT_Y));
+  const traitAtlases = new Map();
+  function loadTraits(race) {
+    if (!traitAtlases.has(race)) traitAtlases.set(race, bitmap('assets/' + race + '.png').then(image => {
+      try {
+        const read = reader('race', TRAIT_CELL, TRAIT_CELL);
+        return Array.from({ length: 8 }, (_, dir) => [0, 1].map(layer =>
+          read(image, dir * TRAIT_CELL, layer * TRAIT_CELL, TRAIT_CELL, TRAIT_CELL)));
+      } finally { image.close(); }
+    }).catch(error => { traitAtlases.delete(race); console.warn(error.message); }));
+    return traitAtlases.get(race);
+  }
+  function paintTraits(pixels, depth, fw, fh, pose, art, skin, showFeatures) {
+    const [cx, cy, rx, ry] = pose, [features, markings] = art;
+    const headX = Math.floor(cx), headY = Math.floor(cy);
+    const headDepth = Math.min(65534, depth[headY * fw + headX] ?? 65534);
+    for (let y = Math.max(0, headY - TRAIT_REACH); y < Math.min(fh, headY + TRAIT_REACH + 1); y++) {
+      for (let x = Math.max(0, headX - TRAIT_REACH); x < Math.min(fw, headX + TRAIT_REACH + 1); x++) {
+        const dx = x + .5 - cx, dy = y + .5 - cy;
+        const u = Math.floor(TRAIT_X + dx * rx + dy * ry);
+        const v = Math.floor(TRAIT_Y - dx * ry + dy * rx);
+        if (u < 0 || v < 0 || u >= TRAIT_CELL || v >= TRAIT_CELL) continue;
+        const src = (v * TRAIT_CELL + u) * 4, dst = y * fw + x, k = dst * 4;
+        // Fins and antennae sit behind the body silhouette. Markings only cover exposed skin.
+        if (showFeatures && features[src + 3] && !pixels[k + 3]) {
+          pixels.set(features.subarray(src, src + 4), k);
+          depth[dst] = headDepth;
+        } else if (markings[src + 3] && pixels[k + 3] &&
+          skin.has(pixels[k] * 65536 + pixels[k + 1] * 256 + pixels[k + 2])) {
+          pixels.set(markings.subarray(src, src + 4), k);
+        }
+      }
+    }
+  }
   // Saved head layers have two drawings per pose: the front (stored for S) and the back (stored for N); the side rows only repeat one of them.
   // A turned head therefore gets a real turn here: the two drawings are wrapped round the head's own axis (HELM-DIRECTIONS-PROPER, 2026-11-13).
   //  - Each row of the hat has a radius about the head axis; inside it the drawing is a shell, and the screen shows the half-turn of it that
@@ -255,6 +297,7 @@
     const hair = rgb(meta.ramps.hair[2]), skin = rgb(meta.ramps.skin[2]);
     const parts = {};
     for (const part of Object.keys(meta.parts)) {
+      if (part === 'body_hat') continue;      // the stub figure has no hair to hide
       const frame = part === 'body' ? solid(ax - 3, ay - 14, 6, 14, row => row < 4 ? hair : skin, 1000)
         : part.startsWith('cloak_') ? solid(ax - 5, ay - 11, 10, 10, () => colour(part), 1500)
         : part.startsWith('armor_') ? solid(ax - 3, ay - 9, 6, 6, () => colour(part), 500)
@@ -312,7 +355,8 @@
       } else if (!background) promote(entry);
       return entry.promise;
     };
-    return { meta, parts, ensure };
+    const traits = new Map(await Promise.all(RACIAL_ART.map(async race => [race, await loadTraits(race)])));
+    return { meta, parts, ensure, traits };
   }
   // The catalog names every worn piece by a unique variant. An original piece is drawn as itself; a recolouring (items
   // with `art` and `tint`, built by scripts/gear_levels.py) is its base drawing painted with the tint, which uses the
@@ -359,10 +403,15 @@
   const HAIR_TIE = 400, BACK_HAIR_TIE = 150;
   const hairTie = (dir, part) => FRONT_DIRS.includes(dir) && CLOTHES_OVER_HAIR.some(slot => part.startsWith(slot + '_')) ? HAIR_TIE : 0;
   const hairKeeps = (dir, part) => BACK_DIRS.includes(dir) && part.startsWith('shoulders_');
+  // A woman's long hair is baked into her body layer and would hang out of any headgear, so under a worn head piece her body is drawn
+  // from `body_hat`: the same body without the long hair (scripts/export_character_body.py --hat-hair). Until the head piece and
+  // that atlas have loaded she keeps her ordinary body (no bald flash). Men, and sets without the extra part, always use `body`.
+  const bodyPart = (parts, equipment) => parts.body_hat && equipment.head && equipment.head !== 'none' && parts['head_' + equipment.head] ? 'body_hat' : 'body';
+  const isBody = part => part === 'body' || part === 'body_hat';
   const SLOT_ORDER = ['cloak', 'armor', 'pants', 'shoulders', 'gloves', 'head', 'necklace', 'accessory', 'weapon'];
   // A dungeon set needs a silhouette at field scale, not only a different tint on
   // the same 160px equipment rig. These marks sit behind the animated figure and
-  // follow it in every pose/facing. One piece shows the origin; more pieces make
+  // turn with it in every pose. One piece shows the origin; more pieces make
   // the mark brighter. They are drawn from the equipped server-approved look.
   const DUNGEON_MARKS = {
     regearvault: { name: 'Undervault', dark: '#123840', bright: '#58f5d4' },
@@ -416,7 +465,7 @@
     const [theme, count] = Object.entries(counts).sort((a, b) => b[1] - a[1])[0] || [];
     return theme ? { theme, count } : null;
   }
-  function dungeonAura(g, mark, t) {
+  function dungeonAura(g, mark, t, dir = 0) {
     const { theme, count } = mark, { dark, bright } = DUNGEON_MARKS[theme];
     const sway = Math.sin(t * 2.3) * 1.5;
     const diamond = (x, y, w, h, fill, stroke = bright) => {
@@ -427,7 +476,12 @@
       g.beginPath(); points.forEach(([x, y], i) => i ? g.lineTo(x, y) : g.moveTo(x, y));
       g.closePath(); g.fillStyle = fill; g.fill(); g.strokeStyle = stroke; g.lineWidth = 1.7; g.stroke();
     };
+    const angle = dir * Math.PI / 4, facing = Math.cos(angle), side = Math.sin(angle);
+    // Foreshorten the mark and shift it behind the wearer as they turn.
+    // Keep some width edge-on so the dungeon's design remains visible.
+    const width = Math.abs(facing) < .32 ? .32 : facing;
     g.save();
+    g.transform(width, .4 * side, 0, 1, 14 * side, 7 * (1 - facing));
     g.globalAlpha *= Math.min(.92, .48 + count * .085);
     // The broken circle is a common field-scale cue; each dungeon then has its
     // own large profile so the sets cannot be mistaken for progression gear.
@@ -655,6 +709,53 @@
       return palette[index].map((channel, k) => Math.round(channel * (1 - mix) + palette[index + 1][k] * mix));
     };
   };
+  // Beats are held poses of the fitted walk cycle. Only the foot-relative
+  // canvas transform interpolates, so hair, race features and gear turn together.
+  // Each row is [walk frame, facing offset, x, y, lean in degrees, height scale].
+  const RACIAL_DANCES = new Map([
+    ['mothkin', {
+      female: { step: .16, poses: [
+        [0, 0, 0, 0, 0, 1], [1, -1, -3, -3, -8, 1.02], [3, -2, -6, -9, -13, 1.04],
+        [3, -2, -8, -12, -10, 1.04], [5, -1, -6, -13, -4, 1.03], [5, 0, -2, -11, 3, 1.02],
+        [2, 1, 3, -9, 9, 1.03], [4, 2, 7, -8, 12, 1.03], [4, 3, 8, -9, 7, 1.02],
+        [6, 4, 5, -10, 2, 1.04], [6, 6, 2, -6, -3, 1.02], [7, 7, 0, 0, 0, .95],
+      ] },
+      male: { step: .13, poses: [
+        [4, -2, 0, 0, -8, .94], [5, -2, -3, -5, -13, 1.03], [7, -1, -8, -9, -10, 1.05],
+        [7, 0, -10, -5, 3, 1.01], [0, 1, -8, 0, 10, .94], [1, 2, -4, -7, 15, 1.04],
+        [3, 2, 2, -13, 12, 1.05], [3, 1, 8, -8, -4, 1.02], [4, 0, 10, 0, -8, .94],
+        [6, -1, 8, -6, -14, 1.03], [2, -1, 4, -10, -9, 1.05], [6, 0, 1, -4, -2, 1.01],
+      ] },
+    }],
+    ['tidekin', {
+      female: { step: .22, poses: [
+        [7, -1, 0, -1, -7, 1], [0, -1, -5, -2, -10, 1.02], [1, -2, -10, -4, -8, 1.04],
+        [2, -3, -12, -5, -3, 1.05], [3, -4, -10, -3, 4, 1.02], [4, 3, -5, 0, 8, .98],
+        [5, 2, 0, 0, 11, .97], [6, 2, 6, -1, 10, .99], [7, 1, 11, -3, 6, 1.03],
+        [0, 1, 12, -5, 0, 1.06], [1, 0, 9, -4, -5, 1.04], [2, 0, 5, -2, -8, 1.02],
+      ] },
+      male: { step: .20, poses: [
+        [0, 0, 0, 0, 0, 1], [2, -1, -4, 0, -10, .96], [4, -2, -9, 0, -17, .88],
+        [4, -2, -11, 0, -14, .86], [3, -1, -8, 0, -7, .92], [1, 0, -4, -1, 4, .99],
+        [5, 0, 0, -2, 9, 1.06], [7, 1, 5, -1, 15, .99], [6, 2, 10, 0, 17, .88],
+        [6, 2, 12, 0, 12, .86], [5, 1, 9, 0, 4, .94], [3, 0, 4, -2, -3, 1.02],
+      ] },
+    }],
+    ['gnome', {
+      female: { step: .11, poses: [
+        [0, 0, 0, 0, 0, 1], [2, -1, -3, 0, -11, .95], [2, -1, -3, 0, -11, .95],
+        [4, 0, 0, -2, 3, 1.02], [6, 1, 3, 0, 11, .95], [6, 1, 3, 0, 11, .95],
+        [1, 2, 2, -3, 5, 1.05], [3, 4, 0, -4, 0, 1.05], [5, 6, -2, -3, -5, 1.05],
+        [7, 0, 0, 0, 0, .93], [1, 0, 1, -2, 4, 1.02], [7, 0, 0, 0, 0, .96],
+      ] },
+      male: { step: .12, poses: [
+        [2, -1, -2, 0, -7, .89], [6, -1, -4, -6, -9, 1.05], [0, -1, -5, 0, -10, .9],
+        [6, -1, -3, -6, -5, 1.05], [3, 0, 0, -8, 0, 1.07], [7, 0, 0, 0, 0, .87],
+        [4, 1, 2, 0, 7, .89], [0, 1, 4, -6, 9, 1.05], [6, 1, 5, 0, 10, .9],
+        [0, 1, 3, -6, 5, 1.05], [7, 0, 0, -8, 0, 1.07], [3, 0, 0, 0, 0, .87],
+      ] },
+    }],
+  ]);
   class MageSprite {
     constructor(source, look = {}, background = false) { this.source = source; this.background = background; this.meta = source.meta; this.cache = new Map(); this.set(look); }
     set(look) {
@@ -677,17 +778,23 @@
         const part = slot + '_' + this.equipment[slot];
         if (this.equipment[slot] !== 'none' && !this.source.parts[part]) this.source.ensure?.(part, this.background).then(() => { if (this.source.parts[part]) this.cache.clear(); });
       }
+      if (this.equipment.head !== 'none' && this.source.meta.parts.body_hat && !this.source.parts.body_hat) this.source.ensure?.('body_hat', this.background).then(() => { if (this.source.parts.body_hat) this.cache.clear(); });
       this.tint = new Map();
       const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
       this.hairColours = new Set((this.meta.ramps.hair || []).map(c => { const v = hex(c); return v[0] * 65536 + v[1] * 256 + v[2]; }));
       const lum = c => c[0] * .299 + c[1] * .587 + c[2] * .114;
-      const hair = this.constructor.HAIR, skin = this.constructor.SKIN;
+      const hair = this.constructor.HAIR, skin = this.constructor.skinPalette(look);
+      this.bodyScale = RACE_APPEARANCE[look.race]?.scale || NORMAL_BODY_SCALE;
+      this.traits = this.source.traits?.get(look.race);
+      this.skinColours = new Set();
       for (const [role, target] of [['hair', hair[look.hairColor || 0]], ['brow', hair[look.hairColor || 0]], ['skin', skin[look.skin || 0]]]) {
         const ramp = this.meta.ramps[role], to = hex(target || (role === 'skin' ? skin[0] : hair[0]));
         const base = lum(hex(this.meta.ramps[role === 'brow' ? 'hair' : role][2]));
         for (const color of ramp) {
           const from = hex(color), k = lum(from) / base, ratio = k < 1 ? k : 1 + (k - 1) * .35;
-          this.tint.set(from[0] * 65536 + from[1] * 256 + from[2], to.map(v => Math.min(255, Math.round(v * ratio))));
+          const painted = to.map(v => Math.min(255, Math.round(v * ratio)));
+          this.tint.set(from[0] * 65536 + from[1] * 256 + from[2], painted);
+          if (this.traits && role === 'skin') this.skinColours.add(painted[0] * 65536 + painted[1] * 256 + painted[2]);
         }
       }
     }
@@ -698,37 +805,45 @@
       const [fw, fh] = this.meta.frame, canvas = document.createElement('canvas'); canvas.width = fw; canvas.height = fh;
       const g = canvas.getContext('2d'), out = g.createImageData(fw, fh), nearest = new Uint16Array(fw * fh); nearest.fill(65535);
       const forge = this.equipment.weapon === 'regearchainforged' ? new Uint8ClampedArray(out.data.length) : null;
-      const chosen = ['body'];
+      const weaponPart = 'weapon_' + this.equipment.weapon;
+      const weaponMask = this.weaponTheme && this.source.parts[weaponPart] ? new Uint8Array(fw * fh) : null;
+      const chosen = [bodyPart(this.source.parts, this.equipment)];
       for (const slot of SLOT_ORDER) if (this.equipment[slot] && this.equipment[slot] !== 'none' && this.source.parts[slot + '_' + this.equipment[slot]]) chosen.push(slot + '_' + this.equipment[slot]);
+      const traitPose = this.traits && this.meta.headFrames?.[key];
       // Hair that lies almost flush on a worn piece (a depth tie) flickered through the cloth. In the front views the worn piece
       // wins over hair that is only just nearer (`hairTie`): sleeves, chest and hands. From the back quarters the shoulder piece
       // includes a mantle across the upper back that the hair hangs over, and the walk cycle swung it in and out of the hair: there
       // the hair keeps its place over a shoulder piece that is only just nearer (`hairKeeps`). Hair clearly in front stays.
       const tracked = FRONT_DIRS.includes(dir) || BACK_DIRS.includes(dir), hairAt = tracked ? new Uint8Array(fw * fh) : null;
       for (const part of chosen) {
-        const f = this.source.parts[part][key], tie = part === 'body' || !tracked ? 0 : hairTie(dir, part), keeps = part !== 'body' && tracked && hairKeeps(dir, part);
+        const f = this.source.parts[part][key], tie = isBody(part) || !tracked ? 0 : hairTie(dir, part), keeps = !isBody(part) && tracked && hairKeeps(dir, part);
+        const markWeapon = weaponMask && part === weaponPart; // The weapon is last in SLOT_ORDER.
         for (let y = 0; y < f.h; y++) for (let x = 0; x < f.w; x++) {
           const pixel = y * f.w + x, src = pixel * 4, dst = (f.y + y) * fw + f.x + x;
           if (!f.pixels[src + 3]) continue;
           if (f.z[pixel] > nearest[dst]) {
             if (!(tie && hairAt[dst] && f.z[pixel] - nearest[dst] < tie)) continue;
           } else if (keeps && hairAt[dst] && nearest[dst] - f.z[pixel] < BACK_HAIR_TIE) continue;
-          if (hairAt) hairAt[dst] = part === 'body' && this.hairColours.has(f.pixels[src] * 65536 + f.pixels[src + 1] * 256 + f.pixels[src + 2]) ? 1 : 0;
+          if (hairAt) hairAt[dst] = isBody(part) && this.hairColours.has(f.pixels[src] * 65536 + f.pixels[src + 1] * 256 + f.pixels[src + 2]) ? 1 : 0;
           nearest[dst] = f.z[pixel];
           const packed = f.pixels[src] * 65536 + f.pixels[src + 1] * 256 + f.pixels[src + 2];
-          const tint = part === 'body' && this.tint.get(packed);
+          const tint = isBody(part) && this.tint.get(packed);
           const lut = this.tintLut.get(part);
           if (lut) {   // a recoloured piece: every colour is painted once and remembered
             let painted = lut.colours.get(packed);
             if (!painted) { painted = [...lut.paint(f.pixels[src], f.pixels[src + 1], f.pixels[src + 2]), 255]; lut.colours.set(packed, painted); }
             out.data.set(painted, dst * 4);
           } else out.data.set(tint ? [...tint, 255] : f.pixels.subarray(src, src + 4), dst * 4);
+          if (markWeapon) weaponMask[dst] = 1;
           if (part === 'weapon_regearchainforged' && f.pixels[src] > 150 && f.pixels[src] > f.pixels[src + 2] * 1.4) {
             forge.set([255, 138, 46, 230], dst * 4);
           }
         }
+        if (part === 'body' && traitPose)
+          paintTraits(out.data, nearest, fw, fh, traitPose, this.traits[dir], this.skinColours, this.equipment.head === 'none');
       }
       g.putImageData(out, 0, 0);
+      if (weaponMask) canvas._enchant = window.WeaponEnchantArt.prepare(out, weaponMask, this.weaponTheme);
       if (this.equipment.weapon === 'regearchainforged') {
         const glow = document.createElement('canvas'); glow.width = fw; glow.height = fh;
         glow.getContext('2d').putImageData(new ImageData(forge, fw, fh), 0, 0); canvas._forge = glow;
@@ -738,6 +853,9 @@
       this.cache.set(key, canvas); return canvas;
     }
     draw(g, h, t, scale = 1.3) {
+      const enchantArt = window.WeaponEnchantArt;
+      const theme = enchantArt?.theme(h.weaponEnchant);
+      if (theme !== this.weaponTheme) { this.weaponTheme = theme; this.cache.clear(); }
       scale *= this.meta.displayScale || 1;
       const C = this.meta.clips;
       const dying = h.dead && !h.ghost;
@@ -747,26 +865,28 @@
       else if (h.atkT > 0) { clip = 'attack'; i = Math.floor(h.atkT / this.meta.attack.duration * C.attack.n); }
       else if (h.moving) { clip = 'walk'; i = Math.floor(h.walk) % C.walk.n; }
       let dir = MageSprite.direction(h.fx, h.fy);
-      const dance = MageSprite.dancePose(h, this.look.gender);
+      const dance = MageSprite.dancePose(h, this.look);
       if (dance) { clip = 'walk'; i = dance.frame % C.walk.n; dir = (dir + dance.turn + 8) % 8; }
       const [ax, ay] = this.meta.anchor;
       g.save(); g.imageSmoothingEnabled = false;
       if (h.dead && h.ghost) g.globalAlpha *= .45;
       g.scale(scale, scale);
-      const mark = !h.dead && dungeonMark(this.equipment);
-      if (mark) dungeonAura(g, mark, t);
       // Move the dressed figure as one unit; equipment stays fitted at every step/turn.
       if (dance) { g.translate(dance.x, dance.y); g.rotate(dance.lean); g.scale(1, dance.stretch); }
+      const mark = !h.dead && dungeonMark(this.equipment);
+      if (mark) dungeonAura(g, mark, t, dir);
       if (h.mounted && !h.dead && window.MountArt?.ready(h.mount)) {   // seated on the saddle: the rider's idle frame laid into the mount's frame
         const art = window.MountArt, moving = !!h.moving, mclip = art.clipFor(h.mount, moving), M = art.meta(h.mount), MC = M.clips[mclip];
         const mi = moving ? Math.floor(h.walk) % MC.n : Math.floor(t * MC.fps) % MC.n, ri = moving && this.equipment.cloak !== 'none' ? Math.floor(h.walk) % C.idle.n : moving ? 0 : Math.floor(t * C.idle.fps) % C.idle.n;
         const key = `mount/${h.mount}/${h.mountTint || 0}/${mclip}/${dir}/${mi}/${ri}`;
         let seat = this.cache.get(key);
-        if (!seat) { seat = art.compose(this.frame('idle', dir, ri), h.mount, mclip, dir, mi, h.mountTint || 0); if (this.cache.size >= 96) this.cache.delete(this.cache.keys().next().value); this.cache.set(key, seat); }
+        if (!seat) { seat = art.compose(this.frame('idle', dir, ri), h.mount, mclip, dir, mi, h.mountTint || 0, this.bodyScale); if (this.cache.size >= 96) this.cache.delete(this.cache.keys().next().value); this.cache.set(key, seat); }
         g.fillStyle = 'rgba(9, 11, 15, .28)'; g.beginPath(); g.ellipse(0, 1, M.shadow[0], M.shadow[1], 0, 0, 6.283); g.fill();
         g.drawImage(seat, -ax, -ay - art.SHIFT);
+        if (seat._enchant) enchantArt.draw(g, seat._enchant, -ax, -ay - art.SHIFT, t, false);
       } else {
         const frame = this.frame(clip, dir, i);
+        g.scale(...this.bodyScale);
         g.drawImage(frame, -ax, -ay);
         if (frame._forge) {
           g.save(); g.globalCompositeOperation = 'screen';
@@ -774,19 +894,35 @@
           g.globalAlpha *= still ? .22 : .22 + .14 * Math.sin(t * Math.PI * 5);
           g.drawImage(frame._forge, -ax, -ay); g.restore();
         }
+        if (frame._enchant && !h.dead && !h.isCorpse) enchantArt.draw(g, frame._enchant, -ax, -ay, t, clip === 'attack');
       }
       g.restore();
     }
     portrait() {
       const c = document.createElement('canvas'); c.width = c.height = 128;
       const g = c.getContext('2d'); g.imageSmoothingEnabled = false;
-      g.drawImage(this.frame(), ...(this.meta.portrait || [56, 18, 48, 48]), 0, 0, 128, 128); return c.toDataURL();
+      const head = this.traits && this.equipment.head === 'none' && this.meta.headFrames?.['idle/0/0'];
+      const crop = head ? [Math.round(head[0]) - 31, Math.round(head[1]) - RACE_APPEARANCE[this.look.race].portraitAbove, 62, 62]
+        : this.meta.portrait || [56, 18, 48, 48];
+      g.drawImage(this.frame(), ...crop, 0, 0, 128, 128); return c.toDataURL();
     }
-    static dancePose(h, gender = h.look?.gender) {
-      if (!Number.isFinite(h.danceT) || h.dead || h.hurtT > 0 || h.atkT > 0 || h.moving || h.mounted) return null;
+    static dancePose(h, look = h.look) {
+      if (!Number.isFinite(h.danceT) || h.dead || h.isCorpse || h.hurtT > 0 || h.atkT > 0 || h.moving || h.mounted) return null;
+      const female = look?.gender === 'female';
+      const dances = RACIAL_DANCES.get(look?.race);
+      if (dances) {
+        const { step, poses } = female ? dances.female : dances.male;
+        const phase = h.danceT / step % poses.length;
+        const index = Math.floor(phase), fraction = phase - index;
+        const pose = poses[index], next = poses[(index + 1) % poses.length];
+        const ease = fraction * fraction * (3 - 2 * fraction);
+        const blend = i => pose[i] + (next[i] - pose[i]) * ease;
+        return { frame: pose[0], turn: pose[1], x: blend(2), y: blend(3),
+          lean: blend(4) * Math.PI / 180, stretch: blend(5) };
+      }
       // Four beats per phrase, at 120 BPM. Reversible footwork keeps the dancer in place.
       const beat = h.danceT * 2, phrase = beat % 4, pulse = Math.sin(beat * Math.PI * 2);
-      if (gender === 'female') {
+      if (female) {
         // Step-touch left/right, a hip sway, then an eight-way twirl on the last beat.
         const sway = Math.sin(beat * Math.PI);
         return { frame: [0, 1, 2, 1, 4, 5, 6, 5][Math.floor(beat * 4) % 8],
@@ -802,6 +938,7 @@
         stretch: 1 - Math.max(0, -pulse) * .055 };
     }
     static direction(fx, fy) { return ((Math.round(-Math.atan2(fx - fy, fx + fy) / (Math.PI / 4)) % 8) + 8) % 8; }
+    static skinPalette(look) { return RACE_APPEARANCE[look.race]?.skin || this.SKIN; }
     // `background` is for other players' sprites: they load one at a time, after your own, without blocking the page.
     static async load(look, { background = false } = {}) {
       const url = this.METADATA;
@@ -817,6 +954,7 @@
   MageSprite.GENERIC = GENERIC; MageSprite.hasGear = hasGear; MageSprite.resolveGear = resolve; MageSprite.tintMatrix = tintMatrix;
   MageSprite.DUNGEON_PALETTES = DUNGEON_PALETTES; MageSprite.dungeonMark = dungeonMark; MageSprite.dungeonAura = dungeonAura;
   MageSprite.HAIR = HAIR; MageSprite.SKIN = SKIN; MageSprite.ARMOR = ARMOR; MageSprite.WEAPON = WEAPON;
+  MageSprite.RACES = Object.freeze(['human', ...RACIAL_ART]);
   MageSprite.equipment = equipment; MageSprite.TIERS = ['apprentice', 'runic'];
   MageSprite.METADATA = 'assets/mage_sprites.txt';
   // Every class has a second atlas set for a female character. `Base.Female` is the same class reading
@@ -825,5 +963,6 @@
   MageSprite.female = (Base, url) => { const Female = class extends Base {}; Female.METADATA = url; Base.Female = Female; return Female; };
   MageSprite.variant = function (look) { return look?.gender === 'female' && Object.hasOwn(this, 'Female') ? this.Female : this; };
   MageSprite.female(MageSprite, 'assets/mage_f_sprites.txt');
+  MageSprite.bodyPart = bodyPart;      // which body layer is drawn under the worn head piece (tests/hat-hair-unit.cjs)
   window.MageSprite = MageSprite;
 })();

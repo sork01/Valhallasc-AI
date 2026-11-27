@@ -60,10 +60,14 @@ fn achievements_refresh_preserves_the_entire_old_catalog() {
         digest,
         "1810c83c4ac9b02244e60fd41d3d3f680f4893a715508dd4bc4ace1504a10620"
     );
-    assert_eq!(raw.len(), 154);
-    assert_eq!(catalog().iter().map(|a| a.points).sum::<u32>(), 4090);
     assert_eq!(
-        catalog().iter().skip(120).map(|a| a.points).sum::<u32>(),
+        format!("{:x}", Sha256::digest(serde_json::to_vec(&raw[..154]).unwrap())),
+        "7c1f79c04629f3e74aea3fadeafa1f2a74a047ecdaa499abe4f6edcb09496c9b"
+    );
+    assert_eq!(raw.len(), 166);
+    assert_eq!(catalog().iter().map(|a| a.points).sum::<u32>(), 4370);
+    assert_eq!(
+        catalog().iter().skip(120).take(34).map(|a| a.points).sum::<u32>(),
         1535
     );
     assert_eq!(
@@ -80,6 +84,38 @@ fn achievements_refresh_preserves_the_entire_old_catalog() {
             .skip(120)
             .all(|a| !a.title_prefix && a.mount.is_empty())
     );
+}
+
+#[test]
+fn achievements_profession_milestones_use_each_saved_skill_at_the_exact_boundary() {
+    type SkillOf = fn(&mut Character) -> &mut crate::profession::Skill;
+    let paths: [(&str, [u16; 3], SkillOf); 4] = [
+        ("fishing_skill", [30, 150, 300], |c| &mut c.fishing.proficiency),
+        ("enchanting_skill", [30, 150, 300], |c| &mut c.enchanting.proficiency),
+        ("blacksmithing_skill", [30, 150, 300], |c| &mut c.blacksmithing.proficiency),
+        ("alchemy_skill", [30, 300, crate::alchemy::MAX_SKILL], |c| &mut c.alchemy.proficiency),
+    ];
+    for (metric, targets, skill_of) in paths {
+        let mut c = hero();
+        for (target, points) in targets.into_iter().zip([10, 20, 40]) {
+            let id = format!("{metric}_{target}");
+            let a = goal(&id);
+            assert_eq!((a.metric.as_str(), a.target, a.points), (metric, target.into(), points));
+            assert_eq!(a.category, "Professions");
+            skill_of(&mut c).skill = target - 1;
+            assert!(!c.sync_achievements().contains(&id), "early award {id}");
+            assert_eq!(c.achievement_progress(a), u32::from(target - 1));
+            skill_of(&mut c).skill = target;
+            assert_eq!(c.sync_achievements(), [id.clone()]);
+            assert!(c.sync_achievements().is_empty(), "duplicate {id}");
+        }
+        let mut legacy = serde_json::to_value(&c).unwrap();
+        legacy.as_object_mut().unwrap().remove("achievements");
+        let mut restored: Character = serde_json::from_value(legacy).unwrap();
+        assert_eq!(restored.sync_achievements().len(), 3, "{metric} saved evidence");
+        assert_eq!(restored.achievement_points(), 70);
+        assert!(restored.sync_achievements().is_empty());
+    }
 }
 
 #[test]
@@ -123,25 +159,31 @@ fn achievements_refresh_numeric_goals_award_at_the_exact_boundary_once() {
 }
 
 #[test]
-fn achievements_refresh_collections_match_real_fish_and_distinct_fisher_quests() {
+fn achievements_refresh_collections_keep_the_original_fish_and_fisher_circuits() {
     let fish: Vec<Value> = serde_json::from_str(include_str!("../../world/fish.txt")).unwrap();
     let a = goal("fish_log_all");
+    let original_habitats = [
+        "Shore", "Cold", "Swamp", "Forest", "Jungle", "Oasis", "Spring", "Lava",
+    ];
     let expected: BTreeSet<_> = fish
         .iter()
+        .filter(|f| original_habitats.contains(&f["habitat"].as_str().unwrap()))
         .map(|f| f["item"].as_str().unwrap().to_owned())
         .collect();
     assert_eq!(a.members.iter().cloned().collect::<BTreeSet<_>>(), expected);
     assert_eq!(a.target, 57);
     let map: Value = serde_json::from_str(include_str!("../../world/map.txt")).unwrap();
-    let quests: Vec<_> = std::iter::once(&map)
+    let original_zones = [0, 1, 2, 3, 6, 19, 20, 22, 25, 26, 28, 45];
+    let quests = std::iter::once(&map)
         .chain(map["zones"].as_array().unwrap())
-        .flat_map(|z| z["quests"].as_array().unwrap())
-        .collect();
+        .enumerate();
     for tier in 1..=4 {
         let a = goal(&format!("fisher_circuit_{tier}"));
         let suffix = format!("_{tier}");
         let expected: BTreeSet<_> = quests
-            .iter()
+            .clone()
+            .filter(|(zone, _)| original_zones.contains(zone))
+            .flat_map(|(_, area)| area["quests"].as_array().unwrap())
             .filter_map(|q| q["id"].as_str())
             .filter(|id| id.starts_with("fisher_") && id.ends_with(&suffix))
             .map(str::to_owned)
@@ -150,7 +192,11 @@ fn achievements_refresh_collections_match_real_fish_and_distinct_fisher_quests()
         assert_eq!(a.target, 13);
         assert_eq!(a.members.len(), 13);
     }
-    assert!(quests.iter().any(|q| q["id"] == "deep_seahorse"));
+    assert!(
+        quests
+            .flat_map(|(_, area)| area["quests"].as_array().unwrap())
+            .any(|q| q["id"] == "deep_seahorse")
+    );
     assert_eq!(goal("seahorse_friend").members, ["deep_seahorse"]);
 }
 

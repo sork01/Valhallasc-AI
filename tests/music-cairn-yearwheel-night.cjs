@@ -1,3 +1,4 @@
+const soundtrack = require('./lib/soundtrack.cjs');
 // Focused private-world playback check for the Cairnspine and Yearwheel night remixes.
 const assert = require('node:assert/strict');
 const path = require('node:path');
@@ -8,8 +9,8 @@ const { StdioClientTransport, getDefaultEnvironment } = require('@modelcontextpr
 const root = path.resolve(__dirname, '..');
 const client = new Client({ name: 'valhallasc-cairn-yearwheel-night-music', version: '1.0.0' });
 const songs = [
-  { zone: 27, x: 14, y: 145, key: 'cairnNightMusic', day: 'cairnMusic', seconds: 32 * 4 * 60 / 94 },
-  { zone: 28, x: 14, y: 359, key: 'yearwheelNightMusic', day: 'yearMusic', seconds: 64 * 4 * 60 / 96 },
+  { zone: 27, x: 14, y: 145, key: 'cairnNightMusic', day: 'cairnMusic', seconds: soundtrack('cairn_night') },
+  { zone: 28, x: 14, y: 359, key: 'yearwheelNightMusic', day: 'yearMusic', seconds: soundtrack('yearwheel_night') },
 ];
 let browser, started = false;
 async function call(name, args = {}) {
@@ -51,8 +52,8 @@ const debug = (page, command) => page.evaluate(c => Online.send({ type: 'debug',
   await page.keyboard.press('n');
   await page.waitForFunction(() => Math.abs(valhalla.yearwheelNightMusic.output.gain.value - .64) < .03, null, { timeout: 10000 });
 
-  await debug(page, { op: 'teleport', zone: 8, x: 80, y: 160 });
-  await page.waitForFunction(() => Field.zone === 8 && DayNight.nightMix === 0 && valhalla.activeNightMusic === valhalla.nightMusic && !valhalla.nightMusic.running && !valhalla.yearwheelNightMusic.running, null, { timeout: 15000 });
+  await debug(page, { op: 'teleport', zone: 5, x: 36, y: 52 });
+  await page.waitForFunction(() => Field.zone === 5 && DayNight.nightMix === 0 && valhalla.activeNightMusic === valhalla.nightMusic && !valhalla.nightMusic.running && !valhalla.yearwheelNightMusic.running, null, { timeout: 15000 });
   await debug(page, { op: 'teleport', zone: 15, x: 16, y: 112 });
   await page.waitForFunction(() => Field.zone === 15 && DayNight.nightMix === 0 && !valhalla.nightMusic.running, null, { timeout: 15000 });
   await debug(page, { op: 'teleport', zone: 28, x: 14, y: 359 });

@@ -1,3 +1,3 @@
 'use strict';
-/* Pearls Beneath the Moon: Nacrehold's night remix. */
+// Nacrehold at Midnight.
 window.createNacreNightMusic = ctx => window.createLoopMusic(ctx, 'assets/music_nacre_night.mp3');

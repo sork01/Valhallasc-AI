@@ -78,26 +78,12 @@ const look = (page, [x0, y0, x1, y1] = [.15, .2, .85, .8]) => page.evaluate(([x0
   await debug({ op: 'set_level', level: 20 });
   await page.waitForTimeout(6500);
 
-  // Click the monolith itself: the Stone offers fighters.
-  // The Stone moved with the shaped city: stage beside it from its map position, clear of the stairs.
-  const stoneAt = await page.evaluate(() => Field._debug.zones[4].npcs.find(n => n.id === 'city_meetingstone'));
-  await stageAt(4, stoneAt.x - 2.5, stoneAt.y - 1.5);
-  const stone = await page.evaluate(() => City.npcs.find(n => n.id === 'city_meetingstone'));
-  await click(stone.x, stone.y, -150);
-  await page.locator('#npc-dialogue').waitFor({ state: 'visible', timeout: 15000 });
-  check(await page.locator('#npc-name').textContent() === 'The Meeting Stone' && await page.locator('#npc-dialogue .gossip-row').count() >= 6, 'A click on the monolith opens the Stone: five classes and a dismissal');
-  const priceRow = await page.locator('#npc-dialogue .gossip-row', { hasText: 'Priest mercenary' }).innerText();
-  // merc_price(20) is 1200 copper, which the coin display shows as 12 silver (COIN-DENOMINATIONS).
-  check(/\b12\s+silver\b/.test(priceRow), `The offer row shows the level-20 price, 12 silver (row text: ${JSON.stringify(priceRow)})`);
-  await page.locator('#npc-dialogue .gossip-row', { hasText: 'Priest mercenary' }).click();
-  await page.waitForFunction(() => /Merc Priest joins your party/.test(document.getElementById('npc-notice').textContent), null, { timeout: 15000 });
-  check(await page.evaluate(() => Field.remotePlayers.some(p => p.look.name === 'Merc Priest')), 'The hired Priest stands beside the hero');
-  await page.keyboard.press('Escape');
-
+  const stone = await page.evaluate(() => WORLD_MAP.zones[3].npcs.find(n => n.id === 'city_meetingstone'));
+  check(stone.offers.length === 1 && stone.offers[0].id === 'summon_party', 'The outdoor stone only summons party members');
   // ---- down the stairs with a real click
   await stageAt(4, ret.x, ret.y);
   await click(stairs.x, stairs.y);
-  await page.waitForFunction(() => Field.zone === 5, null, { timeout: 8000 }).catch(async () => {    // a click that lands on the hired Priest means attack/inspect: send the plain move
+  await page.waitForFunction(() => Field.zone === 5, null, { timeout: 8000 }).catch(async () => {    // Retry with an unambiguous move packet.
     await page.evaluate(([x, y]) => Online.send({ type: 'move', x, y }), [stairs.x, stairs.y]);
     await page.waitForFunction(() => Field.zone === 5, null, { timeout: 30000 });
   });
@@ -112,7 +98,19 @@ const look = (page, [x0, y0, x1, y1] = [.15, .2, .85, .8]) => page.evaluate(([x0
   check(floor.join() === 'true,false,true', 'The floor is painted from the room list; solid rock stays black');
   const mini = await page.evaluate(() => { const c = document.getElementById('minimap'), d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let floorPx = 0, black = 0; for (let i = 0; i < d.length; i += 4) { if (d[i] > 40 && d[i + 2] > 70) floorPx++; else if (d[i] < 20 && d[i + 1] < 20) black++; } return { floorPx, black }; });
   check(mini.floorPx > 800 && mini.black > 2000, `The minimap shows rooms (${mini.floorPx}) in the black of the rock (${mini.black})`);
-  check(await page.evaluate(() => Field.remotePlayers.some(p => p.look.name === 'Merc Priest')), 'The hired Priest followed down the stairs');
+  const smith = await page.evaluate(() => WORLD_MAP.zones[4].npcs.find(n => n.id === 'dungeon_repair_5'));
+  await stageAt(5, smith.x, smith.y - 1);
+  await page.evaluate(() => Online.send({ type: 'interact', npc: 'dungeon_repair_5' }));
+  await page.locator('#npc-dialogue').waitFor({ state: 'visible' });
+  check(await page.locator('#npc-dialogue [data-offer="repair"]').isVisible(), 'The Repair Smith offers repairs alongside hiring');
+  const priceRow = await page.locator('#npc-dialogue .gossip-row', { hasText: 'Priest mercenary' }).innerText();
+  // merc_price(20) is 1200 copper, which the coin display shows as 12 silver (COIN-DENOMINATIONS).
+  check(/\b12\s+silver\b/.test(priceRow), `The offer row shows the level-20 price, 12 silver (row text: ${JSON.stringify(priceRow)})`);
+  await page.locator('#npc-dialogue .gossip-row', { hasText: 'Priest mercenary' }).click();
+  await page.waitForFunction(() => /Merc Priest joins your party/.test(document.getElementById('npc-notice').textContent), null, { timeout: 15000 });
+  check(await page.evaluate(() => Field.remotePlayers.some(p => p.look.name === 'Merc Priest')), 'The hired Priest stands beside the hero');
+  await page.keyboard.press('Escape');
+
   await debug({ op: 'set_hp', hp: 500 });
 
   // ---- monsters in every state (the real atlas when REAL_SPRITES=1)

@@ -2,6 +2,85 @@
 
 Read this before creating, remixing, repairing, or rendering any Valhallasc song. The editable dybase2 project is the musical source of truth. Work on the active project named in the task or wiki; check its actual tempo, meter, notes, instruments, and arrangement before editing. Do not substitute an older draft or treat a rendered MP3 as an editable source.
 
+## Final FileDrop replacements (1.15.6)
+
+The owner supplied the final four missing recordings: Asterion daytime
+(Seven Rings of Light), Asterion nighttime (The Eighth Quiet Ring), Eldmarr
+(The Table He Was Promised), and the shared outdoor fallback (Lanterns After
+Sundown). All **73 game music assets now have supplied remakes**, pinned to their
+FileDrop source and installed hashes in `scripts/soundtrack-filedrop.txt`.
+The 69 earlier installed remakes retain their exact bytes. The preserved-original
+list is empty. The new four URLs use `?v=saga-1.15.6`; earlier release cache
+versions are retained for unchanged recordings.
+
+The established importer and level treatment are reused. Asterion's day/night
+loops are 105 seconds and about 117.143 seconds; the shared night loop is about
+136.667 seconds. Eldmarr's 73.5-second export includes a 1.5-second reverb bar,
+folded into its 72-second musical loop. The performance, pitch and speed stay
+unchanged. Editable projects and original FileDrop files are not modified.
+
+`tests/soundtrack-filedrop.py --slots asterion,asterion_night,eldmarr,night`
+checks all 73 source/output hashes and decodes only the four changed recordings
+for codec, levels, duration, seam and source-performance correlation. The routing
+check covers both Asterion modes, the final-encounter branch and shared fallback;
+cache assertions use each recording's release. `MUTATE=asterion` routes the
+production wrapper to another recording and must fail. `MISSING_ONLY=1` with
+the bounded soundtrack UI check covers Asterion dusk/dawn and actual Web Audio
+output, saved volume and mute/unmute for Eldmarr and the shared fallback.
+Older Asterion/Eldmarr duration fixtures now read the pinned replacement lengths.
+This client-only release keeps the live 1.15.5 dungeon executable in place.
+
+Validation passed for all 73 pinned source/output hashes and the four changed
+recordings' codec, levels, loop lengths, seams and source correlation. The routing
+check passed 71 zone mappings plus the shared fallback and raid/final split;
+restoring the wrong Asterion wrapper failed its intended assertion. The bounded
+missing-tracks playback check passed 12 assertions in
+`test-results/driver-G8qChN/final-songs-playback.json`. Release notes, Swedish,
+changed JavaScript/Python syntax and whitespace gates passed.
+
+## Initial FileDrop soundtrack rollout (1.15.4)
+
+The owner supplied a remade AudioMaker soundtrack through Sork's FileDrop and
+authorized its installation, including the Chained Forge raid theme in a
+follow-up. `scripts/soundtrack-filedrop.txt` pins 69 supplied MP3s, their original
+names, source hashes, destinations, installed hashes, loop lengths and levels.
+Twenty-six earlier imports were retained byte-for-byte; 43 remaining recordings
+were installed. At that release, Asterion's day/night scores, the generic night
+fallback, and Eldmarr had no supplied replacement; 1.15.6 above completes them.
+Older dybase2 briefs below describe historical compositions, not the source of
+the newly supplied performances.
+
+The existing recordings keep their current gain treatment. New recordings keep
+the supplied performance at its original speed, with a cyclic 25 Hz high-pass,
+matching endpoints over 3 ms, and decoded mono RMS near -24 dB at 128 kbps.
+Sixteen supplied dungeon/raid recordings have a one-bar natural reverb tail;
+that tail is tapered and folded into the beginning at the pinned musical bar
+boundary before encoding. The other exports already have their loop tail
+folded. Source files in FileDrop and editable projects are not modified.
+`scripts/import_filedrop_soundtrack.py --apply` reproduces/resumes the conversion
+from pinned sources; its default checks provenance without writing assets.
+
+The Moonwell (zone 18) now has `music_moonwell.js` and its own player, including
+shared channel volume, ducking, mute, master routing and sequential fades.
+Moonspore keeps its own theme. Updated asset URLs have a release query so a
+browser's old MP3 cache cannot keep an earlier recording playing. The story
+cutscene still lasts 62 seconds with its existing narration; its new 120-second
+recording follows that scene clock and stops when the scene ends. Title music
+is the separate remade Snowbound Hearth recording. The Yearwheel now uses the
+supplied Turning Sky and Turning Sky Nocturne pair.
+
+Focused checks are `tests/soundtrack-filedrop.py` (source/asset hashes, codec,
+levels, durations, endpoint continuity and correlation with beginning/middle/end
+sections away from the folded tail), `tests/soundtrack-routing.cjs` (all supplied
+zone mappings, cache versions, the raid/final split and Moonwell volume/mute),
+and the bounded `tests/soundtrack-filedrop-ui.cjs` (real title, Moonwell, daytime,
+night, dungeon and raid playback). `MUTATE=moonwell` on the routing test must
+fail. Recording-duration assertions in older affected tests now read the pinned
+manifest rather than retired bar/tempo assumptions; the intro's finite-score
+ending test seeks near the new recording's end. Existing transition and bounded
+intro-music tests check fades, mute, narration and finite playback. Automated
+signal and playback checks do not constitute an auditory review of the songs.
+
 ## Musical identity
 
 - Give each new zone its own recognizable style. Build a clear motif, a complementary answer, section changes, and an ending that resolves naturally. Keep the game loop musically seamless.
@@ -32,7 +111,7 @@ Read this before creating, remixing, repairing, or rendering any Valhallasc song
 
 1. Inspect the active dybase2 project and its complete note grid, including section boundaries. Check harmony bar by bar and the mix hierarchy track by track.
 2. Render and listen through the entire arrangement against a metronome or steady pulse. Check the intro, transitions, ending, and loop seam. Numeric grid, codec, and level checks cannot establish that the song feels in time or in tune. If direct listening is unavailable, report that limit instead of claiming an auditory sign-off.
-3. Use focused checks for this song: render tracks separately when timing or mix is unclear, compare the start of each rendered attack with its MIDI beat, inspect clipping and export problems, decode the game MP3, and check the in-game crossfade, volume, and mute behavior when routing changes. MIDI timing and rendered attack are separate checks; neither replaces listening.
+3. Use focused checks for this song: render tracks separately when timing or mix is unclear, compare the start of each rendered attack with its MIDI beat, inspect clipping and export problems, decode the game MP3, and check the in-game sequential fade, volume, and mute behavior when routing changes. MIDI timing and rendered attack are separate checks; neither replaces listening.
 4. Follow the established export recipe: fold the tail into the game loop, apply the 25 Hz high-pass needed for Sork-60 DC, and target about -24 dB mono RMS after MP3 decoding (about -23.55 dB in the source WAV at 128 kbps). Export the game loop at 128 kbps. Keep a full-length MP3 with its natural ending; upload it to Sork's FileDrop when the task requests it or the owner asks.
 
 ## Remaining outdoor night songs
@@ -53,6 +132,23 @@ These briefs apply to `TIME-NIGHT-Z16` through `TIME-NIGHT-Z28` in `TODO.md`. Th
 | 27 Cairnspine | `6132f99b6de18dce` · 108 BPM, 4/4, E minor · *The High Pass Rings* | A high mountain watch: trade the stone-marimba and highwind-flute calls. Use a steady walking-step break with a clear downbeat and sparse cairn-bell replies. |
 | 28 Yearwheel | `c7ab959e2d451253` · 100 BPM, 4/4, G major, **64 bars** · *Four Horizons* | One night journey through the seasonal horizons: keep the recurring source motif and its changing seasonal colours across the full form. Evolve one related Chillhop break through the sections; check every transition and the final-to-first loop. Use *Four Horizons*, not the older *Turning Sky* project. |
 
-For each task, first write down the source motif, the new night answer, the chord progression, the beat anchors, and the section map. Check every melodic pitch against its bar's chord and every rendered attack against the grid. Keep Sork-60 pads and synth leads where those parts are permitted, Dexed `WHISTLE FLUTE` for any flute part, and the motif audible over bright accompaniment. Deliver a seamless game MP3 and a natural-ending full MP3 to Sork's FileDrop, then test the zone's dusk and dawn crossfades, saved volume and mute, and the shared fallback in a private world. Keep the TODO item open until the full render has been heard against a metronome and the loop seam has been checked.
+For each task, first write down the source motif, the new night answer, the chord progression, the beat anchors, and the section map. Check every melodic pitch against its bar's chord and every rendered attack against the grid. Keep Sork-60 pads and synth leads where those parts are permitted, Dexed `WHISTLE FLUTE` for any flute part, and the motif audible over bright accompaniment. Deliver a seamless game MP3 and a natural-ending full MP3 to Sork's FileDrop, then test the zone's dusk and dawn sequential fades, saved volume and mute, and the shared fallback in a private world. Keep the TODO item open until the full render has been heard against a metronome and the loop seam has been checked.
 
 The Greenmeadow night repair established the Dexed flute choice. The Emberfall Crags repair showed why checking only MIDI overlap and the global key misses audible double notes and chord clashes: its loud two-note Stabs track competed with a quiet Lead, and the Lead phrase had been copied over different chords. Its next timing pass found that the bass hit beat 3-and in every bar while the kick often missed it, 25 lead notes wandered onto isolated sixteenth positions, and the pad's slow attack and long tail blurred chord changes. The repair added kick anchors, put the lead phrase on eighths, and tightened the same Sork-60 pad's envelope, note length, and reverb send. These are examples to diagnose against the actual song, not settings to copy into every score.
+
+## Day and night transitions
+
+Day and night scores play separately. At the midpoint of dusk or dawn, the current score fades completely to silence over 1.2 seconds; the next score then fades in over 2.5 seconds. The transition follows the audio clock, including background suspension, and uses the latest destination after rapid travel. Volume, mute, and fanfare ducking retain their existing controls. Zone and title changes use the same sequence.
+
+1.15.4 validation: all 69 source/installed hashes, 128 kbps stereo encoding,
+levels, loop lengths and waveform similarity passed in
+`test-results/soundtrack-import/audio-validation.json`. The reference waveform
+uses an independent FFmpeg 25 Hz high-pass before correlation: comparing raw
+bass-heavy source audio to filtered audio falsely rejected Thunderheart because
+of the expected filter phase shift. No assertion threshold was weakened.
+The 68 supplied recording/zone mappings and Moonwell volume/mute checks passed;
+restoring Moonspore's route for zone 18 failed its intended assertion. Bounded
+real playback passed 13 checks (`test-results/driver-U3FB88`), and the bounded
+finite intro-score suite passed 17 (`test-results/driver-UjrmOb`). Transition,
+release-note, Swedish, syntax and whitespace gates passed. Source arrangements
+and narration/cutscene timing were retained; no balance or full-world suite ran.

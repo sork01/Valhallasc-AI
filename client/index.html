@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0a1230">
-<title>Valhalla Rumble · Multiplayer</title>
+<title>Valhalla Saga · Multiplayer</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%230a1230' stroke='%23f5c542' stroke-width='4'/%3E%3Cpath d='M14 22h36l-6 10 6 10H14z' fill='%2359d9ff'/%3E%3C/svg%3E">
 <link rel="manifest" href="valhallasc.webmanifest">
 <link rel="apple-touch-icon" href="assets/install-180.png">
@@ -42,11 +42,11 @@
   <canvas id="fx" aria-hidden="true"></canvas>
 
   <!-- TITLE SCREEN -->
-  <section id="scene-splash" class="scene" aria-label="Valhalla Rumble title screen">
-    <svg id="logo" class="logo" viewBox="0 0 1000 440" role="img" aria-label="Valhalla Rumble, 발할라 럼블"></svg>
+  <section id="scene-splash" class="scene" aria-label="Valhalla Saga title screen">
+    <svg id="logo" class="logo" viewBox="0 0 1000 440" role="img" aria-label="Valhalla Saga, 발할라 사가"></svg>
 
     <p class="cta"><span class="cta-en">[ Touch to Awaken the Horn ]</span><span class="cta-ko" lang="ko">터치하여 시작</span></p>
-    <p class="version">1.6.0</p>
+    <p class="version">1.15.11</p>
 
     <button class="start" id="start" type="button" aria-label="Touch to awaken the horn"></button>
   </section>
@@ -123,23 +123,25 @@
       </div>
     </aside>
 
-    <div class="cc-preview">
-      <canvas id="wcv" aria-label="Warrior preview. Click the axe, mug, head, beard or fish to interact."></canvas>
-      <canvas id="magecv" aria-label="Mage preview. Click to cast a spell." hidden></canvas>
-      <p id="mage-status" class="mage-status" role="status" hidden></p>
-      <div class="cc-turn" role="group" aria-label="Rotate character">
-        <button class="arrow" id="create-turn-left" type="button" aria-label="Turn left">↶</button>
-        <span id="create-facing" aria-live="polite">Front</span>
-        <button class="arrow" id="create-turn-right" type="button" aria-label="Turn right">↷</button>
+    <div class="cc-showcase">
+      <div class="cc-preview">
+        <canvas id="wcv" aria-label="Warrior preview. Click the axe, mug, head, beard or fish to interact."></canvas>
+        <canvas id="magecv" aria-label="Mage preview. Click to cast a spell." hidden></canvas>
+        <p id="mage-status" class="mage-status" role="status" hidden></p>
+        <div class="cc-turn" role="group" aria-label="Rotate character">
+          <button class="arrow" id="create-turn-left" type="button" aria-label="Turn left">↶</button>
+          <span id="create-facing" aria-live="polite">Front</span>
+          <button class="arrow" id="create-turn-right" type="button" aria-label="Turn right">↷</button>
+        </div>
       </div>
-    </div>
 
-    <div class="panel cc-desc">
-      <div class="cc-desc-text">
-        <h3 id="class-name">WARRIOR <span lang="ko">(워리어)</span></h3>
-        <p id="class-desc" data-i18n="warriorDesc">A furious vanguard who thrives on the front lines. High health and crushing melee power.</p>
+      <div class="panel cc-desc">
+        <div class="cc-desc-text">
+          <h3 id="class-name">WARRIOR <span lang="ko">(워리어)</span></h3>
+          <p id="class-desc" data-i18n="warriorDesc">A furious vanguard who thrives on the front lines. High health and crushing melee power.</p>
+        </div>
+        <dl class="stats" id="stats"></dl>
       </div>
-      <dl class="stats" id="stats"></dl>
     </div>
 
     <aside class="panel cc-custom" id="custom-panel" aria-label="Customize Warrior">
@@ -222,6 +224,7 @@
     </aside>
     <div id="loot-rolls" class="loot-rolls" role="group" aria-label="Loot rolls" aria-live="polite"></div>
     <div id="announce" class="announce" role="status" aria-live="polite"></div>
+    <div id="quest-progress" class="quest-progress" role="status" aria-live="polite"></div>
     <div id="error-messages" class="error-messages" role="status" aria-live="polite"></div>
     <div id="rare-pickup" class="rare-pickup" role="status" aria-live="polite" hidden><b></b><span></span></div>
     <div id="social-invites" class="social-invites" role="group" aria-label="Invitations" aria-live="polite"></div>
@@ -272,6 +275,9 @@
           <div id="npc-quest-actions" class="quest-actions" hidden></div>
           <button class="gossip-button" id="npc-back" type="button" hidden>Back</button>
           <button class="gossip-button" id="npc-quest-close" type="button" hidden>Goodbye</button>
+          <button class="window-tool" id="npc-smith-resize" type="button"
+            title="Drag to resize · double-click for the normal size"
+            aria-label="Resize the workshop. Use arrow keys to resize or 0 to reset.">Drag to resize</button>
         </footer>
       </section>
     </div>
@@ -537,39 +543,72 @@
     <div class="pause" id="settings-panel" hidden>
       <section class="panel pause-panel settings-panel" role="dialog" aria-modal="true" aria-labelledby="settings-title">
         <h3 id="settings-title">Settings</h3>
-        <label class="setting-row" for="set-language"><span>Language</span><select id="set-language"><option value="en">English</option><option value="sv">Svenska</option><option value="ko">한국어</option></select></label>
-        <label class="setting-row" for="set-uiscale"><span>UI size</span><input id="set-uiscale" type="range" min="60" max="150" step="5"><output id="set-uiscale-out" for="set-uiscale"></output></label>
-        <label class="setting-row" for="set-music"><span>Music</span><input id="set-music" type="range" min="0" max="100" step="1"><output id="set-music-out" for="set-music"></output></label>
-        <label class="setting-row" for="set-sfx"><span>Sound effects</span><input id="set-sfx" type="range" min="0" max="100" step="1"><output id="set-sfx-out" for="set-sfx"></output></label>
-        <label class="setting-row" for="set-combat-sounds"><span>Combat sounds</span><select id="set-combat-sounds"><option value="recorded">Recorded</option><option value="synthesized">Synthesized</option></select></label>
-        <label class="setting-row" for="set-night"><span>Night darkening</span><input id="set-night" type="range" min="0" max="100" step="1"><output id="set-night-out" for="set-night"></output></label>
-        <label class="setting-row" for="set-weather"><span>Weather effects</span><input id="set-weather" type="range" min="0" max="100" step="1"><output id="set-weather-out" for="set-weather"></output></label>
-        <label class="setting-row" for="set-weather-audio"><span>Weather sound</span><input id="set-weather-audio" type="range" min="0" max="100" step="1"><output id="set-weather-audio-out" for="set-weather-audio"></output></label>
-        <label class="setting-check" id="set-sound-row"><input id="set-sound" type="checkbox"> Sound on <kbd>M / N</kbd></label>
-        <label class="setting-check"><input id="set-low-graphics" type="checkbox"> Low graphics</label>
-        <label class="setting-check"><input id="dps-toggle" type="checkbox" checked> DPS meter</label>
-        <label class="setting-check" title="Point toward the tracked quest objective."><input id="set-quest-arrow" type="checkbox"> Arrow</label>
-        <button class="btn ghost" id="set-fullscreen" type="button" hidden>Fullscreen</button>
-        <button class="btn ghost" id="set-keys" type="button">Keyboard</button>
-        <p class="world-menu-note">Keyboard lets you choose which key does what.</p>
-        <button class="btn ghost" id="set-whats-new" type="button" lang="en" translate="no">What's new</button>
-        <button class="btn ghost" id="set-replay-intro" type="button">Replay intro</button>
-        <button class="btn ghost" id="set-reset-tutorial" type="button">Reset / Replay tutorial</button>
-        <button class="btn ghost" id="set-edit-ui" type="button">Edit UI</button>
-        <p class="world-menu-note">Edit UI lets you drag the skillbar, quest tracker, chat and the other panels where you want them.</p>
-        <button class="btn ghost" id="set-win-reset" type="button">Reset window sizes</button>
-        <p class="world-menu-note">UI size scales the whole interface. Drag the corner grip of a window to resize it; double-click the grip to reset it.</p>
+        <div class="settings-tabs" role="tablist" aria-label="Settings categories">
+          <button class="settings-tab" id="set-tab-sound" type="button" role="tab" aria-controls="set-section-sound" aria-selected="true">Sound</button>
+          <button class="settings-tab" id="set-tab-video" type="button" role="tab" aria-controls="set-section-video" aria-selected="false" tabindex="-1">Video</button>
+          <button class="settings-tab" id="set-keys" type="button" role="tab" aria-controls="keys-panel" aria-selected="false" tabindex="-1">Keybinds</button>
+          <button class="settings-tab" id="set-tab-interface" type="button" role="tab" aria-controls="set-section-interface" aria-selected="false" tabindex="-1">Interface</button>
+          <button class="settings-tab" id="set-tab-floating" type="button" role="tab" aria-controls="set-section-floating" aria-selected="false" tabindex="-1">Floating Text</button>
+          <button class="settings-tab" id="set-tab-general" type="button" role="tab" aria-controls="set-section-general" aria-selected="false" tabindex="-1">General</button>
+        </div>
+        <div class="settings-content">
+          <div class="settings-section" id="set-section-sound" role="tabpanel" aria-labelledby="set-tab-sound">
+            <label class="setting-row" for="set-master"><span>Master volume</span><input id="set-master" type="range" min="0" max="100" step="1"><output id="set-master-out" for="set-master"></output></label>
+            <label class="setting-row" for="set-music"><span>Music</span><input id="set-music" type="range" min="0" max="100" step="1"><output id="set-music-out" for="set-music"></output></label>
+            <label class="setting-row" for="set-sfx"><span>Sound effects</span><input id="set-sfx" type="range" min="0" max="100" step="1"><output id="set-sfx-out" for="set-sfx"></output></label>
+            <label class="setting-row" for="set-weather-audio"><span>Weather sound</span><input id="set-weather-audio" type="range" min="0" max="100" step="1"><output id="set-weather-audio-out" for="set-weather-audio"></output></label>
+            <label class="setting-row" for="set-combat-sounds"><span>Combat sounds</span><select id="set-combat-sounds"><option value="recorded">Recorded</option><option value="synthesized">Synthesized</option></select></label>
+            <label class="setting-check" id="set-sound-row"><input id="set-sound" type="checkbox"> Sound on <kbd>M / N</kbd></label>
+          </div>
+          <div class="settings-section" id="set-section-video" role="tabpanel" aria-labelledby="set-tab-video" hidden>
+            <label class="setting-check"><input id="set-low-graphics" type="checkbox"> Low graphics</label>
+            <label class="setting-row" for="set-night"><span>Night darkening</span><input id="set-night" type="range" min="0" max="100" step="1"><output id="set-night-out" for="set-night"></output></label>
+            <label class="setting-row" for="set-weather"><span>Weather effects</span><input id="set-weather" type="range" min="0" max="100" step="1"><output id="set-weather-out" for="set-weather"></output></label>
+            <button class="btn ghost" id="set-fullscreen" type="button" hidden>Fullscreen</button>
+          </div>
+          <div class="settings-section" id="keys-panel" role="tabpanel" aria-labelledby="set-keys" hidden>
+            <p class="world-menu-note">Click a key box, then press the new key. Backspace clears the box and Esc cancels. A key that another action uses is moved to this one.</p>
+            <p class="world-menu-note keys-message" id="keys-message" role="status" aria-live="polite"></p>
+            <div class="keys-list" id="keys-list"></div>
+            <button class="btn ghost" id="keys-reset-all" type="button">Reset all keys</button>
+          </div>
+          <div class="settings-section" id="set-section-interface" role="tabpanel" aria-labelledby="set-tab-interface" hidden>
+            <label class="setting-row" for="set-uiscale"><span>UI size</span><input id="set-uiscale" type="range" min="60" max="150" step="5"><output id="set-uiscale-out" for="set-uiscale"></output></label>
+            <label class="setting-check"><input id="dps-toggle" type="checkbox" checked> DPS meter</label>
+            <label class="setting-check" title="Point toward the tracked quest objective."><input id="set-quest-arrow" type="checkbox"> Quest arrow</label>
+            <label class="setting-check"><input id="set-track-ore" type="checkbox" checked> Track ore veins on the minimap</label>
+            <label class="setting-check"><input id="set-track-flowers" type="checkbox" checked> Track flower patches on the minimap</label>
+            <button class="btn ghost" id="set-edit-ui" type="button">Edit UI</button>
+            <p class="world-menu-note">Edit UI lets you drag the skillbar, quest tracker, chat and the other panels where you want them.</p>
+            <button class="btn ghost" id="set-win-reset" type="button">Reset window sizes</button>
+            <p class="world-menu-note">UI size scales the whole interface. Drag the corner grip of a window to resize it; double-click the grip to reset it.</p>
+          </div>
+          <div class="settings-section" id="set-section-floating" role="tabpanel" aria-labelledby="set-tab-floating" hidden>
+            <p class="world-menu-note">Choose the text shown above characters. Changes apply immediately.</p>
+            <div class="floating-text-actions"><button class="btn ghost" id="set-floating-all" type="button">All on</button><button class="btn ghost" id="set-floating-none" type="button">All off</button></div>
+            <div class="floating-text-options">
+            <label class="setting-check"><input id="set-floating-damage" data-floating-text="damage" type="checkbox"> Damage dealt</label>
+            <label class="setting-check"><input id="set-floating-incoming" data-floating-text="incoming" type="checkbox"> Damage taken</label>
+            <label class="setting-check"><input id="set-floating-healing" data-floating-text="healing" type="checkbox"> Healing and resources</label>
+            <label class="setting-check"><input id="set-floating-misses" data-floating-text="misses" type="checkbox"> Misses and dodges</label>
+            <label class="setting-check"><input id="set-floating-loot" data-floating-text="loot" type="checkbox"> Items and coins</label>
+            <label class="setting-check"><input id="set-floating-xp" data-floating-text="xp" type="checkbox"> Experience gains</label>
+            <label class="setting-check"><input id="set-floating-professions" data-floating-text="professions" type="checkbox"> Profession skill gains</label>
+            <label class="setting-check"><input id="set-floating-combat" data-floating-text="combat" type="checkbox"> Entering and leaving combat</label>
+            <label class="setting-check"><input id="set-floating-skills" data-floating-text="skills" type="checkbox"> Skill names and set bonuses</label>
+            <label class="setting-check"><input id="set-floating-levels" data-floating-text="levels" type="checkbox"> Level ups and rebirth</label>
+            <label class="setting-check"><input id="set-floating-notices" data-floating-text="notices" type="checkbox"> Other floating notices</label>
+            </div>
+          </div>
+          <div class="settings-section" id="set-section-general" role="tabpanel" aria-labelledby="set-tab-general" hidden>
+            <label class="setting-row" for="set-language"><span>Language</span><select id="set-language"><option value="en">English</option><option value="sv">Svenska</option><option value="ko">한국어</option></select></label>
+            <button class="btn ghost" id="set-whats-new" type="button" lang="en" translate="no">What's new</button>
+            <button class="btn ghost" id="set-replay-intro" type="button">Replay intro</button>
+            <button class="btn ghost" id="set-reset-tutorial" type="button">Reset / Replay tutorial</button>
+            <details id="set-profession-guide"><summary class="btn ghost">Profession guide</summary><dl id="profession-guide-list"></dl></details>
+          </div>
+        </div>
         <button class="btn primary" id="set-back" type="button">Back to menu</button>
-      </section>
-    </div>
-    <div class="pause" id="keys-panel" hidden>
-      <section class="panel pause-panel settings-panel keys-panel" role="dialog" aria-modal="true" aria-labelledby="keys-title">
-        <h3 id="keys-title">Keyboard</h3>
-        <p class="world-menu-note">Click a key box, then press the new key. Backspace clears the box and Esc cancels. A key that another action uses is moved to this one.</p>
-        <p class="world-menu-note keys-message" id="keys-message" role="status" aria-live="polite"></p>
-        <div class="keys-list" id="keys-list"></div>
-        <button class="btn ghost" id="keys-reset-all" type="button">Reset all keys</button>
-        <button class="btn primary" id="keys-back" type="button">Back to settings</button>
       </section>
     </div>
     <div id="fishing-panel" class="pause" hidden>
@@ -578,7 +617,7 @@
         <p id="fishing-hint">Face the water with a rod, then press ‹fish› to cast. Press again when a fish bites.</p>
         <p id="fishing-records"></p>
         <p id="fishing-training" hidden></p>
-        <label>Habitat <select id="fishing-filter"><option value="">All habitats</option><option value="Shore">Shore</option><option value="Cold">Cold</option><option value="Swamp">Swamp</option><option value="Forest">Forest</option><option value="Jungle">Jungle</option><option value="Oasis">Oasis</option><option value="Spring">Spring</option><option value="Lava">Lava</option></select></label>
+        <label>Habitat <select id="fishing-filter"><option value="">All habitats</option><option value="Shore">Shore</option><option value="Cold">Cold</option><option value="Swamp">Swamp</option><option value="Forest">Forest</option><option value="Jungle">Jungle</option><option value="Oasis">Oasis</option><option value="Spring">Spring</option><option value="Lava">Lava</option><option value="Cloudwater">Cloudwater</option><option value="Glasswater">Glasswater</option><option value="Moonwater">Moonwater</option><option value="Greenwater">Greenwater</option><option value="Deep Springs">Deep Springs</option></select></label>
         <ul id="fishing-species"></ul>
       </section>
     </div>
@@ -634,6 +673,7 @@
             <button id="character-tab-stats" class="character-tab" type="button" role="tab" data-tab="stats" aria-selected="true" aria-controls="character-pane-stats">Character &amp; stats</button>
             <button id="character-tab-sets" class="character-tab" type="button" role="tab" data-tab="sets" aria-selected="false" aria-controls="character-sets" tabindex="-1">Dungeon sets</button>
             <button id="character-tab-achievements" class="character-tab" type="button" role="tab" data-tab="achievements" aria-selected="false" aria-controls="character-achievements" tabindex="-1">Achievements</button>
+            <button id="character-tab-professions" class="character-tab" type="button" role="tab" data-tab="professions" aria-selected="false" aria-controls="character-professions" tabindex="-1">Professions</button>
             <button id="character-tab-mounts" class="character-tab" type="button" role="tab" data-tab="mounts" aria-selected="false" aria-controls="character-mounts" tabindex="-1">Mounts</button>
             <button id="character-tab-rebirth" class="character-tab" type="button" role="tab" data-tab="rebirth" aria-selected="false" aria-controls="character-rebirth" tabindex="-1">Rebirth</button>
           </div>
@@ -645,6 +685,7 @@
             </div>
             <p class="character-instructions">Drag gear onto a slot · Right-click a slot to unequip</p>
             <p id="equipment-stats" class="character-stats"></p>
+            <p id="character-racial-passive" class="character-stats racial-passive"></p>
             <section id="character-attributes" class="character-attributes" aria-label="Train character stats"></section>
           </div>
           <section id="character-sets" class="character-sets character-tabpanel" role="tabpanel" aria-labelledby="character-tab-sets" aria-label="Dungeon set bonuses" hidden></section>
@@ -657,6 +698,15 @@
             </div>
             <nav id="achievement-categories" aria-label="Achievement categories"></nav>
             <div id="achievement-list" tabindex="0"></div>
+          </section>
+          <section id="character-professions" class="character-professions character-tabpanel" role="tabpanel" aria-labelledby="character-tab-professions" tabindex="0" hidden>
+            <p id="profession-skills-unavailable">Profession skills are unavailable.</p>
+            <ul id="profession-skills" class="profession-skills" hidden>
+              <li data-profession="fishing"><span>Fishing</span><b></b><progress value="0" aria-hidden="true"></progress></li>
+              <li data-profession="blacksmithing"><span>Blacksmithing and Mining</span><b></b><progress value="0" aria-hidden="true"></progress></li>
+              <li data-profession="enchanting"><span>Enchanting</span><b></b><progress value="0" aria-hidden="true"></progress></li>
+              <li data-profession="alchemy"><span>Alchemy</span><b></b><progress value="0" aria-hidden="true"></progress></li>
+            </ul>
           </section>
           <section id="character-mounts" class="character-mounts character-tabpanel" role="tabpanel" aria-labelledby="character-tab-mounts" aria-label="Mounts" hidden></section>
           <section id="character-rebirth" class="character-rebirth character-tabpanel" role="tabpanel" aria-labelledby="character-tab-rebirth" aria-label="Rebirth" hidden></section>
@@ -686,12 +736,27 @@
   </section>
 
   <section id="chat" class="chat" aria-label="World chat" hidden>
-    <div class="chat-tabs" role="tablist" aria-label="Chat tabs">
-      <button id="tab-chat" class="on" type="button" role="tab" aria-selected="true" aria-controls="chat-log">Chat</button>
-      <button id="tab-system" type="button" role="tab" aria-selected="false" aria-controls="system-log">System</button>
+    <div class="chat-tabs">
+      <div id="chat-tab-list" class="chat-tab-list" role="tablist" aria-label="Chat tabs">
+        <button id="tab-chat" class="on" type="button" role="tab" aria-selected="true" aria-controls="chat-log">Chat</button>
+        <button id="tab-system" type="button" role="tab" aria-selected="false" aria-controls="system-log">System</button>
+      </div>
+      <button id="chat-filter-open" type="button" aria-controls="chat-filters" aria-expanded="false" hidden>Filter</button>
+      <button id="chat-tab-add" type="button" aria-label="New chat tab" title="New chat tab" aria-controls="chat-filters" aria-expanded="false">+</button>
     </div>
     <div id="chat-log" class="chat-log" role="log" aria-live="polite"></div>
     <div id="system-log" class="chat-log system-log" role="log" aria-live="off" hidden></div>
+    <div id="custom-chat-log" class="chat-log system-log" role="log" aria-live="off" hidden></div>
+    <form id="chat-filters" class="chat-log chat-filters" aria-labelledby="chat-filter-title" hidden>
+      <b id="chat-filter-title">Chat filters</b>
+      <label id="chat-tab-label">Tab name <input id="chat-tab-name" type="text" maxlength="24" autocomplete="off"></label>
+      <div id="chat-filter-options"></div>
+      <div class="chat-filter-actions">
+        <button type="submit">Save</button>
+        <button id="chat-filter-cancel" type="button">Cancel</button>
+        <button id="chat-tab-delete" type="button" hidden>Delete tab</button>
+      </div>
+    </form>
     <form id="chat-form"><input id="chat-input" type="text" maxlength="240" placeholder="Enter to chat…" aria-label="Chat message" autocomplete="off" disabled><button type="submit">Send</button></form>
   </section>
   <div id="layout-bar" class="layout-bar" role="toolbar" aria-label="Edit UI" hidden>
@@ -752,9 +817,11 @@
 <script src="music_city_night.js"></script>
 <script src="music_wyrd_night.js"></script>
 <script src="music_sky_night.js"></script>
+<script src="music_deep_night.js"></script>
 <script src="music_nacre_night.js"></script>
 <script src="music_astral_night.js"></script>
 <script src="music_prism_night.js"></script>
+<script src="music_orrery_night.js"></script>
 <script src="music_moonspore_night.js"></script>
 <script src="music_asterion_night.js"></script>
 <script src="music_stormglass_night.js"></script>
@@ -781,6 +848,7 @@
 <script src="music_prism.js"></script>
 <script src="music_orrery.js"></script>
 <script src="music_moonspore.js"></script>
+<script src="music_moonwell.js"></script>
 <script src="music_asterion.js"></script>
 <script src="music_stormglass.js"></script>
 <script src="music_sunward.js"></script>
@@ -810,6 +878,7 @@
 <script src="music_emberwake.js"></script>
 <script src="music_raid.js"></script>
 <script src="warriorview.js"></script>
+<script src="weapon-enchant-art.js"></script>
 <script src="magesprite.js"></script>
 <script src="mountart.js"></script>
 <script src="assassinsprite.js"></script>
@@ -843,6 +912,7 @@
 <script src="alchemy-data.js"></script>
 <script src="alchemy-art.js"></script>
 <script src="alchemy.js"></script>
+<script src="gathering-map.js"></script>
 <script src="attributes.js"></script>
 <script src="mounts.js"></script>
 <script src="rebirth.js"></script>

@@ -8,7 +8,9 @@ from fishing_spots import HABITATS, walkable, segment_distance, SURFACES, radius
 from spirit_guides import clear
 
 ROOT = Path(__file__).resolve().parents[1]
-PREFIXES = {0:'meadow',1:'crags',2:'rime',3:'fen',6:'wyrd',19:'storm',20:'sun',22:'tangle',25:'lapis',26:'fws',28:'yr',45:'ew'}
+PREFIXES = {0:'meadow',1:'crags',2:'rime',3:'fen',6:'wyrd',19:'storm',20:'sun',22:'tangle',25:'lapis',26:'fws',28:'yr',45:'ew',
+            7:'sky',13:'astral',14:'prism',15:'orrery',16:'moonspore',17:'asterion',21:'ribbon',
+            23:'veyr',24:'heartwood',27:'cairn'}
 ELITES = set(json.loads((ROOT/'world/enrage.txt').read_text()))
 DIALOGUE = 'Bring me fish and I can cook a meal or make a stronger rod. Each upgrade replaces your old rod. Platinum line fishes water and Crags lava; tempered platinum also reaches Emberwake. Cooked fish grant one food bonus for ten minutes.'
 
@@ -47,12 +49,24 @@ def location(area, reach, zone, anchor):
     return next((p for p in candidates if safe(area,reach,*p)), None)
 
 
-def install(world, recipes, fish, levels):
+def quest_description(zone, fish, rod):
+    if zone == 0 and fish['item'] == 'fish_glass_eel':
+        return (f"Use a {rod['name']} or better to catch a Glass Eel from the Saltby pier. "
+                "Bring it to the Fisher. Glass Eels already in your bags count.")
+    if rod['tier'] > 1:
+        return (f"Use a {rod['name']} or better to catch the fish for this quest in local waters. "
+                "Bring them to the Fisher. Fish already in your bags count.")
+    return 'Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.'
+
+
+def install(world, recipes, fish, levels, rods):
+    rod_by_tier = {r['tier']: r for r in rods}
     for area in [world,*world['zones']]:
         area['npcs'] = [n for n in area.get('npcs',[]) if not n['id'].startswith('fisher_')]
         area['quests'] = [q for q in area.get('quests',[]) if not q['id'].startswith('fisher_')]
     for zone, habitat in HABITATS.items():
         area = [world,*world['zones']][zone]
+        water_tier = max(r['tier'] for r in rods if zone in r['zones'])
         reach = walkable(area)
         anchors = ['Alderhaven','Saltby'] if zone == 0 else [area['city']['name']]
         for slot, anchor in enumerate(anchors):
@@ -74,12 +88,13 @@ def install(world, recipes, fish, levels):
             for stage, rarity, count in [(1,'common',5),(2,'uncommon',3),(3,'rare',1),(4,'common',5)]:
                 f = next(f for f in pool if f['rarity']==rarity)
                 # Region entry tiers constrain where a species can actually be caught.
-                rod_level = {0:1,1:5,2:10,3:15,6:25,19:40,20:40,22:70,25:80,26:90,28:95,45:95}[zone]
-                level = max(f['level'],rod_level, 25 if rarity=='rare' and habitat!='Lava' else 1,
-                            45 if rarity=='rare' and habitat=='Lava' else 1)
+                rod = rod_by_tier[max(water_tier, f['min_tier'])]
+                region_level = area.get('levels', [1])[0]
+                trophy_level = (45 if habitat == 'Lava' else 25) if rarity == 'rare' else 1
+                level = max(f['level'], rod['level'], region_level, trophy_level)
                 qid = f'{key}_{stage}'
                 title = ('Fresh Fish for ' if stage==1 else 'A Finer Catch for ' if stage==2 else 'A Trophy for ' if stage==3 else 'The Daily Creel at ') + anchor
-                description = 'Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.'
+                description = quest_description(zone, f, rod)
                 area['quests'].append(dict(id=qid,title=title,npc=key,requires=previous if stage<4 else f'{key}_1',
                     repeatable=stage==4,level=level,rewardXp=levels[level-1]//10,rewardGold=max(5,level*3),
                     description=description,objectives=[dict(kind='bring',target=f['item'],count=count,what=f['name'])]))
@@ -98,7 +113,8 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--check',action='store_true');args=parser.parse_args()
     path=ROOT/'world/map.txt';world=json.loads(path.read_text())
     levels=json.loads((ROOT/'world/levels.txt').read_text());levels.append(levels[-1]+2300)
-    install(world,json.loads((ROOT/'world/fishing-workshop.txt').read_text()),json.loads((ROOT/'world/fish.txt').read_text()),levels)
+    install(world,json.loads((ROOT/'world/fishing-workshop.txt').read_text()),json.loads((ROOT/'world/fish.txt').read_text()),
+            levels,json.loads((ROOT/'world/rods.txt').read_text()))
     text=json.dumps(world,ensure_ascii=False,indent=2)+'\n'
     if args.check:
         if path.read_text()!=text:raise SystemExit('Fisher overlay is stale')

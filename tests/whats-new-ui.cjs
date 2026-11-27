@@ -35,6 +35,12 @@ async function newPage() {
     assert.notEqual(body, src, 'Mutation applied');
     return route.fulfill({ body, contentType: 'text/javascript' });
   });
+  if (process.env.MUTATE === 'brand') await page.route('**/logo.js', route => {
+    const src = fs.readFileSync(path.join(root, 'client/logo.js'), 'utf8');
+    const body = src.replace("text: 'SAGA'", "text: 'RUMBLE'");
+    assert.notEqual(body, src, 'Brand mutation applied');
+    return route.fulfill({ body, contentType: 'text/javascript' });
+  });
   return page;
 }
 (async () => {
@@ -42,7 +48,25 @@ async function newPage() {
   const page = await newPage();
   await page.goto(world.url); await waitOpen(page);
   check(await page.locator('#news-title').textContent() === current, 'The dialog title is the current version');
-  check(await page.locator('#news-body').textContent().then(text => /Welcome to Valhalla Rumble/.test(text) && /Greenmeadow/.test(text) && /Linden/.test(text)), 'First visit shows the welcome and where to begin');
+  check(await page.locator('#news-body').textContent().then(text => /Welcome to Valhalla Saga/.test(text) && /Greenmeadow/.test(text) && /Linden/.test(text)), 'First visit shows the welcome and where to begin');
+  check(await page.title() === 'Valhalla Saga · Multiplayer', 'Browser title uses Valhalla Saga');
+  check(await page.locator('#logo #t2').textContent() === 'SAGA', 'Visible logo uses SAGA');
+  check(await page.locator('#logo #ko').textContent() === '발할라 사가', 'Korean ribbon uses the new name');
+  check(await page.locator('#logo').getAttribute('aria-label') === 'Valhalla Saga, 발할라 사가', 'Accessible logo name matches');
+  check((await (await page.request.get(world.url + 'valhallasc.webmanifest')).json()).name === 'Valhalla Saga', 'Installed app name matches');
+  if (process.env.BRAND_ONLY) {
+    await page.locator('#news-close').click();
+    await page.evaluate(() => document.fonts.ready);
+    for (const [label, width, height] of [['desktop', 1440, 900], ['phone', 844, 390]]) {
+      await page.setViewportSize({ width, height });
+      const bounds = await page.locator('#logo #t2').evaluate(el => { const r = el.getBBox(); return { x: r.x, right: r.x + r.width, width: r.width }; });
+      check(bounds.x >= 0 && bounds.right <= 1000 && bounds.width > 100, `${label}: new title fits the existing logo`);
+      await page.screenshot({ path: path.join(world.runDir, `valhalla-saga-${label}.png`) });
+    }
+    check(errors.length === 0, `No browser errors: ${errors.join(' | ')}`);
+    console.log(`Valhalla Saga branding: ${checks} checks passed; screenshots: ${world.runDir}`);
+    return;
+  }
   check(await page.locator('#news-body kbd').allTextContents().then(keys => keys.join(',') === 'W,A,S,D,Space,F,Q'), 'Welcome controls come from the current key map');
   await page.evaluate(() => { Keys.bind('moveUp', 0, 'KeyR'); Keys.bind('attack', 0, 'KeyV'); Keys.bind('talk', 0, 'KeyT'); Keys.bind('quests', 0, 'KeyU'); });
   check(await page.locator('#news-body kbd').allTextContents().then(keys => keys.join(',') === 'R,A,S,D,V,T,U'), 'Welcome controls follow changed bindings while it is open');
@@ -73,7 +97,7 @@ async function newPage() {
   await page.locator('#start').click(); await playGuest(page);
   await page.locator('#cls-mage').click(); await page.locator('#name').fill('Newsreader'); await page.locator('#go').click({ timeout: 60000 });
   await page.waitForFunction(() => Online.connected && !!Field.mageSprites, null, { timeout: 60000 });
-  await page.keyboard.press('Escape'); await page.locator('#p-settings').click();
+  await page.keyboard.press('Escape'); await page.locator('#p-settings').click(); await page.locator('#set-tab-general').click();
   await page.locator('#set-whats-new').click(); await waitOpen(page);
   check(await page.locator('#news-label').textContent() === "What's new", 'Settings reopens the latest notes instead of the welcome');
   check(await page.evaluate(() => [...document.querySelectorAll('.panel-grip, .win-grip:not([data-window="whats-new"])')].every(el => getComputedStyle(el).visibility === 'hidden')), 'Other windows and HUD grips stay behind the notes');
@@ -125,7 +149,7 @@ async function newPage() {
   await sv.context().setExtraHTTPHeaders({ 'Accept-Language': 'sv-SE' });
   await sv.addInitScript(() => Object.defineProperty(navigator, 'language', { value: 'sv-SE' }));
   await sv.reload(); await waitOpen(sv);
-  check(await sv.locator('#news-body h3').textContent() === 'Welcome to Valhalla Rumble!' && await sv.locator('#news-close').textContent() === 'Close', 'A new Swedish player gets the English welcome too');
+  check(await sv.locator('#news-body h3').textContent() === 'Welcome to Valhalla Saga!' && await sv.locator('#news-close').textContent() === 'Close', 'A new Swedish player gets the English welcome too');
   await sv.close();
 
   const unavailable = await newPage(); await seed(unavailable, 'en');

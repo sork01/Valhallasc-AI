@@ -1,3 +1,3 @@
 'use strict';
 /* The Eighth Quiet Ring: Asterion's night remix. */
-window.createAsterionNightMusic = ctx => window.createLoopMusic(ctx, 'assets/music_asterion_night.mp3');
+window.createAsterionNightMusic = ctx => window.createLoopMusic(ctx, 'assets/music_asterion_night.mp3?v=saga-1.15.6');

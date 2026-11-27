@@ -9,7 +9,7 @@ At k = 1.0 the atlas outline of Bifrost Reach is a rounded wedge (bbox 339 x 371
 | island | painted | now |
 |---|---|---|
 | `nw` Windward Meadow | top left, 6,326 tiles | galehounds (30), Windward Roost, the Windcairn, the first ward, the Western Beacon, **Sköll** |
-| `hub` Heimdall's Perch | centre, 6,176 | the old Perch moved whole, the Span door, the Empty Seat circle; a few galehounds and prism golems round it |
+| `hub` Heimdall's Perch | centre, 6,176 | the old Perch moved whole, the Empty Seat circle; a few galehounds and prism golems round it |
 | `north` Hall of the Fallen | small, 1,019 | the Hall Gate, the Silent Bell, the Fallen's Vigil ward |
 | `ne` the Roc's Eyrie | top right, 5,392 | thunderrocs (35) and einherjar, Eyrie Landing, the Last Ward, the Nest Rod, **Heimdall's Shade** |
 | `se` the Stormcrown | bottom right, 5,263 | skyrays (32-33), Stormcrown Station, the Tally Stones, the Station Rod, the Ember Grave Cross |
@@ -21,7 +21,7 @@ At k = 1.0 the atlas outline of Bifrost Reach is a rounded wedge (bbox 339 x 371
 
 Non-regression: after the change `map.txt` differs from the baseline only in Bifrost and in six arrival coordinates (`path_1_7`, `sky_gate`, `maelstrom_up`, `path_9_7`, `span_return`, `span_clear`); every other zone is byte-identical.
 
-The four updrafts each stand on their painted pad, gate near the rim facing the neighbour, arrival six tiles in: **Stormrift** (pad south-west, to the Wyrdwood), **Maelstrom** (the orb in the east, Rán's Deep), **Nacrehold** (south-east pad), **Cragsfall** (the Shardfields' southern tip, the Crags). The Span's door keeps its place on the Perch. `ZoneJourney` already draws the wind passage for any crossing into or out of a sky theme, so nothing changed there.
+The four updrafts each stand on their painted pad, gate near the rim facing the neighbour, arrival six tiles in: **Stormrift** (pad south-west, to the Wyrdwood), **Maelstrom** (the orb in the east, Rán's Deep), **Nacrehold** (south-east pad), **Cragsfall** (the Shardfields' southern tip, the Crags). The Shattered Span now opens off the Lightning Spire trail in the Shardfields. Its gate and exits are local to Bifrost and do not play the wind passage.
 
 ## The design (`scripts/bifrost_design.py`, `bifrost_content.py`)
 

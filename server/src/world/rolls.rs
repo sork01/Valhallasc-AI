@@ -83,18 +83,8 @@ impl World {
         })
     }
 
-    pub(super) fn refused_drop_notice(&mut self, index: usize, session: u64) {
-        let d = &self.drops[index];
-        let bag = d
-            .item
-            .as_deref()
-            .and_then(item)
-            .is_some_and(|i| i.kind == "bag");
-        let text = if bag {
-            "Your bag slots are full or this bag needs a higher level. Nobody nearby can fit it. It stays on the ground."
-        } else {
-            "Nobody nearby has bag room for this item. It stays on the ground."
-        };
+    pub(super) fn refused_drop_notice(&mut self, session: u64) {
+        let text = "Nobody nearby has bag room for this item. It stays on the ground.";
         if let Some(p) = self.players.get_mut(&session)
             && self.time - p.bag_notice_at >= 5.
         {
@@ -375,7 +365,7 @@ impl World {
             group
         };
         let Some(who) = self.next_taker(&group, id) else {
-            self.refused_drop_notice(index, session);
+            self.refused_drop_notice(session);
             return false;
         };
         if self.merc_id(&who) {
@@ -387,15 +377,7 @@ impl World {
             if d.gear.is_some() {
                 p.character.materialize_gear_instances();
             }
-            if item(id).is_some_and(|i| i.kind == "bag") {
-                // Bags are fitted on pickup, so their level and four-slot rules
-                // remain authoritative even when a party shares the pile.
-                if p.character.fit_bag(id).is_err() {
-                    return false;
-                }
-            } else {
-                p.character.add_item(id, d.quantity);
-            }
+            p.character.add_item(id, d.quantity);
             if let Some(mut gear) = d.gear.clone() {
                 gear.id = p.character.next_gear_id;
                 p.character.next_gear_id += 1;
@@ -564,13 +546,7 @@ impl World {
         if gear.is_some() {
             p.character.materialize_gear_instances();
         }
-        if item(item_id).is_some_and(|i| i.kind == "bag") {
-            if p.character.fit_bag(item_id).is_err() {
-                return false;
-            }
-        } else {
-            p.character.add_item(item_id, 1);
-        }
+        p.character.add_item(item_id, 1);
         let rarity = gear.as_ref().map(|g| g.rarity.clone()).or_else(|| item(item_id).map(|i| i.rarity.clone()));
         if let Some(mut copy) = gear {
             copy.id = p.character.next_gear_id;
@@ -1082,10 +1058,15 @@ mod tests {
     }
 
     #[test]
-    fn shared_bag_drops_fit_round_robin_and_wait_when_no_member_is_eligible() {
+    fn shared_bag_drops_go_to_inventory_even_with_four_bags_or_low_level() {
         let mut w = world();
         let who = party(&mut w, &["Ann", "Bob"]);
         let at = spot(&w);
+        for (session, ..) in &who {
+            let c = &mut w.players.get_mut(session).unwrap().character;
+            c.level = 1;
+            c.bags = vec!["trail_pack_l20".into(); 4];
+        }
         for _ in 0..2 {
             w.loot_drop(&who[0].1, 0, at, "trail_pack_l20");
         }
@@ -1098,44 +1079,13 @@ mod tests {
         assert!(w.drops.is_empty());
         for (session, ..) in &who {
             let c = &w.players[session].character;
-            assert_eq!(c.bags, vec!["trail_pack_l20"]);
-            assert_eq!(c.bag_capacity(), 26);
-            assert_eq!(
-                c.quantity("trail_pack_l20"),
-                0,
-                "the bag is fitted, not loose"
-            );
+            assert_eq!(c.bags, vec!["trail_pack_l20"; 4]);
+            assert_eq!(c.bag_capacity(), 56);
+            assert_eq!(c.quantity("trail_pack_l20"), 1);
         }
-        for (session, ..) in &who {
-            w.players.get_mut(session).unwrap().character.level = 1;
-        }
-        w.loot_drop(&who[0].1, 0, at, "trail_pack_l20");
-        collect_all(&mut w);
-        assert_eq!(w.drops.len(), 1, "a level-locked drop waits on the ground");
-        w.players.get_mut(&2).unwrap().character.level = 20;
-        collect_all(&mut w);
-        assert!(w.drops.is_empty());
-        assert_eq!(w.players[&2].character.bag_capacity(), 36);
-        assert_eq!(w.players[&1].character.bag_capacity(), 26);
-        for (session, ..) in &who {
-            let c = &mut w.players.get_mut(session).unwrap().character;
-            c.level = 20;
-            c.bags = vec!["trail_pack_l20".into(); 4];
-        }
-        w.loot_drop(&who[0].1, 0, at, "trail_pack_l20");
-        collect_all(&mut w);
-        assert_eq!(
-            w.drops.len(),
-            1,
-            "a full set with no smaller bag leaves the drop on the ground"
-        );
-        assert!(
-            who.iter()
-                .all(|(session, ..)| w.players[session].character.bag_capacity() == 56)
-        );
     }
     #[test]
-    fn a_bag_drop_expands_capacity_even_when_the_item_grid_is_full() {
+    fn a_bag_drop_needs_an_inventory_cell_or_a_matching_stack() {
         let mut w = world();
         let who = party(&mut w, &["Ann"]);
         let at = spot(&w);
@@ -1149,9 +1099,19 @@ mod tests {
         assert_eq!(c.bag_used(), 16);
         w.loot_drop(&who[0].1, 0, at, "trail_pack_l20");
         collect_all(&mut w);
+        assert_eq!(w.drops.len(), 1);
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        let loose = c.inventory.iter().find(|s| c.equipped_count(item(&s.item).unwrap()) == 0).unwrap().item.clone();
+        assert!(c.consume_item(&loose, 1));
+        collect_all(&mut w);
         assert!(w.drops.is_empty());
-        assert_eq!(w.players[&1].character.bag_capacity(), 26);
+        assert_eq!(w.players[&1].character.quantity("trail_pack_l20"), 1);
+        assert_eq!(w.players[&1].character.bag_capacity(), 16);
         assert_eq!(w.players[&1].character.bag_used(), 16);
+        w.loot_drop(&who[0].1, 0, at, "trail_pack_l20");
+        collect_all(&mut w);
+        assert!(w.drops.is_empty());
+        assert_eq!(w.players[&1].character.quantity("trail_pack_l20"), 2);
     }
 
     #[test]

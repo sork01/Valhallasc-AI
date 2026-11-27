@@ -8,6 +8,10 @@ Owner, 2026-11-06: "i want the minimap to be the whole world. like the zones are
 - `drawMini` draws every world zone whose grid box reaches the view: all shallows first, then land, each land layer with its own zone's fog. Gate-only borders (no seam) show the neighbour too. NPCs, Spark masters and `Quests.mapMarkers(z)` of every zone in view are drawn with no fade (other zones' quest marks only where in view; the hero's own pin to the edge). Enemy dots stay what the server sends (`farDots`, ghosts).
 - One sea colour for the atlas frame (`#2b2421`; Rán's Deep and Nacrehold keep their deep-blue `#071018`). Bifrost's canvas is cut to its islands like an outlined zone.
 
+## Gathering
+
+**Gathering** (1.6.2) adds one **Track** button beside the minimap after learning Blacksmithing or Alchemy. Tap or click to cycle through the learned resource types and back to off. Amber diamonds show ore veins and pink circles show flower patches. An edge arrow points to the closest active resource in the current zone when zoom or distance puts all of that type outside the minimap. The marks show through fog and follow the active resources in each snapshot as they move.
+
 ## Memory and cost
 - Per zone two canvases (land, shallows) at 2.4 px per tile, cached in `miniCache`: 8 soft cap, 14 hard, least recently used first, never the hero's zone, never a zone still in reach (view plus a 60% margin). Missing zones are queued nearest first and built one per 30 ms timer tick from a context kept out of `ctxs` (`miniCtx`), so they never count as seam neighbours for `staleChunk`/`nbFloor`. Leaving the atlas (a dungeon) frees them.
 - Measured 2026-11-10: the renderer sits near 0.8-1.1 GB with or without it; the cache is not a visible share. A bounded run that visits five or six zones in one client dies with `oom-kill` with the OLD client too, and so did the touch section of `tests/minimap-ui.cjs` (two clients): the test now closes the desktop context first.

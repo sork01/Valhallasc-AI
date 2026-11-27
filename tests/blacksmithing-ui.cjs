@@ -14,6 +14,7 @@ const w = new TestWorld();
 w.startLevel = 4;
 w.levelSpread = 0;
 const touch = process.env.TOUCH === '1';
+const miningAudio = process.env.MINING_AUDIO === '1';
 const gear = 'smith_gear_tin_banded_gloves';
 let browser;
 
@@ -26,10 +27,11 @@ let browser;
   });
   if (process.env.MUTATE === 'no-vein-click') {
     const text = fs.readFileSync(path.join(root,'client/field.js'),'utf8');
-    assert(text.includes('window.Blacksmithing.start(vein);'));
+    const call = touch ? "startGathering(vein, smithing, 'veins');" : "startGathering(vein, window.Blacksmithing, 'veins');";
+    assert(text.includes(call));
     await page.route('**/field.js', route => route.fulfill({
       contentType:'application/javascript',
-      body:text.replace('window.Blacksmithing.start(vein);','void vein;'),
+      body:text.replace(call,'void vein;'),
     }));
   }
   const errors = [];
@@ -48,7 +50,39 @@ let browser;
       if (packet?.type === 'mine') miningRequests.push(packet.id);
     });
   });
-  await page.addInitScript(lang => localStorage.setItem('valhallasc.save.v1', JSON.stringify({lang,sound:false})), touch ? 'sv' : 'en');
+  await page.addInitScript(({lang, miningAudio}) => {
+    localStorage.setItem('valhallasc.save.v1', JSON.stringify({lang,sound:miningAudio,musicVol:0}));
+    if (!miningAudio) return;
+    window.strikePlayback = [];
+    const samples = new WeakSet(), buffers = new WeakSet();
+    const fetchAsset = window.fetch;
+    window.fetch = async (input, options) => {
+      const response = await fetchAsset(input, options);
+      if (!String(input).endsWith('/sfx_smith_strike.mp3')) return response;
+      const bytes = response.arrayBuffer.bind(response);
+      response.arrayBuffer = async () => {
+        const sample = await bytes();
+        samples.add(sample);
+        return sample;
+      };
+      return response;
+    };
+    const decode = AudioContext.prototype.decodeAudioData;
+    AudioContext.prototype.decodeAudioData = function (sample, ...callbacks) {
+      const result = decode.call(this, sample, ...callbacks);
+      if (!samples.has(sample)) return result;
+      return result.then(buffer => {
+        buffers.add(buffer);
+        window.strikeDecodedAt = performance.now();
+        return buffer;
+      });
+    };
+    const start = AudioBufferSourceNode.prototype.start;
+    AudioBufferSourceNode.prototype.start = function (...args) {
+      if (buffers.has(this.buffer)) window.strikePlayback.push({at:performance.now(), state:this.context.state});
+      return start.apply(this, args);
+    };
+  }, {lang:touch ? 'sv' : 'en', miningAudio});
   await page.goto(w.url);
   for (const id of ['start','login-guest','cls-warrior']) await page.locator('#'+id).click();
   await page.locator('#name').fill(touch ? 'Touchminer' : 'Desktopminer');
@@ -73,45 +107,88 @@ let browser;
   await page.locator('#npc-inventory button').click();
   await page.waitForFunction(() => Inventory.bagQuantity('smith_pick_1') === 1);
   const skill = page.locator('.smith-skill');
-  assert.match(await skill.textContent(), touch ? /Smidesfärdighet 1 \/ 300/ : /Blacksmithing skill 1 \/ 300/);
+  assert.match(await skill.textContent(), touch ? /Smidesfärdighet 1 \/ 600/ : /Blacksmithing skill 1 \/ 600/);
   const staple = page.locator(`[data-recipe="${gear}"]`);
-  await staple.locator('button').click();
-  await staple.locator('button').filter({hasText:touch ? 'Smid föremål' : 'Forge item'}).waitFor();
-  assert(await staple.locator('button').isDisabled(),'ingredients are required');
+  const craft = staple.locator(`[data-smith-action="${gear}"]`);
+  await craft.click();
+  await craft.filter({hasText:touch ? 'Smid föremål' : 'Forge item'}).waitFor();
+  assert(await craft.isDisabled(),'ingredients are required');
   await page.locator('#npc-x').click();
 
   const safe = v => Math.min(...map.slimes.map(s => Math.hypot(s.x-v.x,s.y-v.y)));
   const vein = [...view.miningVeins].sort((a,b) => safe(b)-safe(a))[0];
   await warp(vein);
-  await page.evaluate(vein => {
-    const draw = Blacksmithing.draw;
-    Blacksmithing.draw = (g,project,width,height,reduced) => {
-      const [x,y] = project(vein.x,vein.y);
-      if (x > 80 && x < width-80 && y > 90 && y < height-60) window.smithVeinTest = {x,y,width,height};
-      draw(g,project,width,height,reduced);
+  // Wandering enemies can put the character in combat even with test invulnerability.
+  const playerId = await page.evaluate(() => Online.id);
+  const nearbyEnemies = view.slimes.filter(s => !s.dead && Math.hypot(s.x-vein.x,s.y-vein.y) < 16);
+  const clearAt = view.tick;
+  for (const enemy of nearbyEnemies) await debug({op:'kill_enemy',id:enemy.id});
+  await w.waitFor(() => view.tick > clearAt && view.players.find(p => p.id === playerId)?.inCombat === false
+    && nearbyEnemies.every(enemy => !view.slimes.some(s => s.id === enemy.id && !s.dead)),
+    15000,'the test vein is clear of combat');
+  await page.evaluate(id => {
+    const draw = Blacksmithing.drawVein;
+    Blacksmithing.drawVein = (g,vein,x,y) => {
+      if (vein.id === id) {
+        const scale = g.getTransform().a;
+        window.smithVeinTest = {x,y,width:g.canvas.width/scale,height:g.canvas.height/scale};
+      }
+      draw(g,vein,x,y);
     };
-  },vein);
+  },vein.id);
   await page.waitForFunction(() => Boolean(window.smithVeinTest));
+  if (miningAudio) await page.evaluate(() => {
+    const mining = Blacksmithing.mining;
+    window.mineTimes = {};
+    Blacksmithing.mining = packet => {
+      window.mineTimes[packet.state] = performance.now();
+      mining(packet);
+    };
+  });
   await page.waitForTimeout(600); // let camera movement settle before taking the hitbox coordinates
   const target = await page.evaluate(() => {
     const {x,y,width,height} = window.smithVeinTest;
     const r = document.getElementById('fieldcv').getBoundingClientRect();
-    return {x:r.x+x*r.width/width,y:r.y+(y-22)*r.height/height};
+    return {x:r.x+x*r.width/width,y:r.y+(y-47)*r.height/height};
   });
   assert(await page.evaluate(({x,y}) => document.elementFromPoint(x,y)?.id === 'fieldcv', target),
     'the ore is visible on the interactive world canvas');
-  if (touch) await page.touchscreen.tap(target.x,target.y);
-  else await page.mouse.click(target.x,target.y);
+  if (touch) {
+    const mine = page.locator('#touch-skills .touch-mine');
+    assert.equal(await mine.textContent(),'Bryt malm');
+    const box = await mine.boundingBox();
+    assert(box.width >= 44 && box.height >= 44,'mining is a full-sized touch target');
+    assert(await mine.evaluate(button => {
+      const r=button.getBoundingClientRect();
+      return document.elementFromPoint(r.x+r.width/2,r.y+r.height/2) === button;
+    }),'the Mine ore button receives touch events');
+    await mine.tap();
+  } else await page.mouse.click(target.x,target.y);
   try {
     await w.waitFor(() => miningPackets.at(-1)?.state === 'done' || miningPackets.at(-1)?.state === 'error', 9500, 'mining reply');
     assert.equal(miningPackets.at(-1).state,'done',miningPackets.at(-1).text || 'pull completed');
     assert(miningPackets.some(packet => packet.state === 'started'));
+    assert.deepEqual(miningRequests,[vein.id]);
     await page.waitForFunction(() => Inventory.bagQuantity('smith_ore_tin') > 0, null, {timeout:8000});
   } catch (error) {
     error.message += ` (sent ${JSON.stringify(miningRequests)}, received ${JSON.stringify(miningPackets)})`;
     throw error;
   }
   assert.match(await page.locator('#mining-status').textContent(),touch ? /Bröt [12] × Tennmalm/ : /Mined [12] × Tin Ore/);
+  if (miningAudio) {
+    const {strikePlayback, mineTimes, strikeDecodedAt} = await page.evaluate(() => ({strikePlayback, mineTimes, strikeDecodedAt}));
+    assert.ok(strikeDecodedAt < mineTimes.started, 'the first pull has its sound decoded before mining starts');
+    assert.equal(strikePlayback.length, 3, 'the mining sample plays three times during the pull');
+    for (const [i, {at, state}] of strikePlayback.entries()) {
+      const offset = at - mineTimes.started;
+      assert.equal(state, 'running', 'the sample plays through the live audio mixer');
+      assert.ok(Math.abs(offset - (300 + i * 600)) < 220 && at < mineTimes.done,
+        `strike ${i + 1} plays near contact before the reward (${Math.round(offset)} ms)`);
+    }
+    assert.deepEqual(errors,[]);
+    console.log('Mining audio: all three pickaxe clangs played through Web Audio during a real mining pull.');
+    return;
+  }
   await page.screenshot({path:path.join(w.runDir,touch ? 'blacksmithing-touch-mining.png' : 'blacksmithing-desktop-mining.png')});
 
   await warp(smith);
@@ -119,7 +196,6 @@ let browser;
   await debug({op:'give_item',item:'smith_leather_strips',quantity:2});
   await page.waitForFunction(() => Inventory.bagQuantity('smith_leather_strips') === 2);
   await interact();
-  const craft = staple.locator('button');
   await craft.scrollIntoViewIfNeeded();
   assert(await craft.isEnabled());
   const workshopBounds = await page.locator('#npc-dialogue > .gossip-window').boundingBox();

@@ -1,7 +1,8 @@
 //! Mining channels and workshop transactions resolve on the world thread.
 use super::*;
 use crate::blacksmithing::{
-    CANDIDATES, CATALOG, Command, Method, STARTER_PICK, TRAINER, WORKSHOP, training_cap,
+    CANDIDATES, CATALOG, Command, MAX_SKILL, Method, Pick, STARTER_PICK, TRAINER, WORKSHOP,
+    training_cap,
 };
 
 const REACH: f64 = 2.6;
@@ -30,12 +31,24 @@ fn skill_for(tier: usize) -> u16 {
     if tier == 0 { 1 } else { training_cap(tier - 1) }
 }
 
+fn training_view(skill: u16) -> Option<Value> {
+    CATALOG.training(skill).map(|band| {
+        let pick = CATALOG.expert_pick(band.cap);
+        let mut view = json!({"cap":band.cap,"ore":CATALOG.tiers[band.tier].ore,"zones":band.zones});
+        if let Some(pick) = pick {
+            view["pick"] = json!(pick.item);
+        }
+        view
+    })
+}
+
 pub(super) fn workshop_view(npc: &Npc, c: &Character) -> Option<Value> {
     npc.offers
         .iter()
         .any(|offer| offer.id == WORKSHOP)
         .then(|| {
-            json!({"skill":c.blacksmithing.proficiency.skill,"recipes":c.blacksmithing.recipes,
+            let skill = c.blacksmithing.proficiency.skill;
+            json!({"skill":skill,"maxSkill":MAX_SKILL,"training":training_view(skill),"recipes":c.blacksmithing.recipes,
             "trainer":c.zone == 0 && npc.id == TRAINER})
         })
 }
@@ -43,8 +56,8 @@ pub(super) fn workshop_view(npc: &Npc, c: &Character) -> Option<Value> {
 fn workshop_action(
     c: &mut Character,
     request: &Command,
-    roll: f64,
-) -> Result<(&'static str, Option<String>), &'static str> {
+    roll: impl FnMut() -> f64,
+) -> Result<(String, Option<String>), &'static str> {
     let progress = &c.blacksmithing;
     let skill = progress.proficiency.skill;
     if let Command::Train { .. } = request {
@@ -57,7 +70,7 @@ fn workshop_action(
         c.blacksmithing.proficiency.initialize(1);
         c.add_item(STARTER_PICK, 1);
         return Ok((
-            "You learned Blacksmithing and received a starter pick.",
+            "You learned Blacksmithing and received a starter pick.".into(),
             None,
         ));
     }
@@ -82,7 +95,7 @@ fn workshop_action(
             if !c.blacksmithing.recipes.insert(recipe.item.clone()) {
                 return Err("You already know this blueprint.");
             }
-            Ok(("You learned the blueprint.", None))
+            Ok(("You learned the blueprint.".into(), None))
         }
         Command::Study { plan } => {
             if progress.recipes.contains(&recipe.item) {
@@ -92,9 +105,9 @@ fn workshop_action(
                 return Err("That blueprint is missing from your bags.");
             }
             c.blacksmithing.recipes.insert(recipe.item.clone());
-            Ok(("You learned the blueprint.", None))
+            Ok(("You learned the blueprint.".into(), None))
         }
-        Command::Craft { .. } => {
+        Command::Craft { all, .. } => {
             if skill < recipe.skill {
                 return Err("Your Blacksmithing skill is too low.");
             }
@@ -102,19 +115,18 @@ fn workshop_action(
             if gear && !progress.recipes.contains(&recipe.item) {
                 return Err("Learn this blueprint before forging it.");
             }
-            if c.gold < recipe.cost {
-                return Err("You cannot afford that recipe.");
-            }
-            for (item, count) in &recipe.ingredients {
-                if !c.consume_item(item, *count) {
-                    return Err("You do not have the ingredients for that recipe.");
-                }
-            }
-            if !c.can_collect(&recipe.item) || c.quantity(&recipe.item) == u32::MAX {
-                return Err("Your bags are full. Make room first.");
-            }
-            c.gold -= recipe.cost;
-            c.add_item(&recipe.item, 1);
+            let all = *all && recipe.method != Method::Upgrade;
+            let costs = recipe
+                .ingredients
+                .iter()
+                .map(|(id, count)| (std::iter::once(id.as_str()), *count));
+            let count = c.produce_recipe(
+                &recipe.item,
+                recipe.cost,
+                all,
+                costs,
+                "You do not have the ingredients for that recipe.",
+            )?;
             if gear {
                 c.materialize_gear_instances();
                 let quality = match recipe.method {
@@ -122,14 +134,21 @@ fn workshop_action(
                     Method::Rare => 1,
                     _ => 0,
                 };
-                c.blacksmithing
-                    .proficiency
-                    .try_gain(quality, training_cap(recipe.tier), roll);
+                c.blacksmithing.proficiency.train_batch(
+                    count,
+                    quality,
+                    CATALOG.forging_cap(skill, recipe.tier),
+                    MAX_SKILL,
+                    crate::profession::EXPERT_ODDS_FLOOR_AT,
+                    roll,
+                );
             }
-            let message = match recipe.method {
-                Method::Smelt => "You smelted a bar.",
-                Method::Upgrade => "You forged a new mining pick.",
-                _ => "You forged equipment.",
+            let message = match (recipe.method, all) {
+                (Method::Smelt, true) => format!("Smelted {} bars.", count),
+                (_, true) => format!("Forged {} pieces of equipment.", count),
+                (Method::Smelt, false) => "You smelted a bar.".into(),
+                (Method::Upgrade, false) => "You forged a new mining pick.".into(),
+                _ => "You forged equipment.".into(),
             };
             Ok((message, Some(recipe.item.clone())))
         }
@@ -172,7 +191,7 @@ impl World {
             Err("Walk closer to the smith to use this workshop.")
         } else {
             let mut staged = p.character.clone();
-            workshop_action(&mut staged, &request, self.smith_roll()).and_then(|action| {
+            workshop_action(&mut staged, &request, || self.smith_roll()).and_then(|action| {
                 self.store
                     .save_many([&staged].into_iter())
                     .map_err(|_| "The Blacksmithing change could not be saved.")?;
@@ -184,11 +203,12 @@ impl World {
         let c = &p.character;
         let (text, output) = result
             .as_ref()
-            .map(|(text, output)| (*text, output.as_deref()))
+            .map(|(text, output)| (text.as_str(), output.as_deref()))
             .unwrap_or_else(|text| (*text, None));
+        let skill = c.blacksmithing.proficiency.skill;
         let _ = p.peer.try_send(
             json!({"type":"blacksmithing","npc":npc,"ok":result.is_ok(),"text":text,
-            "skill":c.blacksmithing.proficiency.skill,"recipes":c.blacksmithing.recipes,
+            "skill":skill,"maxSkill":MAX_SKILL,"training":training_view(skill),"recipes":c.blacksmithing.recipes,
             "gold":c.gold,"inventory":c.inventory,"output":output}),
         );
     }
@@ -234,7 +254,7 @@ impl World {
         });
     }
 
-    fn mine_target(&self, p: &Player, vein_id: u64) -> Result<Vein, &'static str> {
+    fn mine_target(&self, p: &Player, vein_id: u64) -> Result<(Vein, &'static Pick), &'static str> {
         if !self.smith_available(p) || p.fishing.line.is_some() {
             return Err("You need to be free to move before mining.");
         }
@@ -250,17 +270,25 @@ impl World {
         {
             return Err("Move closer to the ore vein.");
         }
-        if c.blacksmithing.proficiency.skill < skill_for(vein.tier) {
+        let skill = c.blacksmithing.proficiency.skill;
+        if skill == 0 {
+            return Err("Learn Blacksmithing from Bram Emberforge in Alderhaven first.");
+        }
+        if skill < skill_for(vein.tier) {
             return Err("Your Blacksmithing skill is too low.");
         }
-        if !CATALOG
+        let pick = CATALOG
             .picks
             .iter()
-            .any(|pick| pick.reaches >= vein.tier && c.quantity(&pick.item) > 0)
-        {
-            return Err("You need a stronger mining pick in your bags.");
-        }
-        Ok(vein)
+            .rev()
+            .find(|pick| {
+                pick.reaches >= vein.tier
+                    && c.quantity(&pick.item) > 0
+                    && (pick.expert_cap == 0
+                        || CATALOG.recipe(&pick.item).is_some_and(|recipe| skill >= recipe.skill))
+            })
+            .ok_or("You need a stronger mining pick in your bags.")?;
+        Ok((vein, pick))
     }
 
     fn mining_notice(p: &Player, state: &str, text: &'static str) {
@@ -277,7 +305,7 @@ impl World {
             return;
         }
         let vein = match self.mine_target(p, id) {
-            Ok(vein) => vein,
+            Ok((vein, _)) => vein,
             Err(text) => return Self::mining_notice(p, "error", text),
         };
         let p = self.players.get_mut(&session).unwrap();
@@ -314,8 +342,8 @@ impl World {
         {
             return Self::interrupt_mining(self.players.get_mut(&session).unwrap());
         }
-        let vein = match self.mine_target(p, channel.vein) {
-            Ok(vein) => vein,
+        let (vein, pick) = match self.mine_target(p, channel.vein) {
+            Ok(target) => target,
             Err(text) => {
                 let p = self.players.get_mut(&session).unwrap();
                 p.mining = None;
@@ -333,7 +361,7 @@ impl World {
         if !staged.can_collect(ore) {
             return Self::mining_notice(p, "error", "Your bags are full. Make room first.");
         }
-        let quantity = 1 + (self.smith_roll() * 2.) as u32;
+        let quantity = 1 + (self.smith_roll() * 2.) as u32 + pick.bonus_ore;
         if staged.quantity(ore).checked_add(quantity).is_none() {
             return Self::mining_notice(
                 &self.players[&session],
@@ -342,17 +370,23 @@ impl World {
             );
         }
         staged.add_item(ore, quantity);
+        let band = CATALOG.training(previous).filter(|band| band.zones.contains(&channel.zone));
+        let required_pick = band.as_ref().and_then(|band| {
+            CATALOG.expert_pick(band.cap).filter(|_| pick.expert_cap < band.cap)
+        });
+        let cap = band.filter(|_| required_pick.is_none()).map_or(previous, |band| band.cap);
         staged
             .blacksmithing
             .proficiency
-            .try_gain(0, training_cap(vein.tier), self.smith_roll());
+            .try_gain(0, cap, self.smith_roll());
         let p = self.players.get_mut(&session).unwrap();
         if self.store.save_many([&staged].into_iter()).is_err() {
             return Self::mining_notice(p, "error", "The Blacksmithing change could not be saved.");
         }
         p.character = staged;
         let _ = p.peer.try_send(json!({"type":"mining","state":"done","vein":vein.id,"item":ore,"quantity":quantity,
-            "skill":p.character.blacksmithing.proficiency.skill,"skillUp":p.character.blacksmithing.proficiency.skill > previous}));
+            "skill":p.character.blacksmithing.proficiency.skill,"skillUp":p.character.blacksmithing.proficiency.skill > previous,
+            "requiredPick":required_pick.map(|pick| &pick.item)}));
         let veins = self.mining_veins.get_mut(&channel.zone).unwrap();
         let index = veins.iter().position(|v| v.id == vein.id).unwrap();
         veins[index].pulls -= 1;

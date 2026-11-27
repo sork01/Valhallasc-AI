@@ -55,6 +55,87 @@ fn talk(w: &mut World, id: &str, action: &str) {
         )),
     );
 }
+
+fn fill_quest_log(character: &mut Character, active: usize) {
+    character.quests = (0..active)
+        .map(|index| QuestProgress { id: format!("test_active_{index}"), ..QuestProgress::default() })
+        .collect();
+    character.quests.push(QuestProgress {
+        id: "test_claimed".into(),
+        claimed: true,
+        completions: 1,
+        ..QuestProgress::default()
+    });
+}
+
+#[test]
+fn quest_log_limit_refuses_a_twenty_first_quest_and_allows_one_after_abandoning() {
+    let mut w = super::wyrd_tests::world();
+    let mut rx = super::wyrd_tests::join(&mut w, 1, Class::Warrior);
+    fill_quest_log(&mut w.players.get_mut(&1).unwrap().character, 19);
+    talk(&mut w, "slime_patrol", "accept");
+    assert_eq!(w.players[&1].character.quest_slots_left(), 0);
+    talk(&mut w, "welcome", "accept");
+    assert!(super::wyrd_tests::drain(&mut rx).iter().any(|packet| {
+        packet["type"] == "error" && packet["text"] == "Your questlog is full"
+    }));
+    assert!(!w.players[&1].character.quests.iter().any(|q| q.id == "welcome"));
+
+    abandon(&mut w, "slime_patrol");
+    talk(&mut w, "welcome", "accept");
+    let c = &w.players[&1].character;
+    assert_eq!(c.quests.iter().filter(|quest| !quest.claimed).count(), 20);
+    assert!(c.quests.iter().any(|q| q.id == "welcome"));
+}
+
+#[test]
+fn quest_log_limit_defers_automatic_quests_until_space_is_available() {
+    let mut w = world();
+    let maps = &mut w.maps;
+    let mut first = maps[0].quests[0].clone();
+    first.id = "test_auto_first".into();
+    first.title = "First delayed quest".into();
+    first.auto_level = Some(1);
+    first.requires = None;
+    first.landing = false;
+    first.handoff_to = None;
+    let mut second = first.clone();
+    second.id = "test_auto_second".into();
+    second.title = "Second delayed quest".into();
+    maps[0].quests = vec![first, second];
+
+    let c = &mut w.players.get_mut(&1).unwrap().character;
+    fill_quest_log(c, 21);
+    assert!(sync_progression(c, maps).is_empty());
+    assert_eq!(c.quests.iter().filter(|q| !q.claimed).count(), 21);
+    c.quests[0].claimed = true;
+    assert!(sync_progression(c, maps).is_empty());
+    c.quests[1].claimed = true;
+    assert_eq!(sync_progression(c, maps), ["First delayed quest"]);
+    assert_eq!(c.quest_slots_left(), 0);
+    c.quests[2].claimed = true;
+    assert_eq!(sync_progression(c, maps), ["Second delayed quest"]);
+    assert_eq!(c.quest_slots_left(), 0);
+}
+
+#[test]
+fn quest_log_limit_defers_landing_quests_without_losing_them() {
+    let mut w = world();
+    let c = &mut w.players.get_mut(&1).unwrap().character;
+    fill_quest_log(c, 20);
+    c.landing = true;
+    c.zone = 1;
+    assert!(super::landing::step_off(c, &w.maps).is_empty());
+    assert!(c.landing);
+    c.quests[0].claimed = true;
+    assert_eq!(super::landing::step_off(c, &w.maps).len(), 1);
+    assert_eq!(c.quest_slots_left(), 0);
+    assert!(c.landing);
+    c.quests[1].claimed = true;
+    assert_eq!(super::landing::step_off(c, &w.maps).len(), 1);
+    assert_eq!(c.quest_slots_left(), 0);
+    assert!(!c.landing);
+}
 #[test]
 fn quest_journal_abandon_resets_progress_without_rewards_and_is_personal() {
     let mut w = world();

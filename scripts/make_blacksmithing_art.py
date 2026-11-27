@@ -23,6 +23,12 @@ METALS = [
     ('#346067', '#71aca2', '#c1f2c7'), ('#4b397b', '#896ab4', '#dfbffd'),
     ('#8a4738', '#df853e', '#ffe194'), ('#302f68', '#746fbe', '#f6deff'),
 ]
+EXPERT_METALS = [
+    ('#423560', '#784fa3', '#d7abf3'), ('#86502b', '#db9b45', '#fff4a8'),
+    ('#285b44', '#4ca96f', '#bbf1b3'), ('#304f72', '#5fadd2', '#dcfbff'),
+    ('#583e73', '#a376a8', '#ffd49b'), ('#62452f', '#bb893b', '#fff0bf'),
+    ('#623e38', '#cd6747', '#ffbf83'), ('#482956', '#9e56a8', '#edbce8'),
+]
 
 
 def rock(draw, shade, index, vein):
@@ -62,8 +68,9 @@ def icon(kind, index):
         d.polygon([(6, 12), (19, 6), (24, 9), (19, 15), (9, 20), (4, 17)], fill=metal)
         d.line([(6, 13), (19, 7), (23, 9)], fill=light, width=2)
         d.line([(11, 17), (18, 14), (20, 11)], fill=light)
-    elif kind == 'pick':
-        dark, metal, light = METALS[[2, 1, 3, 5, 7][index]]
+    elif kind in ('pick', 'expert_pick'):
+        expert = kind == 'expert_pick'
+        dark, metal, light = EXPERT_METALS[index] if expert else METALS[[2, 1, 3, 5, 7][index]]
         d.line((4, 24, 19, 8), fill=INK, width=5)
         d.line((4, 24, 19, 8), fill='#9a653f', width=3)
         d.line((4, 23, 18, 8), fill='#dca670')
@@ -71,15 +78,25 @@ def icon(kind, index):
                   fill=metal, outline=INK)
         d.line([(11, 5), (17, 5), (22, 9), (24, 14)], fill=light)
         d.line([(13, 14), (16, 16)], fill=dark, width=2)
-    elif kind == 'plan':
-        dark, metal, light = METALS[index % len(METALS)]
+        if expert:
+            d.polygon([(5, 8), (11, 7), (15, 9), (13, 11), (8, 11)], fill=dark, outline=INK)
+            d.ellipse((16, 6, 20, 10), fill=light, outline=dark)
+            d.line([(8, 18), (11, 20)], fill=light, width=2)
+            if index == 5:
+                d.line([(13, 3), (17, 2), (22, 4), (25, 8)], fill=light, width=2)
+    elif kind in ('plan', 'expert_plan'):
+        expert = kind == 'expert_plan'
+        dark, metal, light = EXPERT_METALS[index] if expert else METALS[index % len(METALS)]
         d.polygon([(6, 3), (22, 3), (25, 6), (22, 10), (21, 22), (18, 25), (3, 25), (3, 21), (6, 18)],
                   fill='#e7cca0', outline=INK)
         d.line([(9, 5), (20, 5), (18, 21), (4, 22)], fill='#94744e', width=2)
         d.line([(9, 10), (18, 10), (12, 17), (8, 17)], fill=dark, width=2)
         d.ellipse((16, 16, 24, 24), fill=metal, outline=dark)
         d.rectangle((19, 19, 21, 21), fill=light)
-        if index >= 10:
+        if expert:
+            d.polygon([(20, 17), (23, 20), (20, 23), (17, 20)], fill=light, outline=dark)
+            d.line([(7, 7), (20, 7), (17, 15)], fill=metal, width=2)
+        elif index >= 10:
             d.line([(7, 7), (20, 7), (17, 15)], fill='#b974aa', width=2)
     elif index == 0:
         d.polygon([(2, 18), (7, 9), (12, 9), (16, 4), (22, 7), (25, 17), (20, 23), (8, 24)],
@@ -106,12 +123,16 @@ def icon(kind, index):
 
 def roster():
     catalog = json.loads((ROOT / 'world/blacksmithing.txt').read_text())
+    plans = [r for r in catalog['recipes'] if 'plan' in r]
+    expert_plan = lambda recipe: 'dropZone' in recipe or recipe['skill'] == 600
     pairs = [('ore', [t['ore'] for t in catalog['tiers']]),
              ('bar', [r['item'] for r in catalog['recipes'] if r['method'] == 'smelt']),
-             ('pick', [p['item'] for p in catalog['picks']]),
+             ('pick', [p['item'] for p in catalog['picks'] if not p.get('expertCap')]),
              ('part', [p['id'] for p in catalog['materials'] if 'price' in p and p['id'] != 'smith_pick_1']),
-             ('plan', [r['plan'] for r in catalog['recipes'] if 'plan' in r]),
-             ('vein', [f'vein_{i}' for i in range(len(catalog['tiers']))])]
+             ('plan', [r['plan'] for r in plans if not expert_plan(r)]),
+             ('vein', [f'vein_{i}' for i in range(len(catalog['tiers']))]),
+             ('expert_pick', [p['item'] for p in catalog['picks'] if p.get('expertCap')]),
+             ('expert_plan', [r['plan'] for r in plans if expert_plan(r)])]
     return [(key, kind, n) for kind, keys in pairs for n, key in enumerate(keys)]
 
 
@@ -128,17 +149,23 @@ def main():
     ap.add_argument('--preview', type=Path, default=Path('/tmp/valhalla-blacksmithing-art.png'))
     args = ap.parse_args()
     entries = roster()
-    order = [key for key, _, _ in entries]
     if args.action == 'preview':
         atlas = packed([icon(kind, n) for _, kind, n in entries])
         atlas.resize((atlas.width * 3, atlas.height * 3), Image.Resampling.NEAREST).save(args.preview)
         return
     pf = pf_api()
-    if args.action == 'build' and not SOURCE.exists():
-        sources = []
-        for name, group in [('tools', entries[:29]), ('plans_and_veins', entries[29:])]:
-            version = 'v2' if name == 'tools' else 'v1'
-            name = f'valhallasc_blacksmithing_{name}_{version}'
+    sources = json.loads(SOURCE.read_text())['sources'] if SOURCE.exists() else []
+    if args.action == 'build':
+        existing = {key for source in sources for key in source['order']}
+        missing = [entry for entry in entries if entry[0] not in existing]
+        groups = [('expert_v1', missing)]
+        if not sources:
+            groups = [('tools_v2', missing[:29]), ('plans_and_veins_v1', missing[29:54]),
+                      ('expert_v1', missing[54:])]
+        for label, group in groups:
+            if not group:
+                continue
+            name = f'valhallasc_blacksmithing_{label}'
             sprite = pf.ids(name).get(name)
             if not sprite:
                 pixels = [np.array(icon(kind, n)) for _, kind, n in group]
@@ -150,10 +177,11 @@ def main():
                 assert result.get('ok'), result.get('errors')
                 sprite = result['sprite_id']
             sources.append(dict(sprite=sprite, order=[key for key, _, _ in group]))
-        SOURCE.write_text(json.dumps(dict(sources=sources), indent=2) + '\n')
+        if missing:
+            SOURCE.write_text(json.dumps(dict(sources=sources), indent=2) + '\n')
 
-    sources = json.loads(SOURCE.read_text())['sources']
-    assert [key for source in sources for key in source['order']] == order
+    order = [key for source in sources for key in source['order']]
+    assert len(order) == len(entries) and set(order) == {key for key, _, _ in entries}
     frames = []
     for source in sources:
         spec, grids = pf.load(source['sprite'])

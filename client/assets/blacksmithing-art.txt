@@ -63,6 +63,25 @@
         "vein_8",
         "vein_9"
       ]
+    },
+    {
+      "sprite": "9e95cff240d961b1",
+      "order": [
+        "smith_pick_6",
+        "smith_pick_7",
+        "smith_pick_8",
+        "smith_pick_9",
+        "smith_pick_10",
+        "smith_pick_11",
+        "smith_plan_stormglass_mantle",
+        "smith_plan_jubilee_signet",
+        "smith_plan_duneglass_longbow",
+        "smith_plan_slatewing_pendant",
+        "smith_plan_caldera_veil",
+        "smith_plan_equinox_crown_ring",
+        "smith_plan_unbroken_hour_pendant",
+        "smith_plan_last_ember_mantle"
+      ]
     }
   ]
 }

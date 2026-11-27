@@ -30,7 +30,7 @@ Click a loose bag item or drag it onto the merchant to sell its stack/copy.
 The server's available list selects the exact next loose copy, excluding worn
 copies, starter/GM gear, quest items and bound licences. The bag tooltip shows
 the exact server-quoted proceeds, including rebirth rounding. **Sell all junk**
-sends one batch of common (gray) gear and materials, preserving green and up.
+sends one batch of common (gray) gear and materials. Mined ore and green or higher gear stay in the bags. Ore can still be sold individually.
 The old You give/You receive basket is replaced by direct sales.
 
 Any epic or legendary sale still opens the confirmation naming those items in

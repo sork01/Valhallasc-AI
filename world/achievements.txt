@@ -2223,5 +2223,137 @@
     "members": [
       "deep_seahorse"
     ]
+  },
+  {
+    "id": "fishing_skill_30",
+    "name": "Apprentice Angler",
+    "description": "Reach Fishing skill 30.",
+    "category": "Professions",
+    "metric": "fishing_skill",
+    "target": 30,
+    "points": 10,
+    "title": "",
+    "mount": ""
+  },
+  {
+    "id": "fishing_skill_150",
+    "name": "Journeyman Angler",
+    "description": "Reach Fishing skill 150.",
+    "category": "Professions",
+    "metric": "fishing_skill",
+    "target": 150,
+    "points": 20,
+    "title": "",
+    "mount": ""
+  },
+  {
+    "id": "fishing_skill_300",
+    "name": "Master Angler",
+    "description": "Reach Fishing skill 300.",
+    "category": "Professions",
+    "metric": "fishing_skill",
+    "target": 300,
+    "points": 40,
+    "title": "",
+    "mount": ""
+  },
+  {
+    "id": "enchanting_skill_30",
+    "name": "Apprentice Enchanter",
+    "description": "Reach Enchanting skill 30.",
+    "category": "Professions",
+    "metric": "enchanting_skill",
+    "target": 30,
+    "points": 10,
+    "title": "",
+    "mount": ""
+  },
+  {
+    "id": "enchanting_skill_150",
+    "name": "Journeyman Enchanter",
+    "description": "Reach Enchanting skill 150.",
+    "category": "Professions",
+    "metric": "enchanting_skill",
+    "target": 150,
+    "points": 20,
+    "title": "",
+    "mount": ""
+  },
+  {
+    "id": "enchanting_skill_300",
+    "name": "Master Enchanter",
+    "description": "Reach Enchanting skill 300.",
+    "category": "Professions",
+    "metric": "enchanting_skill",
+    "target": 300,
+    "points": 40,
+    "title": "",
+    "mount": ""
+  },
+  {
+    "id": "blacksmithing_skill_30",
+    "name": "Apprentice Blacksmith",
+    "description": "Reach Blacksmithing skill 30.",
+    "category": "Professions",
+    "metric": "blacksmithing_skill",
+    "target": 30,
+    "points": 10,
+    "title": "",
+    "mount": ""
+  },
+  {
+    "id": "blacksmithing_skill_150",
+    "name": "Journeyman Blacksmith",
+    "description": "Reach Blacksmithing skill 150.",
+    "category": "Professions",
+    "metric": "blacksmithing_skill",
+    "target": 150,
+    "points": 20,
+    "title": "",
+    "mount": ""
+  },
+  {
+    "id": "blacksmithing_skill_300",
+    "name": "Master Blacksmith",
+    "description": "Reach Blacksmithing skill 300.",
+    "category": "Professions",
+    "metric": "blacksmithing_skill",
+    "target": 300,
+    "points": 40,
+    "title": "",
+    "mount": ""
+  },
+  {
+    "id": "alchemy_skill_30",
+    "name": "Apprentice Alchemist",
+    "description": "Reach Alchemy skill 30.",
+    "category": "Professions",
+    "metric": "alchemy_skill",
+    "target": 30,
+    "points": 10,
+    "title": "",
+    "mount": ""
+  },
+  {
+    "id": "alchemy_skill_300",
+    "name": "Journeyman Alchemist",
+    "description": "Reach Alchemy skill 300.",
+    "category": "Professions",
+    "metric": "alchemy_skill",
+    "target": 300,
+    "points": 20,
+    "title": "",
+    "mount": ""
+  },
+  {
+    "id": "alchemy_skill_600",
+    "name": "Master Alchemist",
+    "description": "Reach Alchemy skill 600.",
+    "category": "Professions",
+    "metric": "alchemy_skill",
+    "target": 600,
+    "points": 40,
+    "title": "",
+    "mount": ""
   }
 ]

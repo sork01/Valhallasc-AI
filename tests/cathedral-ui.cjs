@@ -1,3 +1,4 @@
+const soundtrack = require('./lib/soundtrack.cjs');
 // Private browser checks: three real entries, architecture, animated art, boss bars, maps and wing music.
 const assert = require('node:assert/strict');
 const path = require('node:path');
@@ -105,7 +106,7 @@ const call=async(name,args={})=>{const r=await client.callTool({name,arguments:a
     await shot('cathedral-'+z.cathedralWing+'-boss');
   }
   check(new Set(hues).size===3,'Distinct teal, rose and violet floor palettes');
-  check(await page.evaluate(()=>valhalla.cathedralMusic.map(m=>Math.round(m.duration)).join()==='87,69,128'),'All three music loops decode to their own score lengths');
+  check(await page.evaluate(expected=>valhalla.cathedralMusic.every((m,i)=>Math.abs(m.duration-expected[i])<.05), ['cathedral_cloister','cathedral_reliquary','cathedral_nave'].map(soundtrack)),'All three music loops decode to their own score lengths');
   await page.evaluate(()=>{City.close();Quests.close();WorldMap.show();});
   check(await page.evaluate(()=>WorldMap.open), 'World map opens from the Cathedral');
   // Wings are interiors of Nacrehold (zone 9): they appear as entrance markers (data-to 10/11/12), named by aria-label, not as tiles or labels in the text.

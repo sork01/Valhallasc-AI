@@ -40,7 +40,7 @@ async function ench(bot, request) {
   await wait(() => have('Crafter',recipe) === 1 && world.player('Crafter').gold === 0, 'vendor charges full recipe price');
   const untrained = await ench('Crafter',{op:'open'});
   assert.equal(untrained.skill,0);
-  assert.equal(untrained.maxSkill,300);
+  assert.equal(untrained.maxSkill,600);
   const trained = packet('Crafter','dialogue',e => e.enchantingSkill === 1);
   await new Promise(resolve => setTimeout(resolve, 600));
   send('Crafter', {type:'interact',npc:npc.id,offer:'learn_enchanting'});
@@ -104,7 +104,7 @@ async function ench(bot, request) {
   assert.equal(have('Crafter',recipe),0);
   const saved = await ench('Crafter',{op:'open'});
   assert(saved.recipes.includes('second_wind'));
-  assert(saved.skill >= crafted.skill && saved.skill <= 300);
+  assert(saved.skill >= crafted.skill && saved.skill <= 600);
   await world.debug('Buyer', {op:'give_item',item:'rod_twig_rod',quantity:1});
   await world.debug('Buyer', {op:'teleport',zone:0,x:200.5,y:293.5});
   await world.action('Buyer', {type:'input',dx:1,dy:0});

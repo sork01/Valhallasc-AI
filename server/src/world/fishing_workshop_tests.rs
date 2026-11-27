@@ -120,7 +120,7 @@ fn fishing_workshop_failures_preserve_every_item_and_gold() {
                 .unwrap()
                 .clone();
             assert!(
-                fishing_workshop::purchase(w.players.get_mut(&1).unwrap(), &npc, "rod:2", true)
+                fishing_workshop::purchase(&w.players[&1], &npc, "rod:2", true)
                     .is_err()
             );
         } else {
@@ -231,7 +231,7 @@ fn fishing_workshop_every_fisher_is_reachable_and_quests_consume_real_fish() {
                 .map(move |n| (zone, n.clone()))
         })
         .collect();
-    assert_eq!(jobs.len(), 13);
+    assert_eq!(jobs.len(), 23);
     for (zone, n) in jobs {
         let at = Point { x: n.x, y: n.y };
         let mut collision = at;
@@ -291,4 +291,52 @@ fn fishing_workshop_full_bags_can_use_the_cells_freed_by_ingredients() {
     let c = &w.players[&1].character;
     assert_eq!(c.quantity("rod_willow_rod"), 1);
     assert_eq!(c.bag_used(), full - 2);
+}
+
+#[test]
+fn fishing_workshop_bulk_cooking_respects_funds_space_and_failed_saves() {
+    let (mut w, mut replies) = fishing_tests::angler();
+    let c = &mut w.players.get_mut(&1).unwrap().character;
+    c.inventory.clear();
+    c.level = 99;
+    c.gold = 5;
+    c.add_item("fish_pier_sprat", 7);
+    let offer = Some("cook_all:fish_pier_sprat");
+    visit(&mut w, 0, "smith", offer);
+    assert_eq!(w.players[&1].character.quantity("fish_pier_sprat"), 7);
+
+    visit(&mut w, 0, "fisher_meadow_0", offer);
+    let c = &mut w.players.get_mut(&1).unwrap().character;
+    assert_eq!(c.quantity("dish_shore_grill"), 5);
+    assert_eq!(c.quantity("fish_pier_sprat"), 2);
+    assert_eq!(c.gold, 0);
+    assert!(std::iter::from_fn(|| replies.try_recv().ok())
+        .any(|p| p["notice"] == "Cooked 5 servings."));
+
+    c.consume_item("dish_shore_grill", 5);
+    for filler in ITEMS.iter().filter(|i| i.kind == "material") {
+        if c.bag_used() >= c.bag_capacity() {
+            break;
+        }
+        c.add_item(&filler.id, 1);
+    }
+    c.gold = 2;
+    assert_eq!(c.bag_used(), c.bag_capacity());
+    visit(&mut w, 0, "fisher_meadow_0", offer);
+    let c = &mut w.players.get_mut(&1).unwrap().character;
+    assert_eq!(c.quantity("dish_shore_grill"), 2);
+    assert_eq!(c.quantity("fish_pier_sprat"), 0);
+    assert_eq!(c.bag_used(), c.bag_capacity());
+
+    c.gold = 10;
+    c.consume_item("dish_shore_grill", 2);
+    c.add_item("fish_pier_sprat", 4);
+    let before = inventory(&w);
+    w.store.conn().execute_batch(
+        "CREATE TRIGGER refuse_cooking_save BEFORE UPDATE ON characters BEGIN SELECT RAISE(FAIL, 'test'); END;",
+    ).unwrap();
+    visit(&mut w, 0, "fisher_meadow_0", offer);
+    assert_eq!(inventory(&w), before);
+    assert!(std::iter::from_fn(|| replies.try_recv().ok())
+        .any(|p| p["notice"] == "The Fisher recipe could not be saved."));
 }

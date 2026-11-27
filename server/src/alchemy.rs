@@ -128,7 +128,12 @@ pub enum Command {
     Train { npc: String },
     Learn { npc: String, recipe: String },
     Study { formula: String },
-    Brew { npc: String, recipe: String },
+    Brew {
+        npc: String,
+        recipe: String,
+        #[serde(default)]
+        all: bool,
+    },
 }
 
 pub static CATALOG: LazyLock<Catalog> = LazyLock::new(|| {

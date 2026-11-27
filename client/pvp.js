@@ -1,7 +1,7 @@
 'use strict';
 // PvP controls display server state. Consent, matchmaking and combat are checked by Rust.
 (() => {
-  let state = { flag: false, requests: [], duel: null, queue: null, arena: null, gauntlet: null };
+  let state = { flag: false, requests: [], duel: null, queue: null, arena: null, gauntlet: null, arenaAutoattack: false };
   let available = false;
   // The arena gauntlet banner counts down from the seconds the server sent with the packet.
   let gauntletStamp = 0, gauntletTimer = 0, gauntletTarget = null;
@@ -53,12 +53,23 @@
       body.append(el('p', 'For 2v2 or 3v3, form a party of exactly that size. The leader queues the team.', 'social-note'));
       for (const size of [1, 2, 3]) body.append(button(`Queue ${size}v${size}`, `arena-${size}`, () => send({ op: 'arena_queue', size })));
     }
-    body.append(el('p', `Select an opponent in the world or the Online list, then press ${Keys.label('attack')} to attack.`, 'social-note'));
+    const attackHelp = state.arenaAutoattack && (state.gauntlet || state.arena)
+      ? 'Select an Arena opponent to attack automatically.'
+      : `Select an opponent in the world or the Online list, then press ${Keys.label('attack')} to attack.`;
+    body.append(el('p', attackHelp, 'social-note'));
   }
+  function canAutoattack(id) {
+    if (!state.arenaAutoattack) return false;
+    if (state.gauntlet?.opponent?.id === id) return true;
+    const teams = state.arena?.teams;
+    return !!teams?.some((team, side) => team.includes(Online.id) && teams[1 - side].includes(id));
+  }
+
   window.Pvp = {
+    canAutoattack,
     send, render,
     duel(id) { if (!available) return; send({ op: 'duel_request', id }); window.Social?.show('pvp'); },
-    target(id) { window.Social?.close(); window.Field?.targetPlayer(id); },
+    target(id) { window.Social?.close(); window.Field?.targetPlayer(id, true); },
     canAttack(id, otherFlag) { return !!(state.arena || state.gauntlet?.opponent?.id === id || state.duel?.id === id || (state.flag && otherFlag)); },
     onPacket(packet) {
       available = true; document.getElementById('social-tab-pvp').hidden = false;
@@ -70,7 +81,7 @@
       if (!warning.hidden) warning.textContent = state.duel.returnIn == null ? `${state.duel.name} has ${state.duel.opponentReturnIn}s to return to the duel area.` : `Return to the duel area in ${state.duel.returnIn}s or forfeit!`;
       window.Social?.refreshPvp();
     },
-    reset() { state = { flag: false, requests: [], duel: null, queue: null, arena: null, gauntlet: null }; paintGauntlet(); available = false; document.getElementById('social-tab-pvp').hidden = true; document.getElementById('pvp-duel-warning').hidden = true; },
+    reset() { state = { flag: false, requests: [], duel: null, queue: null, arena: null, gauntlet: null, arenaAutoattack: false }; paintGauntlet(); available = false; document.getElementById('social-tab-pvp').hidden = true; document.getElementById('pvp-duel-warning').hidden = true; },
     get available() { return available; },
     get state() { return state; },
   };

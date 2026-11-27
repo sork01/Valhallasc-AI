@@ -43,6 +43,7 @@ is('+0.5 attack, +0.5% crit (60% cap)', '+0.5 attack, +0.5 % kritisk (60 % tak)'
 is('Rank 3: 40 % stronger. Next rank 4 at level 62: 60 % stronger. 10 Rage · 3s cooldown.', 'Grad 3: 40 % stronger. Nästa grad 4 på nivå 62: 60 % stronger. 10 raseri · 3 s nedkylning.');
 is('Crimson Plumed Helm ×1 · warrior · headgear · Quest item · cannot be sold', 'Crimson Plumed Helm ×1 · krigare · huvudbonad · Uppdragsföremål · kan inte säljas');
 is('1 point available', '1 poäng tillgänglig');
+is('38 experience', '38 erfarenhet');
 is('Friends (3/50)', 'Vänner (3/50)');
 // nothing changes twice
 for (const s of ['Rage 12 / 100', 'Bjud in till grupp', 'Du och Fog är nu vänner.']) { assert.equal(t(t(s)), t(s), s); checks++; }

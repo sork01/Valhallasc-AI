@@ -28,8 +28,8 @@ const debug = (page, command) => page.evaluate(c => Online.send({ type: 'debug',
   await page.waitForFunction(() => Online.connected && Field.zone === 0 && !!valhalla.fmusic?.running, null, { timeout: 60000 });
 
   for (const song of [
-    { zone: 2, x: 64, y: 118.5, key: 'rimeNightMusic', day: 'rmusic', seconds: 32 * 3 * 60 / 88 },
-    { zone: 3, x: 64, y: 9, key: 'fenNightMusic', day: 'gmusic', seconds: 32 * 4 * 60 / 90 },
+    { zone: 2, x: 64, y: 118.5, key: 'rimeNightMusic', day: 'rmusic', seconds: 117.073 },
+    { zone: 3, x: 64, y: 9, key: 'fenNightMusic', day: 'gmusic', seconds: 119.01 },
   ]) {
     await debug(page, { op: 'set_time', hour: 12, freeze: true });
     await debug(page, { op: 'teleport', zone: song.zone, x: song.x, y: song.y });

@@ -27,11 +27,11 @@ const call=async(name,args={})=>{const r=await client.callTool({name,arguments:a
  check(await page.locator('#world-weather').textContent().then(t=>t.includes('Indoors')),'Raid is indoors');
  await page.waitForFunction(()=>Number(getComputedStyle(document.getElementById('area-title')).opacity)<.05,null,{timeout:15000});
  await page.locator('#fieldcv').screenshot({path:path.join(world.artifacts,'chained-forge-muster.png')});
- // The real quartermaster's dialogue and contract offers.
- await teleport(35,303);
- await page.evaluate(()=>Online.send({type:'interact',npc:'cf_quartermaster'}));
- await page.waitForFunction(()=>document.getElementById('npc-dialogue').textContent.includes('Quartermaster Halla'));
- check(await page.locator('#npc-dialogue').textContent().then(t=>t.includes('Hire a Warrior')),'Quartermaster exposes raid contracts');
+ // The real Repair Smith's dialogue and contract offers.
+ await teleport(30,305);
+ await page.evaluate(()=>Online.send({type:'interact',npc:'dungeon_repair_46'}));
+ await page.waitForFunction(()=>document.getElementById('npc-dialogue').textContent.includes('Repair Smith'));
+ check(await page.locator('#npc-dialogue').textContent().then(t=>t.includes('Hire a Warrior')),'The Repair Smith offers raid contracts');
  await page.keyboard.press('Escape');
  const halls=await page.evaluate(()=>WORLD_MAP.zones[45].forgeHalls);
  for(const size of [{width:1440,height:900,label:'desktop'},{width:844,height:390,label:'mobile'}]){
@@ -67,7 +67,7 @@ const call=async(name,args={})=>{const r=await client.callTool({name,arguments:a
  // Probe localization in a fresh Swedish document, as language is fixed on load.
  const sw=await browser.newPage();await sw.addInitScript(()=>localStorage.setItem('valhallasc.save.v1',JSON.stringify({lang:'sv',sound:false})));await sw.goto(world.url);
  check(await sw.evaluate(()=>Locale.translate('The Chained Forge')==='Den fjättrade smedjan'),'Swedish raid name');
- check(await sw.evaluate(()=>Locale.translate('Quartermaster Halla')==='Kvartermästare Halla'),'Swedish quartermaster');await sw.close();
+ check(await sw.evaluate(()=>Locale.translate('Repair Smith')==='Kvartermästare Halla'),'Swedish quartermaster');await sw.close();
  check(bad.length===0,'No missing raid assets');check(errors.length===0,JSON.stringify(errors));
  fs.writeFileSync(path.join(world.artifacts,'chained-forge-ui-result.txt'),JSON.stringify({checks,real:!STUB,errors,bad},null,2));
  console.log(JSON.stringify({passed:true,checks,artifacts:world.artifacts}));

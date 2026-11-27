@@ -16,6 +16,7 @@ mod blacksmithing;
 mod enchanting;
 mod fishing;
 mod fishing_workshop;
+mod mend_proc;
 #[cfg(test)]
 mod fishing_workshop_tests;
 #[cfg(test)]
@@ -248,6 +249,8 @@ mod duel_tests;
 #[cfg(test)]
 mod dungeon_admission_tests;
 #[cfg(test)]
+mod dungeon_difficulty_tests;
+#[cfg(test)]
 mod dungeon_solo_tests;
 #[cfg(test)]
 mod easter_tests;
@@ -479,6 +482,7 @@ struct Player {
     input_at: f64,
     goal: Option<Point>,
     target: Option<usize>,
+    arena_target: Option<u64>,
     face: Point,
     moving: bool,
     walk: f64,
@@ -530,6 +534,8 @@ struct Player {
     forge_ward_left: f64,
     dash_skill: String,
     skill_cd: BTreeMap<String, f64>,
+    /// Seconds left in which Mend costs nothing (`world/mend_proc.rs`).
+    mend_free_left: f64,
     set_cd: BTreeMap<String, f64>,
     set_shield: f64,
     set_shield_left: f64,
@@ -565,10 +571,9 @@ struct Player {
     merc: Option<String>,
     /// The particular group objective this fighter was hired for; Meeting Stone hires have no quest contract.
     merc_quest: Option<String>,
-    /// Set on a fighter hired by a raid contract: the zone of the raid door. The contract ends when the hirer is
-    /// neither there nor inside a raid.
-    merc_raid: Option<usize>,
-    /// Set when the hirer falls: the world time this fighter drops dead for good. Until then it wanders, dazed.
+    /// The private copy in which an instance mercenary was hired.
+    merc_instance: Option<usize>,
+    /// Set when an outdoor hire's hirer falls: the time it dies for good. Instance contracts never acquire this deadline.
     merc_doom: Option<f64>,
     merc_navigation: mercs::Navigation,
     /// A temporary autonomous adventurer in an occupied shared zone.
@@ -595,8 +600,11 @@ impl Player {
             && !self.gauntlet
             && self.guard.is_none()
     }
-    pub(super) fn mark_corpse(&mut self, at: Point) {
-        if self.is_human() {
+    pub(super) fn mark_corpse(&mut self, at: Point, in_instance: bool) {
+        if in_instance {
+            self.character.corpse = None;
+            self.character.ghost = false;
+        } else if self.is_human() {
             self.character.corpse = Some(Corpse {
                 zone: self.character.zone,
                 x: at.x,
@@ -668,6 +676,7 @@ impl Player {
             input_at: -99.,
             goal: None,
             target: None,
+            arena_target: None,
             face: normalize(1., 1.),
             moving: false,
             walk: 0.,
@@ -705,6 +714,7 @@ impl Player {
             forge_ward_left: 0.,
             dash_skill: String::new(),
             skill_cd: BTreeMap::new(),
+            mend_free_left: 0.,
             set_cd: BTreeMap::new(),
             set_shield: 0.,
             set_shield_left: 0.,
@@ -728,7 +738,7 @@ impl Player {
             visible_zone,
             merc: None,
             merc_quest: None,
-            merc_raid: None,
+            merc_instance: None,
             merc_doom: None,
             merc_navigation: mercs::Navigation::default(),
             ambient: None,
@@ -752,8 +762,11 @@ impl Player {
             "emberWard":if self.forge_ward_left>0. {self.forge_ward}else{0.},"emberWardLeft":self.forge_ward_left,"setCounts":c.set_counts(),"setCd":self.set_cd,"signatureWeapon":signature::weapon(c).map(|i|&i.id),
             "pvpFlag":self.pvp_flag,"stun":self.stun,"root":self.root,"absorb":if self.absorb_left > 0. { self.absorb.round() } else { 0. },"absorbLeft":self.absorb_left,"wound":if self.wound_left > 0. { self.wound } else { 0. },"woundLeft":self.wound_left,"pvpSupported":true,"inspectSupported":true,"hidden":self.is_hidden(),"escort":self.escort.as_ref().map(|e| json!({"npc":e.npc,"owner":e.owner})),"gauntlet":self.gauntlet});
         view["equippedLook"] = json!(c.look);
+        view["weaponEnchant"] = json!(c.weapon_enchant());
         view["transmogs"] = json!(c.wardrobe.slots);
         view["abandonedQuests"] = json!(c.abandoned_quests);
+        view["questGoldPercent"] = json!(c.quest_gold_percent());
+        view["npcDiscountPercent"] = json!(c.npc_discount_percent());
         view["seasonalClaims"] = json!(c.seasonal_claims);
         view["seasonalRolls"] = json!(c.seasonal_rolls);
         if let Some(line) = self.fishing.line {
@@ -761,7 +774,27 @@ impl Player {
             if line.biting { view["fishDeadline"] = json!(line.deadline()); }
         }
         if c.fishing.total > 0 { view["fishingLog"] = json!(c.fishing); }
+        let ore = c.blacksmithing.proficiency.skill > 0;
+        let flowers = c.alchemy.proficiency.skill > 0;
+        if ore || flowers {
+            view["gathering"] = json!({ "ore": ore, "flowers": flowers });
+        }
+        if self.is_human() {
+            let cap = crate::profession::MAX_SKILL;
+            view["professions"] = json!({
+                "fishing": {"skill": c.fishing.proficiency.skill, "maxSkill": cap},
+                "blacksmithing": {"skill": c.blacksmithing.proficiency.skill, "maxSkill": crate::blacksmithing::MAX_SKILL},
+                "enchanting": {"skill": c.enchanting.proficiency.skill, "maxSkill": cap},
+                "alchemy": {"skill": c.alchemy.proficiency.skill, "maxSkill": crate::alchemy::MAX_SKILL},
+            });
+            view["learnedRecipes"] = json!({
+                "enchanting": c.enchanting.recipes,
+                "blacksmithing": c.blacksmithing.recipes,
+                "alchemy": c.alchemy.recipes,
+            });
+        }
         view["daze"] = json!(self.daze);
+        view["mendFree"] = json!(r2(self.mend_free_left));
         view["danceT"] = json!(self.dance);
         view["festivalDance"] = self
             .festival_dance
@@ -791,7 +824,7 @@ impl Player {
     fn across_view(&self) -> Value {
         let c = &self.character;
         json!({"id":c.id,"look":c.appearance_look(),"zone":c.zone,"x":r2(c.x),"y":r2(c.y),"r":PLAYER_RADIUS,"hp":r2(c.hp),"maxHp":r2(c.max_hp()),
-            "level":c.level,"fx":r2(self.face.x),"fy":r2(self.face.y),"moving":self.moving,"walk":r2(self.walk),"atkT":r2(self.attack),
+            "level":c.level,"fx":r2(self.face.x),"fy":r2(self.face.y),"moving":self.moving,"walk":r2(self.walk),"atkT":r2(self.attack),"weaponEnchant":c.weapon_enchant(),
             "hurtT":r2(self.hurt),"dead":c.hp<=0.,"ghost":c.hp<=0. && c.ghost,"deadT":r2(self.dead_time),"fallen":c.hp<=0. && self.fallen,"dashT":r2(self.dash),
             "buffs":self.buffs,"sparkTravel":c.spark_travel,"mount":c.mount,"mounted":c.mounted,"mountTint":c.mount_tint,
             "reborn":{"count":c.rebirth_count(),"tier":c.rebirth_highest_tier()},"pvpFlag":self.pvp_flag,"stun":r2(self.stun),
@@ -855,6 +888,14 @@ impl Player {
         self.input = Point::default();
         self.goal = None;
         self.target = None;
+        self.arena_target = None;
+    }
+
+    fn stop_for_stun(&mut self) {
+        let arena_target = self.arena_target;
+        self.stop();
+        self.arena_target = arena_target;
+        self.attack = 0.;
     }
 }
 
@@ -963,6 +1004,11 @@ fn aggro_radius(awareness: f64, monster_level: u32, hero_level: u32) -> f64 {
 }
 
 impl Slime {
+    fn hit_radius(&self) -> f64 {
+        // Wyrdweavers have a wider attackable area than their movement footprint.
+        if self.kind == "weaver" { 0.8 } else { self.r }
+    }
+
     /// An enemy seen across a seam is drawn only while alive or dying.
     fn shows_across(&self) -> bool {
         !self.dead || self.die_t < 2.
@@ -2099,6 +2145,8 @@ pub struct World {
     empty_seat: empty_seat::State,
     /// Counter for mercenary sessions.
     merc_seq: u64,
+    /// Appearance rolls are independent of the combat and ambient behavior rolls.
+    adventurer_race_rng: u64,
     /// Live arena gauntlet runs (world/gauntlet.rs), in memory only.
     gauntlets: Vec<gauntlet::Run>,
     /// Desired autonomous adventurers in each currently occupied shared zone.
@@ -2243,6 +2291,9 @@ impl World {
             raid_key: raid_key::State::default(),
             empty_seat: empty_seat::State::default(),
             merc_seq: 0,
+            adventurer_race_rng: u64::from_le_bytes(
+                uuid::Uuid::new_v4().as_bytes()[..8].try_into().unwrap(),
+            ),
             gauntlets: vec![],
             ambient_targets: BTreeMap::new(),
             ambient_chat_at: BTreeMap::new(),
@@ -2340,6 +2391,13 @@ impl World {
     fn random(&mut self) -> f64 {
         self.rng = self.rng.wrapping_mul(6364136223846793005).wrapping_add(1);
         (self.rng >> 32) as f64 / 4294967296.
+    }
+    fn roll_adventurer_race(&mut self) -> Race {
+        self.adventurer_race_rng = self.adventurer_race_rng
+            .wrapping_mul(6364136223846793005)
+            .wrapping_add(1);
+        let races = [Race::Human, Race::Mothkin, Race::Tidekin, Race::Gnome];
+        races[(self.adventurer_race_rng >> 62) as usize]
     }
     fn alchemy_roll(&mut self) -> f64 {
         self.alchemy_rng = self.alchemy_rng.wrapping_mul(6364136223846793005).wrapping_add(1);
@@ -2792,6 +2850,7 @@ impl World {
                     }
                     look.class = Class::Warrior;
                     look.gender = Gender::Male;
+                    look.race = Race::Human;
                 }
                 look.validate()?;
                 if !wants_gm
@@ -2859,20 +2918,26 @@ impl World {
             c.y = self.maps[0].spawn.y;
         }
         // A dungeon copy is gone once nobody is in it: a hero who logged out inside wakes at its door.
-        if self.is_instance(c.zone)
-            && let Some(door) = self.maps[c.zone].portals.iter().find(|p| !p.after_clear)
+        let left_instance = self.is_instance(c.zone);
+        if left_instance && let Some(door) = self.maps[c.zone].portals.iter().find(|p| !p.after_clear)
         {
             (c.zone, c.x, c.y) = (door.to, door.tx, door.ty);
         }
-        // If a character reconnects dead from an old instance or vanished zone, wake them at half HP at the safe arrival point.
+        // Resolve deaths saved in instances and stranded older ghosts at the safe arrival point.
         if c.hp <= 0.
-            && (c.corpse.as_ref().is_some_and(|cor| {
-                cor.zone >= self.maps.len()
-                    || self.is_arena_zone(cor.zone)
-                    || (self.is_instance(cor.zone) && cor.zone != c.zone)
-            }) || (c.ghost && c.corpse.is_none()))
+            && (left_instance
+                || c.corpse.as_ref().is_some_and(|cor| {
+                    cor.zone >= self.maps.len()
+                        || self.is_arena_zone(cor.zone)
+                        || (self.is_instance(cor.zone) && cor.zone != c.zone)
+                })
+                || (c.ghost && c.corpse.is_none()))
         {
-            c.hp = (c.max_hp() * 0.5).round().max(1.);
+            c.hp = if left_instance && !c.ghost && c.corpse.is_none() {
+                c.max_hp()
+            } else {
+                (c.max_hp() * 0.5).round().max(1.)
+            };
             c.corpse = None;
             c.ghost = false;
         }
@@ -2944,7 +3009,10 @@ impl World {
         let mut snapshot = self.snapshot_for(zone);
         crate::visibility::filter_view(&mut snapshot, &id);
         crate::visibility::cull_view(&mut snapshot, &id);
-        Ok(json!({"type":"welcome","version":1,"id":id,"token":issued,"snapshot":snapshot}))
+        Ok(json!({
+            "type": "welcome", "version": 1, "id": id, "token": issued, "snapshot": snapshot,
+            "xpCurve": { "minGap": XP_LEVEL_MIN_GAP, "rates": XP_LEVEL_RATES },
+        }))
     }
     /// Test servers may start new characters above level 1 (VALHALLA_START_LEVEL).
     fn with_start_level(&self, mut c: Character) -> Character {
@@ -3088,7 +3156,8 @@ impl World {
             ClientMessage::Input { dx, dy } => dx.is_finite() && dy.is_finite() && (*dx != 0. || *dy != 0.),
             ClientMessage::Move { x, y } => x.is_finite() && y.is_finite(),
             ClientMessage::Attack { .. } | ClientMessage::Skill { .. } | ClientMessage::Dash { .. }
-            | ClientMessage::Target { .. } | ClientMessage::Mount { .. } | ClientMessage::Fish {}
+            | ClientMessage::Target { .. } | ClientMessage::Mount { .. }
+            | ClientMessage::Fish { .. }
             | ClientMessage::Interact { .. } | ClientMessage::RaidCross { .. } => true,
             _ => false,
         };
@@ -3112,6 +3181,7 @@ impl World {
                     p.dance = None;
                     p.goal = None;
                     p.target = None;
+                    p.arena_target = None;
                 }
             }
             ClientMessage::RaidCross { id } => {
@@ -3121,7 +3191,7 @@ impl World {
                         .try_send(json!({"type":"error","text":text}));
                 }
             }
-            ClientMessage::Fish {} => self.fish_press(session, fishing::now()),
+            ClientMessage::Fish { auto_aim } => self.fish_press(session, fishing::now(), auto_aim),
             ClientMessage::ShopPresence { open } => {
                 p.fishing.shopping = open;
                 if open && p.fishing.line.is_some() { self.fish_end(session, "Line pulled in.", false, fishing::now()); }
@@ -3135,6 +3205,7 @@ impl World {
                     y: y.clamp(0.7, size - 0.7),
                 });
                 p.target = None;
+                p.arena_target = None;
                 p.input = Point::default();
             }
             ClientMessage::Target { id }
@@ -3146,6 +3217,7 @@ impl World {
             {
                 p.dance = None;
                 p.target = Some(id);
+                p.arena_target = None;
                 p.goal = None;
                 p.input = Point::default();
             }
@@ -3196,8 +3268,12 @@ impl World {
             ClientMessage::Skill { id, fx, fy } if fx.is_finite() && fy.is_finite() => {
                 self.use_skill(session, &id, normalize(fx, fy));
             }
-            ClientMessage::UseItem { item } => {
-                self.use_item(session, &item);
+            ClientMessage::UseItem { item: id, bag_slot } => {
+                if bag_slot.is_some() || item(&id).is_some_and(|i| i.kind == "bag") {
+                    self.equip_inventory_bag(session, &id, bag_slot);
+                } else {
+                    self.use_item(session, &id);
+                }
             }
             ClientMessage::OpenChest { id } => {
                 self.open_chest(session, id);
@@ -3311,6 +3387,9 @@ impl World {
             }
             ClientMessage::Resurrect => self.resurrect_command(session),
             ClientMessage::ShopOpen { npc } => self.shop(session, &npc, shop::Request::Open),
+            ClientMessage::BuyStock { npc, offer, quantity } => {
+                self.shop(session, &npc, shop::Request::Buy(offer, quantity))
+            }
             ClientMessage::SellBatch { npc, items } => {
                 self.shop(session, &npc, shop::Request::Sell(items))
             }
@@ -3473,8 +3552,12 @@ impl World {
         if self.travel_master(npc_id).is_some() {
             return self.spark_interact(session, npc_id, offer_id);
         }
-        if let Some(what) = offer_id.and_then(|id| self.merc_offer(session, npc_id, id)) {
-            return self.merc_interact(session, npc_id, &what);
+        if let Some(offer) = offer_id.and_then(|id| self.merc_offer(session, npc_id, id)) {
+            return self.merc_interact(session, npc_id, &offer);
+        }
+        if offer_id == Some("summon_party") {
+            self.summon_party_at_stone(session, npc_id);
+            return;
         }
         if offer_id == Some("gauntlet") {
             return self.gauntlet_interact(session, npc_id);
@@ -3527,11 +3610,28 @@ impl World {
                 notice = "Please wait a moment before trying again.".into();
             } else {
                 p.service_at = self.time;
-                if id.starts_with("rod:") || id.starts_with("cook:") {
-                    match fishing_workshop::purchase(p, npc, id, trading) {
-                        Ok(()) => {
-                            quest_changed = true;
-                            notice = "Your Fisher recipe is ready.".into();
+                if id.starts_with("rod:")
+                    || id.starts_with("cook:")
+                    || id.starts_with("cook_all:")
+                {
+                    let result = fishing_workshop::purchase(p, npc, id, trading).and_then(
+                        |(mut staged, count)| {
+                            sync_progression(&mut staged, &self.maps);
+                            self.store
+                                .save_many([&staged].into_iter())
+                                .map_err(|_| "The Fisher recipe could not be saved.")?;
+                            Ok((staged, count))
+                        },
+                    );
+                    match result {
+                        Ok((staged, count)) => {
+                            p.character = staged;
+                            p.fishing.line = None;
+                            notice = if id.starts_with("cook_all:") {
+                                format!("Cooked {} servings.", count)
+                            } else {
+                                "Your Fisher recipe is ready.".into()
+                            };
                         }
                         Err(text) => notice = text.into(),
                     }
@@ -3693,6 +3793,9 @@ impl World {
                         } else {
                             (notice, levels, quest_changed) =
                                 quest_action_with_choice(&mut p.character, quest, action, choice);
+                            if notice == QUEST_LOG_FULL {
+                                let _ = p.peer.try_send(json!({"type":"error","text":notice}));
+                            }
                             if action == "claim" && quest_changed {
                                 for (name, count) in quest_drops::discard_excess_quest_items(&mut p.character, quest, &self.maps) {
                                     let _ = p.peer.try_send(json!({"type":"system","text":format!("Discarded {count} × {name}.")}));
@@ -3769,6 +3872,7 @@ impl World {
                     "You are already at full health. Save it for after your next adventure!".into();
                     } else if let Some(def) = offer.mount.as_deref().and_then(mount_def) {
                         let c = &mut p.character;
+                        let price = c.npc_price(offer.cost);
                         let needed = offer
                             .needs
                             .as_deref()
@@ -3782,10 +3886,10 @@ impl World {
                             );
                         } else if needed.is_some_and(|(id, _)| c.quantity(id) == 0) {
                             notice = format!("You need a {} for this.", needed.unwrap().1);
-                        } else if c.gold < offer.cost {
-                            notice = format!("You need {} for the {}.", money_text(offer.cost), def.name);
+                        } else if c.gold < price {
+                            notice = format!("You need {} for the {}.", money_text(price), def.name);
                         } else {
-                            c.gold -= offer.cost;
+                            c.gold -= price;
                             if let Some((id, _)) = needed {
                                 c.consume_item(id, 1);
                             }
@@ -3806,49 +3910,13 @@ impl World {
                             }
                             Err(text) => notice = text.into(),
                         }
-                    } else if let Some(sold) = &offer.item {
-                        // A tiered offer sells the best tier of the line for the buyer's level, at that tier's price.
-                        let level = p.character.level;
-                        let stock = item(sold).map(|base| {
-                            if offer.tiered {
-                                base.family
-                                    .as_deref()
-                                    .and_then(|f| best_tier(f, level))
-                                    .unwrap_or(base)
-                            } else {
-                                base
-                            }
-                        });
-                        let cost = match stock {
-                            Some(i) if offer.tiered => i.price,
-                            _ => offer.cost,
-                        };
-                        match stock {
-                            None => notice = "That item is not for sale.".into(),
-                            Some(i)
-                                if i.kind == "weapon"
-                                    && i.class
-                                        .is_some_and(|class| class != p.character.look.class) =>
-                            {
-                                notice = "This weapon is for another class.".into();
-                            }
-                            Some(i)
-                                if i.kind == "weapon" && p.character.level < i.required_level =>
-                            {
-                                notice = format!("Requires level {}.", i.required_level);
-                            }
-                            Some(_) if p.character.gold < cost => {
-                                notice = format!("You need {} for this purchase.", money_text(cost));
-                            }
-                            Some(i) if !p.character.can_collect(&i.id) => {
-                                notice = "Your bags are full. Make room first.".into();
-                            }
-                            Some(i) => {
-                                p.character.gold -= cost;
-                                p.character.add_item(&i.id, 1);
+                    } else if offer.item.is_some() {
+                        match shop::purchase_items(&mut p.character, offer, 1) {
+                            Ok(i) => {
                                 notice = format!("Bought {}.", i.name);
                                 quest_changed = true;
                             }
+                            Err(text) => notice = text,
                         }
                     } else if p.character.gold < offer.cost {
                         notice = format!("You need {} for this service.", money_text(offer.cost));
@@ -3893,6 +3961,9 @@ impl World {
         }
         let mut dialogue = json!({"type":"dialogue","npc":npc,"notice":notice,"gold":p.character.gold,"level":p.character.level,"mercPrice":mercs::merc_price(p.character.level),"statPoints":p.character.stat_points(),"trainedPoints":p.character.trained_points(),"statResetPrice":p.character.stat_reset_price(),"statResets":p.character.stat_resets,"attributes":p.character.attributes,"statPlayer":if stats_changed { Some(raid_support.snapshot(p)) } else { None },"quests":p.character.quests,"abandonedQuests":p.character.abandoned_quests,"inventory":p.character.inventory,"equipment":p.character.equipment,"gearInstances":p.character.gear_instances,"repairQuote":p.character.repair_quote(repair_multiplier),"repairMultiplier":repair_multiplier,"gearPreview":gear_preview,"bags":p.character.bags,"bagCapacity":p.character.bag_capacity(),"look":p.character.look});
         dialogue["transmogs"] = json!(p.character.wardrobe.slots);
+        if p.character.look.race == Race::Gnome {
+            dialogue["stockPrices"] = json!(shop::stock_prices(&p.character, npc));
+        }
         if npc.offers.iter().any(|o| o.id == "transmogrify") {
             dialogue["wardrobe"] = json!(p.character.wardrobe.unlocked);
             dialogue["transmogPrice"] = json!(p.character.transmog_price());
@@ -4256,8 +4327,15 @@ impl World {
     fn update_player(&mut self, session: u64) {
         self.update_resource(session);
         self.update_enchanting(session);
+        self.expire_mend_proc(session);
         let carry_speed = self.forge_carry_speed(session);
+        let arena_opponent = self.players[&session].arena_target.and_then(|target| {
+            self.arena_opponent(session, target).map(|point| (target, point))
+        });
         let p = self.players.get_mut(&session).unwrap();
+        if arena_opponent.is_none() {
+            p.arena_target = None;
+        }
         // Also covers old mounted saves and administrative zone changes, before movement.
         if p.character.mounted && !self.maps[p.character.zone].allows_mount(&p.character.mount) {
             p.character.mounted = false;
@@ -4275,6 +4353,7 @@ impl World {
             &mut p.pvp_fight,
             &mut p.absorb_left,
             &mut p.forge_ward_left,
+            &mut p.mend_free_left,
         ] {
             *timer = if *timer - TICK < 1e-9 {
                 0.
@@ -4392,7 +4471,9 @@ impl World {
                 3.2
             };
             if p.dead_time >= respawn_delay && !p.fallen {
-                if p.ambient.is_some() || p.merc.is_some() || p.guard.is_some() {
+                let zone = p.character.zone;
+                let is_human = p.is_human();
+                if !is_human || self.instances.iter().any(|instance| instance.zone == zone) {
                     let map = &self.maps[p.character.zone];
                     let rally = self
                         .instances
@@ -4424,8 +4505,10 @@ impl World {
                     }
                     let id = p.character.id.clone();
                     self.event("respawn", &id, point, 0., false);
+                    if is_human {
+                        self.save();
+                    }
                 } else {
-                    let zone = p.character.zone;
                     let death_point = p
                         .character
                         .corpse
@@ -4528,9 +4611,7 @@ impl World {
             }
         }
         if p.stun > 0. {
-            // Stunned: stands where it is, like a player frozen in amber.
-            p.stop();
-            p.attack = 0.;
+            p.stop_for_stun();
             return;
         }
         let mut strike = false;
@@ -4547,11 +4628,13 @@ impl World {
         let mut dir = Point::default();
         let mut travel = 0.;
         let mut auto_attack = false;
+        let mut arena_attack = None;
         // A fighting escort finds its way round walls to its enemy like a hired fighter.
         let hired = (p.merc.is_some()
             && p.escort.as_ref().is_none_or(|e| e.fighting())
             && !p.gauntlet)
             || p.guard.is_some();
+        let mut navigate = hired;
         let mut navigation_goal = None;
         if self.time - p.input_at > 0.3 {
             p.input = Point::default();
@@ -4565,34 +4648,42 @@ impl World {
                 .get(id)
                 .filter(|s| !s.dead && s.zone == p.character.zone)
             {
-                let distance = p.character.point().distance(s.point());
-                let facing = p.character.point().direction(s.point());
-                if distance - s.r <= p.character.look.class.reach()
-                    && (!hired
-                        || self.maps[p.character.zone].line_clear(
-                            p.character.point(),
-                            s.point(),
-                            0.05,
-                        ))
-                {
+                let here = p.character.point();
+                let distance = here.distance(s.point()) - s.hit_radius();
+                let facing = here.direction(s.point());
+                let class = p.character.look.class;
+                let in_reach = distance <= class.reach();
+                // A Wyrdweaver can stand beside a tree or a ridge during a volley.
+                let find_clear_approach = hired || s.kind == "weaver";
+                let clear = in_reach
+                    && (!(find_clear_approach || class.ranged())
+                        || self.maps[p.character.zone].line_clear(here, s.point(), 0.05));
+                if in_reach && (!find_clear_approach || clear) {
                     p.face = facing;
-                    auto_attack = !p.character.look.class.ranged()
-                        || self.maps[p.character.zone].line_clear(
-                            p.character.point(),
-                            s.point(),
-                            0.05,
-                        );
+                    auto_attack = clear;
                 } else {
                     dir = facing;
                     // Stop just inside reach: at the exact floating-point boundary a fighter can keep
                     // requesting a sub-pixel step forever without ever starting its attack.
-                    travel = (distance - s.r - p.character.look.class.reach()
-                        + if hired { 0.05 } else { 0. })
-                    .max(0.);
+                    travel = (distance - class.reach() + 0.05).max(0.);
+                    navigate = find_clear_approach;
                     navigation_goal = Some(s.point());
                 }
             } else {
                 p.target = None;
+            }
+        } else if let Some((opponent, point)) = arena_opponent {
+            let here = p.character.point();
+            let class = p.character.look.class;
+            let reach = pvp::attack_range(class);
+            let distance = here.distance(point);
+            if distance > reach {
+                dir = here.direction(point);
+                travel = distance - reach + 0.05;
+            } else if p.cooldown <= 0. && p.dash <= 0.
+                && (!class.ranged() || self.maps[p.character.zone].line_clear(here, point, 0.05))
+            {
+                arena_attack = Some(opponent);
             }
         } else if let Some(goal) = p.goal {
             travel = p.character.point().distance(goal);
@@ -4604,7 +4695,7 @@ impl World {
                 navigation_goal = Some(goal);
             }
         }
-        if hired
+        if navigate
             && p.root <= 0.
             && p.dash <= 0.
             && let Some(goal) = navigation_goal.filter(|goal| {
@@ -4675,6 +4766,9 @@ impl World {
         }
         if auto_attack {
             self.start_attack(session);
+        }
+        if let Some(opponent) = arena_attack {
+            self.attack_arena_opponent(session, opponent);
         }
         if self.players[&session].ambient.is_none() && self.players[&session].guard.is_none() {
             self.use_portal(session);
@@ -5045,12 +5139,18 @@ impl World {
                 }
                 let d = point.distance(s.point());
                 let facing = point.direction(s.point());
-                d - s.r < reach && (d < 0.6 || facing.x * face.x + facing.y * face.y > 0.15)
+                d - s.hit_radius() <= reach
+                    && (d < 0.6 || facing.x * face.x + facing.y * face.y > 0.15)
+                    && (s.kind != "weaver" || self.maps[zone].line_clear(point, s.point(), 0.05))
             })
             .map(|s| s.id)
             .collect();
+        let mut landed = false;
         for id in hit {
-            self.enchant_hit(id, session, damage, crit, enchanting::Hit::Basic);
+            landed |= self.enchant_hit(id, session, damage, crit, enchanting::Hit::Basic) > 0.;
+        }
+        if landed {
+            self.roll_mend_proc(session);
         }
     }
     /// Announces a level gain to the zone, with the new level and the skills it unlocks.
@@ -5092,7 +5192,7 @@ impl World {
                 !s.dead
                     && s.zone == zone
                     && !skip.contains(&s.id)
-                    && at.distance(s.point()) - s.r < radius
+                    && at.distance(s.point()) - s.hit_radius() < radius
             })
             .map(|s| (at.distance(s.point()), s.id))
             .collect();
@@ -5241,13 +5341,16 @@ impl World {
         };
         let now = self.enchant_now();
         let pve = self.enchant_pve(session);
+        let price = self.skill_price(session, &skill);
         let p = self.players.get_mut(&session).unwrap();
         let (discounted, borrowed) = if pve {
             p.enchant_cast_modifiers(self.time)
         } else {
             (false, false)
         };
-        let cost = skill.cost * if discounted { 0.7 } else { 1. };
+        // A free cast keeps the Spellweaver discount for one that costs something.
+        let discounted = discounted && price > 0.;
+        let cost = price * if discounted { 0.7 } else { 1. };
         if p.character.resource() < cost {
             let text = format!(
                 "Not enough {}: {} costs {}.",
@@ -6244,8 +6347,9 @@ impl World {
                     },
                 )
             })
-            .filter(|(_, _, d, reach)| {
-                *d < *reach || (hunting && (was_chasing || s.target.is_some()))
+            .filter(|(_, point, d, reach)| {
+                (*d < *reach || (hunting && (was_chasing || s.target.is_some())))
+                    && map.line_clear(s.point(), *point, 0.05)
             })
             .map(|(id, point, d, _)| (id, point, d))
             .min_by(|a, b| a.2.total_cmp(&b.2));
@@ -6341,9 +6445,10 @@ impl World {
                         ENEMY_WINDUP_REACH + s.r + if slam > 0. { 0.9 } else { 0. },
                         |r| r.range,
                     );
-                    let visible = dungeon.is_none()
-                        || d > attack_reach
-                        || pursuit::clear_line(map, s.point(), point, s.r);
+                    let visible = map.line_clear(s.point(), point, 0.05)
+                        && (dungeon.is_none()
+                            || d > attack_reach
+                            || pursuit::clear_line(map, s.point(), point, s.r));
                     let shoots = ranged.as_ref().is_some_and(|r| {
                         visible && d > Slime::melee_inside(&s.kind) + s.r && d < r.range * 3.
                     });
@@ -6356,12 +6461,13 @@ impl World {
                         } else if d > r.range * 0.85 {
                             goal = Some(point);
                         } else if d < r.range * 0.35
+                            && s.hp < s.max_hp * 0.2
                             && matches!(
                                 s.kind.as_str(),
-                                "archer" | "acolyte" | "crow" | "weaver" | "skyray"
+                                "archer" | "acolyte" | "crow" | "skyray"
                             )
                         {
-                            // Too close for comfort: back away from the hero while the shot recovers.
+                            // A badly hurt ranged mob backs away while the shot recovers.
                             let away = point.direction(s.point());
                             goal = Some(Point {
                                 x: s.x + away.x * 3.,
@@ -6742,7 +6848,8 @@ impl World {
             p.attack = 0.;
             p.buffs.clear();
             p.stop();
-            p.mark_corpse(point);
+            let in_instance = self.instances.iter().any(|instance| instance.zone == p.character.zone);
+            p.mark_corpse(point, in_instance);
             p.apply_death_penalty();
         }
         self.event_with(
@@ -6790,7 +6897,7 @@ impl World {
                     !s.dead
                         && s.zone == b.zone
                         && !b.hits.contains(&s.id)
-                        && segment_distance(s.point(), start, end) < s.r + 0.22
+                        && segment_distance(s.point(), start, end) < s.hit_radius() + 0.22
                         && self.maps[b.zone].line_clear(start, s.point(), 0.05)
                 })
                 .map(|s| (start.distance(s.point()), s.id))
@@ -6947,7 +7054,7 @@ impl World {
                 // Refused loot must stay at its world position, before the magnet
                 // can attach it to a fighter's feet. Recheck room without taking a turn.
                 if !self.drop_has_room(i, session) {
-                    self.refused_drop_notice(i, session);
+                    self.refused_drop_notice(session);
                     continue;
                 }
                 let dir = point.direction(at);
@@ -7113,6 +7220,8 @@ fn walk_with_actors(
     }
 }
 
+const QUEST_LOG_FULL: &str = "Your questlog is full";
+
 // Only called after the NPC's range, living-player and cooldown checks.
 fn quest_action(character: &mut Character, quest: &Quest, action: &str) -> (String, u32, bool) {
     // Internal quest helpers (including private test shortcuts) choose the first legal class
@@ -7163,6 +7272,9 @@ fn quest_action_with_choice(
         "accept" => {
             if prior.is_some_and(|i| !character.quests[i].claimed || !quest.repeatable) {
                 return refused("You have already taken this quest.");
+            }
+            if character.quest_slots_left() == 0 {
+                return refused(QUEST_LOG_FULL);
             }
             let progress = QuestProgress {
                 id: quest.id.clone(),
@@ -7234,9 +7346,10 @@ fn quest_action_with_choice(
             *character = next;
             character.quests[i].claimed = true;
             character.quests[i].completions = character.quests[i].completions.saturating_add(1);
-            let gold = character.boosted_gold(quest.reward_gold);
+            let gold = character.quest_gold(quest.reward_gold);
             character.gold = character.gold.saturating_add(gold);
-            let (xp, levels) = character.reward_xp(quest.reward_xp);
+            let base_xp = level_adjusted_xp(quest.reward_xp, character.level, quest.level);
+            let (xp, levels) = character.reward_xp(base_xp);
             (
                 format!(
                     "Quest complete: {}! +{} XP and +{}.{}",
@@ -7279,6 +7392,47 @@ mod tests {
     fn world() -> World {
         World::with_level_spread(Store::open(std::path::Path::new(":memory:")).unwrap(), 0)
     }
+    #[test]
+    fn profession_snapshot_keeps_saved_skills_and_caps_private() {
+        let mut world = world();
+        let (tx, _rx) = mpsc::channel(256);
+        world.join(1, None, Some(Look::default()), tx).unwrap();
+        let player = world.players.get_mut(&1).unwrap();
+        let expected = json!({
+            "fishing": {"skill": 1, "maxSkill": 600},
+            "blacksmithing": {"skill": 0, "maxSkill": 600},
+            "enchanting": {"skill": 0, "maxSkill": 600},
+            "alchemy": {"skill": 0, "maxSkill": 600},
+        });
+        assert_eq!(player.snapshot()["professions"], expected);
+        player.character.fishing.proficiency.skill = 329;
+        player.character.blacksmithing.proficiency.skill = 387;
+        player.character.enchanting.proficiency.skill = 300;
+        player.character.alchemy.proficiency.skill = 527;
+        player.character.enchanting.recipes.insert(crate::enchanting::Enchant::DoubleTap);
+        player.character.blacksmithing.recipes.insert("smith_gear_meadowguard_gloves".into());
+        player.character.alchemy.recipes.insert("alchemy_trailwind_potion".into());
+
+        let mut other = json!({"players": [player.snapshot()]});
+        let mut owner = other.clone();
+        crate::visibility::filter_view(&mut owner, &player.character.id);
+        let saved = &owner["players"][0]["professions"];
+        assert_eq!(saved, &json!({
+            "fishing": {"skill": 329, "maxSkill": 600},
+            "blacksmithing": {"skill": 387, "maxSkill": 600},
+            "enchanting": {"skill": 300, "maxSkill": 600},
+            "alchemy": {"skill": 527, "maxSkill": 600},
+        }));
+        assert_eq!(owner["players"][0]["learnedRecipes"], json!({
+            "enchanting": ["double_tap"],
+            "blacksmithing": ["smith_gear_meadowguard_gloves"],
+            "alchemy": ["alchemy_trailwind_potion"],
+        }));
+        crate::visibility::filter_view(&mut other, "another player");
+        assert!(other["players"][0].get("professions").is_none());
+        assert!(other["players"][0].get("learnedRecipes").is_none());
+    }
+
     /// Open Greenmeadow ground: outside every camp and city, 8+ units from any scenery, 13+ from any enemy spawn.
     const OPEN_GROUND: Point = Point { x: 276., y: 226. };
     /// New heroes land on Greenmeadow's pier, which sits inside Saltby's sanctuary (nothing can hurt them there).
@@ -7845,7 +7999,7 @@ mod tests {
         );
         let saved = w.store.load(&token).unwrap().unwrap();
         assert_eq!(saved.quantity(reward), 1);
-        assert_eq!(saved.gold, gold + q.reward_gold);
+        assert_eq!(saved.gold, gold + saved.quest_gold(q.reward_gold));
         assert!(
             saved
                 .quests
@@ -8735,7 +8889,7 @@ mod tests {
         quest_interact(&mut w, "crags_captain", Some("quest:claim:crags_onward"));
         let c = &w.players[&1].character;
         assert!(c.quests[0].claimed && c.quests[0].completions == 1);
-        assert_eq!(c.gold, gold + 100);
+        assert_eq!(c.gold, gold + c.quest_gold(100));
         assert_eq!(c.xp, xp + xp_to_level(5) / 10);
     }
 
@@ -8905,13 +9059,13 @@ mod tests {
         quest_interact(&mut w, "crags_supplier", None);
         assert_eq!(w.players[&1].character.quests[0].counts, vec![1, 1, 1]);
         quest_interact(&mut w, "crags_captain", Some("quest:claim:crags_welcome"));
-        assert_eq!(w.players[&1].character.gold, 40);
+        assert_eq!(w.players[&1].character.gold, 42);
         assert_eq!(
             w.store.load(token).unwrap().unwrap().quests[0].completions,
             1
         );
         quest_interact(&mut w, "crags_captain", Some("quest:claim:crags_welcome"));
-        assert_eq!(w.players[&1].character.gold, 40, "no duplicate reward");
+        assert_eq!(w.players[&1].character.gold, 42, "no duplicate reward");
         quest_interact(&mut w, "crags_scout", Some("quest:accept:crags_wisps"));
         assert_eq!(w.players[&1].character.quests[1].counts, vec![0]);
     }
@@ -10817,7 +10971,7 @@ mod tests {
         w.players.get_mut(&1).unwrap().character.zone = CITY;
         quest_interact(&mut w, "city_herald", Some("quest:claim:city_seals"));
         let c = &w.players[&1].character;
-        assert_eq!(c.gold, 520);
+        assert_eq!(c.gold, 546);
         assert!(c.quests[1].claimed && c.quests[1].completions == 1);
         // Kills are still credited only inside the killer's own zone: a kill in the glacier touches no city quest.
         let mut c2 = c.clone();
@@ -10912,7 +11066,7 @@ mod tests {
         give(&mut w, &gel, 4);
         quest_interact(&mut w, "city_alchemist", Some("quest:claim:city_gel"));
         let c = &w.players[&1].character;
-        assert_eq!(c.gold, 480, "reward paid");
+        assert_eq!(c.gold, 504, "reward paid");
         // Exactly 8 and 4 were taken, and the copies left over (1 gel, 4 blue) are discarded: no other quest needs them.
         assert_eq!((c.quantity(&gel), c.quantity(&blue)), (0, 0));
         assert!(
@@ -10967,7 +11121,7 @@ mod tests {
             // Accepting again starts from nothing: neither the handed-in copies nor the discarded spare are left.
             assert_eq!(counts(&w, "city_order"), vec![0, 0]);
         }
-        assert_eq!(w.players[&1].character.gold, 2 * 540);
+        assert_eq!(w.players[&1].character.gold, 2 * 567);
     }
 
     #[test]
@@ -11084,7 +11238,7 @@ mod tests {
             .quests
             .iter()
             .filter(|q| in_chain(q))
-            .map(|q| q.reward_gold)
+            .map(|q| c.quest_gold(q.reward_gold))
             .sum();
         assert_eq!(c.gold, gold, "every reward paid once");
         assert!(
@@ -11747,12 +11901,12 @@ mod tests {
         w.players.get_mut(&1).unwrap().character.xp = 95;
         quest_interact(&mut w, "guide", Some("quest:claim:welcome"));
         let c = &w.players[&1].character;
-        assert_eq!((c.level, c.xp, c.gold), (2, 5, 12));
+        assert_eq!((c.level, c.xp, c.gold), (2, 5, 13));
         assert_eq!(c.hp, c.max_hp());
         assert!(c.quests[0].claimed);
         quest_interact(&mut w, "guide", Some("quest:claim:welcome"));
         quest_interact(&mut w, "guide", Some("quest:accept:welcome"));
-        assert_eq!(w.players[&1].character.gold, 12);
+        assert_eq!(w.players[&1].character.gold, 13);
         assert_eq!(w.players[&1].character.quests[0].completions, 1);
     }
 
@@ -11791,7 +11945,7 @@ mod tests {
         w.slimes[king] = Slime::new(king, &w.maps[0].slimes[king]);
         w.hit_slime(king, 1, 1000., false);
         quest_interact(&mut w, "gatekeeper", Some("quest:claim:king_challenge"));
-        assert_eq!(w.players[&1].character.gold, 24 + 35 + 60);
+        assert_eq!(w.players[&1].character.gold, 25 + 37 + 63);
     }
 
     #[test]
@@ -11823,18 +11977,18 @@ mod tests {
         }
         quest_interact(&mut w, "merchant", Some("quest:claim:meadow_bounty"));
         let saved = w.store.load(&token).unwrap().unwrap(); // Claim saves immediately.
-        assert_eq!(saved.gold, 49);
+        assert_eq!(saved.gold, 51);
         assert_eq!(saved.quests[1].completions, 1);
         w.players.get_mut(&1).unwrap().character = saved;
         quest_interact(&mut w, "merchant", Some("quest:claim:meadow_bounty"));
-        assert_eq!(w.players[&1].character.gold, 49);
+        assert_eq!(w.players[&1].character.gold, 51);
         quest_interact(&mut w, "merchant", Some("quest:accept:meadow_bounty"));
         let saved = w.store.load(&token).unwrap().unwrap();
         assert_eq!(saved.quests[1].counts, vec![0]);
         assert!(!saved.quests[1].claimed);
         assert_eq!(saved.quests[1].completions, 1);
         quest_interact(&mut w, "merchant", Some("quest:claim:meadow_bounty"));
-        assert_eq!(w.players[&1].character.gold, 49);
+        assert_eq!(w.players[&1].character.gold, 51);
     }
 
     #[test]
@@ -12261,7 +12415,10 @@ mod tests {
         w.hit_slime(id, 1, 1000., false);
         assert_eq!(w.next_king_spawn, deadline);
         assert_eq!(w.players[&1].character.kills, 1);
-        assert_eq!(w.players[&1].character.xp, 38, "half XP in Greenmeadow");
+        assert_eq!(
+            w.players[&1].character.xp, 44,
+            "half XP in Greenmeadow plus the 15% level bonus"
+        );
         assert_eq!(w.drops.iter().filter(|d| d.item.is_none()).count(), 1);
         assert_eq!(
             w.drops
@@ -12273,8 +12430,9 @@ mod tests {
                 .count(),
             1
         );
-        // Authored 30 gold, halved by MOB_GOLD_SCALE.
-        assert_eq!(w.drops[0].value, 15);
+        // Recipe drops can precede the coin pile. The authored 30 gold is halved by MOB_GOLD_SCALE.
+        let coins = w.drops.iter().find(|drop| drop.item.is_none()).unwrap();
+        assert_eq!(coins.value, 15);
         for _ in 0..500 {
             w.time += TICK;
             w.update_king_spawn();
@@ -12674,13 +12832,13 @@ mod tests {
             (182., 17., 30, 8)
         );
         assert_eq!(high.r, base.r, "level never changes body size");
-        // A kill pays the rolled enemy's XP and gold, not the kind's default.
+        // The rolled enemy level sets the base XP, the level bonus and the gold.
         let mut w = world();
         let _rx = join(&mut w, 1, Class::Warrior);
         let id = w.slimes.iter().position(|s| s.kind == "beetle").unwrap();
         w.slimes[id] = Slime::with_level(id, &w.spawns[id].clone(), 7);
         w.hit_slime(id, 1, 5000., false);
-        assert_eq!(w.players[&1].character.xp, 40);
+        assert_eq!(w.players[&1].character.xp, 46);
         assert_eq!(
             w.drops.iter().find(|d| d.item.is_none()).unwrap().value,
             6,
@@ -12981,7 +13139,7 @@ mod tests {
         let mut w = world();
         let _rx = join(&mut w, 1, Class::Warrior);
         assert_eq!(w.players[&1].character.xp_need(), 100);
-        // Greenmeadow kills pay half XP: a level-2 green pays (45 + 5 x 2) / 2, rounded up.
+        // A level-2 green pays 28 in Greenmeadow and gets a 3% bonus for a level-1 hero.
         let kill = |w: &mut World| {
             w.hit_slime(0, 1, 1000., false);
             w.slimes[0].respawn = TICK;
@@ -12989,14 +13147,14 @@ mod tests {
         };
         kill(&mut w);
         assert_eq!(w.players[&1].character.level, 1);
-        assert_eq!(w.players[&1].character.xp, 28);
+        assert_eq!(w.players[&1].character.xp, 29);
         kill(&mut w);
         kill(&mut w);
         assert_eq!(w.players[&1].character.level, 1);
-        assert_eq!(w.players[&1].character.xp, 84);
+        assert_eq!(w.players[&1].character.xp, 87);
         w.hit_slime(0, 1, 1000., false);
         assert_eq!(w.players[&1].character.level, 2);
-        assert_eq!(w.players[&1].character.xp, 12);
+        assert_eq!(w.players[&1].character.xp, 16);
         assert_eq!(w.players[&1].character.xp_need(), 200);
         assert_eq!(w.players[&1].character.hp, 140.);
     }
@@ -13009,7 +13167,10 @@ mod tests {
         w.hit_slime(id, 1, 1000., false);
         w.hit_slime(id, 1, 1000., false);
         assert_eq!(w.players[&1].character.kills, 1);
-        assert_eq!(w.players[&1].character.xp, 35, "half XP in Greenmeadow");
+        assert_eq!(
+            w.players[&1].character.xp, 39,
+            "half XP in Greenmeadow plus the 12% level bonus"
+        );
         assert_eq!(w.drops.iter().filter(|d| d.item.is_none()).count(), 1);
         assert_eq!(
             w.drops
@@ -13147,7 +13308,7 @@ mod tests {
                 .count(),
             1
         );
-        assert_eq!(w.players[&1].character.xp, 28);
+        assert_eq!(w.players[&1].character.xp, 29);
         w.slimes[0].respawn = TICK;
         w.step();
         assert!(!w.slimes[0].dead);
@@ -13407,6 +13568,80 @@ mod tests {
     }
 
     #[test]
+    fn playable_races_survive_guest_and_account_reconnects_with_ordinary_class_stats() {
+        let legacy: Look =
+            serde_json::from_str(r#"{"name":"Lina","class":"hunter","gender":"female"}"#).unwrap();
+        assert_eq!(legacy.race, Race::Human);
+        assert!(serde_json::from_str::<Look>(r#"{"race":"typo"}"#).is_err());
+        for (key, race) in [
+            ("mothkin", Race::Mothkin),
+            ("tidekin", Race::Tidekin),
+            ("gnome", Race::Gnome),
+        ] {
+            check_playable_race(&legacy, key, race);
+        }
+    }
+
+    fn check_playable_race(legacy: &Look, key: &str, race: Race) {
+        let mut w = world();
+        let look: Look =
+            serde_json::from_value(json!({"name":"Neris","class":"hunter","gender":"female","race":key}))
+                .unwrap();
+
+        let (tx, _rx) = mpsc::channel(256);
+        let guest = w.join(1, None, Some(look.clone()), tx).unwrap();
+        let token = guest["token"].as_str().unwrap().to_owned();
+        assert_eq!(guest["snapshot"]["players"][0]["look"]["race"], key);
+        assert_eq!(guest["snapshot"]["players"][0]["r"], PLAYER_RADIUS);
+        let (tx, _rx) = mpsc::channel(256);
+        w.join(2, None, Some(legacy.clone()), tx).unwrap();
+        let guest = &w.players[&1].character;
+        let human = &w.players[&2].character;
+        assert_eq!(guest.max_hp(), human.max_hp());
+        assert_eq!(guest.look.class, human.look.class);
+        assert_eq!(guest.level, human.level);
+        assert_eq!(guest.zone, human.zone);
+        assert_eq!(guest.landing, human.landing);
+        w.leave(1);
+        let (tx, _rx) = mpsc::channel(256);
+        w.join(3, Some(token), None, tx).unwrap();
+        assert_eq!(w.players[&3].character.look.race, race);
+
+        let owner = w
+            .store
+            .create_account("moonhunter", "unused")
+            .unwrap()
+            .unwrap();
+        let join_account = |w: &mut World, session, character, look| {
+            let (tx, _rx) = mpsc::channel(256);
+            w.join_as(
+                session,
+                Identity::Account {
+                    id: owner.id.clone(),
+                    gm: false,
+                    character,
+                    look,
+                },
+                tx,
+            )
+            .unwrap()
+        };
+        let account = join_account(
+            &mut w,
+            4,
+            None,
+            Some(Look {
+                name: "Sivre".into(),
+                ..look
+            }),
+        );
+        let id = account["id"].as_str().unwrap().to_owned();
+        w.leave(4);
+        join_account(&mut w, 5, Some(id), None);
+        assert_eq!(w.players[&5].character.appearance_look().race, race);
+    }
+
+    #[test]
     fn only_the_living_killer_collects_a_drop() {
         let mut w = world();
         let _a = join(&mut w, 1, Class::Mage);
@@ -13541,6 +13776,50 @@ mod tests {
             assert_eq!(w.slimes[0].state, state, "offset {extra:+}");
         }
     }
+    #[test]
+    fn ranged_mobs_retreat_during_recovery_only_below_twenty_percent() {
+        let mut w = world();
+        let _rx = join(&mut w, 1, Class::Warrior);
+        off_pier(&mut w, 1);
+        let spawn_x = OPEN_GROUND.x + 2.5;
+        let spawn_y = OPEN_GROUND.y;
+        for kind in ["archer", "acolyte", "crow", "skyray", "weaver"] {
+            let spawn = SlimeSpawn {
+                ambush: None,
+                kind: kind.into(),
+                zone: 0,
+                x: spawn_x,
+                y: spawn_y,
+            };
+            for (health, cooldown, retreats, state) in [
+                (1., 10., false, "chase"),
+                (0.201, 10., false, "chase"),
+                (0.2, 10., false, "chase"),
+                (0.199, 10., kind != "weaver", "chase"),
+                (0.199, 0., false, "windup"),
+            ] {
+                let mut enemy = Slime::new(0, &spawn);
+                enemy.hp = enemy.max_hp * health;
+                enemy.atk_cd = cooldown;
+                enemy.state = "chase".into();
+                enemy.target = Some(1);
+                w.slimes[0] = enemy;
+
+                w.update_slime(0);
+
+                let enemy = &w.slimes[0];
+                assert_eq!(enemy.state, state, "{kind} at {health:.3} health");
+                if retreats {
+                    assert!(enemy.x > spawn_x, "{kind} should retreat below 20% health");
+                } else {
+                    assert_eq!(enemy.x, spawn_x, "{kind} at {health} should hold position");
+                }
+                assert_eq!(enemy.y, spawn_y);
+                assert_eq!(enemy.target, Some(1));
+            }
+        }
+    }
+
     /// ENEMY-CHASE-CLOSE-RANGE: open-world enemies keep chasing past `HOME_LEASH_RANGE` while the target is close,
     /// and return home only once the target leaves close range.
     #[test]
@@ -14755,7 +15034,7 @@ mod tests {
             .quests
             .iter()
             .filter(|q| claimed.contains(&q.id.as_str()))
-            .map(|q| q.reward_gold)
+            .map(|q| ch(&w).quest_gold(q.reward_gold))
             .sum();
         assert_eq!(ch(&w).gold, gold);
         assert!(
@@ -14799,7 +15078,7 @@ mod tests {
             .quests
             .iter()
             .filter(|q| claimed.contains(&q.id))
-            .map(|q| q.reward_gold)
+            .map(|q| ch(&w).quest_gold(q.reward_gold))
             .sum();
         assert_eq!(ch(&w).gold, reward_gold);
         for id in &claimed {
@@ -15786,6 +16065,26 @@ mod tests {
             .find(|g| g.item == "necklace_upgrade")
             .unwrap()
             .wear
+    }
+
+    #[test]
+    fn racial_gnome_repair_quote_matches_single_and_bulk_costs() {
+        let (mut w, mut rx) = debug_world();
+        wear_necklace(&mut w, 40);
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        c.look.race = Race::Gnome;
+        c.gold = 50;
+        stand_at(&mut w, 1, "smith");
+        drain(&mut rx);
+        w.interact(1, "smith", None);
+        let quote = packets(&mut rx, "dialogue").pop().unwrap();
+        assert_eq!(quote["repairQuote"][0][1], 22);
+        let id = quote["repairQuote"][0][0].as_u64().unwrap();
+        w.interact(1, "smith", Some(&format!("repair:{id}")));
+        assert_eq!((necklace_wear(&w), ch(&w).gold), (0, 28));
+        wear_necklace(&mut w, 40);
+        w.interact(1, "smith", Some("repair_all"));
+        assert_eq!((necklace_wear(&w), ch(&w).gold), (0, 6));
     }
     fn notices(rx: &mut mpsc::Receiver<Value>) -> Vec<String> {
         packets(rx, "notice")
@@ -16862,5 +17161,60 @@ mod tests {
         assert!(c.corpse.is_none());
         assert!(c.zone < w.maps.len());
         assert_eq!(c.hp, (c.max_hp() * 0.5).round().max(1.));
+    }
+    #[test]
+    fn corpse_run_dungeon_and_raid_deaths_restart_alive_at_entrance() {
+        for (idx, (zone, rally)) in [
+            (5usize, None),
+            (46usize, Some(Point { x: 151., y: 45. })),
+        ]
+        .into_iter()
+        .enumerate()
+        {
+            let mut w = world();
+            assert!(w.is_instance(zone));
+            w.enter_instance(zone);
+            if let Some(inst) = w.instances.iter_mut().find(|i| i.zone == zone) {
+                inst.rally = rally;
+            }
+            let session = 10 + idx as u64;
+            let (tx, _rx) = mpsc::channel(256);
+            w.join(session, None, Some(Look::default()), tx).unwrap();
+            let death_pt = Point {
+                x: w.maps[zone].spawn.x + 15.,
+                y: w.maps[zone].spawn.y + 15.,
+            };
+            {
+                let p = w.players.get_mut(&session).unwrap();
+                p.character.zone = zone;
+                p.character.x = death_pt.x;
+                p.character.y = death_pt.y;
+                p.character.hp = 10.;
+                p.fallen = false;
+                p.pack_death = false;
+            }
+            w.hurt_player(session, 10_000., Point { x: 0., y: 0. });
+            {
+                let p = &w.players[&session];
+                assert_eq!(p.character.hp, 0.);
+                assert!(!p.character.ghost, "instance death must not set ghost");
+                assert!(
+                    p.character.corpse.is_none(),
+                    "instance death must not leave a corpse"
+                );
+            }
+            w.players.get_mut(&session).unwrap().dead_time = 3.2;
+            w.update_player(session);
+            let expected = rally.unwrap_or(w.maps[zone].spawn);
+            let p = &w.players[&session];
+            assert!(!p.character.ghost);
+            assert!(p.character.corpse.is_none());
+            assert_eq!(p.character.hp, p.character.max_hp());
+            assert!(
+                p.character.point().distance(expected) < 2.,
+                "zone {zone}: expected respawn near {expected:?}, got {:?}",
+                p.character.point()
+            );
+        }
     }
 }

@@ -2,12 +2,13 @@
 (() => {
   // ---------- tiny persistent state ----------
   const KEY = 'valhallasc.save.v1';
-  const defaults = { lang: /^ko/i.test(navigator.language || '') ? 'ko' : /^sv/i.test(navigator.language || '') ? 'sv' : 'en', sound: true, musicVol: 1, sfxVol: 1, night: 1, weather: 1, weatherAudio: .7, lowGraphics: false, touchGraphicsSuggested: false, ui: {}, uiScale: .8, winScale: {}, panelSize: {}, char: null, draft: null };
+  const FLOATING_TEXT = ['damage', 'incoming', 'healing', 'misses', 'loot', 'xp', 'professions', 'combat', 'skills', 'levels', 'notices'];
+  const defaults = { lang: /^ko/i.test(navigator.language || '') ? 'ko' : /^sv/i.test(navigator.language || '') ? 'sv' : 'en', sound: true, masterVol: 1, musicVol: .35, sfxVol: 1, night: 1, weather: 1, weatherAudio: .7, lowGraphics: false, touchGraphicsSuggested: false, ui: {}, uiScale: .8, winScale: {}, panelSize: {}, char: null, draft: null };
   let save = { ...defaults };
   try { Object.assign(save, JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) { /* private mode */ }
   save.combatSounds = save.combatSounds === 'recorded' ? 'recorded' : 'synthesized';
   const vol = v => Number.isFinite(+v) ? Math.max(0, Math.min(1, +v)) : 1;
-  save.musicVol = vol(save.musicVol); save.sfxVol = vol(save.sfxVol); save.night = vol(save.night); save.weather = vol(save.weather); save.weatherAudio = vol(save.weatherAudio);
+  save.masterVol = vol(save.masterVol); save.musicVol = vol(save.musicVol); save.sfxVol = vol(save.sfxVol); save.night = vol(save.night); save.weather = vol(save.weather); save.weatherAudio = vol(save.weatherAudio);
   // Sork's own arrangement (2026-10-21) is what a player gets until they move something (uiSet / panelSizeSet): offsets in cqw from the stylesheet positions, sizes in cqw.
   const DEFAULT_UI = { map: { x: 1.4, y: -1.4 }, travel: { x: 1.33, y: -2.26 }, bags: { x: 1.37, y: 0.49 }, social: { x: 1.42, y: 0.66 }, chat: { x: -1.28, y: 0.53 }, frame: { x: -1.4, y: -1.4 }, party: { x: 61.04, y: 17.53 }, buffs: { x: -1.24, y: -2.79 }, quests: { x: -1.4, y: -2.48 }, dps: { x: 22, y: 0 } };
   const DEFAULT_PANEL_SIZE = { quests: { w: 19.61, h: 31.28 }, chat: { w: 34.2, h: 7.95 } };
@@ -41,8 +42,13 @@
       hunterLoading: 'Calling the Hunter…', hunterError: 'Hunter sprites could not load. Select Hunter again to retry.',
       hunterArmorNames: ['Simple cloth', 'Scout\u2019s Jerkin', 'Wildwarden Coat'], hunterWeaponNames: ['Empty hands', 'Hunter\u2019s Shortbow', 'Wildwarden Longbow'],
       areaName: 'Greenmeadow Field', gold: 'gold', slain: 'enemies', paused: 'Paused', resume: 'Resume',
-      defeated: 'Defeated!', defeatedSub: 'Releasing your spirit…', defeatedWait: 'You have fallen. Wait for the fight to end.', ghostForm: 'Spirit Form', ghostSub: 'Return to your body to resurrect', ghostResurrect: 'Resurrect', lvl: 'Lv',
+      defeated: 'Defeated!', defeatedSub: 'Releasing your spirit…', defeatedStartSub: 'You wake up back at the start…', defeatedWait: 'You have fallen. Wait for the fight to end.', ghostForm: 'Spirit Form', ghostSub: 'Return to your body to resurrect', ghostResurrect: 'Resurrect', lvl: 'Lv',
       name: 'Name', namePh: 'Your name', random: 'Random name',
+      race: 'Race', human: 'Human', mothkin: 'Mothkin', tidekin: 'Tidekin', gnome: 'Gnome',
+      humanPassive: ['Resourcefulness', 'Earn 5% more coin from quest turn-ins.'],
+      mothkinPassive: ['Moonlit Forager', 'Gather alchemy flowers 15% faster during the world’s night.'],
+      tidekinPassive: ['Water Sense', 'Wait 10% less time for a bite when fishing in water.'],
+      gnomePassive: ['Haggler', 'Pay 10% less for shop stock, equipment repairs, and Spark Travel.'],
       noGear: 'No gear', facingNames: ['Front', 'Front left', 'Left side', 'Back left', 'Back view', 'Back right', 'Right side', 'Front right'],
       hairBeard: 'Hair & Beard', skin: 'Skin', armor: 'Armor', armorNames: ['Crimson', 'Azure', 'Verdant'], runes: 'Runes',
       tip: 'Tip: click the Warrior’s axe, mug, head, beard or fish!',
@@ -73,8 +79,13 @@
       hunterLoading: '사냥꾼 소환 중…', hunterError: '사냥꾼을 불러오지 못했습니다. 다시 선택해 주세요.',
       hunterArmorNames: ['기본 옷', '정찰병의 조끼', '와일드워든 코트'], hunterWeaponNames: ['맨손', '사냥꾼의 단궁', '와일드워든 장궁'],
       areaName: '푸른 초원', gold: '골드', slain: '적', paused: '일시정지', resume: '계속하기',
-      defeated: '쓰러졌다!', defeatedSub: '영혼을 해방하는 중…', defeatedWait: '쓰러졌습니다. 전투가 끝날 때까지 기다리세요.', ghostForm: '영혼 상태', ghostSub: '시신으로 돌아가 부활하세요', ghostResurrect: '부활', lvl: 'Lv',
+      defeated: '쓰러졌다!', defeatedSub: '영혼을 해방하는 중…', defeatedStartSub: '시작 지점에서 깨어납니다…', defeatedWait: '쓰러졌습니다. 전투가 끝날 때까지 기다리세요.', ghostForm: '영혼 상태', ghostSub: '시신으로 돌아가 부활하세요', ghostResurrect: '부활', lvl: 'Lv',
       name: '이름', namePh: '이름 입력', random: '무작위 이름',
+      race: '종족', human: '인간', mothkin: '나방족', tidekin: '물결족', gnome: '노움',
+      humanPassive: ['수완', '퀘스트를 완료할 때 동전을 5% 더 받습니다.'],
+      mothkinPassive: ['달빛 채집가', '게임 내 밤에는 연금술 꽃을 15% 더 빠르게 채집합니다.'],
+      tidekinPassive: ['물의 감각', '물에서 낚시할 때 입질까지 기다리는 시간이 10% 줄어듭니다.'],
+      gnomePassive: ['흥정꾼', '상점 물품, 장비 수리, 스파크 여행에 10% 할인을 받습니다.'],
       noGear: '장비 없음', facingNames: ['정면', '왼쪽 앞', '왼쪽', '왼쪽 뒤', '뒷면', '오른쪽 뒤', '오른쪽', '오른쪽 앞'],
       hairBeard: '머리·수염', skin: '피부', armor: '갑옷', armorNames: ['진홍', '청람', '초록'], runes: '룬',
       tip: '팁: 워리어의 도끼, 맥주잔, 머리, 수염, 물고기를 눌러 보세요!',
@@ -110,9 +121,17 @@
   }
 
   // ---------- audio (recorded combat and the original synthesized effects) ----------
-  let ac = null;
+  let ac = null, masterGain = null;
   function audio() {
-    if (!ac) { const A = window.AudioContext || window.webkitAudioContext; if (A) ac = new A(); }
+    if (!ac) {
+      const Audio = window.AudioContext || window.webkitAudioContext;
+      if (!Audio) return null;
+      ac = new Audio();
+      masterGain = ac.createGain();
+      masterGain.gain.value = taper(save.masterVol);
+      masterGain.connect(ac.destination);
+      window.setLoopMusicOutput?.(ac, masterGain);
+    }
     if (ac && ac.state === 'suspended') ac.resume();
     return ac;
   }
@@ -122,7 +141,7 @@
   const taper = v => v * v;
   let sfxGain = null;
   function sfxOut(c) {
-    if (!sfxGain || sfxGain.context !== c) { sfxGain = c.createGain(); sfxGain.connect(c.destination); }
+    if (!sfxGain || sfxGain.context !== c) { sfxGain = c.createGain(); sfxGain.connect(masterGain); }
     sfxGain.gain.value = save.sound ? taper(save.sfxVol) : 0;
     return sfxGain;
   }
@@ -177,10 +196,10 @@
   // ---------- background music (music.js) ----------
   // Browsers only let audio start after a tap or key press, so the score begins on the first one
   // (on the title screen that is the tap that awakens the horn) and then plays on every screen.
-  let music = null, fmusic = null, cmusic = null, rmusic = null, gmusic = null, smusic = null, vmusic = null, wmusic = null, kmusic = null, dmusic = null, nmusic = null, amusic = null, pmusic = null, omusic = null, mmusic = null, hmusic = null, tmusic = null, qmusic = null, jmusic = null, whmusic = null, lmusic = null, fwMusic = null, cairnMusic = null, yearMusic = null, cathedralMusic = [], eyeMusic = null, elderMusic = null, pavilionMusic = null, rainMusic = null, seedMusic = null, sunkenMusic = null, thunderMusic = null, bloomMusic = null, solarMusic = null, amberMusic = null, solsticeMusic = null, nornrootMusic = null, skybridgeMusic = null, blackhourMusic = null, longshipMusic = null, emberwakeMusic = null, emberwakeNightMusic = null, musicZone = 0;
-  let nightMusic = null, meadowNightMusic = null, cragsNightMusic = null, rimeNightMusic = null, fenNightMusic = null, cityNightMusic = null, wyrdNightMusic = null, skyNightMusic = null, nacreNightMusic = null, astralNightMusic = null, prismNightMusic = null, moonsporeNightMusic = null, asterionNightMusic = null, stormglassNightMusic = null, sunwardNightMusic = null, ribbonwildNightMusic = null, tanglecrownNightMusic = null, veyrrootNightMusic = null, lapisNightMusic = null, frostwakeNightMusic = null, cairnNightMusic = null, yearwheelNightMusic = null, activeNightMusic = null, stormglassMusic = null, activeScore = null, lastNightMix = -1;
+  let music = null, fmusic = null, cmusic = null, rmusic = null, gmusic = null, smusic = null, vmusic = null, wmusic = null, kmusic = null, dmusic = null, nmusic = null, amusic = null, pmusic = null, omusic = null, mmusic = null, moonwellMusic = null, hmusic = null, tmusic = null, qmusic = null, jmusic = null, whmusic = null, lmusic = null, fwMusic = null, cairnMusic = null, yearMusic = null, cathedralMusic = [], eyeMusic = null, elderMusic = null, pavilionMusic = null, rainMusic = null, seedMusic = null, sunkenMusic = null, thunderMusic = null, bloomMusic = null, solarMusic = null, amberMusic = null, solsticeMusic = null, nornrootMusic = null, skybridgeMusic = null, blackhourMusic = null, longshipMusic = null, emberwakeMusic = null, emberwakeNightMusic = null, musicZone = 0;
+  let nightMusic = null, meadowNightMusic = null, cragsNightMusic = null, rimeNightMusic = null, fenNightMusic = null, cityNightMusic = null, wyrdNightMusic = null, skyNightMusic = null, deepNightMusic = null, nacreNightMusic = null, astralNightMusic = null, prismNightMusic = null, orreryNightMusic = null, moonsporeNightMusic = null, asterionNightMusic = null, stormglassNightMusic = null, sunwardNightMusic = null, ribbonwildNightMusic = null, tanglecrownNightMusic = null, veyrrootNightMusic = null, lapisNightMusic = null, frostwakeNightMusic = null, cairnNightMusic = null, yearwheelNightMusic = null, activeNightMusic = null, stormglassMusic = null, activeScore = null, musicTransition = null;
   let raidMusic = null, eldmarrMusic = null, raidFinalFight = false, cutsceneScore = null;
-  const nightScores = new Map(); // completed outdoor remixes; other zones use nightMusic
+  const nightScores = new Map(); // zones with an explicit night score, including the Deep and Orrery
   function ensureMusic() {
     const c = audio(); if (!c || !window.createMusic) return;
     ensureWeatherSound();
@@ -193,9 +212,11 @@
     if (!cityNightMusic && window.createCityNightMusic) { cityNightMusic = window.createCityNightMusic(c); nightScores.set(4, cityNightMusic); }
     if (!wyrdNightMusic && window.createWyrdNightMusic) { wyrdNightMusic = window.createWyrdNightMusic(c); nightScores.set(6, wyrdNightMusic); }
     if (!skyNightMusic && window.createSkyNightMusic) { skyNightMusic = window.createSkyNightMusic(c); nightScores.set(7, skyNightMusic); }
+    if (!deepNightMusic && window.createDeepNightMusic) { deepNightMusic = window.createDeepNightMusic(c); nightScores.set(8, deepNightMusic); }
     if (!nacreNightMusic && window.createNacreNightMusic) { nacreNightMusic = window.createNacreNightMusic(c); nightScores.set(9, nacreNightMusic); }
     if (!astralNightMusic && window.createAstralNightMusic) { astralNightMusic = window.createAstralNightMusic(c); nightScores.set(13, astralNightMusic); }
     if (!prismNightMusic && window.createPrismNightMusic) { prismNightMusic = window.createPrismNightMusic(c); nightScores.set(14, prismNightMusic); }
+    if (!orreryNightMusic && window.createOrreryNightMusic) { orreryNightMusic = window.createOrreryNightMusic(c); nightScores.set(15, orreryNightMusic); }
     if (!moonsporeNightMusic && window.createMoonsporeNightMusic) { moonsporeNightMusic = window.createMoonsporeNightMusic(c); nightScores.set(16, moonsporeNightMusic); }
     if (!asterionNightMusic && window.createAsterionNightMusic) { asterionNightMusic = window.createAsterionNightMusic(c); nightScores.set(17, asterionNightMusic); }
     if (!stormglassNightMusic && window.createStormglassNightMusic) { stormglassNightMusic = window.createStormglassNightMusic(c); nightScores.set(19, stormglassNightMusic); }
@@ -221,6 +242,7 @@
     if (!pmusic && window.createPrismMusic) pmusic = window.createPrismMusic(c);
     if (!omusic && window.createOrreryMusic) omusic = window.createOrreryMusic(c);
     if (!mmusic && window.createMoonsporeMusic) mmusic = window.createMoonsporeMusic(c);
+    if (!moonwellMusic && window.createMoonwellMusic) moonwellMusic = window.createMoonwellMusic(c);
     if (!hmusic && window.createAsterionMusic) hmusic = window.createAsterionMusic(c);
     if (!stormglassMusic && window.createStormglassMusic) stormglassMusic = window.createStormglassMusic(c);
     if (!tmusic && window.createSunwardMusic) tmusic = window.createSunwardMusic(c);
@@ -257,38 +279,29 @@
   function syncMusic() {
     if (!ac || ac.state !== 'running') return;
     // In the game each zone selects its score; Greenmeadow and Alderhaven share the folk tune.
-    const here = scene === 'game' ? (musicZone === 46 ? (raidFinalFight ? eldmarrMusic : raidMusic) : musicZone === 45 && emberwakeMusic ? emberwakeMusic : musicZone === 44 && blackhourMusic ? blackhourMusic : musicZone === 43 && longshipMusic ? longshipMusic : musicZone === 42 && skybridgeMusic ? skybridgeMusic : musicZone === 41 && nornrootMusic ? nornrootMusic : musicZone === 28 && yearMusic ? yearMusic : musicZone === 27 && cairnMusic ? cairnMusic : musicZone === 26 && fwMusic ? fwMusic : musicZone === 25 && lmusic ? lmusic : (musicZone === 23 || musicZone === 24) && whmusic ? whmusic : musicZone === 22 && jmusic ? jmusic : musicZone === 21 && qmusic ? qmusic : musicZone === 19 && stormglassMusic ? stormglassMusic : musicZone === 20 && tmusic ? tmusic : musicZone === 17 && hmusic ? hmusic : (musicZone === 18 || musicZone === 16) && mmusic ? mmusic : musicZone === 29 && eyeMusic ? eyeMusic : musicZone === 30 && elderMusic ? elderMusic : musicZone === 31 && pavilionMusic ? pavilionMusic : musicZone === 32 && rainMusic ? rainMusic : musicZone === 33 && seedMusic ? seedMusic : musicZone === 34 && sunkenMusic ? sunkenMusic : musicZone === 35 && thunderMusic ? thunderMusic : musicZone === 36 && bloomMusic ? bloomMusic : musicZone === 37 && solarMusic ? solarMusic : musicZone === 38 && amberMusic ? amberMusic : musicZone === 39 && solsticeMusic ? solsticeMusic : (musicZone >= 30 && musicZone <= 33) && vmusic ? vmusic : musicZone === 15 && omusic ? omusic : musicZone === 14 && pmusic ? pmusic : musicZone === 13 && amusic ? amusic : musicZone >= 10 && musicZone <= 12 && cathedralMusic[musicZone - 10] ? cathedralMusic[musicZone - 10] : musicZone === 9 && nmusic ? nmusic : musicZone === 8 && dmusic ? dmusic : musicZone === 7 && kmusic ? kmusic : musicZone === 6 && wmusic ? wmusic : musicZone === 5 ? vmusic : musicZone === 4 && smusic ? smusic : musicZone === 3 && gmusic ? gmusic : musicZone === 2 && rmusic ? rmusic : musicZone > 0 && cmusic ? cmusic : fmusic) : null;
+    const here = scene === 'game' ? (musicZone === 46 ? (raidFinalFight ? eldmarrMusic : raidMusic) : musicZone === 45 && emberwakeMusic ? emberwakeMusic : musicZone === 44 && blackhourMusic ? blackhourMusic : musicZone === 43 && longshipMusic ? longshipMusic : musicZone === 42 && skybridgeMusic ? skybridgeMusic : musicZone === 41 && nornrootMusic ? nornrootMusic : musicZone === 28 && yearMusic ? yearMusic : musicZone === 27 && cairnMusic ? cairnMusic : musicZone === 26 && fwMusic ? fwMusic : musicZone === 25 && lmusic ? lmusic : (musicZone === 23 || musicZone === 24) && whmusic ? whmusic : musicZone === 22 && jmusic ? jmusic : musicZone === 21 && qmusic ? qmusic : musicZone === 19 && stormglassMusic ? stormglassMusic : musicZone === 20 && tmusic ? tmusic : musicZone === 17 && hmusic ? hmusic : musicZone === 18 && moonwellMusic ? moonwellMusic : musicZone === 16 && mmusic ? mmusic : musicZone === 29 && eyeMusic ? eyeMusic : musicZone === 30 && elderMusic ? elderMusic : musicZone === 31 && pavilionMusic ? pavilionMusic : musicZone === 32 && rainMusic ? rainMusic : musicZone === 33 && seedMusic ? seedMusic : musicZone === 34 && sunkenMusic ? sunkenMusic : musicZone === 35 && thunderMusic ? thunderMusic : musicZone === 36 && bloomMusic ? bloomMusic : musicZone === 37 && solarMusic ? solarMusic : musicZone === 38 && amberMusic ? amberMusic : musicZone === 39 && solsticeMusic ? solsticeMusic : (musicZone >= 30 && musicZone <= 33) && vmusic ? vmusic : musicZone === 15 && omusic ? omusic : musicZone === 14 && pmusic ? pmusic : musicZone === 13 && amusic ? amusic : musicZone >= 10 && musicZone <= 12 && cathedralMusic[musicZone - 10] ? cathedralMusic[musicZone - 10] : musicZone === 9 && nmusic ? nmusic : musicZone === 8 && dmusic ? dmusic : musicZone === 7 && kmusic ? kmusic : musicZone === 6 && wmusic ? wmusic : musicZone === 5 ? vmusic : musicZone === 4 && smusic ? smusic : musicZone === 3 && gmusic ? gmusic : musicZone === 2 && rmusic ? rmusic : musicZone > 0 && cmusic ? cmusic : fmusic) : null;
     activeScore = here;
     activeNightMusic = scene === 'game' ? (nightScores.get(musicZone) || nightMusic) : null;
-    for (const m of [nightMusic, ...nightScores.values()]) if (m && m !== activeNightMusic && m.running) m.stop();
-    for (const m of [fmusic, cmusic, rmusic, gmusic, smusic, vmusic, wmusic, kmusic, dmusic, nmusic, amusic, pmusic, omusic, mmusic, hmusic, stormglassMusic, tmusic, qmusic, jmusic, whmusic, lmusic, fwMusic, cairnMusic, yearMusic, eyeMusic, elderMusic, pavilionMusic, rainMusic, seedMusic, sunkenMusic, thunderMusic, bloomMusic, solarMusic, amberMusic, solsticeMusic, nornrootMusic, skybridgeMusic, blackhourMusic, longshipMusic, emberwakeMusic, raidMusic, eldmarrMusic, ...cathedralMusic]) if (m && m !== here && m.running) m.stop();
-    if (scene === 'game') { if (music && music.running) music.stop(); if (here && !here.running) here.start(); }
-    else if (music && !music.running) music.start();
-    lastNightMix = -1;
     applyMusicLevel(3);
-    syncNightMusic(3);
+    syncNightMusic();
   }
-  function syncNightMusic(secs = 1.2) {
-    if (!ac || ac.state !== 'running' || !activeNightMusic) return;
-    const mix = scene === 'game' ? (window.DayNight?.nightMix || 0) : 0;
-    if (mix > .001 && !activeNightMusic.running) activeNightMusic.start();
-    if (mix <= .001 && activeNightMusic.running) activeNightMusic.stop();
-    if (Math.abs(mix - lastNightMix) < .005) return;
-    lastNightMix = mix;
-    const volume = save.sound && !cutsceneScore ? taper(save.musicVol) : 0;
-    if (activeScore) activeScore.setLevel(volume * (1 - mix), secs);
-    activeNightMusic.setLevel(volume * mix, secs);
+  function musicNightMix() { return scene === 'game' ? (window.DayNight?.getNightMix(nightScores.has(musicZone)) || 0) : 0; }
+  function syncNightMusic() {
+    if (!ac || ac.state !== 'running') return;
+    if (!musicTransition) musicTransition = window.createMusicTransition(ac);
+    // Scores have independent tempos and harmonies: change at dusk/dawn through silence.
+    musicTransition(scene === 'game' ? (musicNightMix() >= .5 && activeNightMusic ? activeNightMusic : activeScore) : music);
   }
-  setInterval(() => { if (scene === 'game') syncNightMusic(); }, 1000);
+  setInterval(syncNightMusic, 100);
   function applyMusicLevel(secs = 1.5) {
     if (cutsceneScore) cutsceneScore.setLevel(save.sound ? .55 * taper(save.musicVol) : 0, secs);
     if (music) music.setLevel(save.sound && !cutsceneScore ? (scene === 'splash' ? 1 : .55) * taper(save.musicVol) : 0, secs);
-    const volume = save.sound && !cutsceneScore ? taper(save.musicVol) : 0, mix = scene === 'game' ? (window.DayNight?.nightMix || 0) : 0;
-    for (const m of [fmusic, cmusic, rmusic, gmusic, smusic, vmusic, wmusic, kmusic, dmusic, nmusic, amusic, pmusic, omusic, mmusic, hmusic, stormglassMusic, tmusic, qmusic, jmusic, whmusic, lmusic, fwMusic, cairnMusic, yearMusic, eyeMusic, elderMusic, pavilionMusic, rainMusic, seedMusic, sunkenMusic, thunderMusic, bloomMusic, solarMusic, amberMusic, solsticeMusic, nornrootMusic, skybridgeMusic, blackhourMusic, longshipMusic, emberwakeMusic, raidMusic, eldmarrMusic, ...cathedralMusic]) if (m) m.setLevel(volume * (m === activeScore ? 1 - mix : 1), secs);
-    for (const m of [nightMusic, ...nightScores.values()]) if (m) m.setLevel(m === activeNightMusic ? volume * mix : 0, secs);
+    const volume = save.sound && !cutsceneScore ? taper(save.musicVol) : 0;
+    for (const m of [fmusic, cmusic, rmusic, gmusic, smusic, vmusic, wmusic, kmusic, dmusic, nmusic, amusic, pmusic, omusic, mmusic, moonwellMusic, hmusic, stormglassMusic, tmusic, qmusic, jmusic, whmusic, lmusic, fwMusic, cairnMusic, yearMusic, eyeMusic, elderMusic, pavilionMusic, rainMusic, seedMusic, sunkenMusic, thunderMusic, bloomMusic, solarMusic, amberMusic, solsticeMusic, nornrootMusic, skybridgeMusic, blackhourMusic, longshipMusic, emberwakeMusic, raidMusic, eldmarrMusic, ...cathedralMusic]) if (m) m.setLevel(volume, secs);
+    for (const m of [nightMusic, ...nightScores.values()]) if (m) m.setLevel(volume, secs);
   }
   // Dip every field score under a short fanfare so it is heard over the music.
-  function duckMusic(secs) { for (const m of [fmusic, cmusic, rmusic, gmusic, smusic, vmusic, wmusic, kmusic, dmusic, nmusic, amusic, pmusic, omusic, mmusic, hmusic, stormglassMusic, tmusic, qmusic, jmusic, whmusic, lmusic, fwMusic, cairnMusic, yearMusic, eyeMusic, elderMusic, pavilionMusic, rainMusic, seedMusic, sunkenMusic, thunderMusic, bloomMusic, solarMusic, amberMusic, solsticeMusic, nornrootMusic, skybridgeMusic, blackhourMusic, longshipMusic, emberwakeMusic, raidMusic, eldmarrMusic, nightMusic, ...nightScores.values(), ...cathedralMusic]) if (m?.running && m.duck) m.duck(secs); }
+  function duckMusic(secs) { for (const m of [fmusic, cmusic, rmusic, gmusic, smusic, vmusic, wmusic, kmusic, dmusic, nmusic, amusic, pmusic, omusic, mmusic, moonwellMusic, hmusic, stormglassMusic, tmusic, qmusic, jmusic, whmusic, lmusic, fwMusic, cairnMusic, yearMusic, eyeMusic, elderMusic, pavilionMusic, rainMusic, seedMusic, sunkenMusic, thunderMusic, bloomMusic, solarMusic, amberMusic, solsticeMusic, nornrootMusic, skybridgeMusic, blackhourMusic, longshipMusic, emberwakeMusic, raidMusic, eldmarrMusic, nightMusic, ...nightScores.values(), ...cathedralMusic]) if (m?.running && m.duck) m.duck(secs); }
   function unlockAudio() { const c = audio(); if (c) c.resume().then(ensureMusic).catch(() => {}); }
   ['pointerdown', 'keydown', 'touchstart'].forEach(ev => addEventListener(ev, unlockAudio, { capture: true }));
   // Safari's pinch gesture zooms the page past the stage and strands the player; the game never wants it.
@@ -401,7 +414,7 @@
   const equipmentKeys = c => [c.class + 'Armor', c.class + 'Weapon'];
   const NAMES = ['Bjorn', 'Ragna', 'Thora', 'Ulfar', 'Freya', 'Gunnar', 'Sunwoo', 'Haneul', 'Minjae', 'Dolgi', 'Eirik', 'Seoyun', 'Astrid', 'Jihoon'];
   const randName = () => NAMES[Math.floor(Math.random() * NAMES.length)];
-  const defaultCfg = () => ({ name: randName(), class: 'warrior', gender: 'male', hairColor: 0, skin: 0, armor: 0, rune: 0, warriorArmor: 'crimson', warriorWeapon: 'sword', mageArmor: 'apprentice', mageWeapon: 'ash', assassinArmor: 'shadow', assassinWeapon: 'daggers', priestArmor: 'pilgrim', priestWeapon: 'mace', hunterArmor: 'scout', hunterWeapon: 'shortbow' });
+  const defaultCfg = () => ({ name: randName(), class: 'warrior', gender: 'male', race: 'human', hairColor: 0, skin: 0, armor: 0, rune: 0, warriorArmor: 'crimson', warriorWeapon: 'sword', mageArmor: 'apprentice', mageWeapon: 'ash', assassinArmor: 'shadow', assassinWeapon: 'daggers', priestArmor: 'pilgrim', priestWeapon: 'mace', hunterArmor: 'scout', hunterWeapon: 'shortbow' });
   const idx = (v, n) => { v = Math.floor(+v); return v >= 0 && v < n ? v : 0; };
   let cfg = defaultCfg();
   const load = c => {
@@ -411,7 +424,8 @@
     cfg.armor = idx(cfg.armor, OPT.armors); cfg.rune = idx(cfg.rune, OPT.runeHues.length);
     cfg.class = ['mage', 'assassin', 'priest', 'hunter'].includes(cfg.class) ? cfg.class : 'warrior';
     cfg.gender = cfg.gender === 'female' ? 'female' : 'male';
-    if (modular(cfg)) { cfg.hairColor = idx(cfg.hairColor, spriteClass(cfg).HAIR.length); cfg.skin = idx(cfg.skin, spriteClass(cfg).SKIN.length); }
+    cfg.race = MageSprite.RACES.includes(cfg.race) ? cfg.race : 'human';
+    if (modular(cfg)) { cfg.hairColor = idx(cfg.hairColor, spriteClass(cfg).HAIR.length); cfg.skin = idx(cfg.skin, spriteClass(cfg).skinPalette(cfg).length); }
     const warriorGear = WarriorSprite.equipment(cfg); cfg.warriorArmor = warriorGear.armor; cfg.warriorWeapon = warriorGear.weapon;
     const gear = MageSprite.equipment(cfg); cfg.mageArmor = gear.armor; cfg.mageWeapon = gear.weapon;
     const assassinGear = AssassinSprite.equipment(cfg); cfg.assassinArmor = assassinGear.armor; cfg.assassinWeapon = assassinGear.weapon;
@@ -426,7 +440,7 @@
   const wcv = $('wcv');
   const view = new window.WarriorView(wcv, name => onWarrior(name));
   view.reduced = reduced;
-  window.valhalla = { view, get music() { return music; }, get fmusic() { return fmusic; }, get cmusic() { return cmusic; }, get rmusic() { return rmusic; }, get gmusic() { return gmusic; }, get smusic() { return smusic; }, get vmusic() { return vmusic; }, get wmusic() { return wmusic; }, get kmusic() { return kmusic; }, get dmusic() { return dmusic; }, get nmusic() { return nmusic; }, get amusic() { return amusic; }, get pmusic() { return pmusic; }, get omusic() { return omusic; }, get mmusic() { return mmusic; }, get hmusic() { return hmusic; }, get tmusic() { return tmusic; }, get qmusic() { return qmusic; }, get jmusic() { return jmusic; }, get whmusic() { return whmusic; }, get lmusic() { return lmusic; }, get fwMusic() { return fwMusic; }, get cairnMusic() { return cairnMusic; }, get yearMusic() { return yearMusic; }, get nornrootMusic() { return nornrootMusic; }, get skybridgeMusic() { return skybridgeMusic; }, get blackhourMusic() { return blackhourMusic; }, get emberwakeMusic() { return emberwakeMusic; }, get emberwakeNightMusic() { return emberwakeNightMusic; }, get longshipMusic() { return longshipMusic; }, get cathedralMusic() { return cathedralMusic; }, get ctx() { return ac; } };   // debug handle (also used by the tests)
+  window.valhalla = { view, get music() { return music; }, get fmusic() { return fmusic; }, get cmusic() { return cmusic; }, get rmusic() { return rmusic; }, get gmusic() { return gmusic; }, get smusic() { return smusic; }, get vmusic() { return vmusic; }, get wmusic() { return wmusic; }, get kmusic() { return kmusic; }, get dmusic() { return dmusic; }, get nmusic() { return nmusic; }, get amusic() { return amusic; }, get pmusic() { return pmusic; }, get omusic() { return omusic; }, get mmusic() { return mmusic; }, get moonwellMusic() { return moonwellMusic; }, get hmusic() { return hmusic; }, get tmusic() { return tmusic; }, get qmusic() { return qmusic; }, get jmusic() { return jmusic; }, get whmusic() { return whmusic; }, get lmusic() { return lmusic; }, get fwMusic() { return fwMusic; }, get cairnMusic() { return cairnMusic; }, get yearMusic() { return yearMusic; }, get nornrootMusic() { return nornrootMusic; }, get skybridgeMusic() { return skybridgeMusic; }, get blackhourMusic() { return blackhourMusic; }, get emberwakeMusic() { return emberwakeMusic; }, get emberwakeNightMusic() { return emberwakeNightMusic; }, get longshipMusic() { return longshipMusic; }, get cathedralMusic() { return cathedralMusic; }, get ctx() { return ac; } };   // debug handle (also used by the tests)
   Object.defineProperties(window.valhalla, { raidMusic: { get: () => raidMusic }, eldmarrMusic: { get: () => eldmarrMusic } });
   Object.defineProperty(window.valhalla, 'nightMusic', { get: () => nightMusic });
   Object.defineProperty(window.valhalla, 'meadowNightMusic', { get: () => meadowNightMusic });
@@ -436,9 +450,11 @@
   Object.defineProperty(window.valhalla, 'cityNightMusic', { get: () => cityNightMusic });
   Object.defineProperty(window.valhalla, 'wyrdNightMusic', { get: () => wyrdNightMusic });
   Object.defineProperty(window.valhalla, 'skyNightMusic', { get: () => skyNightMusic });
+  Object.defineProperty(window.valhalla, 'deepNightMusic', { get: () => deepNightMusic });
   Object.defineProperty(window.valhalla, 'nacreNightMusic', { get: () => nacreNightMusic });
   Object.defineProperty(window.valhalla, 'astralNightMusic', { get: () => astralNightMusic });
   Object.defineProperty(window.valhalla, 'prismNightMusic', { get: () => prismNightMusic });
+  Object.defineProperty(window.valhalla, 'orreryNightMusic', { get: () => orreryNightMusic });
   Object.defineProperty(window.valhalla, 'moonsporeNightMusic', { get: () => moonsporeNightMusic });
   Object.defineProperty(window.valhalla, 'asterionNightMusic', { get: () => asterionNightMusic });
   Object.defineProperty(window.valhalla, 'stormglassNightMusic', { get: () => stormglassNightMusic });
@@ -499,6 +515,7 @@
     const h = { fx: Math.cos(angle) - Math.sin(angle), fy: Math.cos(angle) + Math.sin(angle), atkT: age >= 0 && age < mage.meta.attack.duration ? age : 0, walk: 0 };
     mage.draw(g, h, reduced ? 0 : now / 1000, 2.7);
     if (cfg.class === 'mage' && h.atkT > .24 && h.atkT < .5) {
+      g.scale(...mage.bodyScale);
       g.fillStyle = '#e6f8ff'; g.shadowColor = '#59d9ff'; g.shadowBlur = 15;
       g.beginPath(); g.arc(49, -180, 6 * (1 - (h.atkT - .24) / .26), 0, Math.PI * 2); g.fill();
     }
@@ -538,6 +555,10 @@
   // controls
   const custom = $('custom');
   const row = (label, ...kids) => el('div', { class: 'row' }, el('span', { class: 'lab', text: label }), el('div', { class: 'ctl' }, ...kids));
+  function renderRacialPassive(container, race) {
+    const [name, description] = t((MageSprite.RACES.includes(race) ? race : 'human') + 'Passive');
+    container.replaceChildren(el('strong', { text: name }), document.createTextNode(' · ' + description));
+  }
   const opt = (k, v, cls, label, color) => {
     const b = el('button', { class: cls, type: 'button', 'data-k': k, 'data-v': String(v), 'aria-label': label, 'aria-pressed': 'false' });
     if (color) b.style.setProperty('--c', color);
@@ -565,6 +586,17 @@
     const dice = el('button', { class: 'arrow', type: 'button', 'aria-label': t('random'), text: '↻' });
     dice.addEventListener('click', () => { cfg.name = randName(); input.value = cfg.name; saveDraft(); blip(700); });
     custom.append(row(t('name'), input, dice));
+    const race = el('select', { class: 'gear-pick', id: 'create-race', 'aria-label': t('race'), 'aria-describedby': 'create-racial-passive' });
+    for (const value of MageSprite.RACES) race.append(el('option', { value, text: t(value) }));
+    race.value = cfg.race;
+    race.addEventListener('change', () => {
+      cfg.race = race.value;
+      buildControls(); refresh(); $('create-race').focus({ preventScroll: true }); blip(760);
+    });
+    custom.append(row(t('race'), race));
+    const passive = el('p', { class: 'tip racial-passive', id: 'create-racial-passive' });
+    renderRacialPassive(passive, cfg.race);
+    custom.append(passive);
     if (modular(cfg)) {      // every class comes in a male and a female body; the choice is part of the look, fixed once the character is made
       const seg = el('div', { class: 'seg', role: 'group', 'aria-label': t('gender') });
       for (const g of ['male', 'female']) {
@@ -577,7 +609,7 @@
     const sw = (k, list, labelKey) => { const d = el('div', { class: 'swatches' }); list.forEach((c, i) => d.append(opt(k, i, 'sw', `${t(labelKey)} ${i + 1}`, c))); return d; };
     const isModular = modular(cfg), C = spriteClass(cfg);
     custom.append(row(t(isModular ? 'hair' : 'hairBeard'), sw('hairColor', isModular ? C.HAIR : OPT.hairSwatch, isModular ? 'hair' : 'hairBeard')));
-    custom.append(row(t('skin'), sw('skin', isModular ? C.SKIN : OPT.skinSwatch, 'skin')));
+    custom.append(row(t('skin'), sw('skin', isModular ? C.skinPalette(cfg) : OPT.skinSwatch, 'skin')));
     if (isModular) {
       for (const key of equipmentKeys(cfg)) custom.append(gearSelect(key, cfg[key], value => { cfg[key] = value; refresh(); blip(760); }));
       const clear = el('button', { class: 'btn ghost cc-no-gear', id: 'create-no-gear', type: 'button', text: t('noGear'), title: 'Starter gear stays in your bag.' });
@@ -626,13 +658,14 @@
   function enterCreate() {
     if (save.char && !save.draft) load(save.char);
     buildControls(); refresh(); updateClass();
+    scenes.create.scrollTop = 0;
     if (view.ok && !modular(cfg)) view.resize();
     clearTimeout(introTimer); introTimer = setTimeout(() => { if (modular(cfg)) castPreview(); else if (view.ok) view.play('attack'); }, 450);
     $('cls-' + cfg.class).focus({ preventScroll: true });
   }
   function leaveCreate() { clearTimeout(introTimer); cancelAnimationFrame(mageRaf); if (view.ok) view.setActive(false); }
   for (const name of ['warrior', 'mage', 'assassin', 'priest', 'hunter']) $('cls-' + name).addEventListener('click', () => {
-    if (cfg.class !== name) { cfg.class = name; if (modular(cfg)) cfg.skin = idx(cfg.skin, spriteClass(cfg).SKIN.length); buildControls(); refresh(); }
+    if (cfg.class !== name) { cfg.class = name; if (modular(cfg)) cfg.skin = idx(cfg.skin, spriteClass(cfg).skinPalette(cfg).length); buildControls(); refresh(); }
     updateClass(); if (modular(cfg)) castPreview(); else if (view.ok) view.play('attack');
   });
   $('back').addEventListener('click', () => { blip(520); show('splash'); });
@@ -963,17 +996,24 @@
   }
   // FISHING-SOUND-END
   const professionCueBuffers = {};
+  function loadProfessionCue(c, key) {
+    return professionCueBuffers[key] ||= fetch(`assets/sfx_${key}.mp3`).then(r => {
+      if (!r.ok) throw Error('profession_audio');
+      return r.arrayBuffer();
+    }).then(b => c.decodeAudioData(b)).catch(() => { delete professionCueBuffers[key]; return null; });
+  }
+  function primeMiningSound() {
+    const c = save.sound && audio();
+    if (c) loadProfessionCue(c, 'smith_strike');
+  }
   function professionSound(profession, cue) {
     if (!save.sound) return;
     const c = audio(); if (!c) return;
     const requested = performance.now();
     const key = profession + '_' + cue;
-    const buffer = professionCueBuffers[key] ||= fetch(`assets/sfx_${key}.mp3`).then(r => {
-      if (!r.ok) throw Error('profession_audio');
-      return r.arrayBuffer();
-    }).then(b => c.decodeAudioData(b)).catch(() => { delete professionCueBuffers[key]; return null; });
-    buffer.then(b => {
-      if (!b || !save.sound || scene !== 'game' || performance.now() - requested > 1200) return;
+    const maxDelay = key === 'smith_strike' ? 220 : 1200;
+    loadProfessionCue(c, key).then(b => {
+      if (!b || !save.sound || scene !== 'game' || performance.now() - requested > maxDelay) return;
       const source = c.createBufferSource();
       source.buffer = b; source.connect(sfxOut(c)); source.start();
     });
@@ -1148,11 +1188,11 @@
     if (url) {
       const c = audio();
       if (c && window.createCutsceneMusic) {
-        cutsceneScore = window.createCutsceneMusic(c, url, () => window.Cutscene?.state?.el || 0);
+        cutsceneScore = window.createCutsceneMusic(c, url, () => window.Cutscene?.state?.el || 0, masterGain);
         cutsceneScore.start();
       }
     }
-    applyMusicLevel(.35); lastNightMix = -1; syncNightMusic(.35);
+    applyMusicLevel(.35); syncNightMusic();
   }
   window.CutsceneAudio = { play: cutsceneSound, prepareNarration, narrate, stopNarration, setScore: setCutsceneScore,
     get score() { return cutsceneScore; }, get narrating() { return !!narrationSource; } };
@@ -1164,7 +1204,11 @@
     if (name === 'levelup') levelBanner(data);
     if (name === 'rebirth') window.Rebirth?.celebrate(data);
     if (name === 'spriteError') showToast(t((save.char?.class || 'mage') + 'Error'));
-    if (name === 'death') { $('dead-msg').hidden = !!Field.hero?.ghost; $('ghost-msg').hidden = !Field.hero?.ghost; }
+    if (name === 'death') {
+      $('dead-msg').hidden = !!Field.hero?.ghost;
+      $('ghost-msg').hidden = !Field.hero?.ghost;
+      $('dead-sub').textContent = t(Field.inInstance ? 'defeatedStartSub' : 'defeatedSub');
+    }
     if (name === 'ghost') { $('dead-msg').hidden = true; $('ghost-msg').hidden = false; }
     if (name === 'unghost' || name === 'respawn') { $('ghost-msg').hidden = true; window.City?.close?.(false); }
     if (name === 'respawn') $('dead-msg').hidden = true;
@@ -1191,6 +1235,7 @@
     rarePickupTimer = setTimeout(() => { rarePickupBox.hidden = true; rarePickupBox.classList.remove('show'); }, rarity === 'legendary' ? 4800 : 3200);
   }
   function enterGame() {
+    primeMiningSound();
     if (save.sound && save.combatSounds === 'recorded') { const c = audio(); if (c) window.RecordedCombat?.prime(c); }
     const c = save.char || cfg, p = $('hud-portrait');
     if (modular(c)) {
@@ -1213,7 +1258,27 @@
     const at = $('area-title'); at.classList.remove('show'); void at.offsetWidth; at.classList.add('show');
   }
   function leaveGame() { window.Settings?.close(false); if (window.Field) Field.stop(); }
-  const CHARACTER_TABS = ['stats', 'sets', 'achievements', 'mounts', 'rebirth'];
+  const CHARACTER_TABS = ['stats', 'sets', 'achievements', 'professions', 'mounts', 'rebirth'];
+  const professionPanel = $('character-professions'), professionList = $('profession-skills');
+  const professionRows = Array.from(professionList?.children || [], row => ({
+    id: row.dataset.profession, value: row.querySelector('b'), bar: row.querySelector('progress'),
+  }));
+  function renderProfessions(skills) {
+    if ($('equipment').hidden || !professionPanel || professionPanel.hidden) return;
+    const available = professionRows.every(({id}) => Number.isInteger(skills?.[id]?.skill) && skills[id].maxSkill > 0);
+    if (professionList.hidden === available) {
+      professionList.hidden = !available;
+      $('profession-skills-unavailable').hidden = available;
+    }
+    if (!available) return;
+    for (const {id, value, bar} of professionRows) {
+      const {skill, maxSkill} = skills[id];
+      if (bar.max !== maxSkill) bar.max = maxSkill;
+      if (bar.value !== skill) bar.value = skill;
+      const text = skill + ' / ' + maxSkill;
+      if (value.textContent !== text) value.textContent = text;
+    }
+  }
   let equipmentFocus = null, equipmentArtPending = null, characterTab = 'stats';
   function setCharacterTab(tab = 'stats') {
     characterTab = CHARACTER_TABS.includes(tab) ? tab : 'stats';
@@ -1230,6 +1295,7 @@
     if (!$('equipment').hidden) {
       if (characterTab === 'achievements') window.Achievements?.onShow?.();
       else renderEquipment();
+      if (characterTab === 'professions') renderProfessions(Field.hero?.professions);
       window.Settings?.applyScale?.();
     }
   }
@@ -1249,6 +1315,7 @@
     const g = canvas.getContext('2d'); g.translate(160, 365); mage.draw(g, { fx: 1, fy: 1, walk: 0 }, 0, 2.8);
     const stats = Field.equipmentStats;
     $('character-subtitle').textContent = `${c.name} · Level ${Field.hero.level} ${c.class[0].toUpperCase() + c.class.slice(1)}`;
+    renderRacialPassive($('character-racial-passive'), c.race);
     $('equipment-stats').textContent = `${t('attack')}: ${Number(stats.attack.toFixed(1))} · ${t('defense')}: ${Number(stats.defense.toFixed(1))}`;
     window.Attributes?.render();
     window.Mounts?.render();
@@ -1276,7 +1343,7 @@
     else if (characterTab === 'stats') $('field-' + save.char.class + 'Armor')?.focus({ preventScroll: true });
     else $('character-tab-' + characterTab)?.focus({ preventScroll: true });
   }
-  window.CharacterPane = { open: tab => openEquipment('both', tab), close: () => { if (!$('equipment').hidden) setPause(false); }, setTab: setCharacterTab, get tab() { return characterTab; } };
+  window.CharacterPane = { open: tab => openEquipment('both', tab), close: () => { if (!$('equipment').hidden) setPause(false); }, setTab: setCharacterTab, updateProfessions: renderProfessions, get tab() { return characterTab; } };
   addEventListener('keydown', e => {
     if (scene !== 'game' || e.defaultPrevented || e.repeat) return;
     const isEsc = e.key === 'Escape' || Keys.is(e, 'menu'), isChar = Keys.is(e, 'character'), isBags = Keys.is(e, 'bags'), gearKey = isChar || isBags;
@@ -1514,10 +1581,14 @@
   // Preferences shared with settings.js (volumes and the HUD layout); it never touches localStorage itself.
   window.Prefs = {
     get lang() { return save.lang; },
+    get master() { return save.masterVol; },
     get music() { return save.musicVol; }, get sfx() { return save.sfxVol; }, get sound() { return save.sound; },
+    get floatingText() { return Object.fromEntries(FLOATING_TEXT.map(key => [key, save.floatingText?.[key] !== false])); },
     get combatSounds() { return save.combatSounds; },
     get touchSkills() { return save.touchSkills && typeof save.touchSkills === 'object' ? save.touchSkills : {}; },
     get questArrow() { return save.questArrow === true; },
+    get trackOre() { return save.trackOre !== false; },
+    get trackFlowers() { return save.trackFlowers !== false; },
     get lowGraphics() { return save.lowGraphics === true; },
     get dpsMeter() { return save.dpsMeter !== false; },
     get touchGraphicsSuggested() { return save.touchGraphicsSuggested === true; },
@@ -1533,17 +1604,25 @@
     get winScale() { return save.winScale && typeof save.winScale === 'object' ? save.winScale : {}; },
     get panelSize() { return !save.panelSizeSet && !has(save.panelSize) ? DEFAULT_PANEL_SIZE : save.panelSize && typeof save.panelSize === 'object' ? save.panelSize : {}; },
     set(patch) {
+      if ('floatingText' in patch) save.floatingText = Object.fromEntries(FLOATING_TEXT.map(key => [key, typeof patch.floatingText?.[key] === 'boolean' ? patch.floatingText[key] : save.floatingText?.[key] !== false]));
       if ('lang' in patch && ['en', 'sv', 'ko'].includes(patch.lang) && patch.lang !== save.lang) {
         save.lang = patch.lang; persist(); location.reload(); return;
+      }
+      if ('masterVol' in patch) {
+        save.masterVol = vol(patch.masterVol);
+        if (masterGain) masterGain.gain.value = taper(save.masterVol);
       }
       if ('musicVol' in patch) save.musicVol = vol(patch.musicVol);
       if ('sfxVol' in patch) save.sfxVol = vol(patch.sfxVol);
       if ('sound' in patch) save.sound = !!patch.sound;
       if ('combatSounds' in patch && ['recorded', 'synthesized'].includes(patch.combatSounds)) { save.combatSounds = patch.combatSounds; window.RecordedCombat?.stop(); }
       if (!save.sound) { window.RecordedCombat?.stop(); stopNarration(); }
+      if (patch.sound && scene === 'game') primeMiningSound();
       if (save.sound && save.combatSounds === 'recorded') { const c = audio(); if (c) window.RecordedCombat?.prime(c); }
       if ('touchSkills' in patch) save.touchSkills = patch.touchSkills && typeof patch.touchSkills === 'object' ? patch.touchSkills : {};
       if ('questArrow' in patch) save.questArrow = !!patch.questArrow;
+      if ('trackOre' in patch) save.trackOre = !!patch.trackOre;
+      if ('trackFlowers' in patch) save.trackFlowers = !!patch.trackFlowers;
       if ('lowGraphics' in patch) save.lowGraphics = !!patch.lowGraphics;
       if ('dpsMeter' in patch) save.dpsMeter = !!patch.dpsMeter;
       if ('touchGraphicsSuggested' in patch) save.touchGraphicsSuggested = !!patch.touchGraphicsSuggested;

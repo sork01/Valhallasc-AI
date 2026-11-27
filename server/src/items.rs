@@ -5,6 +5,7 @@ use std::sync::LazyLock;
 #[cfg(test)]
 mod cloak_tests;
 mod gear_services;
+mod workshop;
 pub use gear_services::{DeathWear, GearInstance, SPIRIT_GUIDE_WEAR};
 pub mod hierlooms;
 mod orange;
@@ -1080,16 +1081,9 @@ impl Character {
         next.bag_used() > next.bag_capacity() && next.bag_used() > self.bag_used()
     }
     pub fn can_collect(&self, id: &str) -> bool {
-        item(id).is_some_and(|i| {
-            if i.kind == "bag" {
-                self.can_fit_bag(id).is_ok()
-            } else {
-                self.has_room_for(i)
-            }
-        })
+        item(id).is_some_and(|i| self.has_room_for(i))
     }
-    /// None means an empty expansion slot; Some(index) replaces the smallest smaller bag.
-    fn bag_slot(&self, id: &str) -> Result<Option<usize>, &'static str> {
+    fn bag_for_fit(&self, id: &str) -> Result<&'static Item, &'static str> {
         let bag = item(id)
             .filter(|i| i.kind == "bag" && i.bag_slots > 0)
             .ok_or("Unknown bag.")?;
@@ -1099,6 +1093,11 @@ impl Character {
         if self.level < bag.required_level {
             return Err("Your level is too low for this bag.");
         }
+        Ok(bag)
+    }
+    /// A merchant uses an empty slot or replaces the smallest smaller bag.
+    fn bag_slot(&self, id: &str) -> Result<Option<usize>, &'static str> {
+        let bag = self.bag_for_fit(id)?;
         if self.bags.len() < 4 {
             return Ok(None);
         }
@@ -1114,15 +1113,42 @@ impl Character {
             .map(|(n, _)| Some(n))
             .ok_or("All four expansion bag slots are filled.")
     }
-    pub fn can_fit_bag(&self, id: &str) -> Result<(), &'static str> {
-        self.bag_slot(id).map(|_| ())
-    }
-    pub fn fit_bag(&mut self, id: &str) -> Result<usize, &'static str> {
+    fn fit_bag(&mut self, id: &str) -> Result<usize, &'static str> {
         match self.bag_slot(id)? {
             Some(index) => self.bags[index] = id.into(),
             None => self.bags.push(id.into()),
         }
         Ok(self.bag_capacity())
+    }
+    pub fn equip_inventory_bag(
+        &mut self,
+        id: &str,
+        slot: Option<usize>,
+    ) -> Result<usize, &'static str> {
+        self.bag_for_fit(id)?;
+        let mut next = self.clone();
+        if !next.consume_item(id, 1) {
+            return Err("You do not have that item.");
+        }
+        match slot {
+            Some(slot) => {
+                let old = next.bags.get_mut(slot).ok_or("Unknown expansion bag slot.")?;
+                if old == id {
+                    return Err("That bag is already fitted in this slot.");
+                }
+                let old = std::mem::replace(old, id.into());
+                next.add_item(&old, 1);
+                let before = self.bag_used().saturating_sub(self.bag_capacity());
+                if next.bag_used().saturating_sub(next.bag_capacity()) > before {
+                    return Err("Make room in your inventory before replacing that bag.");
+                }
+            }
+            None if next.bags.len() < 4 => next.bags.push(id.into()),
+            None => return Err("Choose an expansion bag to replace."),
+        }
+        let capacity = next.bag_capacity();
+        *self = next;
+        Ok(capacity)
     }
     pub fn purchase_bag(&mut self, id: &str) -> Result<usize, &'static str> {
         let price = item(id)
@@ -1130,6 +1156,7 @@ impl Character {
             .ok_or("Unknown bag.")?
             .price;
         self.bag_slot(id)?;
+        let price = self.npc_price(price);
         if self.gold < price {
             return Err("You need more gold for this bag.");
         }
@@ -3548,6 +3575,36 @@ mod tests {
         assert!(c.gear_instance_equipped(ids[2]));
     }
     #[test]
+    fn inventory_bag_can_fill_a_slot_or_swap_without_losing_items() {
+        let mut c = character();
+        c.add_item("adventurer_satchel", 1);
+        assert_eq!(c.equip_inventory_bag("adventurer_satchel", None), Err("Your level is too low for this bag."));
+        assert_eq!(c.quantity("adventurer_satchel"), 1);
+        c.level = 20;
+        assert_eq!(c.equip_inventory_bag("adventurer_satchel", None), Ok(24));
+        assert_eq!(c.quantity("adventurer_satchel"), 0);
+        c.bags.extend(["linen_satchel".into(), "trail_pack_l20".into(), "linen_satchel".into()]);
+        c.add_item("trail_pack_l20", 2);
+        assert!(c.equip_inventory_bag("trail_pack_l20", None).is_err());
+        assert!(c.equip_inventory_bag("trail_pack_l20", Some(4)).is_err());
+        assert!(c.equip_inventory_bag("trail_pack_l20", Some(2)).is_err());
+        assert_eq!(c.quantity("trail_pack_l20"), 2);
+        assert_eq!(c.equip_inventory_bag("trail_pack_l20", Some(0)), Ok(48));
+        assert_eq!(c.bags, ["trail_pack_l20", "linen_satchel", "trail_pack_l20", "linen_satchel"]);
+        assert_eq!(c.quantity("trail_pack_l20"), 1);
+        assert_eq!(c.quantity("adventurer_satchel"), 1);
+
+        for material in ITEMS.iter().filter(|i| i.kind == "material").take(c.bag_capacity() - c.bag_used()) {
+            c.add_item(&material.id, 1);
+        }
+        assert_eq!(c.bag_used(), c.bag_capacity());
+        assert_eq!(c.equip_inventory_bag("adventurer_satchel", Some(0)), Err("Make room in your inventory before replacing that bag."));
+        assert_eq!(c.bags[0], "trail_pack_l20");
+        assert_eq!(c.quantity("adventurer_satchel"), 1);
+        assert_eq!(c.quantity("trail_pack_l20"), 1);
+        assert_eq!(c.bag_capacity(), 48);
+    }
+    #[test]
     fn purchases_validate_funds_life_and_four_bags_and_upgrade_the_smallest() {
         let mut c = character();
         c.gold = 100_000;
@@ -3625,7 +3682,7 @@ mod tests {
         c.level = 1; // A level loss does not take away a fitted legacy or earned bag.
         assert_eq!(c.bag_capacity(), 24);
         assert_eq!(
-            c.can_fit_bag("adventurer_satchel"),
+            c.bag_slot("adventurer_satchel"),
             Err("Your level is too low for this bag.")
         );
         assert!(c.can_collect("linen_satchel"));

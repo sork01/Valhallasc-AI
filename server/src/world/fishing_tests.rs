@@ -26,10 +26,40 @@ pub(super) fn angler() -> (World, mpsc::Receiver<Value>) {
     (world, rx)
 }
 fn cast(w: &mut World, time: f64) -> f64 {
-    w.fish_press(1, time);
+    w.fish_press(1, time, false);
     let line = w.players[&1].fishing.line.expect("pier cast");
     line.deadline() - 1.2
 }
+
+#[test]
+fn racial_tidekin_shortens_the_wait_for_water_bites_only() {
+    let (mut w, _rx) = angler();
+    w.world_clock.set(Some(12.), true).unwrap();
+    w.maps[1].fishing_spots.clear();
+    w.maps[1].objects =
+        vec![serde_json::from_value(json!({"kind":"lava","x":53.,"y":50.,"r":2.})).unwrap()];
+    for (zone, phase) in [(0, 0.9), (1, 1.0)] {
+        w.weather.set(zone, "clear", None, daynight::unix_ms()).unwrap();
+        if zone == 1 {
+            let p = w.players.get_mut(&1).unwrap();
+            (p.character.zone, p.character.x, p.character.y) = (1, 50., 50.);
+            p.character.level = 5;
+            p.character.fishing.proficiency.skill = 30;
+            p.character.add_item("rod_emberline_rod", 1);
+        }
+        let mut wait = Vec::new();
+        for race in [Race::Human, Race::Tidekin] {
+            let p = w.players.get_mut(&1).unwrap();
+            p.fishing = Default::default();
+            p.character.look.race = race;
+            w.rng = 123;
+            let bite = cast(&mut w, 20.);
+            wait.push(bite - 20.5);
+        }
+        assert!((wait[0] * phase - wait[1]).abs() < 1e-9, "{zone}: {wait:?}");
+    }
+}
+
 #[test]
 fn fishing_deadline_bags_save_and_privacy() {
     let (mut w, mut rx) = angler();
@@ -47,8 +77,8 @@ fn fishing_deadline_bags_save_and_privacy() {
     assert_eq!(view["players"][0]["fishing"]["state"], "bite");
     let deadline = w.players[&1].fishing.line.unwrap().deadline();
     w.rng = 1; // deterministic species catch; junk/treasure are tested separately.
-    w.fish_press(1, deadline + 0.25);
-    w.fish_press(1, deadline + 0.25);
+    w.fish_press(1, deadline + 0.25, false);
+    w.fish_press(1, deadline + 0.25, false);
     let catch = std::iter::from_fn(|| rx.try_recv().ok())
         .find(|v| v["kind"] == "fish_catch")
         .unwrap();
@@ -72,7 +102,7 @@ fn fishing_deadline_bags_save_and_privacy() {
     );
     cast(&mut w, 50.);
     let deadline = w.players[&1].fishing.line.unwrap().deadline();
-    w.fish_press(1, deadline + 0.251);
+    w.fish_press(1, deadline + 0.251, false);
     assert_eq!(w.players[&1].character.fishing.total, 1);
 }
 
@@ -82,9 +112,9 @@ fn fishing_early_cooldown_fifth_miss_and_cancel() {
     for i in 0..5 {
         let t = 20. + i as f64 * 20.;
         let bite = cast(&mut w, t);
-        w.fish_press(1, bite - 0.001);
+        w.fish_press(1, bite - 0.001, false);
         assert!(w.players[&1].fishing.line.is_none());
-        w.fish_press(1, bite + 0.5);
+        w.fish_press(1, bite + 0.5, false);
         assert!(w.players[&1].fishing.line.is_none());
     }
     assert!(
@@ -93,7 +123,7 @@ fn fishing_early_cooldown_fifth_miss_and_cancel() {
     );
     let bite = cast(&mut w, 150.);
     w.players.get_mut(&1).unwrap().last_hurt += 1.;
-    w.fish_press(1, bite + 0.01);
+    w.fish_press(1, bite + 0.01, false);
     assert_eq!(w.players[&1].character.fishing.total, 0);
     cast(&mut w, 180.);
     w.players.get_mut(&1).unwrap().character.x += 0.61;
@@ -117,7 +147,7 @@ fn fishing_cast_blockers_and_full_bag_before_roll() {
             7 => p.fishing.shopping = true,
             _ => p.frozen = true,
         }
-        w.fish_press(1, 10.);
+        w.fish_press(1, 10., false);
         assert!(w.players[&1].fishing.line.is_none(), "blocker {blocked}");
         let p = w.players.get_mut(&1).unwrap();
         p.character = c;
@@ -137,7 +167,7 @@ fn fishing_cast_blockers_and_full_bag_before_roll() {
     }
     assert!(c.bag_used() >= c.bag_capacity());
     let rng = w.rng;
-    w.fish_press(1, bite + 0.1);
+    w.fish_press(1, bite + 0.1, false);
     assert_eq!(w.rng, rng);
     assert_eq!(w.players[&1].character.fishing.total, 0);
     assert!(
@@ -145,7 +175,7 @@ fn fishing_cast_blockers_and_full_bag_before_roll() {
     );
     assert!(matches!(
         serde_json::from_value::<ClientMessage>(json!({"type":"fish"})),
-        Ok(ClientMessage::Fish {})
+        Ok(ClientMessage::Fish { auto_aim: false })
     ));
 }
 
@@ -160,12 +190,13 @@ fn fishing_lava_shore_requires_matching_rod_and_direction() {
     p.character.x = 50.;
     p.character.y = 50.;
     p.character.level = 5;
-    w.fish_press(1, 10.);
+    p.character.fishing.proficiency.skill = 30;
+    w.fish_press(1, 10., false);
     assert!(w.players[&1].fishing.line.is_none());
     let p = w.players.get_mut(&1).unwrap();
     p.character.add_item("rod_emberline_rod", 1);
     p.face.x = -1.;
-    w.fish_press(1, 12.);
+    w.fish_press(1, 12., false);
     assert!(w.players[&1].fishing.line.is_none());
     w.players.get_mut(&1).unwrap().face.x = 1.;
     let bite = cast(&mut w, 14.);
@@ -173,7 +204,7 @@ fn fishing_lava_shore_requires_matching_rod_and_direction() {
     assert_eq!(view["fishing"]["lava"], true);
     assert!((51. ..55.).contains(&view["fishing"]["x"].as_f64().unwrap()));
     w.rng = 1;
-    w.fish_press(1, bite + 0.01);
+    w.fish_press(1, bite + 0.01, false);
     let c = &w.players[&1].character;
     let id = c.fishing.species.keys().next().unwrap();
     let fish: Value = serde_json::from_str(include_str!("../../../world/fish.txt")).unwrap();
@@ -218,7 +249,7 @@ fn fishing_achievements_real_hook_ignores_copies_junk_and_misses() {
     let (mut w, mut rx) = angler();
     w.players.get_mut(&1).unwrap().character.rebirth_tiers = [0, 0, 0, 0, 2];
     let bite = cast(&mut w, 20.);
-    w.fish_press(1, bite - 0.01);
+    w.fish_press(1, bite - 0.01, false);
     w.update_achievements();
     assert!(
         !w.players[&1]
@@ -229,7 +260,7 @@ fn fishing_achievements_real_hook_ignores_copies_junk_and_misses() {
     );
     let bite = cast(&mut w, 50.);
     w.rng = 0;
-    w.fish_press(1, bite + 0.1);
+    w.fish_press(1, bite + 0.1, false);
     w.update_achievements();
     assert_eq!(w.players[&1].character.fishing.total, 0);
     assert!(
@@ -241,7 +272,7 @@ fn fishing_achievements_real_hook_ignores_copies_junk_and_misses() {
     );
     let bite = cast(&mut w, 80.);
     w.rng = 35;
-    w.fish_press(1, bite + 0.1);
+    w.fish_press(1, bite + 0.1, false);
     w.update_achievements();
     assert_eq!(w.players[&1].character.fishing.total, 0);
     assert!(
@@ -256,7 +287,7 @@ fn fishing_achievements_real_hook_ignores_copies_junk_and_misses() {
     w.players.get_mut(&1).unwrap().character.fishing.total = 98;
     let bite = cast(&mut w, 110.);
     w.rng = 1;
-    w.fish_press(1, bite + 0.1);
+    w.fish_press(1, bite + 0.1, false);
     w.update_achievements();
     let packets: Vec<_> = std::iter::from_fn(|| rx.try_recv().ok()).collect();
     let catch = packets.iter().find(|v| v["kind"] == "fish_catch").unwrap();
@@ -271,7 +302,7 @@ fn fishing_achievements_real_hook_ignores_copies_junk_and_misses() {
     );
     let bite = cast(&mut w, 140.);
     w.rng = 1;
-    w.fish_press(1, bite + 0.1);
+    w.fish_press(1, bite + 0.1, false);
     w.update_achievements();
     assert_eq!(w.players[&1].character.fishing.total, 100);
     assert!(
@@ -354,7 +385,7 @@ fn fishing_achievements_titles_survive_sqlite_reconnect_and_snapshot() {
         assert!(
             std::iter::from_fn(|| rx.try_recv().ok()).any(|m| m["type"] == "achievements"
                 && m["selected"] == id
-                && m["maximum"] == 4090)
+                && m["maximum"] == 4370)
         );
     }
     w.leave(2);

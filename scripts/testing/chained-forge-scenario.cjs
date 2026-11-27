@@ -16,9 +16,9 @@ module.exports=(kit,map)=>({
   await w.debug(bot,{op:'set_gold',gold:2000000});
   await w.action(bot,{type:'move',x:30,y:296});await w.advance(1800);await w.action(bot,{type:'stop'});
   check(w.player(bot).y>294,'The inner gate refuses a group of one');
-  await kit.teleport(w,bot,{npc:'cf_quartermaster'});
+  await kit.teleport(w,bot,{npc:'dungeon_repair_46'});
   for(const cls of ['warrior','warrior','mage','mage','assassin','assassin','priest','priest','hunter'])
-    await kit.talkTo(w,bot,'cf_quartermaster','merc_'+cls);
+    await kit.talkTo(w,bot,'dungeon_repair_46','merc_'+cls);
   await w.waitFor(()=>w.views.get(bot).players.filter(p=>p.look.name.startsWith('Merc ')).length===9,10000,'Nine raid hires');
   check(w.player(bot).gold===965000,'Nine contracts charge the normal level-99 price');
   check(w.views.get(bot).players.length===10,'Ten fighters gather inside the raid, no outdoor overflow');

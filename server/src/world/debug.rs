@@ -209,7 +209,8 @@ impl World {
                 p.attack = 0.;
                 p.buffs.clear();
                 p.stop();
-                p.mark_corpse(point);
+                let in_instance = self.instances.iter().any(|instance| instance.zone == p.character.zone);
+                p.mark_corpse(point, in_instance);
                 p.apply_death_penalty();
                 self.event("death", &actor, point, 0., false);
                 self.save();

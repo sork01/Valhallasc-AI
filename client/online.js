@@ -42,7 +42,7 @@
     return L.head + parts.map((n, i) => n + ' ' + L.units[i][n === 1 ? 0 : 1]).join(', ');
   }
   // PLAYED-END
-  function log(text, name, channel) {
+  function log(text, name, channel, kind, includeSystem = true) {
     if (!name) text = window.Locale?.translate(text) || text;
     const line = document.createElement('p');
     if (channel) line.className = 'chat-' + channel;
@@ -50,8 +50,9 @@
     line.append(document.createTextNode(text)); $('chat-log').append(line);
     while ($('chat-log').children.length > 80) $('chat-log').firstElementChild.remove();
     $('chat-log').scrollTop = $('chat-log').scrollHeight;
-    // Everything that is not a player's chat line is also kept on the System tab.
-    if (!name) window.SystemLog?.add(text, channel === 'refused' ? 'sys-taken' : 'sys-note');
+    if (!includeSystem) return;
+    if (!name || channel === 'npc') window.SystemLog?.notice?.(text, kind, channel === 'refused', name);
+    else window.SystemLog?.chat?.(text, name, channel);
   }
   // The loading screen shows one of five paintings picked at random; it keeps its picture while it stays open (retries do not swap it).
   const LOADING_ART = 5;
@@ -112,6 +113,7 @@
     if (character) { window.GM?.onSelf?.(character); window.Mail?.onUnread(character.mailUnread || 0, character.mailTotal); }
     if (character) window.Trade?.onSnapshot(character);
     if (character) window.Shop?.onSnapshot(character);
+    if (character) window.SystemLog?.snapshot?.(character);
     if (character && slot && JSON.stringify(slot.look) !== JSON.stringify(character.look)) { slot.look = character.look; persist(); }
     callbacks.onSnapshot?.(packet); window.DpsMeter?.update(packet.damageMeter);
     if (character) window.Tutorial?.onSnapshot(character);
@@ -147,6 +149,7 @@
       if (!current()) return;
       let packet; try { packet = JSON.parse(event.data); } catch (_) { return; }
       if (packet.type !== 'snapshot') flushSnapshot();
+      window.SystemLog?.packet?.(packet);
       switch (packet.type) {
         case 'welcome': {
           clearTimeout(joinTimeout); renamePending=false; $('name-change-form').hidden=true; connected = true; failures = 0; busySince = null; id = packet.id;
@@ -164,10 +167,12 @@
           }
           if (initialSlot?.initialEmptySlots?.length) send({ type: 'equip', slots: Object.fromEntries(initialSlot.initialEmptySlots.map(slot => [slot, 'none'])) });
           characterGm = character?.gm === true; window.GM?.onSelf?.(character);
+          window.Quests?.setXpCurve?.(packet.xpCurve);
           window.Fishing?.reset(); window.Blacksmithing?.reset(); window.Alchemy?.reset(); callbacks.onWelcome?.(packet);
           window.DpsMeter?.update(packet.snapshot.damageMeter);
           window.Social?.reset(); window.Trade?.reset(); window.Inspect?.reset(); window.Bank?.reset(); window.Mail?.reset(); window.BossSign?.reset(); window.Pvp?.reset(); window.PortraitMenu?.supported(!!character?.inspectSupported); window.Trade?.onSnapshot(character); send({ type: 'social', command: { op: 'refresh' } }); if (character?.pvpSupported) send({ type: 'pvp', command: { op: 'refresh' } });
           window.Mail?.onUnread(character?.mailUnread || 0, character?.mailTotal);
+          if (character) window.SystemLog?.welcome?.(character);
           finishLoading(); $('chat-input').disabled = false;
           heartbeat = setInterval(() => send({ type: 'ping', nonce: Date.now() }), 5000);
           const L = (a, all) => Keys.label(a, all), T = window.Locale?.translate || (x => x), word = text => T(text).toLowerCase();
@@ -188,11 +193,11 @@
           const npc = window.City?.npcs?.find(n => n.id === packet.npc), text = window.Locale?.translate(packet.text) || packet.text;
           window.Field?.bubble('npc:' + packet.npc, text); log(text, npc?.name || packet.npc, 'npc'); break;
         }
-        case 'system': log(packet.text); break;
+        case 'system': log(packet.text, null, null, packet.kind); break;
         case 'played': log(playedText(packet.seconds)); break;
         case 'cutscene': window.Cutscene?.play(packet.scenes, { skippable: packet.skippable === true }); break;
-        case 'announce': log(packet.text); window.Announce?.show(packet.text, packet.kind); break;
-        case 'notice': window.Achievements?.onNotice(packet); if (packet.ok === false) window.Field?.error(packet.text); log(packet.text, null, packet.ok === false ? 'refused' : 'notice'); window.Social?.onNotice(packet); break;
+        case 'announce': log(packet.text, null, packet.kind === 'error' ? 'refused' : null, packet.kind); window.Announce?.show(packet.text, packet.kind); break;
+        case 'notice': window.Achievements?.onNotice(packet); if (packet.ok === false) window.Field?.error(packet.text); log(packet.text, null, packet.ok === false ? 'refused' : 'notice', packet.kind); window.Social?.onNotice(packet); break;
         case 'debug': window.GM?.onReply(packet); break;
         case 'social': window.Social?.onState(packet); break;
         case 'enchanting': window.Enchanting?.onPacket(packet); break;
@@ -287,6 +292,7 @@
     // True while the character in the world is the administrator character; the server decides it, this only shows the console.
     get gm() { return characterGm; },
     log,
+    logChat(text) { log(text, null, null, null, false); },
     async api(path, body) {
       try {
         const res = await fetch(new URL('api/' + path, location.href), {

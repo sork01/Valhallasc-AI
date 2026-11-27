@@ -97,11 +97,27 @@ change. When expanding the atlas, add the new region achievement and update the
 Explorer threshold, translations, documented maximum and focused catalog checks
 together. See the table below for the current catalog.
 
-Prepared catalog: **154 achievements / 4,090 points / 20 titles / 12 available mounts**.
-The live catalog remains **120 achievements / 2,555 points / 12 titles**. Fishing
-and the seahorse quest are live; the November 20 expansion remains staged at the
-owner's explicit request.
+Version 1.7.0 includes the November 20 expansion and the new Professions
+category for **166 achievements / 4,370 points / 20 titles / 12 available mounts**.
+The 34 post-launch achievements retain their original points and rewards.
 The older seasonal candidate totals below describe their historical releases.
+
+### Profession milestones
+
+| Profession | Apprentice (10 points) | Journeyman (20 points) | Master (40 points) |
+| --- | ---: | ---: | ---: |
+| Fishing | 30 | 150 | 300 |
+| Enchanting | 30 | 150 | 300 |
+| Blacksmithing | 30 | 150 | 300 |
+| Alchemy | 30 | 300 | 600 |
+
+The 12 milestones read the character's saved profession skill. The normal
+achievement reconciliation counts existing training at login and awards each
+milestone once. The separate Fishing catch, species and workshop achievements
+remain in their existing categories. Settings also offers a **Profession guide**,
+with the same starter lessons shown near Alderhaven and Saltby mentors and in
+their workshops. The tutorial records each lesson when the player acknowledges
+it. Returning characters can open the guide even with tutorial tips disabled.
 
 | Achievement | Requirement | Points | Extra reward |
 | --- | --- | ---: | --- |

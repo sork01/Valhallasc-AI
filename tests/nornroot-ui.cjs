@@ -1,3 +1,4 @@
+const soundtrack = require('./lib/soundtrack.cjs');
 // One new dungeon only: real client travel, readable art, sign, music and controls.
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
@@ -10,8 +11,8 @@ const client=new Client({name:'nornroot-private-ui',version:'1'});
 let browser,started=false;
 const call=async(name,args={})=>{const r=await client.callTool({name,arguments:args});assert.ok(!r.isError,JSON.stringify(r.content));return r.structuredContent;};
 (async()=>{
-  await client.connect(new StdioClientTransport({command:process.execPath,args:[path.join(root,'scripts/test-mcp.cjs')],cwd:root,stderr:'pipe',
-    env:{...getDefaultEnvironment(),VALHALLA_BINARY:process.env.VALHALLA_BINARY||path.join(root,'target/debug/valhalla-server')}}));
+  await client.connect(new StdioClientTransport({command:process.execPath,args:[path.join(root,'scripts/test-mcp.cjs')],cwd:root,stderr:'inherit',
+    env:{...getDefaultEnvironment(),NODE_PATH:process.env.NODE_PATH||'',VALHALLA_BINARY:process.env.VALHALLA_BINARY||path.join(root,'target/debug/valhalla-server')}}));
   const world=await call('start_world',{godMode:true,levelSpread:0});started=true;
   browser=await chromium.launch({headless:true,args:['--autoplay-policy=no-user-gesture-required']});
   const page=await browser.newPage({viewport:{width:1440,height:900},reducedMotion:'reduce'});
@@ -33,6 +34,29 @@ const call=async(name,args={})=>{const r=await client.callTool({name,arguments:a
   await debug({op:'set_level',level:25});await debug({op:'explore_all'});
   await page.waitForFunction(()=>Field.hero.level===25);
   await page.locator('#levelup-banner').waitFor({state:'hidden'});
+  if (process.env.SERVICES_ONLY === '1') {
+    await debug({op:'quest',id:'entry_norn',action:'finish'});
+    await debug({op:'set_gold',gold:10000});
+    await teleport(6,160,185.5);
+    await page.evaluate(()=>Online.send({type:'move',x:150,y:185.1}));
+    await page.waitForFunction(()=>Field.zone===6&&Math.hypot(Field.hero.x-150,Field.hero.y-185.1)<1);
+    const { gate, arrival } = await page.evaluate(() => ({
+      gate: WORLD_MAP.zones[5].portals.find(p => p.id === 'wyrd_nornroot'),
+      arrival: WORLD_MAP.zones[40].portals.find(p => p.id === 'barrow_return'),
+    }));
+    await teleport(6,arrival.tx,arrival.ty); await shot('clearing');
+    await page.evaluate(({x,y})=>Online.send({type:'move',x,y}),gate);
+    await page.waitForFunction(()=>Field.zone===41);
+    const smith = await page.evaluate(()=>WORLD_MAP.zones[40].npcs.find(n=>n.id==='dungeon_repair_41'));
+    await teleport(41,smith.x,smith.y-1);
+    await page.evaluate(()=>Online.send({type:'interact',npc:'dungeon_repair_41'}));
+    await page.locator('#npc-dialogue [data-offer="merc_priest"]').click();
+    await page.waitForFunction(()=>Field.remotePlayers.some(p=>p.look.name==='Merc Priest'));
+    assert(await page.locator('#npc-dialogue [data-offer="repair"]').isVisible(), 'hire dialogue retains repair controls');
+    assert.deepEqual(errors, []);
+    console.log('The through road, relocated entrance and interior hire controls passed');
+    return;
+  }
   const gear=await page.evaluate(()=>WORLD_ITEMS.filter(i=>i.source==='nornroot'&&(!i.class||i.class==='warrior')).map(i=>({id:i.id,slot:({armor:'chest',weapon:'hands',accessory:'accessory1'})[i.kind]||i.kind})));
   // Eight set pieces plus the cloak: cloaks take a slot but never count toward the set.
   assert.equal(gear.length,9);
@@ -45,13 +69,16 @@ const call=async(name,args={})=>{const r=await client.callTool({name,arguments:a
   if(!STUB)await page.waitForFunction(()=>Field.warriorSprites?.equipment?.armor==='fatewoven'&&Field.warriorSprites?.source?.parts?.weapon_fatewoven);
   // The Barrow door is shut until entry_norn is done; finish it (with its chain) through the test shortcut.
   await debug({op:'quest',id:'entry_norn',action:'finish'});
-  // Wyrdwood's entrance to the Barrow is (154,183.5); (154,188.5) is the arrival tile from the Barrow's return.
-  await teleport(6,154,188.5);await shot('entrance');
-  await page.evaluate(()=>Online.send({type:'move',x:154,y:183.5}));
+  const { gate, arrival } = await page.evaluate(() => ({
+    gate: WORLD_MAP.zones[5].portals.find(p => p.id === 'wyrd_nornroot'),
+    arrival: WORLD_MAP.zones[40].portals.find(p => p.id === 'barrow_return'),
+  }));
+  await teleport(6, arrival.tx, arrival.ty); await shot('entrance');
+  await page.evaluate(({x, y}) => Online.send({type:'move', x, y}), gate);
   await page.waitForFunction(()=>Field.zone===41,null,{timeout:15000});
   await page.evaluate(()=>Online.send({type:'stop'}));
   await page.waitForFunction(()=>valhalla.nornrootMusic?.running&&valhalla.nornrootMusic.loaded,null,{timeout:30000});
-  assert.ok(await page.evaluate(()=>Math.abs(valhalla.nornrootMusic.duration-24*5*60/88)<.05),'The new 5/4 music decodes at the correct loop length');
+  assert.ok(await page.evaluate(seconds=>Math.abs(valhalla.nornrootMusic.duration-seconds)<.05, soundtrack('nornroot')),'The new 5/4 music decodes at the replacement recording length');
   assert.ok(await page.evaluate(()=>DayNight.nightMix<.01),'Dungeon keeps indoor light and its own score');
   assert.ok(await page.evaluate(()=>WORLD_MAP.zones[40].name==='Nornroot Barrow'&&WORLD_MAP.zones[5].portals.some(p=>p.to===41)),'Correct Wyrdwood entrance and stable zone ID');
   if(!STUB)assert.equal(await page.evaluate(async()=>{

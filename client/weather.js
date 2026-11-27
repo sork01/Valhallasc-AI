@@ -55,7 +55,6 @@
     g.save();
     if (type === 'rain' || type === 'thunderstorm') {
       g.fillStyle = `rgba(17,37,70,${.12*a})`; g.fillRect(0,0,width,height);
-      g.fillStyle = `rgba(55,96,135,${.07*a})`; g.fillRect(0,height*.72,width,height*.28);
       const count = window.Prefs?.lowGraphics ? 16 : moving ? Math.round(45 + a*105) : 40;
       g.lineWidth = a > .7 ? 1.8 : 1.2; g.strokeStyle = `rgba(183,220,255,${.36*a})`;
       const wind = 115;
@@ -71,7 +70,6 @@
       }
     } else if (type === 'snow') {
       g.fillStyle = `rgba(202,228,248,${.055*a})`; g.fillRect(0,0,width,height);
-      g.fillStyle = `rgba(234,246,255,${.05*a})`; g.fillRect(0,height*.68,width,height*.32);
       const count = window.Prefs?.lowGraphics ? 12 : moving ? Math.round(35 + a*70) : 35;
       g.fillStyle = `rgba(242,250,255,${.72*a})`;
       for (let i=0;i<count;i++) {

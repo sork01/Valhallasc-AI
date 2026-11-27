@@ -1,3 +1,4 @@
+const soundtrack = require('./lib/soundtrack.cjs');
 // Focused private-world playback check for four new outdoor night remixes.
 const assert = require('node:assert/strict');
 const path = require('node:path');
@@ -8,8 +9,8 @@ const { StdioClientTransport, getDefaultEnvironment } = require('@modelcontextpr
 const root = path.resolve(__dirname, '..');
 const client = new Client({ name: 'valhallasc-ribbon-tangle-night-music', version: '1.0.0' });
 const songs = [
-  { zone: 21, x: 12, y: 70, key: 'ribbonwildNightMusic', day: 'qmusic', seconds: 80 },
-  { zone: 22, x: 14, y: 111, key: 'tanglecrownNightMusic', day: 'jmusic', seconds: 32 * 4 * 60 / 88 },
+  { zone: 21, x: 12, y: 70, key: 'ribbonwildNightMusic', day: 'qmusic', seconds: soundtrack('ribbonwild_night') },
+  { zone: 22, x: 14, y: 111, key: 'tanglecrownNightMusic', day: 'jmusic', seconds: soundtrack('tanglecrown_night') },
 ];
 let browser, started = false;
 async function call(name, args = {}) {

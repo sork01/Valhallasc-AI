@@ -1,6 +1,7 @@
 // One real hook, one early miss and one lava cast; no loot grind or combat shortcuts.
 const fs = require('node:fs');
 const path = require('node:path');
+const { seedFishingSkill } = require('./fishing-fixture.cjs');
 module.exports = (_kit, map) => ({
   description: 'Fishing through real packets: pier cast, early miss, private deadline, public bobber, catch, cumulative platinum line and SQLite restart.',
   startLevel: 99, levelSpread: 0, godMode: true,
@@ -48,6 +49,7 @@ module.exports = (_kit, map) => ({
     const species = fish.find(f => f.item === caught.item);
     check(species ? own().fishingLog.species[caught.item].count === 1 && own().fishingLog.species[caught.item].bestKg === caught.kg : (own().fishingLog?.total || 0) === 0, 'Real species record or non-fish exclusion matches the award');
 
+    await seedFishingSkill(w, bot, 30);
     const area = map.zones[0];
     const point = [...area.fishingSpots].sort((a, b) => {
       const clearance = p => Math.min(...area.slimes.filter(s => !s.sleeping).map(s => Math.hypot(p.shore.x - s.x, p.shore.y - s.y)));

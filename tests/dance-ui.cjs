@@ -1,8 +1,9 @@
-// Focused command/snapshot checks plus real dressed renders of both dances on all five classes.
+// Command/snapshot checks plus real dressed renders of all eight dances on all five classes.
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const { chromium } = require('./lib/playwright.cjs');
+const { playGuest } = require('./lib/guest.cjs');
 const { requireMemoryLimit } = require('./lib/touch.cjs');
 const { TestWorld } = require('../scripts/testing/driver.cjs');
 requireMemoryLimit();
@@ -16,15 +17,20 @@ async function scripts(page) {
   }));
   if (process.env.MUTATE) await page.route('**/magesprite.js', async route => {
     const body = candidate ? fs.readFileSync(path.join(candidate, 'magesprite.js'), 'utf8') : await (await route.fetch()).text();
-    await route.fulfill({ body: body.replace('const dance = MageSprite.dancePose(h, this.look.gender);', 'const dance = null;'), contentType: 'text/javascript' });
+    const call = 'const dance = MageSprite.dancePose(h, this.look);';
+    const replacement = process.env.MUTATE === 'race'
+      ? "const dance = MageSprite.dancePose(h, { ...this.look, race: 'human' });"
+      : 'const dance = null;';
+    assert.ok(body.includes(call), 'Mutation must replace the dance renderer call');
+    await route.fulfill({ body: body.replace(call, replacement), contentType: 'text/javascript' });
   });
 }
 (async () => {
   await world.start();
-  await world.connect({ bot: 'Freya', class: 'hunter', gender: 'female' });
-  await world.debug('Freya', { op: 'teleport', zone: 0, x: 36, y: 79 });
   browser = await chromium.launch({ headless: true });
   if (!process.env.DANCE_ART_ONLY) {
+    await world.connect({ bot: 'Freya', class: 'hunter', gender: 'female' });
+    await world.debug('Freya', { op: 'teleport', zone: 0, x: 36, y: 79 });
     const page = await browser.newPage({ viewport: { width: 1000, height: 700 } });
     const errors = []; page.on('pageerror', e => errors.push(e.message));
     await scripts(page);
@@ -32,8 +38,10 @@ async function scripts(page) {
       window.AudioContext = undefined; window.webkitAudioContext = undefined;
       localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false }));
     });
-    await page.goto(world.url); await page.locator('#start').click(); await page.locator('#login-guest').click();
-    await page.locator('#cls-warrior').click(); await page.locator('#name').fill('Ulfar'); await page.locator('#go').click({ timeout: 60000 });
+    await page.goto(world.url); await page.locator('#start').click(); await playGuest(page);
+    await page.locator('#cls-warrior').click(); await page.locator('#gender-male').click();
+    await page.locator('#create-race').selectOption('tidekin');
+    await page.locator('#name').fill('Ulfar'); await page.locator('#go').click({ timeout: 60000 });
     await page.waitForFunction(() => Online.connected && Field.hero?.hp > 0 && Field.warriorSprites);
     if (await page.locator('#low-gfx-dismiss').isVisible()) await page.locator('#low-gfx-dismiss').click();
     await page.evaluate(() => Online.send({ type: 'debug', ref: 1, command: { op: 'teleport', zone: 0, x: 36, y: 79 } }));
@@ -45,8 +53,11 @@ async function scripts(page) {
     await submit('/dance');
     await page.waitForFunction(() => Number.isFinite(Field.hero.danceT));
     const id = await page.evaluate(() => Online.id);
-    await world.waitFor(() => Number.isFinite(world.snapshot.players.find(p => p.id === id)?.danceT), 5000, 'Observer sees male dance');
-    check(true, 'Typing /dance starts the local dance and an observer receives it');
+    await world.waitFor(() => Number.isFinite(world.snapshot.players.find(p => p.id === id)?.danceT), 5000, 'Observer sees Tidekin dance');
+    const observerLook = world.snapshot.players.find(p => p.id === id).look;
+    check(observerLook.race === 'tidekin' && observerLook.gender === 'male' &&
+      await page.evaluate(() => Field.warriorSprites.look.race === 'tidekin' && Field.warriorSprites.look.gender === 'male'),
+    'Typing /dance starts a male Tidekin dance with the same appearance for the dancer and observer');
     const start = await page.evaluate(() => ({ x: Field.hero.x, y: Field.hero.y, danceT: Field.hero.danceT }));
     await page.waitForFunction(t => Field.hero.danceT > t + 1.1, start.danceT);
     check(await page.evaluate(at => Math.hypot(Field.hero.x - at.x, Field.hero.y - at.y) < .01, start), 'The dance loops in place through idle network input');
@@ -57,7 +68,11 @@ async function scripts(page) {
     await submit('/DANCE');
     await page.waitForFunction(() => Field.hero.danceT === null);
     check(true, 'Typing /dance again stops, even though focusing chat sends Stop');
-    await page.waitForTimeout(1100); await submit('/dance');
+    // Chat is rate limited in simulation time, which can lag wall time under the CPU cap.
+    await world.waitFor(() => world.snapshot.players.find(p => p.id === id)?.danceT === null);
+    const stoppedAt = world.snapshot.time;
+    await world.waitFor(() => world.snapshot.time >= stoppedAt + 1);
+    await submit('/dance');
     await page.waitForFunction(() => Number.isFinite(Field.hero.danceT));
     await page.keyboard.down('d');
     await page.waitForFunction(() => Field.hero.danceT === null); await page.keyboard.up('d');
@@ -75,44 +90,67 @@ async function scripts(page) {
     await scripts(art);
     await art.context().grantPermissions(['local-network-access'], { origin: world.url });
     await art.route('**/dance-art-fixture', route => route.fulfill({ contentType: 'text/html', body:
-      '<!doctype html><canvas width="1440" height="430"></canvas>' + ['items', 'magesprite', 'warriorsprite', 'assassinsprite', 'priestsprite', 'huntersprite'].map(s => `<script src="/${s}.js"></script>`).join('') }));
+      '<!doctype html><canvas></canvas>' + ['items', 'magesprite', 'warriorsprite', 'assassinsprite', 'priestsprite', 'huntersprite'].map(s => `<script src="/${s}.js"></script>`).join('') }));
     await art.goto(world.url + 'dance-art-fixture');
     // The normal UI test uses stubs; this isolated page explicitly loads the actual atlas source.
     const result = await art.evaluate(async cls => {
       window.__valhallaTestSprites = false;
       const Base = { warrior: WarriorSprite, mage: MageSprite, assassin: AssassinSprite, priest: PriestSprite, hunter: HunterSprite }[cls];
-      const canvas = document.querySelector('canvas'), g = canvas.getContext('2d');
-      g.fillStyle = '#20313d'; g.fillRect(0, 0, 1440, 430);
-      const hashes = [], changes = [], used = [], choreography = [];
-      for (const [row, gender] of ['female', 'male'].entries()) {
+      const races = ['human', 'mothkin', 'tidekin', 'gnome'], genders = ['female', 'male'];
+      const canvas = document.querySelector('canvas');
+      canvas.width = 1440; canvas.height = 215 * races.length * genders.length;
+      const g = canvas.getContext('2d'), temp = document.createElement('canvas');
+      temp.width = 180; temp.height = 190;
+      const tg = temp.getContext('2d', { willReadFrequently: true });
+      g.fillStyle = '#20313d'; g.fillRect(0, 0, canvas.width, canvas.height);
+      g.font = '18px sans-serif'; g.fillStyle = '#ffe3a0';
+      const dances = [];
+      for (const [body, gender] of genders.entries()) {
         const look = { class: cls, gender, name: cls, head: 'none', shoulders: 'none', gloves: 'none', pants: 'none', necklace: 'none', accessory: 'none', cloak: 'none' };
         const sprite = await Base.variant(look).load(look);
         for (const [slot, value] of Object.entries(sprite.equipment)) if (value && value !== 'none') await sprite.source.ensure(slot + '_' + value);
-        g.font = '18px sans-serif'; g.fillStyle = '#ffe3a0'; g.fillText(`${gender} ${cls}`, 12, row * 215 + 22);
-        const samples = [], poses = [];
-        const temp = document.createElement('canvas'); temp.width = 180; temp.height = 190; const tg = temp.getContext('2d');
-        for (let k = 0; k < 16; k++) {
-          const danceT = k / 8 + .03125, h = { look, danceT, fx: 1, fy: 1, dead: false, hurtT: 0, atkT: 0, moving: false };
+        const used = ['armor', 'weapon'].every(slot => sprite.source.parts[slot + '_' + sprite.equipment[slot]]);
+        for (const [index, race] of races.entries()) {
+          const row = index * genders.length + body;
+          sprite.set({ ...look, race });
+          g.fillText(`${race} ${gender} ${cls}`, 12, row * 215 + 22);
+          const samples = new Set(), poses = [];
           const calls = [], original = sprite.frame;
-          sprite.frame = function (...args) { calls.push(args); return original.apply(this, args); };
-          tg.clearRect(0, 0, 180, 190); tg.save(); tg.translate(90, 172); sprite.draw(tg, h, danceT); tg.restore();
+          sprite.frame = function (...args) { calls.push(args.join('/')); return original.apply(this, args); };
+          for (let k = 0; k < 24; k++) {
+            const danceT = k / 8 + .03125, h = { danceT, fx: 1, fy: 1 };
+            calls.length = 0;
+            tg.clearRect(0, 0, 180, 190); tg.save(); tg.translate(90, 172); sprite.draw(tg, h, danceT); tg.restore();
+            const pixels = tg.getImageData(0, 0, 180, 190).data;
+            let opaque = 0, edge = 0, hash = 2166136261;
+            for (let i = 0; i < pixels.length; i += 4) {
+              for (let channel = 0; channel < 4; channel++) hash = Math.imul(hash ^ pixels[i + channel], 16777619);
+              if (!pixels[i + 3]) continue;
+              opaque++;
+              const x = (i / 4) % 180, y = Math.floor(i / 720);
+              if (x === 0 || x === 179 || y === 0 || y === 189) edge++;
+            }
+            if (opaque < 500 || edge) throw Error(`${cls}/${race}/${gender}/${k}: empty or clipped dance (${opaque}/${edge})`);
+            samples.add(hash); poses.push(calls[0]);
+            if (k % 3 === 0) g.drawImage(temp, (k / 3) * 180, row * 215 + 25);
+          }
           sprite.frame = original;
-          const pixels = tg.getImageData(0, 0, 180, 190).data;
-          let opaque = 0, edge = 0, hash = 2166136261;
-          for (let i = 0; i < pixels.length; i++) { hash = Math.imul(hash ^ pixels[i], 16777619); if (i % 4 === 3 && pixels[i]) { opaque++; const p = (i - 3) / 4, x = p % 180, y = Math.floor(p / 180); if (x === 0 || x === 179 || y === 0 || y === 189) edge++; } }
-          if (opaque < 500 || edge) throw Error(`${cls}/${gender}/${k}: empty or clipped dance (${opaque}/${edge})`);
-          samples.push(hash); poses.push(calls[0]?.join('/'));
-          if (k % 2 === 0) g.drawImage(temp, (k / 2) * 180, row * 215 + 25);
+          dances.push({ label: `${cls}/${race}/${gender}`, poses, renders: samples.size, used });
         }
-        hashes.push(samples); choreography.push(poses); changes.push(new Set(poses).size); used.push(sprite.equipment.armor !== 'none' && sprite.equipment.weapon !== 'none');
       }
-      return { hashes, changes, used, choreography, png: canvas.toDataURL() };
+      const legacy = genders.every(gender => Array.from({ length: 24 }, (_, k) => ({ danceT: k / 8 })).every(h =>
+        JSON.stringify(Base.dancePose(h, { gender })) === JSON.stringify(Base.dancePose(h, { race: 'human', gender }))));
+      return { dances, legacy, png: canvas.toDataURL() };
     }, cls);
-    for (let body = 0; body < 2; body++) {
-      check(new Set(result.hashes[body]).size >= 8 && result.changes[body] >= 4, `${cls}/${body === 0 ? 'female' : 'male'}: ${new Set(result.hashes[body]).size} distinct renders and ${result.changes[body]} dance poses reach the real compositor`);
-      check(result.used[body], `${cls}/${body === 0 ? 'female' : 'male'}: equipped armor and weapon remain in the dance`);
+    for (const { label, poses, renders, used } of result.dances) {
+      const distinct = new Set(poses).size;
+      check(renders >= 8 && distinct >= 4 && poses.every(pose => pose?.startsWith('walk/')),
+        `${label}: ${renders} distinct renders and ${distinct} dance poses reach the real compositor`);
+      check(used, `${label}: equipped armor and weapon are loaded for the dance`);
     }
-    check(JSON.stringify(result.choreography[0]) !== JSON.stringify(result.choreography[1]), `${cls}: the two body types have different dance sequences`);
+    check(new Set(result.dances.map(dance => JSON.stringify(dance.poses))).size === 8,
+      `${cls}: all eight race and body combinations use different choreography`);
+    check(result.legacy, `${cls}: older appearances use the two Human dances`);
     fs.writeFileSync(path.join(world.runDir, `dance-${cls}.png`), Buffer.from(result.png.split(',')[1], 'base64'));
     await art.close();
   }

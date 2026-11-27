@@ -21,11 +21,33 @@ for (const kind of Object.keys(D.KINDS)) {
   check(D.pose({ ...f, t: k.life * k.hold * .8 }).alpha === 1, `${kind} holds at full opacity before it fades`);
   const r = D.pose({ ...f, t: k.life * .5 }, true);
   check(r.dx === 0 && r.dz === 0 && r.scale === 1, `${kind} fades in place under reduced motion`);
-  if (k.pop > 1.05) check(D.pose({ ...f, t: .12 }).scale > 1.05 && D.pose({ ...f, t: .005 }).scale < .6, `${kind} pops in from small to over full size`);
-  if (k.ease > .4) { const a = D.pose({ ...f, t: k.life * .25 }).dz, b = D.pose({ ...f, t: k.life * .5 }).dz - a, c = D.pose({ ...f, t: k.life * .75 }).dz - D.pose({ ...f, t: k.life * .5 }).dz;
+  if (kind !== 'crit' && k.pop > 1.05) check(D.pose({ ...f, t: .12 }).scale > 1.05 && D.pose({ ...f, t: .005 }).scale < .6, `${kind} pops in from small to over full size`);
+  if (kind !== 'crit' && k.ease > .4) { const a = D.pose({ ...f, t: k.life * .25 }).dz, b = D.pose({ ...f, t: k.life * .5 }).dz - a, c = D.pose({ ...f, t: k.life * .75 }).dz - D.pose({ ...f, t: k.life * .5 }).dz;
     check(a > b && b > c, `${kind} rises fast at first and slows`); }
 }
 check(D.KINDS.crit.size > D.KINDS.hit.size && D.KINDS.miss.size < D.KINDS.hit.size, 'crits are bigger and a miss is smaller than a hit');
+{
+  const crit = { kind: 'crit', text: '123', lane: 1, z0: 8, side: 1 };
+  const at = (t, reduced) => D.pose({ ...crit, t }, reduced);
+  const held = at(.18);
+  check(at(.001).scale < .6 && at(.09).scale >= 1.5 && at(.09).dz > held.dz * .85,
+    'a crit pops from small to oversized and reaches most of its height within 90 ms');
+  check(held.scale === 1 && held.alpha === 1, 'a crit has settled at full size and opacity by 180 ms');
+  for (const t of [.3, .6, .9, 1.18]) {
+    const next = at(t);
+    check(next.dx === held.dx && next.dz === held.dz && next.scale === held.scale && next.alpha === 1,
+      `a crit stays still and fully visible at ${t}s`);
+  }
+  const fading = at(1.35);
+  check(fading.dx === held.dx && fading.dz === held.dz && fading.alpha > 0 && fading.alpha < 1,
+    'a crit fades without drifting');
+  check(at(1.18, true).alpha === 1, 'reduced motion keeps the longer opacity hold');
+
+  const list = [], hit = { x: 5, y: 7, head: 70, kind: 'hit', text: '123' };
+  for (let i = 0; i < 5; i++) D.spawn(list, hit, seeded(i));
+  const queuedCrit = D.spawn(list, { ...hit, kind: 'crit' }, seeded(0));
+  check(queuedCrit.t >= -.08, 'a crit waits at most one stagger beat behind a burst of hits');
+}
 
 // A run of hits over one head never overlaps (any pair, any frame), whatever side each number happens to pick.
 function overlapsIn(hits, interval, delay, seed, kind = 'hit') {

@@ -3417,16 +3417,11 @@ fn the_fallen_wake_at_the_door_when_the_boss_dies() {
         "the usual three seconds start when the fight ends"
     );
     steps(&mut r, 3.);
-    assert!(r.w.players[&2].character.ghost, "released as ghost at the door");
+    assert!(r.alive(2), "the kill ended the fight");
     assert!(!r.w.players[&2].fallen);
-    assert!(r.at(2).distance(r.w.maps[r.zone].spawn) < 5.);
-    let corpse = r.w.players[&2].character.corpse.clone().unwrap();
-    r.put(2, corpse.x, corpse.y);
-    steps(&mut r, 0.2);
-    assert!(r.w.players[&2].character.ghost, "manual Resurrect required");
-    r.w.message(2, ClientMessage::Resurrect);
-    assert!(r.alive(2), "pressing Resurrect near corpse resurrects at half HP");
     assert!(!r.w.players[&2].character.ghost);
+    assert!(r.w.players[&2].character.corpse.is_none());
+    assert!(r.at(2).distance(r.w.maps[r.zone].spawn) < 5.);
 }
 
 #[test]
@@ -3441,14 +3436,12 @@ fn the_fallen_wake_when_the_party_is_wiped_and_the_boss_walks_home() {
         "nobody left to fight: the boss lets go"
     );
     assert!(
-        !r.w.players[&1].character.ghost && !r.w.players[&2].character.ghost,
-        "nobody releases before the last one is ready: the first cannot run ahead early"
+        !r.alive(1) && !r.alive(2),
+        "nobody wakes before the last one is ready: the first cannot pull the boss back onto the rest"
     );
     steps(&mut r, 3.);
-    assert!(
-        r.w.players[&1].character.ghost && r.w.players[&2].character.ghost,
-        "both release as ghosts together"
-    );
+    assert!(r.alive(1) && r.alive(2), "both wake together");
+    assert!(!r.w.players[&1].character.ghost && !r.w.players[&2].character.ghost);
 }
 
 #[test]
@@ -3457,11 +3450,11 @@ fn a_fallen_hero_is_not_held_by_a_fight_that_never_ends() {
     fell(&mut r, 2);
     r.w.players.get_mut(&2).unwrap().dead_time = FALLEN_HOLD_MAX - 1.;
     steps(&mut r, 0.5);
-    assert!(!r.alive(2) && !r.w.players[&2].character.ghost);
+    assert!(!r.alive(2));
     steps(&mut r, 4.);
     assert!(
-        r.w.players[&2].character.ghost && !r.w.players[&2].fallen && r.w.boss.fights.contains_key(&r.boss),
-        "the cap let them go as a ghost"
+        r.alive(2) && !r.w.players[&2].character.ghost && r.w.boss.fights.contains_key(&r.boss),
+        "the cap let them go"
     );
 }
 
@@ -3473,7 +3466,7 @@ fn a_hero_who_falls_before_the_boss_wakes_gets_up_as_before() {
     fell(&mut r, 1);
     steps(&mut r, 4.);
     assert!(r.w.boss.fights.is_empty());
-    assert!(r.w.players[&1].character.ghost, "no fight, so the old three seconds to ghost");
+    assert!(r.alive(1) && !r.w.players[&1].character.ghost, "no fight, so the old three seconds");
 }
 
 #[test]
@@ -3525,8 +3518,8 @@ fn a_hired_fighter_who_falls_stays_down_too() {
     );
     steps(&mut r, 3.);
     assert!(
-        r.w.players.values().all(|p| !p.fallen && (p.character.hp > 0. || p.character.ghost)),
-        "and then everyone releases together"
+        r.w.players.values().all(|p| !p.fallen && p.character.hp > 0. && !p.character.ghost),
+        "and then everyone wakes together"
     );
 }
 
