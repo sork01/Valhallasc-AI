@@ -10,9 +10,10 @@ const baseline = JSON.parse(execFileSync('git', ['show', 'c0b93e8e:client/assets
 const people = [world, ...world.zones].flatMap(z => z.npcs || []).filter(n => !['stone','scenery','mailbox','spirit_guide'].includes(n.art) && !/meeting stone/i.test(n.name));
 const fishers=people.filter(n=>n.id.startsWith('fisher_'));
 // Four new Transmog Masters reuse the local smiths' existing player-style sprites.
-assert.equal(people.length-fishers.length, 592);
+// 592 plus four Alchemists, five Enchanting Masters and eighteen GM Island staff.
+assert.equal(people.length-fishers.length, 619);
 assert.equal(people.filter(n=>n.id.endsWith('_transmog')).length,4);
-assert.equal(fishers.length,13);
+assert.equal(fishers.length,23);
 for(const n of fishers)assert.equal(old.npcs[n.id].art,'fisher_rod');
 assert.deepEqual(Object.keys(old.npcs).sort(), people.map(n => n.id).sort(), 'Every actual person, and no scenery, is assigned');
 for (const [key, value] of Object.entries(baseline)) if (key !== 'npcs') assert.deepEqual(old[key], value, key);

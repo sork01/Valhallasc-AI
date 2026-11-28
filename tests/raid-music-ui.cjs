@@ -70,7 +70,10 @@ const call = async (name, args = {}) => {
   });
   await page.goto(world.url); await page.locator('#start').click(); await playGuest(page);
   await page.locator('#name').fill('Forge Listener'); await page.locator('#go').click({ timeout: 60000 });
-  await page.waitForFunction(() => Online.connected && Field.hero && valhalla.fmusic?.running, null, { timeout: 60000 });
+  await page.waitForFunction(() => Online.connected && Field.hero, null, { timeout: 60000 });
+  // The world clock may read night, when the meadow's night score plays instead of the day one.
+  await page.evaluate(() => Online.send({ type: 'debug', command: { op: 'set_time', hour: 12, freeze: true } }));
+  await page.waitForFunction(() => !!valhalla.fmusic?.running, null, { timeout: 60000 });
   const debug = command => page.evaluate(command => Online.send({ type: 'debug', command }), command);
   const travel = async (zone, x, y) => {
     await debug({ op: 'teleport', zone, x, y });
@@ -126,10 +129,12 @@ const call = async (name, args = {}) => {
   await page.waitForFunction(() => Math.abs(valhalla.eldmarrMusic.output.gain.value - .09) < .002);
   check(true, 'Saved volume reaches the boss player');
   await page.evaluate(() => Prefs.set({ sound: false }));
-  await page.waitForFunction(() => valhalla.raidMusic.output.gain.value < .001 && valhalla.eldmarrMusic.output.gain.value < .001);
-  check(true, 'Mute reaches both raid players');
+  // Only one score plays at a time (client 1.14.7); a stopped player's gain is not processed until it starts again.
+  await page.waitForFunction(() => valhalla.eldmarrMusic.output.gain.value < .001);
+  check(true, 'Mute reaches the playing raid score');
   fixture = 'dormant'; await selected(false);
-  check(await page.evaluate(() => valhalla.raidMusic.output.gain.value < .001), 'A track switch remains muted');
+  await page.waitForFunction(() => valhalla.raidMusic.output.gain.value < .001);
+  check(true, 'A track switch remains muted');
   await travel(45, 22, 137);
   await page.waitForFunction(() => valhalla.emberwakeNightMusic.running && !valhalla.raidMusic.running && !valhalla.eldmarrMusic.running);
   check(true, 'Leaving the raid restores the outdoor night music and stops both raid players');

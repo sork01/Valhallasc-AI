@@ -31,7 +31,7 @@ const GROUND = ['The Drum Terraces', 'The Blackwater Edge'], lums = {};
   check(seams.map(p => p.to).sort((a, b) => a - b).join() === '20,21,23', 'the seams are Sunward Vale, the Ribbonwild and the Veyrroot Canopy (the Tanglecrown has no rim gate any more)');
   check(Z.portals.some(p => p.id === 'tangle_rain_gate' && p.to === 32), 'the temple door leads to the Temple of the Rain Crown');
   for (const p of Z.portals.filter(p => !p.seam)) check(onFloor(Z, p.x, p.y), `${p.id} stands on the floor`);
-  check(Z.regions.names.length === 14 && Z.camps.length === 4 && Z.quests.length === 32, 'fourteen regions, five hubs and 32 quests');
+  check(Z.regions.names.length === 14 && Z.camps.length === 4 && Z.quests.filter(q => !q.id.startsWith('fisher_')).length === 32, 'fourteen regions, five hubs and 32 quests (Fisher quests aside)');
   server = spawn(process.env.VALHALLA_BINARY, [], { cwd: root, stdio: 'ignore',
     env: { ...process.env, VALHALLA_BIND: `127.0.0.1:${port}`, VALHALLA_DB: path.join(tmp, 'v.sqlite'), VALHALLA_CLIENT_DIR: path.join(root, 'client'), VALHALLA_TEST_COMMANDS: '1', VALHALLA_GOD_MODE: '1', VALHALLA_START_LEVEL: process.env.START_LEVEL || '99', VALHALLA_LEVEL_SPREAD: '0' } });
   for (let i = 0; i < 100; i++) { try { if ((await fetch(`http://127.0.0.1:${port}/health`)).ok) break; } catch (_) {} await new Promise(r => setTimeout(r, 200)); }

@@ -1,11 +1,11 @@
-const { playGuest } = require('./lib/guest.cjs');
+const { playGuest } = require('../lib/guest.cjs');
 // Verify the deployed HTTPS client and real WSS multiplayer route.
 const { chromium } = require('playwright');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const url = process.env.VALHALLA_PUBLIC_URL || 'https://gunning.se/Valhallasc/';
-const root = path.resolve(__dirname, '..');
+const root = path.resolve(__dirname, '../..');
 const result = { url, ids: [], checks: 0 };
 let browser;
 function check(value, message) { assert.ok(value, message); result.checks++; }

@@ -113,7 +113,13 @@ fn empty_seat_campaign_rewards_cover_all_classes_and_real_raid_without_changing_
     }
     assert_eq!(quest(&w, "es_27").objectives[0].target, "cf_eldmarr");
     assert_eq!(quest(&w, "es_28").min_level, 99);
-    assert_eq!(w.maps.iter().filter(|m| m.template.is_none()).count(), 47);
+    assert_eq!(
+        w.maps
+            .iter()
+            .filter(|m| m.template.is_none() && !m.gm_only)
+            .count(),
+        47
+    );
     assert_eq!(w.instances.iter().filter(|i| i.template == 46).count(), 3);
     assert!(
         w.maps[45]
@@ -138,7 +144,8 @@ fn empty_seat_sites_and_sleeping_summons_use_actual_server_collision() {
             let mut actual = at;
             map.collide(&mut actual, PLAYER_RADIUS);
             assert!(actual.distance(at) < 0.01, "{} blocked", p.id);
-            for source in &w.maps {
+            // (The GM island's return gate is closed to players.)
+            for source in w.maps.iter().filter(|m| !m.gm_only) {
                 // (A seam or a vaulted opening has no arrival disc.)
                 for portal in source
                     .portals

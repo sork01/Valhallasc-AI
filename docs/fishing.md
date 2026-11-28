@@ -179,11 +179,13 @@ Item kind `rod` (not a worn slot: the best rod in the bags is used; a tenth-slot
 | 1 | Twig Rod | 1 | Greenmeadow and ordinary Rimeveil/Gloamfen waters; buy for 50 copper |
 | 2 | Platinum Rod | 5 | Emberfall Crags lava and Wyrdwood shores |
 | 3 | Willow Rod | 10 | Rich Rimeveil and Gloamfen spots |
-| 4 | Reedglass Rod | 25 | Sunward, Tanglecrown and rare water species |
-| 5 | Silverline Rod | 40 | Stormglass and Lapis Erg |
-| 6 | Tempered Platinum Rod | 45 | Emberwake lava |
-| 7 | Starcatch Rod | 60 | Frostwake |
-| 8 | Worldwire Rod | 80 | Yearwheel and every water legendary species |
+| 4 | Reedglass Rod | 25 | Sunward, Tanglecrown, Bifrost Reach and rare water species |
+| 5 | Silverline Rod | 40 | Stormglass, Lapis Erg and Astralhollow |
+| 6 | Tempered Platinum Rod | 45 | Emberwake lava, Prismwaste and the Obsidian Orrery |
+| 7 | Starcatch Rod | 55 | Frostwake, the Moonspore Canopy and Asterion |
+| 8 | Worldwire Rod | 70 | Yearwheel, the Ribbonwild and every water legendary species |
+| 9 | Rootbraid Rod | 80 | Veyrroot Canopy and Heartwood |
+| 10 | Cairnsteel Rod | 90 | The Cairnspine |
 
 **One cumulative progression:** every upgrade consumes the immediately previous rod, five accessible fish, one existing material and copper. No separate line item, worn slot or second rod is needed. Every rod from Platinum onward fishes ordinary water and Crags lava; Tempered Platinum and later rods also fish Emberwake. The highest usable carried rod is selected automatically. Stable item IDs remain unchanged: former Emberline is now Platinum, former Magma Reel is Tempered Platinum.
 

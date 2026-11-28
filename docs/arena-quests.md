@@ -45,7 +45,7 @@ pays a blue weapon of the hero's class for that level, experience and gold.
 ## Measured win rates (scripted play, no target)
 
 There is no win-rate target (owner, 2026-10-21): these are numbers for the owner to react to. They come from the gauntlet
-itself, not from the duel matrix: `cargo test -- --ignored --nocapture rates_` (the `rates_<level>` tests in
+itself, not from the duel matrix: `cargo test --features valhalla-server/tools -- --ignored --nocapture rates_` (the `rates_<level>` tests in
 `gauntlet_tests.rs`, `GAUNTLET_SEEDS` runs per class and level, default 6; `GAUNTLET_OPPONENT_HEALTH` sets the opponents'
 health without a rebuild) plays whole runs through the real quest code with the hero driven by the mercenaries' brain
 (`gauntlet_play`, the same driver as the opponents, no potions, no kiting). Each cell is "chance of winning all five fights /

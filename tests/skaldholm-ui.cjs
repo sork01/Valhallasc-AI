@@ -81,6 +81,8 @@ const look = (page, [x0, y0, x1, y1] = [.15, .2, .85, .8]) => page.evaluate(([x0
     await debug({ op: 'teleport', zone, x, y });
     // A teleport lands on the nearest free ground (and the server may correct the spot a moment later), so accept a spot within 6 tiles.
     await page.waitForFunction(([zone, x, y]) => Field.zone === zone && Math.hypot(Field.hero.x - x, Field.hero.y - y) < 6, [zone, x, y], { timeout: 20000 });
+    // The overlay covers the load of a zone's artwork and would swallow the next click.
+    await page.locator('#connection-overlay').waitFor({ state: 'hidden', timeout: 60000 });
     let last = null;
     for (let i = 0; i < 40; i++) {
       const now = await page.evaluate(() => Field._debug.w2s(Field.hero.x, Field.hero.y));
@@ -298,6 +300,8 @@ const look = (page, [x0, y0, x1, y1] = [.15, .2, .85, .8]) => page.evaluate(([x0
   // The claim takes the eight bring items; the two spare quest items are then discarded (`discard_excess_quest_items`:
   // no active quest wants them any more), so the bag holds no quest gel at all.
   const bag = item => page.evaluate(item => (Field.hero.inventory.find(i => i.item === item) || {}).quantity || 0, item);
+  // The dialogue reply can arrive before the snapshot that carries the emptied bag.
+  await page.waitForFunction(() => !Field.hero.inventory.some(i => ['qi_city_gel', 'qi_city_gel_2'].includes(i?.item) && i.quantity > 0), null, { timeout: 10000 }).catch(() => {});
   const gelLeft = [await bag('qi_city_gel'), await bag('qi_city_gel_2')];
   check(gelLeft[0] === 0 && gelLeft[1] === 0, `The claim used the quest gel, and the spare quest gel was discarded (left ${gelLeft.join(' / ')})`);
   await page.keyboard.press('Escape');

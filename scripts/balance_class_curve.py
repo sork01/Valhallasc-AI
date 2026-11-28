@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Class attack curve from replayed best rotations (owner, 2026-10-19).
 
-Reads `REPLAY <level> <class> <dps>` lines (from `cargo test replay_best_rotations -- --ignored --nocapture`, one log per
+Reads `REPLAY <level> <class> <dps>` lines (from `cargo test --features valhalla-server/tools replay_best_rotations -- --ignored --nocapture`, one log per
 class), takes the mean DPS of the five classes at each level as the benchmark, and prints the CLASS_ATTACK_CURVE rows
 with every class's entry multiplied by benchmark / its DPS. Run it on the output of the CURRENT curve; run the replay
 again on the new curve, and again through this script (it prints the remaining spread), until every class is near 1.00.

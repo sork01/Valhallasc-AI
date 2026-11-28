@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Bounded checks for the player-style NPC atlases (client/assets/npcp_*.png + npcp.txt): contract, borders, animation,
-recolour table, head sockets (a Python port of NpcArt.head), 24 distinct looks. No browser, no PixelFlow.
+recolour table, head sockets (a Python port of NpcArt.head), 25 distinct looks. No browser, no PixelFlow.
 usage: python3 tests/npcp-art.py [--mutate]      (--mutate blanks one skin tone in a copy and must fail the socket/recolour checks)
 """
 import json
@@ -130,11 +130,11 @@ for i, k1 in enumerate(keys):
         if d < worst[0]:
             worst = (d, (k1, k2))
 if not FOCUSED:
-    check(len(keys) == 24, f'{len(keys)} general designs, want 24')
+    check(len(keys) == 25, f'{len(keys)} general designs, want 25')
 named_plan = ROOT / 'docs/npc-named-plan.txt'
 named_count = json.loads(named_plan.read_text())['counts']['namedDesigns'] if named_plan.exists() else 0
 reuse_count = len([k for k in META['sprites'] if k.startswith('reuse_')])
-check(len(META['sprites']) == 164 + named_count + reuse_count, f"{len(META['sprites'])} designs in total, want {164 + named_count + reuse_count}")
+check(len(META['sprites']) == 165 + named_count + reuse_count, f"{len(META['sprites'])} designs in total, want {165 + named_count + reuse_count}")
 if NAMED_ONLY:
     check(len(keys) == named_count, f'{len(keys)} named designs, want {named_count}')
 elif ART_GROUP == 'reuse':

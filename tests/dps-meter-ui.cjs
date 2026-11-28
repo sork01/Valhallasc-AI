@@ -105,7 +105,9 @@ const results = [];
     await page.waitForFunction(() => Online.connected && Field.hero);
     check(await page.evaluate(() => Prefs.dpsMeter === false), 'hidden preference survives a reload');
     check(await page.locator('#dps-meter').isHidden(), 'meter stays hidden on reconnect');
-    await page.keyboard.press('Escape'); await page.locator('#p-settings').click(); await page.locator('#dps-toggle').check();
+    // The graphics suggestion returns after a reload on small screens and sits over Settings until dismissed.
+    if (await page.locator('#low-gfx-dismiss').isVisible()) await page.locator('#low-gfx-dismiss').click();
+    await page.keyboard.press('Escape'); await page.locator('#p-settings').click(); await page.locator('#set-tab-interface').click(); await page.locator('#dps-toggle').check();
     check(await page.evaluate(() => Prefs.dpsMeter === true), 'Settings can restore the meter');
     await page.locator('#set-back').click(); await page.keyboard.press('Escape'); check(await page.locator('#dps-meter').isVisible(), 'restored meter is visible');
     check(await page.evaluate(() => Locale.translate('DPS meter') === 'DPS meter'), 'English label stays English');

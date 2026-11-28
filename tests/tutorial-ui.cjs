@@ -153,7 +153,8 @@ async function run() {
       await page.waitForFunction(() => Tutorial.state().done.includes('consumables'), null, { timeout: 10000 });
 
       // Open Merchant -> merchant step & outsideClose guard
-      const merchant = await page.evaluate(() => City.npcsOf(0).find(n => n.buys || n.stock?.length));
+      // Other buyers (the smith) open their own lessons first.
+      const merchant = await page.evaluate(() => City.npcsOf(0).find(n => n.id === 'merchant'));
       check(!!merchant, 'Greenmeadow merchant NPC exists');
       await debug({ op: 'teleport', zone: 0, x: merchant.x, y: merchant.y });
       await page.waitForFunction(([mx, my]) => Math.hypot(Field.hero.x - mx, Field.hero.y - my) < 3, [merchant.x, merchant.y]);

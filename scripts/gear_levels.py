@@ -123,7 +123,7 @@ def tint(level, rarity, shared=False):
 def budget(kind, cls, rarity, level):
     """(attack, defense) for a piece; the formula the Rust test checks the catalog against."""
     stat, base = SLOT_BASE.get(kind, ('defense', CHEST_BASE.get(cls, 3.0)))
-    total = base * LEVEL_FACTOR[level]
+    total = base * LEVEL_FACTOR.get(level, 0.16 * level + 0.8)   # crafted pieces sit between the ladder's levels
     tier = RARITY_ORDER.index(rarity)
     if tier == 0:
         values = {'attack': 0.0, 'defense': 0.0}

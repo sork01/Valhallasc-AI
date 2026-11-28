@@ -4,12 +4,12 @@ const fs = require('node:fs');
 const path = require('node:path');
 const http = require('node:http');
 const { chromium } = require('playwright');
-require('./lib/touch.cjs').requireMemoryLimit();
-const root = path.resolve(__dirname, '../client');
-const out = process.env.TORSO_ART_DIR ? path.resolve(process.env.TORSO_ART_DIR) : path.resolve(__dirname, '../test-results/female-torso');
+require('../lib/touch.cjs').requireMemoryLimit();
+const root = path.resolve(__dirname, '../../client');
+const out = process.env.TORSO_ART_DIR ? path.resolve(process.env.TORSO_ART_DIR) : path.resolve(__dirname, '../../test-results/female-torso');
 const candidates = path.join(out, 'assets'), before = path.join(out, 'before');
 const classes = ['warrior', 'mage', 'assassin', 'priest', 'hunter'];
-// Usage: TORSO_ART_DIR=<dir> node tests/female-torso-art.cjs (default <repo>/test-results/female-torso). The dir must hold
+// Usage: TORSO_ART_DIR=<dir> node tests/tools/female-torso-art.cjs (default <repo>/test-results/female-torso). The dir must hold
 //   <dir>/assets/   the candidate female body/outfit files, made by: python3 scripts/export_character_torso.py <class> --out <dir>/assets
 //   <dir>/before/   the same files as they are in client/assets now, copied from client/assets (<class>_f_* for all five classes)
 // The exporter imports the Python rig make_warrior_sprites.py (VALHALLA_TOOLS or /media/raid/valhallasc-data/valhalla-tools).

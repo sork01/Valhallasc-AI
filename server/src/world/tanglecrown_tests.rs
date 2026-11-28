@@ -1,6 +1,6 @@
 //! The Tanglecrown (zone 22, levels 75-80) as an authored rain jungle on the shapes pilot: its data, the two rim gates, the temple door and the Ribbonwild seam, Banyan Landing,
 //! the Rainstep Camp and three outposts, the quests (holds, visits, brings, kills, the two elite quests) and the new elite with no quest.
-use super::wyrd_tests::{at, blocked, flood, join, lines, place, reached, world};
+use super::wyrd_tests::{approached, at, blocked, flood, join, lines, place, reached, world};
 use super::*;
 
 const JUNGLE: usize = 22;
@@ -279,7 +279,7 @@ fn everyone_and_everything_in_the_tanglecrown_can_be_walked_to_from_the_landing(
     let map = &w.maps[JUNGLE];
     let open = flood(map, &blocked(map, &[]), map.spawn);
     for n in &map.npcs {
-        assert!(reached(map, &open, at(n.x, n.y)), "{} is cut off", n.id);
+        assert!(approached(map, &open, n), "{} is cut off", n.id);
     }
     for p in &map.places {
         assert!(reached(map, &open, at(p.x, p.y)), "{} is cut off", p.id);

@@ -173,3 +173,5 @@ def append_icons():
             if item.get('art')==style:at[item['id']]=cell
     meta.update(rows=rows,at=at);picture.save(assets/'items.png',optimize=True);path.write_text(json.dumps(meta,indent=1)+'\n')
     (ROOT/'client/itemicons.js').write_text("'use strict';\nwindow.ITEM_ICONS = "+json.dumps(dict(size=size,cols=cols,rows=rows,at=at),separators=(',',':'))+';\n')
+    import blacksmithing_catalog  # cells moved: crafted pieces follow their templates
+    blacksmithing_catalog.alias_icons(json.loads((ROOT/'world/blacksmithing.txt').read_text()),ROOT)

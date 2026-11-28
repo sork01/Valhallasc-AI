@@ -2,7 +2,7 @@
 // Resolve objectives against the current authored world. No saved layout coordinates or translated ids.
 window.QuestGuidance = {
   create(areas, sources) {
-    const npcs = new Map(), places = new Map(), enemies = new Map(), pools = new Map();
+    const npcs = new Map(), places = new Map(), enemies = new Map(), waters = new Map(), pools = new Map();
     const point = (p, zone, extra = {}) => ({ x: p.x, y: p.y, zone, ...extra });
     const index = (map, key, value) => { if (!map.has(key)) map.set(key, []); map.get(key).push(value); };
     areas.forEach((area, zone) => {
@@ -12,6 +12,8 @@ window.QuestGuidance = {
         if (p.chain) index(places, `chain:${p.chain}`, point(p, zone, { place: p.id }));
       }
       for (const s of area.slimes || []) if (!s.ambush) index(enemies, s.kind, point(s, zone, { enemy: s.kind }));
+      // Where an angler stands to cast, not where the bobber lands.
+      for (const s of area.fishingSpots || []) index(waters, `${zone}:${s.habitat}`, point(s.shore, zone, { fishing: s.id }));
     });
     const arena = areas.flatMap((a, z) => (a.npcs || []).filter(n => n.offers?.some(o => o.id === 'gauntlet')).map(n => point(n, z, { npc: n.id })));
     function pool(q, o) {
@@ -28,7 +30,9 @@ window.QuestGuidance = {
           if (local.length || ['slime', 'any'].includes(o.target)) points = local;
         }
       } else if (o.kind === 'bring') {
-        points = sources[o.target] || [];
+        points = (sources[o.target] || []).flatMap(p => p.water ? waters.get(`${p.zone}:${p.water}`) || [] : [p]);
+        // A fish swims in many waters: guide to the quest's own province when it has them.
+        if (points.some(p => p.fishing)) { const local = points.filter(p => p.zone === q.zone); if (local.length) points = local; }
         // Secret key hunts retain their giver's hint, never the positions of hidden crosses.
         if (!points.length && /^(hour_shard_|ember_shard_|ember_key$)/.test(o.target)) points = npcs.get(q.npc) || [];
       } else if (['visit', 'hold', 'memory', 'echo', 'chime'].includes(o.kind)) {
@@ -54,7 +58,7 @@ window.QuestGuidance = {
           });
         }
         const buckets = new Map();
-        for (const p of points) index(buckets, `${p.zone}:${p.enemy || p.npc || p.place || ''}`, p);
+        for (const p of points) index(buckets, `${p.zone}:${p.enemy || p.npc || p.place || ''}`, p);   // one bucket for a zone's casting spots
         for (const candidates of buckets.values()) out.push({ objective: i, label: o.label, candidates });
       });
       return out;

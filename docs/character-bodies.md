@@ -18,7 +18,7 @@ only the exported parts' bounds. Other gear, bespoke progression/raid artwork,
 and editor IDs remain intact. Do not use a broad progression gear rebuild or
 overwrite its saved editor sprites for a body adjustment.
 
-Run `bash scripts/test-touch-bounded.sh tests/female-torso-art.cjs` after all
+Run `bash scripts/test-touch-bounded.sh tests/tools/female-torso-art.cjs` after all
 five candidates exist. The private HTTP fixture loads the real compositor,
 before/candidate bodies and original outfits. Matching poses, colors, scale,
 and clothing produce comparison rows in `test-results/female-torso`.

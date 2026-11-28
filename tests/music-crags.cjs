@@ -7,6 +7,7 @@ const { chromium } = require('./lib/playwright.cjs');
 const { Client } = require('@modelcontextprotocol/sdk/client/index.js');
 const { StdioClientTransport, getDefaultEnvironment } = require('@modelcontextprotocol/sdk/client/stdio.js');
 const root = path.resolve(__dirname, '..');
+const soundtrack = require('./lib/soundtrack.cjs');
 const client = new Client({ name: 'valhallasc-music', version: '1.0.0' });
 let browser, started = false, checks = 0;
 const check = (value, message) => { assert.ok(value, message); checks++; };
@@ -15,16 +16,16 @@ async function call(name, args = {}) {
   assert.ok(!result.isError, `${name}: ${JSON.stringify(result.content)}`); return result.structuredContent;
 }
 const SONGS = [
-  { id: 'title', make: 'createMusic', seconds: 84.71, name: 'Snowbound Hearth' },
-  { id: 'night', make: 'createNightMusic', seconds: 80, name: 'Lanterns After Sundown' },
-  { id: 'meadow', make: 'createFieldMusic', seconds: 79.565, name: 'Greenmeadow Wander' },
-  { id: 'crags', make: 'createCragMusic', seconds: 80.0, name: 'Ashfall Run' },
-  { id: 'rime', make: 'createRimeMusic', seconds: 99.661, name: 'Rimeveil Spiral' },
-  { id: 'fen', make: 'createFenMusic', seconds: 83.077, name: 'Gloamfen Lanternmere' },
-  { id: 'city', make: 'createCityMusic', seconds: 110.769, name: 'Skaldholm Square' },
-  { id: 'wyrd', make: 'createWyrdMusic', seconds: 90.0, name: 'Wyrdwood Wanderings' },
-  { id: 'sky', make: 'createSkyMusic', seconds: 109.16, name: 'Above the Storm' },
-  { id: 'deep', make: 'createDeepMusic', seconds: 121.59, name: 'Lullaby of the Deep' },
+  { id: 'title', make: 'createMusic', seconds: soundtrack('title'), name: 'Snowbound Hearth' },
+  { id: 'night', make: 'createNightMusic', seconds: soundtrack('night'), name: 'Lanterns After Sundown' },
+  { id: 'meadow', make: 'createFieldMusic', seconds: soundtrack('meadow'), name: 'Greenmeadow Wander' },
+  { id: 'crags', make: 'createCragMusic', seconds: soundtrack('crags'), name: 'Ashfall Run' },
+  { id: 'rime', make: 'createRimeMusic', seconds: soundtrack('rime'), name: 'Rimeveil Spiral' },
+  { id: 'fen', make: 'createFenMusic', seconds: soundtrack('fen'), name: 'Gloamfen Lanternmere' },
+  { id: 'city', make: 'createCityMusic', seconds: soundtrack('city'), name: 'Skaldholm Square' },
+  { id: 'wyrd', make: 'createWyrdMusic', seconds: soundtrack('wyrd'), name: 'Wyrdwood Wanderings' },
+  { id: 'sky', make: 'createSkyMusic', seconds: soundtrack('sky'), name: 'Above the Storm' },
+  { id: 'deep', make: 'createDeepMusic', seconds: soundtrack('deep'), name: 'Lullaby of the Deep' },
 ];
 (async () => {
   browser = await chromium.launch({ headless: true });
@@ -59,7 +60,10 @@ const SONGS = [
   check(true, 'On the title screen the title theme plays');
   await game.locator('#login-guest').click();
   await game.locator('#name').fill('Bard'); await game.locator('#go').click({ timeout: 60000 });
-  await game.waitForFunction(() => Online.connected && !!valhalla.fmusic?.running, null, { timeout: 60000 });
+  await game.waitForFunction(() => Online.connected, null, { timeout: 60000 });
+  // The world clock may read night, when the meadow's night score plays instead of the day one.
+  await game.evaluate(() => Online.send({ type: 'debug', command: { op: 'set_time', hour: 12, freeze: true } }));
+  await game.waitForFunction(() => !!valhalla.fmusic?.running, null, { timeout: 60000 });
   await game.evaluate(() => Online.send({ type: 'debug', command: { op: 'set_time', hour: 12, freeze: true } }));
   await game.waitForFunction(() => Math.abs(DayNight.hour - 12) < .01 && DayNight.nightMix === 0, null, { timeout: 10000 });
   check(await game.evaluate(() => !valhalla.cmusic.running && !valhalla.rmusic.running && !valhalla.gmusic.running && !valhalla.smusic.running && !valhalla.wmusic.running && !valhalla.music.running), 'In Greenmeadow only the meadow tune is running');

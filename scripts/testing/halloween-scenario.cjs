@@ -1,3 +1,4 @@
+const { humanGold } = require('./rewards.cjs');
 // Private protocol fixtures only: no grinding or encounter balance measurements.
 const map = JSON.parse(require('node:fs').readFileSync(require('node:path').join(__dirname, '../../world/map.txt'), 'utf8'));
 module.exports = kit => ({
@@ -36,7 +37,7 @@ module.exports = kit => ({
     const gold=w.player(bot).gold;
     await kit.talkTo(w,bot,'nacre_gardener',`quest:claim:${id}`);
     await w.waitFor(()=>q().claimed&&w.player(bot).seasonalClaims[id]===20261026);
-    check(w.player(bot).gold===gold+250,'A third-city host pays the shared reward');
+    check(w.player(bot).gold===gold+humanGold(250),'A third-city host pays the shared reward');
     await kit.teleport(w,bot,{npc:'asterion_singer'});
     await kit.talkTo(w,bot,'asterion_singer',`quest:accept:${id}`);
     await w.advance(300);

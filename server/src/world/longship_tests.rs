@@ -401,6 +401,7 @@ fn longship_anchorfall_warns_and_spares_players_outside_the_drawn_lane() {
     }
 }
 
+#[cfg(feature = "tools")]
 #[test]
 #[ignore = "focused combat calibration: hired five against the new packs and side guardians"]
 fn longship_hired_five_can_clear_the_packs_and_guardians() {

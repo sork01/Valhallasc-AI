@@ -11,7 +11,7 @@ run_dir="$(realpath "$(mktemp -d test-results/best-rotation-XXXXXX)")"
 if [[ -z "${DPS_TEST_BINARY:-}" ]]; then
   export CARGO_PROFILE_TEST_OPT_LEVEL=2 CARGO_PROFILE_TEST_DEBUG=0
   export CARGO_TARGET_DIR="${CARGO_TARGET_DIR:-target/ttk}"
-  built="$(bash scripts/cargo.sh test --offline --no-run --message-format=json | python3 -c '
+  built="$(bash scripts/cargo.sh test --offline --features valhalla-server/tools --no-run --message-format=json | python3 -c '
 import json, sys
 for line in sys.stdin:
     try:

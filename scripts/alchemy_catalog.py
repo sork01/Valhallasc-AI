@@ -182,6 +182,20 @@ def apply(catalog, world, items, veins):
     return dict(sorted(pools.items()))
 
 
+# The new counters' artwork: the town alchemist's player-style design, and a Nacre townsperson's for the merfolk counter.
+HUMAN_ART, MERFOLK_ART = 'alchemist', 'special_nacre_healer'
+
+
+def assign_art(manifest, world):
+    """Give every Alchemist this overlay adds a saved design (the older city alchemist keeps theirs)."""
+    added = {ident for ident, name, *_ in WORKSHOPS.values() if name}
+    for area in [world, *world['zones']]:
+        for npc in area['npcs']:
+            if npc['id'] in added:
+                art = MERFOLK_ART if npc['look'].get('species') == 'merfolk' else HUMAN_ART
+                manifest['npcs'][npc['id']] = dict(art=art, identity=dict(npc['look']), color=npc['color'])
+
+
 def publish(name, key, data):
     encoded = json.dumps(data, ensure_ascii=False, separators=(',', ':'))
     (ROOT / f'client/{name}.js').write_text(f"'use strict';\nwindow.{key} = {encoded};\n")
@@ -197,6 +211,10 @@ def main():
     pools = apply(catalog, world, items, read('mining-veins'))
     for name, data in [('map', world), ('items', items), ('flower-patches', pools)]:
         (ROOT / f'world/{name}.txt').write_text(json.dumps(data, indent=2, ensure_ascii=False) + '\n')
+    art_path = ROOT / 'client/assets/npc.txt'
+    art = json.loads(art_path.read_text())
+    assign_art(art, world)
+    art_path.write_text(json.dumps(art, indent=2, ensure_ascii=False) + '\n')
     sources = {zone: [p['flower'] for p in groups] for zone, groups in pools.items()}
     formula_zones = {area['final_boss']: zone for zone, area in enumerate([world, *world['zones']])
                      if area.get('final_boss')}

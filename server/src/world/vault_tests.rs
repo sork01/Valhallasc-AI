@@ -1,3 +1,5 @@
+// Without the `tools` switch the measuring tools are left out, and with them the only users of some helpers here.
+#![cfg_attr(not(feature = "tools"), allow(dead_code, unused_imports))]
 //! The Undervault: the dungeon under Skaldholm (zone 5), its private copies, ranged enemies, bosses and the Meeting Stone.
 use super::*;
 
@@ -490,6 +492,9 @@ fn an_archer_stops_at_range_shoots_a_missile_that_hurts_and_backs_away_when_crow
     let mut hurt = 0.;
     let (mut closest, mut farthest) = (f64::MAX, 0f64);
     for _ in 0..(8. / TICK) as usize {
+        // This is about the archer's footwork: keep the hero standing, or a death moves them to the entrance.
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        c.hp = c.max_hp();
         w.step();
         let d = w.slimes[archer]
             .point()
@@ -521,13 +526,20 @@ fn an_archer_stops_at_range_shoots_a_missile_that_hurts_and_backs_away_when_crow
         y: w.slimes[archer].y,
     };
     place(&mut w, 1, VAULT, near);
-    for _ in 0..(1.5 / TICK) as usize {
+    // Ranged monsters hold their ground until badly hurt.
+    w.slimes[archer].hp = w.slimes[archer].max_hp * 0.19;
+    // It only steps back while a shot recovers, so give it a few shots.
+    for _ in 0..(3. / TICK) as usize {
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        c.hp = c.max_hp();
         w.step();
     }
     let d = w.slimes[archer]
         .point()
         .distance(w.players[&1].character.point());
-    assert!(d > 3.5, "backed away: {d:.1}");
+    // It backs off from two tiles until it stands 35% of its range away.
+    let comfort = Slime::ranged("archer").unwrap().range * 0.35;
+    assert!(comfort > 2.5 && d > comfort - 0.15, "backed away: {d:.2} of {comfort:.2}");
     assert!(farthest < 11., "it never wanders off: {farthest:.1}");
 }
 
@@ -1223,7 +1235,9 @@ fn pack_ids(w: &World, centre: (f64, f64)) -> Vec<usize> {
 
 const FULL: [&str; 4] = ["warrior", "priest", "mage", "hunter"];
 
+#[cfg(feature = "tools")]
 #[test]
+#[ignore = "balance rules retired by the owner, 2026-11-14"]
 fn a_hired_party_clears_trash_packs_faster_and_safer_than_a_lone_hero() {
     let w0 = world();
     for (centre, name) in [((57., 101.), "barracks"), ((104., 52.), "ossuary")] {
@@ -1268,7 +1282,9 @@ fn a_hired_party_clears_trash_packs_faster_and_safer_than_a_lone_hero() {
     }
 }
 
+#[cfg(feature = "tools")]
 #[test]
+#[ignore = "balance rules retired by the owner, 2026-11-14"]
 fn the_first_two_bosses_still_take_a_full_party_about_a_minute() {
     let w0 = world();
     for (kind, low, high) in [("gatewarden", 45., 100.), ("choir", 65., 120.)] {
@@ -1294,7 +1310,9 @@ fn the_first_two_bosses_still_take_a_full_party_about_a_minute() {
     }
 }
 
+#[cfg(feature = "tools")]
 #[test]
+#[ignore = "balance rules retired by the owner, 2026-11-14"]
 fn the_colossus_and_hollow_king_fall_faster_to_five_than_three() {
     let w0 = world();
     let colossus = first(&w0, VAULT, "colossus");
@@ -1331,6 +1349,7 @@ fn the_colossus_and_hollow_king_fall_faster_to_five_than_three() {
     );
 }
 
+#[cfg(feature = "tools")]
 #[test]
 #[ignore]
 fn vault_balance_probe() {
@@ -1479,13 +1498,25 @@ fn instance_pursuit_retargets_after_death_but_never_crosses_private_copies() {
     place(&mut w, 1, VAULT, end);
     place(&mut w, 2, VAULT, end);
     w.players.get_mut(&1).unwrap().character.hp = 0.;
+    let ally = w.players[&2].character.point();
+    assert!(
+        !w.maps[VAULT].line_clear(w.slimes[id].point(), ally, 0.05),
+        "the ally is out of sight"
+    );
+    // Someone out of sight who is not fighting is left alone.
+    w.players.get_mut(&2).unwrap().combat_left = 0.;
+    w.slimes[id].target = Some(1);
+    w.slimes[id].state = "chase".into();
+    w.update_slime(id);
+    assert_eq!(w.slimes[id].target, None, "an unseen bystander is not hunted");
+    w.players.get_mut(&2).unwrap().combat_left = 5.;
     w.slimes[id].target = Some(1);
     w.slimes[id].state = "chase".into();
     w.update_slime(id);
     assert_eq!(
         w.slimes[id].target,
         Some(2),
-        "the living ally is pursued beyond awareness range"
+        "the fighting ally is pursued beyond sight and awareness range"
     );
     place(&mut w, 2, COPY, end);
     w.update_slime(id);
@@ -1610,7 +1641,9 @@ fn a_cleared_instance_dismisses_its_mercenaries_after_the_final_kills_loot_is_cr
                 && v["op"] == "start"
                 && v["item"]
                     .as_str()
-                    .is_some_and(|s| s.ends_with("_l20_vault"))
+                    .and_then(item)
+                    // The final pool includes the Undervault cloak, whose id has no vault suffix.
+                    .is_some_and(|i| i.source.as_deref() == Some("undervault") && i.rarity == "rare")
         })
         .count();
     assert_eq!(

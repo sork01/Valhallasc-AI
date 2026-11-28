@@ -1,6 +1,6 @@
 //! The Yearwheel (zone 28, levels 95-99) as an authored map on the shapes pilot, at its own scale (k = 2.8, grid 888): four season towns round the Equinox Crossing, three outposts, thirteen elites,
 //! the four sealed doors and the Black Hour Foundry's, a wall on the Lapis and Frostwake sides, and ONE crossing to Sunward Vale: a seamless vault.
-use super::wyrd_tests::{at, blocked, flood, join, lines, place, reached, world};
+use super::wyrd_tests::{approached, at, blocked, flood, join, lines, place, reached, world};
 use super::*;
 
 const YEAR: usize = 28;
@@ -580,7 +580,7 @@ fn everyone_and_everything_on_the_wheel_can_be_walked_to_from_the_vault() {
     let map = &w.maps[YEAR];
     let open = flood(map, &blocked(map, &[]), map.spawn);
     for n in &map.npcs {
-        assert!(reached(map, &open, at(n.x, n.y)), "{} is cut off", n.id);
+        assert!(approached(map, &open, n), "{} is cut off", n.id);
     }
     for p in &map.places {
         let r = p.r + 1.;

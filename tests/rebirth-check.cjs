@@ -96,7 +96,8 @@ const VARIANT = armor.id.replace('warrior_armor_', '');
       return { xp: p.xp - before.xp, gold: p.gold - before.gold, levelBefore: before.level, level: p.level };
     };
     const first = await claim('welcome');
-    assert.deepEqual([first.xp, first.gold], [3, 12], 'the level-50 hero gets 30% of a level-1 quest’s XP');
+    // The hero is Human: +5% quest gold, added to any rebirth bonus.
+    assert.deepEqual([first.xp, first.gold], [3, 13], 'the level-50 hero gets 30% of a level-1 quest’s XP');
 
     // A real hero has already stepped off the Greenmeadow dock (world/landing.rs grants the landing quests once, on
     // the first step off). Do the same here, so the rebirth below resets a character that has arrived.
@@ -117,7 +118,7 @@ const VARIANT = armor.id.replace('warrior_armor_', '');
 
     // 3. The same quest again pays its rewards again, with the XP bonus (level 1 has a 100 XP bar, 10 XP + 10% = 11).
     const again = await claim('welcome');
-    assert.deepEqual([again.xp, again.gold], [percentOf(10, 10), 12], 'a repeated quest pays again, boosted');
+    assert.deepEqual([again.xp, again.gold], [percentOf(10, 10), 13], 'a repeated quest pays again, boosted');
     // A real kill pays the XP bonus too. Greenmeadow kills pay half XP (world.rs kill_xp: a level-1 slime's 50 XP is 25),
     // and the party of two shares it at party level 1 (40% of 25 is 10 each); the reborn hero's 10 becomes 11, the
     // unreborn friend keeps 10.
@@ -142,7 +143,7 @@ const VARIANT = armor.id.replace('warrior_armor_', '');
     assert.equal(perk('drops'), 1);
     keeps('tier 3');
     const second = await claim('welcome');
-    assert.deepEqual([second.xp, second.gold], [percentOf(10, 20), percentOf(12, 10)], 'XP +20% and gold +10%');
+    assert.deepEqual([second.xp, second.gold], [percentOf(10, 20), percentOf(12, 15)], 'XP +20% and gold +10%');
 
     // 5. Drops on real elite kills. Control at x1, then after the first tier-5 rebirth at x2.
     const rimesaber = zones[YEAR].slimes.findIndex(s => s.kind === 'rimesaber');

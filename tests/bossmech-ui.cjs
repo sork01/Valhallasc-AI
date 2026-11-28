@@ -49,6 +49,7 @@ async function call(name, args = {}) {
   const debug = command => page.evaluate(command => { Online.send({ type: 'debug', ref: Math.floor(Math.random() * 1e9), command }); }, command).then(() => page.waitForTimeout(300));
   // New heroes start on the Saltby pier (a sanctuary, and walls block casts): move to open ground in zone 0 first.
   await debug({ op: 'teleport', zone: 0, x: 250, y: 235 });
+  await debug({ op: 'set_time', hour: 12, freeze: true });   // night shading shrinks the sampled tint
   await page.waitForFunction(() => Math.hypot(Field.hero.x - 250, Field.hero.y - 235) < 8, null, { timeout: 15000 });
   const hero = () => page.evaluate(() => ({ x: Field.hero.x, y: Field.hero.y }));
   const fights = () => page.evaluate(() => JSON.parse(JSON.stringify(BossMech.fights)));

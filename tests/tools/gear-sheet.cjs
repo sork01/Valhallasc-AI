@@ -1,9 +1,9 @@
 // Contact sheet through the real compositor: one class, chosen gear, chosen directions. Run through test-touch-bounded.sh.
 // Env: OUT=<png> LOOKS='[{"head":"warden"},{"cloak":"travel"}]' CLS=hunter GENDER=male CLIP=idle K=0 Z=2 DIRS='[0,1,2,3,4,5,6,7]'; NOHEAD=1 leaves hats unturned; BOX='[x,y,w,h]' picks the part of the frame shown (default the upper body).
 const fs=require('node:fs'),http=require('node:http'),path=require('node:path');
-if(!process.env.OUT||!process.env.LOOKS){console.error(`usage: OUT=<png> LOOKS='[{"head":"warden"}]' [CLS=hunter GENDER=male CLIP=idle K=0 Z=2 DIRS='[0,1,2,3,4,5,6,7]' NOHEAD=1 BOX='[x,y,w,h]'] node tests/gear-sheet.cjs\nA tool that writes a contact sheet; it has no assertions. Exits 2 without OUT and LOOKS; it is not a pass.`);process.exit(2);}
-const {chromium}=require('playwright');require('./lib/touch.cjs').requireMemoryLimit();
-const root=path.resolve(__dirname,'../client'),out=process.env.OUT;
+if(!process.env.OUT||!process.env.LOOKS){console.error(`usage: OUT=<png> LOOKS='[{"head":"warden"}]' [CLS=hunter GENDER=male CLIP=idle K=0 Z=2 DIRS='[0,1,2,3,4,5,6,7]' NOHEAD=1 BOX='[x,y,w,h]'] node tests/tools/gear-sheet.cjs\nA tool that writes a contact sheet; it has no assertions. Exits 2 without OUT and LOOKS; it is not a pass.`);process.exit(2);}
+const {chromium}=require('playwright');require('../lib/touch.cjs').requireMemoryLimit();
+const root=path.resolve(__dirname,'../../client'),out=process.env.OUT;
 const cls=process.env.CLS||'hunter',gender=process.env.GENDER||'male',looks=JSON.parse(process.env.LOOKS),clip=process.env.CLIP||'idle',K=+process.env.K||0,Z=+process.env.Z||2,DIRS=JSON.parse(process.env.DIRS||'[0,1,2,3,4,5,6,7]'),BOX=JSON.parse(process.env.BOX||'[45,5,70,75]');
 const server=http.createServer((req,res)=>{const name=new URL(req.url,'http://localhost').pathname;
  if(name==='/'){res.setHeader('Content-Type','text/html');return res.end('<!doctype html><canvas id="sheet"></canvas>'+['items','magesprite','warriorsprite','assassinsprite','priestsprite','huntersprite'].map(s=>`<script src="/${s}.js"></script>`).join(''));}

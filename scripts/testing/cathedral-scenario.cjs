@@ -6,6 +6,7 @@ const catalog = JSON.parse(fs.readFileSync(path.join(__dirname, '../../world/cat
 const items = JSON.parse(fs.readFileSync(path.join(__dirname, '../../world/items.txt'), 'utf8'));
 const bossKind = kind => catalog.find(e => e.kind === kind)?.boss;
 const levels = JSON.parse(fs.readFileSync(path.join(__dirname, '../../world/levels.txt'), 'utf8'));
+const { scaledXp } = require('./rewards.cjs');
 const totalXp = p => p.xp + levels.slice(0, p.level - 1).reduce((a,b)=>a+b,0);
 
 module.exports = {
@@ -61,13 +62,15 @@ module.exports = {
         await kit.teleport(w,mate,{zone,x:boss.x-4,y:boss.y+1});
         const earlier=new Set(w.events);
         const xpBefore=[totalXp(w.player(bot)),totalXp(w.player(mate))];
+        const heroLevels={[bot]:w.player(bot).level,[mate]:w.player(mate).level};
         const goldBefore=w.player(bot).gold+w.player(mate).gold;
         await w.debug(bot,{op:'kill_enemy',id:boss.id});
         await w.advance(550); // A fellowship level can change on this kill; allow its party packet to arrive.
         const xpPercent=w.bots.get(bot).social.party.xp.xpPercent;
-        const expectedXp=Math.max(1,Math.floor(((45+5*boss.level)*12*xpPercent+50)/100));
-        await w.waitFor(()=>[bot,mate].every((b,i)=>totalXp(w.player(b))-xpBefore[i]===expectedXp),3000,'Both party XP snapshots');
-        check([bot,mate].every((b,i)=>totalXp(w.player(b))-xpBefore[i]===expectedXp),`${boss.kind}: level-derived boss XP reaches both nearby party members`);
+        // Each recipient's level curve applies first, then the party share.
+        const expected=[bot,mate].map(b=>Math.max(1,Math.floor((scaledXp(w,(45+5*boss.level)*12,heroLevels[b],boss.level)*xpPercent+50)/100)));
+        await w.waitFor(()=>[bot,mate].every((b,i)=>totalXp(w.player(b))-xpBefore[i]===expected[i]),3000,'Both party XP snapshots');
+        check([bot,mate].every((b,i)=>totalXp(w.player(b))-xpBefore[i]===expected[i]),`${boss.kind}: level-derived boss XP reaches both nearby party members`);
         const count=boss.kind===z.final_boss?2:1;
         const rolls=await w.waitFor(()=>{
           const all=w.events.filter(e=>!earlier.has(e)&&e.bot===bot&&e.type==='roll'&&e.op==='start');return all.length>=count&&all;

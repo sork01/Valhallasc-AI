@@ -1,3 +1,4 @@
+const { humanGold } = require('./rewards.cjs');
 // Private protocol fixtures only: no grinding or encounter balance measurements.
 module.exports = kit => ({
   description: 'Valentine: shared city daily quest, five hired fighters, ritual summon, guaranteed unicorn reward, cross-city claim, persistence and event expiry.',
@@ -32,7 +33,7 @@ module.exports = kit => ({
     const gold=w.player(bot).gold;
     await kit.talkTo(w,bot,'nacre_gardener',`quest:claim:${id}`);
     await w.waitFor(()=>q().claimed&&w.player(bot).seasonalClaims[id]===20270210);
-    check(w.player(bot).gold===gold+300&&w.player(bot).mounts.includes('roseheart'),'A third-city host pays the shared reward and guaranteed unicorn');
+    check(w.player(bot).gold===gold+humanGold(300)&&w.player(bot).mounts.includes('roseheart'),'A third-city host pays the shared reward and guaranteed unicorn');
     await kit.teleport(w,bot,{npc:'asterion_singer'});
     await kit.talkTo(w,bot,'asterion_singer',`quest:accept:${id}`);
     await w.advance(300);

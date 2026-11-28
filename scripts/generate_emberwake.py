@@ -63,7 +63,7 @@ def build():
         'Chainmaw carries a broken link from the first chain. Bring companions and end its watch.' ,True),
         npc('smith','Orri Hearthmender','Keeper of the bellows',118,38,
         'Yrsa feeds air into the mountain. Silence the living bellows before the last chain cracks.',True),
-        npc('stone','The Emberwake Meeting Stone','Gather a party · hire fighters',127,29,
+        npc('stone','The Emberwake Meeting Stone','Gather your party',127,29,
         'Gather here before the Nine-Chain Door. The raid is sealed. This stone calls the usual outdoor company; the raid will allow ten fighters in total.',True),
         npc('seal','The Nine-Chain Door','Sealed entrance',133,24,
         'Nine Wardens hold nine chains. Beyond them waits Eldmarr, the Ember-Lord. The door is sealed.'),

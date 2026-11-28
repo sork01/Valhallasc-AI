@@ -35,3 +35,5 @@ The real-sprite browser test passed **18 checks**, including ten connected raid 
 Reproduce the measurement with `RAID_BOSSES=cf_sigrun RAID_BOSS_SEEDS=16 ELITE_POWER_FILE=world/elite-power.txt ENRAGE_FILE=test-results/sigrun/enrage-off.txt /media/raid/valhallasc-data/raid-bosses-target/debug/deps/valhalla_server-fadf8f897c2036af --ignored --nocapture raid_boss_measure_first_three`. The optional harness name predates this fourth Warden; its selector now includes Sigrun. Private browser binary: `/media/raid/valhallasc-data/raid-bosses-target/debug/valhalla-server`, built from the final source with `--profile test`.
 
 Source remains uncommitted in isolated `feat/raid-boss-4`. No merge, deployment, production DB change or service restart was performed.
+
+The measurement is a tool, not part of the test suite: build the binary above with `--features valhalla-server/tools` ([test-tools.md](test-tools.md)).

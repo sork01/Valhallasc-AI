@@ -1,3 +1,5 @@
+// Without the `tools` switch the measuring tools are left out, and with them the only users of some helpers here.
+#![cfg_attr(not(feature = "tools"), allow(dead_code, unused_imports))]
 //! Three Cathedral wings: collision, level gates, private copies, encounter rewards and complete clears.
 use super::wyrd_tests::{at, blocked, drain, flood, join, place, reached, world};
 use super::*;
@@ -545,6 +547,7 @@ fn fight(
     (w, result)
 }
 
+#[cfg(feature = "tools")]
 #[test]
 #[ignore = "manual encounter balance probe"]
 fn cathedral_balance_probe() {

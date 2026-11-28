@@ -85,7 +85,7 @@ Local review artifacts are in `test-results/shared-slime/`:
 - `baseline-game.png`, `firelord-game.png`: original/candidate Firelord beside the real hero.
 - `rendered-<kind>.png`: production compositor pose boards.
 
-`tests/shared-slime-art.cjs` runs through the bounded browser wrapper with real
+`tests/tools/shared-slime-art.cjs` runs through the bounded browser wrapper with real
 sprites, one 960×600 page and the existing main debug test binary. It summons the
 real Firelord through the keeper quest and cross, then exercises the production
 bank loaders, frame lookup, animation state machine, tint, compositor, click

@@ -178,24 +178,24 @@ async function call(name, args = {}) {
     await target(near.id);
   };
   // The adventurer walks, so it can leave the four-step range between standing and opening the menu: re-stand and retry.
-  let adventurerTradeWhy = 'none';
-  for (let attempt = 0; attempt < 4; attempt++) {
+  let adventurerTradeWhy = 'none', traded = false;
+  for (let attempt = 0; attempt < 8 && !traded; attempt++) {
     await stand();
+    await dismissTutorial(alice);
     await badge.click({ button: 'right' });
     adventurerTradeWhy = await entry('trade').locator('.pm-reason').count() ? (await entry('trade').locator('.pm-reason').textContent()).trim() : 'none';
-    if (!await tradeOff()) break;
-    await alice.keyboard.press('Escape');
+    // It may also step away before the request arrives, so an attempt counts only once the refusal comes back.
+    if (!await tradeOff()) traded = await entry('trade').click({ timeout: 1500 })
+      .then(() => alice.waitForFunction(() => ['chat-log', 'system-log'].some(id => document.getElementById(id).textContent.includes('declined your trade request')), null, { timeout: 4000 })).then(() => true, () => false);
+    if (!traded) await alice.keyboard.press('Escape');
   }
-  check(!await tradeOff(), `Trade is enabled for an adventurer like for a person (reason shown: ${adventurerTradeWhy})`);
-  await dismissTutorial(alice);
-  await entry('trade').click();
-  await alice.waitForFunction(() => document.getElementById('chat-log').textContent.includes('declined your trade request'), null, { timeout: 10000 });
+  check(traded, `Trade is enabled for an adventurer like for a person (reason shown: ${adventurerTradeWhy})`);
   check(await alice.locator('#trade-panel').isHidden() && await alice.evaluate(() => Trade.state === null), 'The adventurer declines the trade and no window opens');
   await stand();
   await badge.click({ button: 'right' });
   if (await entry('duel').getAttribute('aria-disabled') === 'false') {
     await entry('duel').click();
-    await alice.waitForFunction(() => document.getElementById('chat-log').textContent.includes('declined your duel'), null, { timeout: 10000 });
+    await alice.waitForFunction(() => ['chat-log', 'system-log'].some(id => document.getElementById(id).textContent.includes('declined your duel')), null, { timeout: 10000 });
     check(await alice.evaluate(() => !Pvp.state.duel && Pvp.state.requests.length === 0), 'The adventurer declines the duel and nothing is queued');
   } else await alice.keyboard.press('Escape');
 

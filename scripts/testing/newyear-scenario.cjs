@@ -1,3 +1,4 @@
+const { humanGold } = require('./rewards.cjs');
 // Private protocol fixtures only: no grinding or encounter balance measurements.
 module.exports = kit => ({
   description: 'New Year: shared city daily quest, five hired fighters, ritual summon, personal daily roll, cross-city claim, persistence and event expiry.',
@@ -32,7 +33,7 @@ module.exports = kit => ({
     const gold=w.player(bot).gold;
     await kit.talkTo(w,bot,'nacre_gardener',`quest:claim:${id}`);
     await w.waitFor(()=>q().claimed&&w.player(bot).seasonalClaims[id]===20261229);
-    check(w.player(bot).gold===gold+300,'A third-city host pays the shared reward');
+    check(w.player(bot).gold===gold+humanGold(300),'A third-city host pays the shared reward');
     await kit.teleport(w,bot,{npc:'asterion_singer'});
     await kit.talkTo(w,bot,'asterion_singer',`quest:accept:${id}`);
     await w.advance(300);

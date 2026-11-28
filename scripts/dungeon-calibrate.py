@@ -24,7 +24,7 @@ TESTS = {
 
 
 def test_binary():
-    out = subprocess.run(["bash", "scripts/cargo.sh", "test", "--no-run", "--message-format=json"],
+    out = subprocess.run(["bash", "scripts/cargo.sh", "test", "--features", "valhalla-server/tools", "--no-run", "--message-format=json"],
                          cwd=ROOT, capture_output=True, text=True).stdout
     path = None
     for line in out.splitlines():

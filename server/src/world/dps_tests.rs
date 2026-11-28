@@ -1,3 +1,5 @@
+// Without the `tools` switch the measuring tools are left out, and with them the only users of some helpers here.
+#![cfg_attr(not(feature = "tools"), allow(dead_code, unused_imports))]
 //! Damage-per-second harness (`DPS-HARNESS`; the rules are in TODO.md and the method at the top of `docs/dps-report.md`).
 //!
 //! One run is a class at a level in the normal gear for that level, playing the mercenaries' rotation (`auto_play`)
@@ -395,26 +397,31 @@ fn report(class: Class) {
     println!("{text}");
 }
 
+#[cfg(feature = "tools")]
 #[test]
 #[ignore = "full grid; run with scripts/dps-parallel.sh"]
 fn dps_warrior() {
     report(Class::Warrior);
 }
+#[cfg(feature = "tools")]
 #[test]
 #[ignore = "full grid; run with scripts/dps-parallel.sh"]
 fn dps_mage() {
     report(Class::Mage);
 }
+#[cfg(feature = "tools")]
 #[test]
 #[ignore = "full grid; run with scripts/dps-parallel.sh"]
 fn dps_assassin() {
     report(Class::Assassin);
 }
+#[cfg(feature = "tools")]
 #[test]
 #[ignore = "full grid; run with scripts/dps-parallel.sh"]
 fn dps_priest() {
     report(Class::Priest);
 }
+#[cfg(feature = "tools")]
 #[test]
 #[ignore = "full grid; run with scripts/dps-parallel.sh"]
 fn dps_hunter() {

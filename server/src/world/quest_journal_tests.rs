@@ -283,6 +283,8 @@ fn quest_journal_all_28_handoffs_are_immediate_level_independent_and_rewardless(
         c.inventory.clear();
         c.quests.clear();
         c.abandoned_quests.clear();
+        super::wyrd_tests::set_aside_travel_quests(&mut w, 1);
+        let c = &mut w.players.get_mut(&1).unwrap().character;
         if let Some(prev) = &q.requires {
             c.quests.push(QuestProgress {
                 id: prev.clone(),

@@ -26,7 +26,10 @@ const debug = (page, command) => page.evaluate(c => Online.send({ type: 'debug',
   await page.addInitScript(() => localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: true, musicVol: .8 })));
   await page.goto(world.url); await page.locator('#start').click(); await page.locator('#login-guest').click();
   await page.locator('#name').fill('QuietGlass'); await page.locator('#go').click({ timeout: 60000 });
-  await page.waitForFunction(() => Online.connected && Field.zone === 0 && !!valhalla.fmusic?.running, null, { timeout: 60000 });
+  await page.waitForFunction(() => Online.connected && Field.zone === 0, null, { timeout: 60000 });
+  // The world clock may read night, when the meadow's night score plays instead of the day one.
+  await page.evaluate(() => Online.send({ type: 'debug', command: { op: 'set_time', hour: 12, freeze: true } }));
+  await page.waitForFunction(() => !!valhalla.fmusic?.running, null, { timeout: 60000 });
 
   for (const song of [
     { zone: 13, x: 64, y: 116, key: 'astralNightMusic', day: 'amusic', seconds: 117.073 },

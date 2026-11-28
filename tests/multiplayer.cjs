@@ -126,6 +126,8 @@ async function stageAt(page, point) {
   check(STUB || await warrior.evaluate(() => {const src=Field.beetleSprites;return src.img.beetle.complete && src.img.beetle.naturalWidth===576 && src.img.beetle.naturalHeight===320 && Object.keys(src.meta.clips).length===5;}), 'PixelFlow beetle atlas and all five clips load in browser');
   await warrior.waitForFunction(() => Field.remotePlayers.length === 2 && Field.remotePlayers.every(p => p.sprite), null, { timeout: 60000 });
   check(await warrior.evaluate(() => Field.hero.maxHp===120 && Field.remotePlayers.some(p=>p.look.class==='mage'&&p.maxHp===80) && Field.remotePlayers.some(p=>p.look.class==='assassin'&&p.maxHp===90)), 'Three classes see each other');
+  // The overlay also covers the load of newly seen artwork.
+  await warrior.locator('#connection-overlay').waitFor({ state: 'hidden', timeout: 60000 });
   check(await warrior.locator('#connection-overlay').isHidden(), 'Connected overlay is visibly hidden');
   check(await warrior.locator('#chat').isVisible(), 'Chat is visible');
   const warriorId=await warrior.evaluate(()=>Online.id);

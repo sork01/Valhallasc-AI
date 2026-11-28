@@ -84,13 +84,13 @@ async function enter(browser, world, { lang = 'en', touch = false, name = 'TabTe
       row.querySelector('span').textContent, row.querySelector('b').textContent, row.querySelector('progress').max, row.querySelector('progress').position,
     ]));
     check(JSON.stringify(values) === JSON.stringify([
-      ['Fishing', '1 / 300', 300, 1/300], ['Blacksmithing and Mining', '0 / 300', 300, 0],
-      ['Enchanting', '0 / 300', 300, 0], ['Alchemy', '0 / 600', 600, 0],
+      ['Fishing', '1 / 600', 600, 1/600], ['Blacksmithing and Mining', '0 / 600', 600, 0],
+      ['Enchanting', '0 / 600', 600, 0], ['Alchemy', '0 / 600', 600, 0],
     ]), 'all four fresh skills show the correct caps');
     await page.evaluate(() => Online.send({ type: 'blacksmithing', request: { op: 'train', npc: 'smith' } }));
     await page.waitForFunction(() => Field.hero.professions?.blacksmithing?.skill === 1);
     const mining = page.locator('#profession-skills [data-profession="blacksmithing"]');
-    check(await mining.locator('b').textContent() === '1 / 300' && await mining.locator('progress').evaluate(node => node.value === 1),
+    check(await mining.locator('b').textContent() === '1 / 600' && await mining.locator('progress').evaluate(node => node.value === 1),
       'learning Blacksmithing updates the open tab from the next snapshot');
     await page.keyboard.press('End');
     check(await page.evaluate(() => document.activeElement.id === 'character-tab-rebirth' && !document.getElementById('character-rebirth').hidden), 'End moves to Rebirth');

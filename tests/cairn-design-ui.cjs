@@ -31,7 +31,7 @@ const GROUND = ['The Frostwake Rim', 'The Walking Toe'], lums = {};
   check(Z.portals.some(p => p.to === 26 && p.seam && !p.walk), 'the Frostwake Shelf crossing is a seam (it was a rim gate until 2026-11-09)');
   check(Z.portals.some(p => p.id === 'cairn_thunderheart_gate' && p.to === 35), 'the Thunderheart Gate door leads to its dungeon');
   for (const p of Z.portals) check(onFloor(Z, p.x, p.y) || p.seam, `${p.id} stands on the floor`);
-  check(Z.regions.names.length === 14 && Z.camps.length === 3 && Z.quests.length === 29, 'fourteen regions, four hubs and 29 quests');
+  check(Z.regions.names.length === 14 && Z.camps.length === 3 && Z.quests.filter(q => !q.id.startsWith('fisher_')).length === 29, 'fourteen regions, four hubs and 29 quests (Fisher quests aside)');
   server = spawn(process.env.VALHALLA_BINARY, [], { cwd: root, stdio: 'ignore',
     env: { ...process.env, VALHALLA_BIND: `127.0.0.1:${port}`, VALHALLA_DB: path.join(tmp, 'v.sqlite'), VALHALLA_CLIENT_DIR: path.join(root, 'client'), VALHALLA_TEST_COMMANDS: '1', VALHALLA_GOD_MODE: '1', VALHALLA_START_LEVEL: process.env.START_LEVEL || '99', VALHALLA_LEVEL_SPREAD: '0' } });
   for (let i = 0; i < 100; i++) { try { if ((await fetch(`http://127.0.0.1:${port}/health`)).ok) break; } catch (_) {} await new Promise(r => setTimeout(r, 200)); }

@@ -74,6 +74,10 @@ fn elite_kills(tiers: [u32; 5], kills: usize) -> Tally {
                     assert!(item(i).is_some());
                     t.orange += 1;
                 }
+                // Blueprints, recipes and formulas have their own drop rules and are not gear.
+                Some(i) if item(i).is_some_and(|i| {
+                    matches!(i.source.as_deref(), Some("blacksmithing" | "enchanting" | "alchemy"))
+                }) => {}
                 Some(_) => {
                     let at = RARITIES.iter().position(|r| *r == rarity_of(d)).unwrap();
                     t.gear[at] += 1;

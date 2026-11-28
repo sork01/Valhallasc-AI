@@ -4,7 +4,6 @@ import copy
 import json
 import os
 from pathlib import Path
-import subprocess
 import sys
 import unittest
 ROOT=Path(__file__).resolve().parents[1]
@@ -15,12 +14,20 @@ if os.environ.get('MUTATE')=='quest':
 
 class Seahorse(unittest.TestCase):
     def test_overlay_is_exact_stable_and_preserves_every_other_zone_and_quest(self):
-        base=json.loads(subprocess.check_output(['git','show','054e7619:world/map.txt'],cwd=ROOT))
         actual=json.loads((ROOT/'world/map.txt').read_text())
+        def split(world):
+            rest=copy.deepcopy(world);own=[]
+            for index,area in enumerate([rest,*rest['zones']]):
+                own+=[(index,q) for q in area['quests'] if q['id']==source.QUEST]
+                area['quests']=[q for q in area['quests'] if q['id']!=source.QUEST]
+            return rest,own
+        base,released=split(actual)
         candidate=copy.deepcopy(base);source.install(candidate)
-        self.assertTrue(candidate==actual,'only the seahorse quest may change the released world')
+        rest,installed=split(candidate)
+        self.assertTrue(rest==base,'the overlay may change only the seahorse quest')
+        self.assertTrue(installed==released,'the released quest is exactly what the overlay installs')
         again=copy.deepcopy(candidate);source.install(again);self.assertTrue(again==candidate,'second overlay is stable')
-        self.assertTrue(json.dumps(candidate,ensure_ascii=False,indent=2)+'\n'==(ROOT/'world/map.txt').read_text(),'canonical map bytes')
+        self.assertTrue(json.dumps(actual,ensure_ascii=False,indent=2)+'\n'==(ROOT/'world/map.txt').read_text(),'canonical map bytes')
         areas=[actual,*actual['zones']]
         quests=[(i,q) for i,a in enumerate(areas) for q in a['quests'] if q.get('rewardMount')=='seahorse']
         self.assertEqual(len(quests),1);zone,q=quests[0]

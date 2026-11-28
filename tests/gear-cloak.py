@@ -12,16 +12,18 @@ ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'scripts'))
 import cloak_catalog as cloak
 import gear_levels as gear
 import vendor_weapons
+import blacksmithing_catalog
 import orange_rules
 
 class Cloaks(unittest.TestCase):
     def setUp(self):
         self.items=json.loads((ROOT/'world/items.txt').read_text())
         # The catalogue of 100: the plain ladder plus one per dungeon. Variants (_b/_c, GEAR-VARIETY-3X) and the pieces other
-        # generators own (Chainforged, Hierloom) are checked separately.
+        # generators own (Chainforged, Hierloom, Blacksmithing) are checked separately.
         self.all_cloaks=[i for i in self.items if i['kind']=='cloak']
         self.variants=[i for i in self.all_cloaks if i['id'].endswith(('_b','_c'))]
-        self.cloaks=[i for i in self.all_cloaks if not i['id'].endswith(('_b','_c')) and i.get('source') not in ('chained_forge','raid_hierlooms')]
+        self.cloaks=[i for i in self.all_cloaks if not i['id'].endswith(('_b','_c')) and i.get('source') not in ('chained_forge','raid_hierlooms','blacksmithing')]
+        self.crafted=[i for i in self.all_cloaks if i.get('source')=='blacksmithing']
     def test_catalogue_and_stamina_budget(self):
         self.assertEqual(len(self.cloaks),100)
         self.assertTrue(all(not i.get('class') and not i.get('starter') and i['attack']==i['defense']==0 for i in self.cloaks))
@@ -47,9 +49,14 @@ class Cloaks(unittest.TestCase):
             signature=(item['art'],t['hue'],t['saturate'],t['brightness'])
             self.assertNotIn(signature,colours,item['id']);colours.add(signature)
 
+    def crafting(self,items):
+        """The Blacksmithing overlay, which sync-world runs after the cloak pass and which owns the crafted cloaks."""
+        world=json.loads((ROOT/'world/map.txt').read_text())
+        blacksmithing_catalog.apply(json.loads((ROOT/'world/blacksmithing.txt').read_text()),world,items)
+        return items
     def test_generation_is_stable_and_preserves_other_gear(self):
-        regenerated=cloak.apply(copy.deepcopy(self.items));self.assertEqual(regenerated,self.items)
-        self.assertEqual(cloak.apply(copy.deepcopy(regenerated)),regenerated)
+        regenerated=self.crafting(cloak.apply(copy.deepcopy(self.items)));self.assertEqual(regenerated,self.items)
+        self.assertEqual(self.crafting(cloak.apply(copy.deepcopy(regenerated))),regenerated)
         old=[i for i in self.items if i['kind']!='cloak'];new=[i for i in regenerated if i['kind']!='cloak'];self.assertEqual(old,new)
         rules=orange_rules.build();self.assertEqual(len(rules['pieces']),60)
         self.assertEqual(rules,json.loads((ROOT/'world/orange_rules.txt').read_text()))
@@ -64,7 +71,7 @@ class Cloaks(unittest.TestCase):
                 def generate():
                     with contextlib.redirect_stdout(io.StringIO()):gear.main()
                     # sync-world runs the vendor-weapon overlay right after the generator; gear_levels.py alone drops it.
-                    items=json.loads(path.read_text());vendor_weapons.apply(items,copy.deepcopy(world))
+                    items=json.loads(path.read_text());vendor_weapons.apply(items,copy.deepcopy(world));self.crafting(items)
                     path.write_text(json.dumps(items,indent=2,ensure_ascii=False)+'\n')
                 generate();self.assertEqual(path.read_bytes(),before)
                 generate();self.assertEqual(path.read_bytes(),before)
@@ -78,7 +85,12 @@ class Cloaks(unittest.TestCase):
                 for npc in area.get('npcs',[]):
                     if 'offers' in npc:npc['offers']=sorted(npc['offers'],key=lambda o:o['id'])
             return w
-        self.assertEqual(ordered(cloak.apply_world(copy.deepcopy(world),self.items)),ordered(world))
+        # Fishers are added after the cloak pass, so replaying it must not meet them (and they sell no cloaks).
+        earlier=copy.deepcopy(world)
+        for area in [earlier,*earlier['zones']]:
+            self.assertFalse([o for n in area['npcs'] if n['id'].startswith('fisher_') for o in n['offers'] if o['id'].startswith('buy_cloak_')])
+            area['npcs']=[n for n in area['npcs'] if not n['id'].startswith('fisher_')]
+        self.assertEqual(ordered(cloak.apply_world(copy.deepcopy(earlier),self.items)),ordered(earlier))
         vendors=0;quests=0
         for area in [world,*world['zones']]:
             for npc in area.get('npcs',[]):
@@ -121,7 +133,8 @@ class Cloaks(unittest.TestCase):
                     actual=sprite_bounds.part_bounds(assets/meta['parts'][part]['png'],meta)
                     self.assertEqual(base64.b64decode(bounds['parts'][part]),actual)
         self.assertEqual(len(ids),255);self.assertEqual(len(set(ids)),255)
-        for item in self.cloaks+self.variants:self.assertIn(item['id'],icons)
+        self.assertTrue(self.crafted)
+        for item in self.cloaks+self.variants+self.crafted:self.assertIn(item['id'],icons)
 
     def test_handwritten_swedish_for_every_cloak(self):
         sv=json.loads((ROOT/'scripts/sv-translations.txt').read_text())

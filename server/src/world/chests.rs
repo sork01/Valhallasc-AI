@@ -1138,8 +1138,9 @@ mod tests {
         assert!(!w.chest_area(copy), "not active yet");
         w.enter_instance(copy);
         assert!(w.chest_area(copy));
+        // One attempt samples a handful of random tiles and may find none.
         assert!(
-            w.spawn_chest(copy),
+            (0..200).any(|_| w.spawn_chest(copy)),
             "a tile fits inside the Undervault rooms"
         );
         let chest = w.chests.list[0].clone();

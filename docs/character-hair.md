@@ -33,7 +33,7 @@ bounds unchanged. Use CPU/memory limits on this shared host.
 Focused verification before installation:
 
 ```sh
-HAIR_CANDIDATES=1 bash scripts/test-touch-bounded.sh tests/character-hair-art.cjs
+HAIR_CANDIDATES=1 bash scripts/test-touch-bounded.sh tests/tools/character-hair-art.cjs
 ```
 
 It compares canonical crown

@@ -27,3 +27,5 @@ Checks: `cargo test aggro_level` (formula and the in-world lock-on at both radii
 ## Obstacles and combat
 
 Fresh awareness requires a clear line through the same solid obstacles as movement. Existing pursuit can continue around a corner, but a monster behind cover cannot renew the hero's five-second combat timer or begin an attack through the wall. This includes Ran's Deep and its labyrinth walls, letting blocked aggro expire so gathering can resume.
+
+Inside a dungeon or raid copy, a monster that is mid-fight and loses its target (death, leaving, hiding) turns on the nearest living fighter who is still in combat, whether or not it can see them. Fighters out of combat still need to be in sight. Open-world monsters are unchanged.

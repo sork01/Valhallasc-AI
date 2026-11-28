@@ -355,7 +355,7 @@ npm test
 
 The optional full browser regression suite (`npm run test:browser:full`) starts its own isolated Rust server/database and uses three independent browser clients. It covers character creation, visible remote players, movement replication, player pass-through, enemy spacing in server snapshots and rendered combat, equipment, safe chat, invalid commands/keys, duplicate sessions, slime and Ironhide combat, shared kills, XP pacing, loot, page reload, server restart/reconnect, and switching between saved characters, walking through the city gate, NPC dialogue, sanctuary healing, armorer fitting, and shop affordability. Screenshots and disposable databases are written under gitignored `test-results/`. The existing sibling Playwright installation was used for testing in this workspace via `NODE_PATH`; no runtime dependency on the sibling project is required.
 
-`node tests/public-smoke.cjs` verifies the actual public HTTPS/WSS deployment with two browser clients. It also checks canonical redirects, private-file protection, chat, movement replication, and saved-character reload. It records only the test character IDs in `test-results/public-smoke-results.json`; remove those specific test characters from SQLite after both clients disconnect.
+`node tests/tools/public-smoke.cjs` verifies the actual public HTTPS/WSS deployment with two browser clients. It also checks canonical redirects, private-file protection, chat, movement replication, and saved-character reload. It records only the test character IDs in `test-results/public-smoke-results.json`; remove those specific test characters from SQLite after both clients disconnect.
 
 ## Current scope
 

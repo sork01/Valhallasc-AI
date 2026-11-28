@@ -99,6 +99,7 @@ async function openHero(context, world, { lang = 'en', name = 'MenuHero' } = {})
       await page.keyboard.press('Escape');
       await page.locator('#p-settings').click();
       check(await page.locator('#dps-toggle').isChecked(), tag('DPS meter starts on'));
+      await page.locator('#set-tab-interface').click();
       await page.locator('#dps-toggle').uncheck();
       check(await page.evaluate(() => Prefs.dpsMeter === false), tag('unchecking turns the meter off'));
       await page.locator('#dps-toggle').check();

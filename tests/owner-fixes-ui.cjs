@@ -37,7 +37,7 @@ async function player(touch = false) {
     localStorage.setItem('valhallasc.save.v1', JSON.stringify({lang:touch?'sv':'en', sound:false, dpsMeter:false, uiSet:true,ui:{},panelSizeSet:true,panelSize:{}}));
     localStorage.setItem('valhallasc.whats-new.v1', version);
   }, { touch, version: fs.readFileSync(path.join(candidate || 'client', 'index.html'),'utf8').match(/class="version">([^<]+)/)[1] });
-  await page.goto(world.url); await page.locator('#start').click(); await page.locator('#login-guest').click();
+  await require('./lib/travel-quests.cjs')(page);await page.goto(world.url); await page.locator('#start').click(); await page.locator('#login-guest').click();
   await page.locator('#cls-warrior').click(); await page.locator('#name').fill(touch ? 'FixTouch' : 'FixDesktop'); await page.locator('#go').click({timeout:60000});
   await wait(page, () => Online.connected && Field.hero?.hp > 0);
   if (await page.locator('#low-gfx-dismiss').isVisible()) await page.locator('#low-gfx-dismiss').click();
@@ -163,7 +163,8 @@ async function portalTest(page, touch) {
   check(await page.locator('[data-action="discard-leftovers"][data-item="qi_city_gel"]').count()===0,'Confirmed discard removes the leftover stack');
   await page.evaluate(()=>City.close());
   // A real dropped bag remains at a fixed world position while the hero walks.
-  for(let n=0;n<4;n++) await debug(page,{op:'give_item',item:'linen_satchel',quantity:1});
+  // Loose bags are ordinary stacks (docs/bag-tiers.md): one is refused only with no free cell and no matching stack.
+  for(const id of await page.evaluate(()=>WORLD_ITEMS.filter(i=>i.kind==='material'&&!i.id.startsWith('qi_')).slice(0,16).map(i=>i.id))) await debug(page,{op:'give_item',item:id,quantity:1,force:true});
   await debug(page,{op:'teleport',zone:0,x:250,y:235});   // open ground (the old (15,15) is void in the shaped world)
   await debug(page,{op:'drop_item',item:'linen_satchel',quantity:1});
   await wait(page,()=>Field._debug.drops.some(d=>d.item==='linen_satchel' && d.t>.6));

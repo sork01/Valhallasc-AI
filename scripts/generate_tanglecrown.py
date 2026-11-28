@@ -27,7 +27,7 @@ def people():
  npc('trader','Koro Flint','Landing provisions',17,100,'I buy field finds and keep the boardwalk supplied.',[dict(id='stew',label="Buy Traveler's Stew",cost=12,item='traveler_stew',tiered=True),dict(id='satchel',label='Buy Linen Satchel',cost=500,bag='linen_satchel')],True),
  npc('tracker','Mara Vines','Canopy tracker',42,96,'The jaguar circles the high terrace. Listen for silence before it springs.',mercenary_offers.offers()),
  npc('scholar','Oru Slate','Temple scholar',103,39,'The Rain Crown is silent. Record its guardians before anyone opens the temple.'),
- npc('stone','Banyan Meeting Stone','Gather a party · hire fighters',92,48,'Gather companions for the jungle elites. The temple itself remains sealed.',mercenary_offers.offers(open_=True)),
+ npc('stone','Banyan Meeting Stone','Gather your party',92,48,'Gather companions for the jungle elites. The temple itself remains sealed.',mercenary_offers.offers(open_=True)),
  ]
  folk[0]['art']='tangle_warden';folk[5]['art']='tangle_scholar';folk[-1]['art']='stone'
  quests=[

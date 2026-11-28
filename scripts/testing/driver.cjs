@@ -245,6 +245,7 @@ class TestWorld extends EventEmitter {
       }
       this.snapshotsChecked++;
       this.spacingFailure ||= spacingViolation(snapshot);
+      if (this.clearTravelQuests) this.setAsideTravelQuests(bot);
     } else {
       // The latest friends/party state per bot. Party health arrives twice a second, so it never enters the event log.
       const identity = this.bots.get(bot);
@@ -282,6 +283,7 @@ class TestWorld extends EventEmitter {
       let packet;
       try { packet = JSON.parse(data.toString()); } catch { player.connectionError = 'Invalid server packet.'; ws.close(); return; }
       if (packet.type === 'welcome') {
+        this.xpCurve = packet.xpCurve || this.xpCurve;
         player.token = packet.token || player.token;
         player.id = packet.id;
         welcomed = true;
@@ -302,6 +304,17 @@ class TestWorld extends EventEmitter {
     player.heartbeat.unref();
     ws.once('close', () => clearInterval(player.heartbeat));
     return { bot, id: player.id, class: player.class, player: this.player(bot) };
+  }
+  // A high-level hero leaving the dock is handed every automatic "Onward to ..." quest, which fills the 20 slot journal.
+  // Scenarios that need room abandon each one as it arrives (the normal journal action), queued ahead of their next action.
+  setAsideTravelQuests(bot) {
+    const identity = this.bots.get(bot);
+    if (identity?.socket?.readyState !== WebSocket.OPEN) return;
+    for (const quest of this.player(bot)?.quests || []) {
+      if (quest.claimed || !quest.id.endsWith('_onward') || identity.setAside?.has(quest.id)) continue;
+      (identity.setAside ||= new Set()).add(quest.id);
+      this.action(bot, { type: 'quest_abandon', id: quest.id }).catch(() => {});
+    }
   }
   player(bot) {
     const identity = this.bots.get(bot);

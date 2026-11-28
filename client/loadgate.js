@@ -84,7 +84,7 @@ window.LoadingTips = {
     'Every piece of gear takes a cell of its own in your bags, even identical ones.',
     'In a party, green and better gear is rolled for with Need, Greed or Pass.',
     'Elite enemies drop better gear. Bring a party or hire mercenaries.',
-    'Hire mercenaries at a Meeting Stone. They always match your level.',
+    'Elite quest givers and dungeon Repair Smiths can hire mercenaries. They always match your level.',
     'Open the world map to see the regions of Veyrheim and the roads between them.',
     'Quest items drop only while you are on the quest and still need them.',
     'Money is counted in copper, silver and gold: 100 copper make 1 silver, and 100 silver make 1 gold.',

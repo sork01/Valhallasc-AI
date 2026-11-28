@@ -91,7 +91,7 @@ def people():
         person('stonewarden', 'Voss the Unmoored', 'Meeting Stone warden', 116, 94, '#9ec8dd',
                'The Stone gathers the lost. The Moonwell below it scatters the unready. Bring five if you want the bell to sound for your return.',
                look('#ae806d','#fcf6e3','long','helm','#6a91a8',beard='#ece0ce')),
-        person('stone', 'The Asterion Meeting Stone', 'Gather a party · hire fighters', 120.5, 88.0, '#9ec8dd',
+        person('stone', 'The Asterion Meeting Stone', 'Gather your party', 120.5, 88.0, '#9ec8dd',
                'The runes call companions to this court. The stair beside the stone opens a private Moonwell for each party.',
                offers=mercenary_offers.offers(open_=True)),
         person('singer', 'Vela Glassvoice', 'City chorus', 92, 107, '#f0c690',

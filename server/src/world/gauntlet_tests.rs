@@ -1,3 +1,5 @@
+// Without the `tools` switch the measuring tools are left out, and with them the only users of some helpers here.
+#![cfg_attr(not(feature = "tools"), allow(dead_code, unused_imports))]
 //! Arena gauntlet quests (`docs/arena-quests.md`): the quest data, a whole run of five fights and its reward, the ways a
 //! run ends without one, and that an opponent is nobody's player but the hero's foe.
 use super::gauntlet::{FIGHTS, opponent_character};
@@ -597,10 +599,12 @@ fn measure(class: Class, level: u32) -> String {
     }
     format!("RATE level {level} {class:?}: runs {passed}/{seeds}, fights {won_fights}/{fights}")
 }
+#[cfg(feature = "tools")]
 macro_rules! rates {
     ($($name:ident: $level:expr),*) => {$(
+        #[cfg(feature = "tools")]
         #[test]
-        #[ignore]
+        #[ignore = "win rates to read; build with --features tools"]
         fn $name() {
             for class in [Class::Warrior, Class::Mage, Class::Assassin, Class::Priest, Class::Hunter] {
                 println!("{}", measure(class, $level));
@@ -608,4 +612,5 @@ macro_rules! rates {
         }
     )*};
 }
+#[cfg(feature = "tools")]
 rates!(rates_20: 20, rates_30: 30, rates_40: 40, rates_50: 50, rates_60: 60, rates_70: 70, rates_80: 80, rates_90: 90, rates_99: 99);

@@ -25,7 +25,7 @@ const check = (condition, message) => { assert.ok(condition, message); checks++;
   await page.waitForFunction(() => Online.connected && Field.remotePlayers.length >= 3 && Field.remotePlayers.every(p => p.sprite), null, { timeout: 60000 });
   const first = await page.evaluate(() => Field.remotePlayers.map(p => ({ id: p.id, name: p.look.name, class: p.look.class, level: p.level, x: p.x, y: p.y, sprite: !!p.sprite })));
   check(first.length >= 3 && first.length <= 6, 'An occupied shared zone has three to six adventurers');
-  check(first.every(p => names.has(p.name) && p.level >= 1 && p.level <= 5 && p.sprite), 'Names, map levels and class sprites are present');
+  check(first.every(p => names.has(p.name) && p.level >= 1 && p.level <= 25 /* Fisher quests widen Greenmeadow (owner accepted 2026-11-27) */ && p.sprite), 'Names, map levels and class sprites are present');
   check(new Set(first.map(p => p.name)).size === first.length, 'Names do not repeat within the zone');
   check(first.every(p => p.x < 24 || p.x > 48 || p.y < 72 || p.y > 94), 'Field arrivals do not appear inside the Alderhaven quest hub');
   // The zone fills toward its target one adventurer every 0.5 s (world/ambient.rs), and the client learns of each one a snapshot

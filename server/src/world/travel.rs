@@ -498,49 +498,55 @@ mod spark_tests {
     #[test]
     fn spark_routes_are_the_fastest_flights_between_every_pair_of_stations() {
         let (w, _, _) = world(Class::Warrior);
-        let stations = w.spark_stations();
-        let n = stations.len();
-        assert!(n >= 94, "{n} stations");
-        // A second opinion, worked out another way: all pairs at once.
-        let mut best = vec![vec![f64::INFINITY; n]; n];
-        for (i, a) in stations.iter().enumerate() {
-            best[i][i] = 0.;
-            for link in &a.1.travel_links {
-                let j = stations
-                    .iter()
-                    .position(|s| &s.1.id == link)
-                    .unwrap_or_else(|| panic!("{} links to {link}, no station", a.1.id));
-                let (length, _) = w
-                    .spark_leg(*a, stations[j])
-                    .unwrap_or_else(|| panic!("{} to {link} has no open crossing", a.1.id));
-                assert!(stations[j].1.travel_links.contains(&a.1.id), "{link} back");
-                best[i][j] = length + LEG_HANDICAP;
-            }
-        }
-        for k in 0..n {
-            for i in 0..n {
-                for j in 0..n {
-                    best[i][j] = best[i][j].min(best[i][k] + best[k][j]);
+        for island in [false, true] {
+            let stations: Vec<_> = w
+                .spark_stations()
+                .into_iter()
+                .filter(|s| w.maps[s.0].gm_only == island)
+                .collect();
+            let n = stations.len();
+            assert!(n >= if island { 6 } else { 94 }, "{n} stations");
+            // A second opinion, worked out another way: all pairs at once.
+            let mut best = vec![vec![f64::INFINITY; n]; n];
+            for (i, a) in stations.iter().enumerate() {
+                best[i][i] = 0.;
+                for link in &a.1.travel_links {
+                    let j = stations
+                        .iter()
+                        .position(|s| &s.1.id == link)
+                        .unwrap_or_else(|| panic!("{} links to {link}, no station", a.1.id));
+                    let (length, _) = w
+                        .spark_leg(*a, stations[j])
+                        .unwrap_or_else(|| panic!("{} to {link} has no open crossing", a.1.id));
+                    assert!(stations[j].1.travel_links.contains(&a.1.id), "{link} back");
+                    best[i][j] = length + LEG_HANDICAP;
                 }
             }
-        }
-        for (i, a) in stations.iter().enumerate() {
-            let routes = w.spark_routes(&a.1.id);
-            assert_eq!(routes.len(), n, "every station is reached from {}", a.1.id);
-            for (j, b) in stations.iter().enumerate() {
-                let route = &routes[&b.1.id];
-                assert_eq!(
-                    (route.first(), route.last()),
-                    (Some(&a.1.id), Some(&b.1.id))
-                );
-                let unique: std::collections::BTreeSet<_> = route.iter().collect();
-                assert_eq!(unique.len(), route.len(), "{route:?} visits a stop twice");
-                assert!(
-                    (weighed(&w, route) - best[i][j]).abs() < 1e-6,
-                    "{route:?} takes {} where {} is possible",
-                    weighed(&w, route),
-                    best[i][j]
-                );
+            for k in 0..n {
+                for i in 0..n {
+                    for j in 0..n {
+                        best[i][j] = best[i][j].min(best[i][k] + best[k][j]);
+                    }
+                }
+            }
+            for (i, a) in stations.iter().enumerate() {
+                let routes = w.spark_routes(&a.1.id);
+                assert_eq!(routes.len(), n, "every station is reached from {}", a.1.id);
+                for (j, b) in stations.iter().enumerate() {
+                    let route = &routes[&b.1.id];
+                    assert_eq!(
+                        (route.first(), route.last()),
+                        (Some(&a.1.id), Some(&b.1.id))
+                    );
+                    let unique: std::collections::BTreeSet<_> = route.iter().collect();
+                    assert_eq!(unique.len(), route.len(), "{route:?} visits a stop twice");
+                    assert!(
+                        (weighed(&w, route) - best[i][j]).abs() < 1e-6,
+                        "{route:?} takes {} where {} is possible",
+                        weighed(&w, route),
+                        best[i][j]
+                    );
+                }
             }
         }
         // Under the first-found route with the fewest legs this flight went by Rootfoot, three times as far.
@@ -575,7 +581,12 @@ mod spark_tests {
         // Every crossing between two zones with stations joins the stations nearest to it.
         let mut crossings = 0;
         for (zone, map) in w.maps.iter().enumerate() {
-            for gate in map.portals.iter().filter(|g| !g.after_clear) {
+            // The GM gate and its return join no public stations (checked in the island refusal test).
+            for gate in map
+                .portals
+                .iter()
+                .filter(|g| !g.after_clear && !map.gm_only && !w.maps[g.to].gm_only)
+            {
                 let back = w.maps[gate.to]
                     .portals
                     .iter()
@@ -683,6 +694,41 @@ mod spark_tests {
             w.players[&1].character.travel_stops,
             ["travel_stonefold", "travel_saltby"]
         );
+    }
+
+    #[test]
+    fn spark_never_carries_an_ordinary_hero_to_the_gm_island() {
+        let (mut w, _, _) = world(Class::Mage);
+        let island = w
+            .spark_stations()
+            .into_iter()
+            .find(|s| w.maps[s.0].gm_only)
+            .unwrap()
+            .1
+            .id
+            .clone();
+        // No public route leads there, in either direction.
+        assert!(w.spark_route(A, &island).is_none());
+        assert!(w.spark_route(&island, A).is_none());
+        // Even a link that should not exist cannot carry an ordinary hero in.
+        for (from, to) in [(A, island.as_str()), (island.as_str(), A)] {
+            let npc = w
+                .maps
+                .iter_mut()
+                .flat_map(|m| &mut m.npcs)
+                .find(|n| n.id == from)
+                .unwrap();
+            npc.travel_links.push(to.into());
+        }
+        assert!(w.spark_route(A, &island).is_some());
+        w.players.get_mut(&1).unwrap().character.travel_stops = vec![A.into(), island.clone()];
+        stand(&mut w, A);
+        assert_eq!(
+            w.spark_start(1, A, &island).unwrap_err(),
+            "Only a GM may enter GM Island."
+        );
+        assert_eq!(w.players[&1].character.gold, 200);
+        assert!(w.players[&1].character.spark_travel.is_none());
     }
 
     #[test]

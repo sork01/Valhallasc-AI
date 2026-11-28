@@ -17,6 +17,8 @@ SPAN_GATE = (236.5, 309.5)
 SPAN_RETURN = (236.5, 314.5)
 SPAN_GUIDES = {'span_guide': (231.5, 309.5), 'span_chronicler': (231.5, 312.5)}
 SPAN_SPUR = [[232.5, 303.5], list(SPAN_GATE)]
+# Elite hunts without the group flag that could be hired for at a stone before open hiring moved indoors.
+SPAN_HUNTS = ('sky_h_shardking', 'sky_wr_alpha')
 SPAN_DESCRIPTION = 'Take the side trail near the Lightning Spire in the Shardfields. Enter The Shattered Span and speak to Torvald, the Last Watcher.'
 
 
@@ -130,6 +132,22 @@ def stone_position(zone, door, returns):
     raise ValueError(f"No safe Meeting Stone position at {door['id']} in {zone['name']}")
 
 
+def elite_hires(zones):
+    """Every elite quest hunted outdoors can be hired for at its giver (a quest-gated contract, never an open one)."""
+    outdoors = [zone for zone in zones if not zone.get('copies')]
+    prey = {spawn['kind'] for zone in outdoors for spawn in zone['slimes']}
+    people = {npc['id']: npc for zone in outdoors for npc in zone.get('npcs', [])}
+    for zone in outdoors:
+        for quest in zone.get('quests', []):
+            if not (quest.get('group') or quest['id'] in SPAN_HUNTS):
+                continue
+            if not any(o.get('kind', 'kill') == 'kill' and o['target'] in prey for o in quest['objectives']):
+                continue
+            giver = people[quest['npc']]
+            if not any(offer.get('merc') for offer in giver['offers']):
+                giver['offers'] = giver['offers'] + offers()
+
+
 def install(world):
     zones = [world, *world['zones']]
     instances = {index for index, zone in enumerate(zones) if zone.get('copies') and zone.get('players')}
@@ -153,6 +171,7 @@ def install(world):
             if meeting:
                 npc['offers'] = [o for o in npc['offers'] if o['id'] != SUMMON['id']] + [dict(SUMMON)]
                 npc['dialogue'] = STONE_DIALOGUE
+                npc['role'] = 'Gather your party'
             if npc['id'] == 'barrow_guide':
                 npc['dialogue'] = npc['dialogue'].replace(' I can hire fighters to help you.', '')
             if npc['id'] == 'span_guide':
@@ -190,6 +209,7 @@ def install(world):
                                      role='Party summons', dialogue=STONE_DIALOGUE, x=x, y=y,
                                      color='#8e87ad', art='stone', offers=[dict(SUMMON)]))
             zone['objects'].append(dict(kind='meetingstone', x=x, y=y, r=.55, v=0, label='Dungeon Meeting Stone'))
+    elite_hires(zones)
 
 
 if __name__ == '__main__':

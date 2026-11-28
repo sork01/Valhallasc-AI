@@ -21054,6 +21054,126 @@
   "cloak_l99_epic_c": [
    7,
    105
+  ],
+  "smith_gear_gilded_ward_ring": [
+   0,
+   8
+  ],
+  "smith_gear_wyrdwatch_signet": [
+   0,
+   8
+  ],
+  "smith_gear_cobalt_longbow": [
+   6,
+   28
+  ],
+  "smith_gear_galewarden_longbow": [
+   6,
+   28
+  ],
+  "smith_gear_mithril_scale_vest": [
+   0,
+   13
+  ],
+  "smith_gear_prismguard_vest": [
+   0,
+   13
+  ],
+  "smith_gear_stormsilver_twin_daggers": [
+   6,
+   33
+  ],
+  "smith_gear_thunderwake_daggers": [
+   6,
+   33
+  ],
+  "smith_gear_sunsteel_greaves": [
+   9,
+   45
+  ],
+  "smith_gear_dunewarden_greaves": [
+   9,
+   45
+  ],
+  "smith_gear_stariron_talisman": [
+   4,
+   54
+  ],
+  "smith_gear_stariron_signet": [
+   5,
+   54
+  ],
+  "smith_gear_chronoguard_breastplate": [
+   3,
+   99
+  ],
+  "smith_gear_yearwheel_longbow": [
+   7,
+   101
+  ],
+  "smith_gear_split_second_daggers": [
+   7,
+   100
+  ],
+  "smith_gear_epoch_staff": [
+   2,
+   100
+  ],
+  "smith_gear_last_hour_mace": [
+   2,
+   101
+  ],
+  "smith_gear_moonspore_pendant": [
+   8,
+   34
+  ],
+  "smith_gear_stormglass_mantle": [
+   6,
+   105
+  ],
+  "smith_gear_sunward_trail_leggings": [
+   3,
+   40
+  ],
+  "smith_gear_jubilee_signet": [
+   3,
+   43
+  ],
+  "smith_gear_tanglecrown_mantle": [
+   6,
+   105
+  ],
+  "smith_gear_duneglass_longbow": [
+   6,
+   48
+  ],
+  "smith_gear_frostwake_pauldrons": [
+   2,
+   49
+  ],
+  "smith_gear_slatewing_pendant": [
+   4,
+   54
+  ],
+  "smith_gear_yearwheel_band": [
+   5,
+   54
+  ],
+  "smith_gear_caldera_veil": [
+   7,
+   105
+  ],
+  "smith_gear_equinox_crown_ring": [
+   0,
+   102
+  ],
+  "smith_gear_unbroken_hour_pendant": [
+   9,
+   101
+  ],
+  "smith_gear_last_ember_mantle": [
+   7,
+   105
   ]
  },
  "sprite": "2cfcb85ef0037fbf",

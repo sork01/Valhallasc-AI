@@ -1,9 +1,11 @@
+// Without the `tools` switch the measuring tools are left out, and with them the only users of some helpers here.
+#![cfg_attr(not(feature = "tools"), allow(dead_code, unused_imports))]
 //! `CONS-AUDIT`: how the potions and food compare with real characters (`docs/consumable-audit.md`).
 //!
 //! Characters are built exactly like the kill-time harness builds them (normal gear for the level, `ttk::build_character`),
 //! so health, mana, defense and dodge come from the real formulas. Monster damage uses the damage rule of
 //! `hurt_player_by`: `max(damage - defense, 1) * DAMAGE_TAKEN_SCALE`, one hit per windup plus cooldown. Run with
-//! `bash scripts/cargo.sh test --offline consumable_audit -- --ignored --nocapture` and `CONS_OUT=path.json`.
+//! `bash scripts/cargo.sh test --features valhalla-server/tools --offline consumable_audit -- --ignored --nocapture` and `CONS_OUT=path.json`.
 use super::ttk::{CLASSES, Case, Foe, Spread, build_character, pick_enemy};
 use super::wyrd_tests::world;
 use super::*;
@@ -60,6 +62,7 @@ fn pinned(w: &mut World, level: u32, boss: bool) -> Option<usize> {
     Some(id)
 }
 
+#[cfg(feature = "tools")]
 #[test]
 #[ignore = "audit table; see the module comment"]
 fn consumable_audit() {

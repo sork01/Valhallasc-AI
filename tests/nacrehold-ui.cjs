@@ -100,11 +100,11 @@ async function call(name, args = {}) {
   check((await page.locator('#npc-text').textContent()).includes('level 40'), 'The warden explains the open level-40 Cathedral wing');
   check((await page.locator('#npc-text').textContent()).includes('Grand Nave'), 'The warden describes all three playable wings');
   await stage(110.7, 57.2);   // beside the Meeting Stone (map.txt nacre_stone 111.7,59.2)
-  await debug({ op: 'set_gold', gold: 20000 });   // amounts are copper: a level-40 priest hire is 5,000 (merc_price anchors)
   await page.evaluate(() => Field.visitNpc('nacre_stone'));
   await page.locator('#npc-dialogue').waitFor({ state: 'visible' });
-  check(await page.locator('[data-offer="merc_priest"]').isEnabled(), 'The Meeting Stone offers the existing priest hire');
-  check(await page.locator('[data-offer^="merc_"]').count() === 6, 'All five classes and dismissal are offered');
+  // Meeting Stones summon party members; fighters are hired from elite quest givers and dungeon smiths (1.13.0).
+  check(await page.locator('[data-offer="summon_party"]').isEnabled(), 'The Meeting Stone offers party summons');
+  check(await page.locator('[data-offer^="merc_"]').count() === 0, 'The Meeting Stone hires nobody');
   await stage(132.3, 211.7);   // beside the travel master (map.txt 133.3,213.7)
   await page.evaluate(() => Field.visitNpc('travel_nacrehold'));
   await page.locator('#npc-dialogue').waitFor({ state: 'visible' });

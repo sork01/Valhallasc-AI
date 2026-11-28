@@ -79,7 +79,8 @@ fn vendor_weapon_stock_is_available_at_merchants_and_armorers_only() {
     let w = world();
     let mut vendors = 0;
     for npc in w.maps.iter().flat_map(|m| &m.npcs) {
-        let eligible = npc.buys || npc.role == "Armorer";
+        // Fishers buy catches; they are not weapon merchants.
+        let eligible = (npc.buys || npc.role == "Armorer") && !npc.id.starts_with("fisher_");
         let stock: Vec<_> = npc
             .offers
             .iter()

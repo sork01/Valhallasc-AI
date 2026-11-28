@@ -13,7 +13,7 @@ const check = (ok, text) => { assert.ok(ok, text); checks++; console.log(text); 
   const errors = [];
   page.on('pageerror', e => errors.push(e.message));
   await page.addInitScript(() => localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false })));
-  await page.goto(world.url);
+  await require('./lib/travel-quests.cjs')(page);await page.goto(world.url);
   await page.locator('#start').click(); await page.locator('#login-guest').click();
   await page.locator('#cls-hunter').click(); await page.locator('#name').fill('DoorTester');
   await page.locator('#go').click({ timeout: 60000 });

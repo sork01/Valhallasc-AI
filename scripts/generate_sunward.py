@@ -91,7 +91,7 @@ def people_and_quests():
         npc('keeper', 'Rowan Alder', 'Elder Hollow keeper', 101, 29,
             'The roots have opened. Gather five companions before descending: the heart below has awakened.',
             look=dict(skin='#835e4b', hair='#d2c39b', style='long', hat='hood', hatColor='#568054')),
-        npc('stone', 'Millbridge Meeting Stone', 'Gather a party · hire fighters', 91, 29,
+        npc('stone', 'Millbridge Meeting Stone', 'Gather your party', 91, 29,
             'The stone gathers companions for a fee that grows with your level. The Elder Hollow is open to prepared parties.',
             mercenary_offers.offers(open_=True)),
     ]

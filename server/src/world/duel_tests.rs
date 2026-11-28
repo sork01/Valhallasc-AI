@@ -1,3 +1,5 @@
+// Without the `tools` switch the measuring tools are left out, and with them the only users of some helpers here.
+#![cfg_attr(not(feature = "tools"), allow(dead_code, unused_imports))]
 //! Duel matrix (`PVP-DUEL-MATRIX`; method at the top of `docs/duel-report.md`).
 //!
 //! Two characters of the same level in the normal gear for that level fight a real duel (`world/pvp.rs`: challenge,
@@ -130,6 +132,7 @@ fn play(w: &mut World, me: u64, foe: u64, side: &mut Side) {
 pub fn run_duel(a: Class, b: Class, level: u32, seed: u64, a_left: bool) -> DuelRun {
     let mut w = world();
     w.rng = seed;
+    w.resource_rng = seed; // class resource procs have their own stream
     for s in w.slimes.iter_mut().filter(|s| s.zone == ZONE) {
         s.dead = true;
         s.respawn = 1e9;
@@ -338,6 +341,7 @@ fn report() {
     println!("{text}");
 }
 
+#[cfg(feature = "tools")]
 #[test]
 #[ignore = "full grid; run with scripts/duel-parallel.sh"]
 fn duel_matrix() {

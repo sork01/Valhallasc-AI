@@ -81,6 +81,7 @@ fn skipping_idle_enemies_keeps_the_random_sequence_of_the_full_simulation() {
         s.respawn = 1e9;
     }
     let simulated = w.slimes.iter().filter(|s| !w.zone_idle(s.zone)).count() as u64;
+    w.step(); // the first tick also fills the zone's rich fishing spots
     w.rng = 99;
     let mut expected = w.rng;
     for _ in 0..30 {

@@ -20,7 +20,7 @@ const check=(v,s)=>{assert.ok(v,s);console.log(++checks+': '+s);};
   const WS=window.WebSocket;window.WebSocket=class extends WS{constructor(...a){super(...a);this.addEventListener('message',e=>{if(typeof e.data==='string'){try{take(JSON.parse(e.data));}catch{}return;}const buf=e.data instanceof ArrayBuffer?Promise.resolve(e.data):e.data.arrayBuffer();buf.then(b=>take(JSON.parse(window.pako.inflateRaw(new Uint8Array(b),{to:'string'})))).catch(()=>{});});}};
   window.__self=()=>window.__snap?.players.find(p=>p.id===window.Online?.id);
  });
- await page.goto(world.url);await page.locator('#start').click();await playGuest(page);await page.locator('#cls-warrior').click();await page.locator('#name').fill('Festival Check');await page.locator('#go').click({timeout:60000});
+ await require('./lib/travel-quests.cjs')(page);await page.goto(world.url);await page.locator('#start').click();await playGuest(page);await page.locator('#cls-warrior').click();await page.locator('#name').fill('Festival Check');await page.locator('#go').click({timeout:60000});
  await page.waitForFunction(()=>Online.connected&&Field.hero?.hp>0,null,{timeout:60000});
  const send=m=>page.evaluate(m=>Online.send(m),m),debug=command=>send({type:'debug',command});
  const wait=(fn,arg)=>page.waitForFunction(fn,arg,{timeout:15000});

@@ -86,7 +86,8 @@ const suite = {
     await page.keyboard.press('Escape');
     await visit(0,'guide'); await press(page.locator('#npc-quest-list [data-quest="arena_alder_40"]'));
     await debug(page,{op:'set_level',level:1}); await page.waitForFunction(()=>Field.hero.level===1);
-    await press(page.locator('#npc-dialogue [data-action="accept"]'));
+    // The window drops the offer when the level changes, so send the stale acceptance directly.
+    await sleep(700); await page.evaluate(()=>Online.send({type:'interact',npc:'guide',offer:'quest:accept:arena_alder_40'}));
     await page.waitForFunction(()=>document.querySelector('#npc-notice').textContent.includes('You are level 1'));
     check(await page.locator('#npc-dialogue').isVisible(),'server-refused acceptance leaves conversation open with its reason');
     await page.keyboard.press('Escape'); await debug(page,{op:'set_level',level:40});

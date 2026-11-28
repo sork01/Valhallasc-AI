@@ -79,7 +79,8 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     await around(23, 'meetingstone'); const order = await trace();   // the Crown stone at (220.3,243.3) in the Canopy (map.txt), beside its heart_stone master (222,245)
     check(order.some(x => x.kind === 'meetingstone'), 'Crown Meeting Stone is drawn in its actual zone');
     await page.evaluate(() => Field.visitNpc('heart_stone')); await page.waitForFunction(() => !document.querySelector('#npc-dialogue').hidden);
-    check((await page.locator('#npc-dialogue').textContent()).includes('Hire a Warrior'), 'visible Crown Meeting Stone keeps hiring interactions');
+    // Meeting Stones summon party members; fighters are hired from elite quest givers and dungeon smiths (1.13.0).
+    check(await page.locator('#npc-dialogue [data-offer="summon_party"]').count() === 1 && await page.locator('#npc-dialogue [data-offer^="merc_"]').count() === 0, 'visible Crown Meeting Stone keeps its party summons');
     await page.screenshot({ path: path.join(out, 'canopy-stone.png') }); await page.evaluate(() => City.close());
   }
   if (!mutation || mutation === 'oasis') await ground(25, 'lapis_oasis');

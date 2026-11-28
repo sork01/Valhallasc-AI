@@ -142347,7 +142347,7 @@
     "rarity": "uncommon",
     "class": "warrior",
     "attack": 0.4,
-    "defense": 1.6,
+    "defense": 1.4,
     "tint": {
       "hue": 70,
       "saturate": 1.0,
@@ -142365,8 +142365,8 @@
     "kind": "gloves",
     "rarity": "rare",
     "class": "warrior",
-    "attack": 0.5,
-    "defense": 1.9,
+    "attack": 0.4,
+    "defense": 1.7,
     "bonusStats": {
       "accuracy": 1
     },
@@ -142387,8 +142387,8 @@
     "kind": "weapon",
     "rarity": "uncommon",
     "class": "warrior",
-    "attack": 6.4,
-    "defense": 1.6,
+    "attack": 8.3,
+    "defense": 2.1,
     "tint": {
       "hue": 70,
       "saturate": 1.0,
@@ -142406,8 +142406,8 @@
     "kind": "weapon",
     "rarity": "rare",
     "class": "warrior",
-    "attack": 7.5,
-    "defense": 1.9,
+    "attack": 9.8,
+    "defense": 2.4,
     "bonusStats": {
       "dexterity": 1
     },
@@ -142428,8 +142428,8 @@
     "kind": "gloves",
     "rarity": "uncommon",
     "class": "warrior",
-    "attack": 0.6,
-    "defense": 2.4,
+    "attack": 0.7,
+    "defense": 2.9,
     "tint": {
       "hue": 140,
       "saturate": 1.0,
@@ -142447,8 +142447,8 @@
     "kind": "gloves",
     "rarity": "rare",
     "class": "warrior",
-    "attack": 0.7,
-    "defense": 2.8,
+    "attack": 0.8,
+    "defense": 3.4,
     "bonusStats": {
       "dexterity": 3
     },
@@ -142469,8 +142469,8 @@
     "kind": "weapon",
     "rarity": "uncommon",
     "class": "mage",
-    "attack": 12.8,
-    "defense": 3.2,
+    "attack": 14.7,
+    "defense": 3.7,
     "tint": {
       "hue": 210,
       "saturate": 1.0,
@@ -142488,8 +142488,8 @@
     "kind": "weapon",
     "rarity": "rare",
     "class": "mage",
-    "attack": 15.0,
-    "defense": 3.8,
+    "attack": 17.3,
+    "defense": 4.3,
     "bonusStats": {
       "dexterity": 5
     },
@@ -142509,8 +142509,8 @@
   {
     "kind": "accessory",
     "rarity": "uncommon",
-    "attack": 7.2,
-    "defense": 1.8,
+    "attack": 7.4,
+    "defense": 1.9,
     "tint": {
       "hue": 10,
       "saturate": 1.0,
@@ -142527,8 +142527,8 @@
   {
     "kind": "accessory",
     "rarity": "rare",
-    "attack": 8.5,
-    "defense": 2.1,
+    "attack": 8.7,
+    "defense": 2.2,
     "bonusStats": {
       "dexterity": 10
     },
@@ -142549,8 +142549,8 @@
     "kind": "weapon",
     "rarity": "uncommon",
     "class": "hunter",
-    "attack": 22.4,
-    "defense": 5.6,
+    "attack": 24.3,
+    "defense": 6.1,
     "tint": {
       "hue": 60,
       "saturate": 1.0,
@@ -142568,8 +142568,8 @@
     "kind": "weapon",
     "rarity": "rare",
     "class": "hunter",
-    "attack": 26.3,
-    "defense": 6.6,
+    "attack": 28.6,
+    "defense": 7.1,
     "bonusStats": {
       "strength": 15
     },
@@ -142590,8 +142590,8 @@
     "kind": "armor",
     "rarity": "uncommon",
     "class": "warrior",
-    "attack": 6.0,
-    "defense": 24.0,
+    "attack": 6.4,
+    "defense": 25.4,
     "tint": {
       "hue": 270,
       "saturate": 1.0,
@@ -142609,8 +142609,8 @@
     "kind": "armor",
     "rarity": "rare",
     "class": "warrior",
-    "attack": 7.1,
-    "defense": 28.2,
+    "attack": 7.5,
+    "defense": 29.9,
     "bonusStats": {
       "dexterity": 35
     },
@@ -142631,8 +142631,8 @@
     "kind": "weapon",
     "rarity": "uncommon",
     "class": "assassin",
-    "attack": 41.6,
-    "defense": 10.4,
+    "attack": 43.5,
+    "defense": 10.9,
     "tint": {
       "hue": 120,
       "saturate": 1.0,
@@ -142650,8 +142650,8 @@
     "kind": "weapon",
     "rarity": "rare",
     "class": "assassin",
-    "attack": 48.9,
-    "defense": 12.2,
+    "attack": 51.1,
+    "defense": 12.8,
     "bonusStats": {
       "agility": 55
     },
@@ -142671,8 +142671,8 @@
   {
     "kind": "pants",
     "rarity": "uncommon",
-    "attack": 3.4,
-    "defense": 13.6,
+    "attack": 3.5,
+    "defense": 14.1,
     "tint": {
       "hue": 60,
       "saturate": 1.0,
@@ -142689,8 +142689,8 @@
   {
     "kind": "pants",
     "rarity": "rare",
-    "attack": 4.0,
-    "defense": 16.0,
+    "attack": 4.1,
+    "defense": 16.5,
     "bonusStats": {
       "agility": 85
     },
@@ -142710,8 +142710,8 @@
   {
     "kind": "necklace",
     "rarity": "uncommon",
-    "attack": 32.0,
-    "defense": 8.0,
+    "attack": 32.3,
+    "defense": 8.1,
     "tint": {
       "hue": 270,
       "saturate": 1.0,
@@ -142728,7 +142728,7 @@
   {
     "kind": "accessory",
     "rarity": "rare",
-    "attack": 28.2,
+    "attack": 28.5,
     "defense": 7.1,
     "bonusStats": {
       "strength": 108

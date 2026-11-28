@@ -78,7 +78,7 @@ def build():
   npc('bellkeeper','Ylva Bellward','Mammoth bellkeeper',36,67,'When the old mammoth moves, every bronze bell on the western shelf answers.',mercenary_offers.offers(),art='frostwake_bellkeeper'),
   npc('skywatcher','Vessa Aurora','Aurora watcher',119,70,'The manta swims through curtains of light above the eastern cliff.',mercenary_offers.offers(),art='frostwake_skywatcher'),
   npc('ribkeeper','Irik Deepice','Leviathan watcher',88,37,'The shape below the crevasse can swallow a whole caravan. Bring five companions.',mercenary_offers.offers(),art='frostwake_ribkeeper'),
-  npc('stone','Frostwake Meeting Stone','Gather a party · hire fighters',116,29,'The last warm lantern before the deep ice.',mercenary_offers.offers(open_=True),art='stone'),
+  npc('stone','Frostwake Meeting Stone','Gather your party',116,29,'The last warm lantern before the deep ice.',mercenary_offers.offers(open_=True),art='stone'),
  ]
  quests=[
   quest('welcome','Lanterns on the Shelf','captain','Meet the healer, surveyor and snow scout.',[talk('healer','Meet Neri'),talk('surveyor','Meet Orin'),talk('scout','Meet Jorren')],85,8500),

@@ -169,7 +169,10 @@ const stageRect = page => rect(page, '#stage');
   }
   await page.locator('#start').click(); await playGuest(page);
   await page.locator('#cls-mage').click(); await page.locator('#name').fill('Tuner'); await page.locator('#go').click({ timeout: 60000 });
-  await page.waitForFunction(() => Online.connected && !!Field.mageSprites && !!valhalla.fmusic?.running, null, { timeout: 60000 });
+  await page.waitForFunction(() => Online.connected && !!Field.mageSprites, null, { timeout: 60000 });
+  // The world clock may read night, when the meadow's night score plays instead of the day one.
+  await page.evaluate(() => Online.send({ type: 'debug', command: { op: 'set_time', hour: 12, freeze: true } }));
+  await page.waitForFunction(() => !!valhalla.fmusic?.running, null, { timeout: 60000 });
   await page.evaluate(() => {
     window.sent = []; const original = Online.send; Online.send = message => { sent.push(message.type === 'input' && !message.dx && !message.dy ? 'ping' : message.type); return original(message); };
     window.levels = []; for (const m of [valhalla.music, valhalla.fmusic]) { const set = m.setLevel; m.setLevel = (v, s) => { levels.push(v); return set.call(m, v, s); }; }

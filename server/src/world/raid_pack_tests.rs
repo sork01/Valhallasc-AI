@@ -266,6 +266,7 @@ fn raid_pack_seeded_purple_rate_and_rebirth_kill_path() {
 
 /// Each reported fight starts from the actual authored positions and uses the
 /// same contract, skills and consumables as mercenaries in the playable world.
+#[cfg(feature = "tools")]
 #[test]
 #[ignore = "Optional diagnostics: owner deferred raid pack clear-time balance"]
 fn raid_pack_measure_encounters() {
@@ -352,6 +353,7 @@ fn raid_pack_measure_encounters() {
     assert!(failed.is_empty(), "{}", failed.join("\n"));
 }
 
+#[cfg(feature = "tools")]
 #[test]
 #[ignore = "RAID-PACKS only: careless basic-attack control"]
 fn raid_pack_careless_ten_without_defense_or_healing_lose() {

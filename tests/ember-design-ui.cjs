@@ -34,7 +34,7 @@ const GROUND = ['The Ash Verge', 'The Black Shore'], lums = {};
   check(Z.portals.every(p => p.seam || p.id === 'ew_raid'), 'no rim gate is left: every border is a seam (the Orrery since 2026-11-08), the raid door aside');
   check(Z.portals.some(p => p.id === 'ew_raid' && p.to === 46 && p.needs_quest === 'raid_key'), 'the raid door keeps its key');
   for (const p of Z.portals.filter(p => !p.seam)) check(onFloor(Z, p.x, p.y), `${p.id} stands on the floor`);
-  check(Z.regions.names.length === 14 && Z.camps.length === 4 && Z.quests.length === 26, 'fourteen regions, five hubs and 26 quests');
+  check(Z.regions.names.length === 14 && Z.camps.length === 4 && Z.quests.filter(q => !q.id.startsWith('fisher_')).length === 26, 'fourteen regions, five hubs and 26 quests (Fisher quests aside)');
   server = spawn(process.env.VALHALLA_BINARY, [], { cwd: root, stdio: 'ignore',
     env: { ...process.env, VALHALLA_BIND: `127.0.0.1:${port}`, VALHALLA_DB: path.join(tmp, 'v.sqlite'), VALHALLA_CLIENT_DIR: path.join(root, 'client'), VALHALLA_TEST_COMMANDS: '1', VALHALLA_GOD_MODE: '1', VALHALLA_START_LEVEL: process.env.START_LEVEL || '99', VALHALLA_LEVEL_SPREAD: '0' } });
   for (let i = 0; i < 100; i++) { try { if ((await fetch(`http://127.0.0.1:${port}/health`)).ok) break; } catch (_) {} await new Promise(r => setTimeout(r, 200)); }

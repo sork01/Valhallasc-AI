@@ -9774,6 +9774,51 @@
         "hatColor": "#2f4560"
       },
       "color": "#4f6d8a"
+    },
+    "alchemy_alderhaven": {
+      "art": "alchemist",
+      "identity": {
+        "skin": "#e3ae83",
+        "hair": "#704b51",
+        "style": "bun",
+        "apron": "#4e7469",
+        "prop": "alembic"
+      },
+      "color": "#4e7469"
+    },
+    "alchemy_nacrehold": {
+      "art": "special_nacre_healer",
+      "identity": {
+        "species": "merfolk",
+        "female": true,
+        "tail": "#63c6ab",
+        "skin": "#92c9bc",
+        "hair": "#46314b",
+        "style": "long"
+      },
+      "color": "#4e7469"
+    },
+    "alchemy_asterion": {
+      "art": "alchemist",
+      "identity": {
+        "skin": "#bd8064",
+        "hair": "#704b51",
+        "style": "bun",
+        "apron": "#4e7469",
+        "prop": "alembic"
+      },
+      "color": "#4e7469"
+    },
+    "alchemy_heartwood": {
+      "art": "alchemist",
+      "identity": {
+        "skin": "#e3ae83",
+        "hair": "#704b51",
+        "style": "bun",
+        "apron": "#4e7469",
+        "prop": "alembic"
+      },
+      "color": "#4e7469"
     }
   },
   "tops": {

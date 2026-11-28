@@ -5,9 +5,9 @@ const fs = require('node:fs');
 const http = require('node:http');
 const path = require('node:path');
 const { chromium } = require('playwright');
-require('./lib/touch.cjs').requireMemoryLimit();
-const root = path.resolve(__dirname, '../client');
-const output = path.resolve(__dirname, '../test-results/turning-hair');
+require('../lib/touch.cjs').requireMemoryLimit();
+const root = path.resolve(__dirname, '../../client');
+const output = path.resolve(__dirname, '../../test-results/turning-hair');
 const candidates = path.join(output, 'assets');
 const classes = ['warrior', 'mage', 'assassin', 'priest', 'hunter'];
 const prefix = cls => cls === 'warrior' ? 'warrior_layered' : cls;
@@ -19,7 +19,7 @@ function preflight() {
   const missing = [];
   for (const cls of classes) for (const gender of ['male', 'female']) {
     const file = path.join(candidates, prefix(cls) + (gender === 'female' ? '_f' : '') + '_hair-check.txt');
-    if (!fs.existsSync(file)) missing.push(`  ${path.relative(path.resolve(__dirname, '..'), file)}  <-  ${generator(cls, gender)}`);
+    if (!fs.existsSync(file)) missing.push(`  ${path.relative(path.resolve(__dirname, '../..'), file)}  <-  ${generator(cls, gender)}`);
   }
   if (missing.length) throw Error(`character-hair-art: candidate data is missing (git-ignored, not in the repo). Generate it from the repo root with the commands below, then rerun:\n${missing.join('\n')}`);
 }

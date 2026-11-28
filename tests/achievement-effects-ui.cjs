@@ -9,7 +9,7 @@ const busSource = gameSource.match(/function sfxOut\(c\) \{[\s\S]*?\n  \}/)[0];
 // Compile the unchanged production functions in Node, then send a function to Playwright.
 // The page's production CSP remains enabled; no browser eval or inline script is needed.
 const measureAudio = new Function(`return async () => {
-  let offline, save, sfxGain = null;
+  let offline, save, sfxGain = null, masterGain = null;
   const taper = v => v * v, audio = () => offline;
   // The recorded voice (tests/recorded-audio.cjs) is a separate path: this test measures the synthesised fallback.
   const recordedVoice = () => false;
@@ -18,6 +18,7 @@ const measureAudio = new Function(`return async () => {
   const results = [];
   for (const [sound, sfxVol] of [[true, 1], [true, .5], [false, 1]]) {
     offline = new OfflineAudioContext(1, 96000, 48000); save = { sound, sfxVol }; sfxGain = null;
+    masterGain = offline.createGain(); masterGain.connect(offline.destination);   // effects run through the master volume
     let voices = 0;
     const createOscillator = offline.createOscillator.bind(offline);
     offline.createOscillator = () => { voices++; return createOscillator(); };

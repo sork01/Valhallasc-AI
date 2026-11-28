@@ -90,6 +90,15 @@ pub(crate) fn overlay_npc(id: &str) -> bool {
             .any(|p| id.starts_with(p))
 }
 
+/// People that overlays after the zone designs add: dungeon Meeting Stones, Alchemists, Enchanting and Transmog masters
+/// and Fishers.
+#[cfg(test)]
+pub(crate) fn service_overlay_npc(id: &str) -> bool {
+    ["dungeon_stone_", "alchemy_", "fisher_"].iter().any(|p| id.starts_with(p))
+        || id.ends_with("_transmog")
+        || id.ends_with("_enchanting")
+}
+
 /// People a zone's own generator placed.
 #[cfg(test)]
 pub(crate) fn authored_npc_count(m: &Map) -> usize {
@@ -184,6 +193,8 @@ pub(crate) fn overlay_quest(id: &str) -> bool {
 mod activity_tests;
 #[cfg(test)]
 mod aggro_level_tests;
+#[cfg(test)]
+mod elite_hire_tests;
 mod ambient;
 mod bank;
 #[cfg(test)]
@@ -2512,12 +2523,12 @@ impl World {
                     };
                 }
             }
-            if let Some(point) =
-                free_actor_position(&self.maps[enemy.zone], candidate, enemy.r, &bodies, true)
-                // Never through a wall: the nearest free ground can lie on the far side of a thin one, and a boss
-                // pushed out of its room could not be reached or hit again.
-                && self.maps[enemy.zone].line_clear(enemy.point(), point, enemy.r.min(0.3))
-            {
+            let map = &self.maps[enemy.zone];
+            // Never through a wall: the nearest free ground can lie on the far side of a thin one, and a boss
+            // pushed out of its room could not be reached or hit again. Such spots are passed over for the next one.
+            if let Some(point) = free_actor_position_where(map, candidate, enemy.r, &bodies, true, |point| {
+                map.line_clear(enemy.point(), point, enemy.r.min(0.3))
+            }) {
                 self.slimes[id].x = point.x;
                 self.slimes[id].y = point.y;
             }
@@ -6410,6 +6421,10 @@ impl World {
             .instances
             .iter()
             .any(|i| i.zone == zone && i.grace_until > self.time);
+        // Mid-fight and left without a target, a dungeon monster goes for anyone still in combat, seen or not.
+        let seeking = dungeon.is_some()
+            && s.target.is_none()
+            && matches!(s.state.as_str(), "chase" | "windup" | "lunge");
         let nearest = self
             .players
             .iter()
@@ -6436,13 +6451,15 @@ impl World {
                     } else {
                         aggro_radius(awareness, s.level, p.character.level)
                     },
+                    p.combat_left > 0.,
                 )
             })
-            .filter(|(_, point, d, reach)| {
-                (*d < *reach || (hunting && (was_chasing || s.target.is_some())))
-                    && map.line_clear(s.point(), *point, 0.05)
+            .filter(|(_, point, d, reach, fighting)| {
+                (seeking && *fighting)
+                    || ((*d < *reach || (hunting && (was_chasing || s.target.is_some())))
+                        && map.line_clear(s.point(), *point, 0.05))
             })
-            .map(|(id, point, d, _)| (id, point, d))
+            .map(|(id, point, d, ..)| (id, point, d))
             .min_by(|a, b| a.2.total_cmp(&b.2));
         let target = s.target.and_then(|id| {
             self.players
@@ -7232,13 +7249,26 @@ fn free_actor_position(
     bodies: &[(Point, f64)],
     enemy: bool,
 ) -> Option<Point> {
+    free_actor_position_where(map, origin, radius, bodies, enemy, |_| true)
+}
+
+/// The free spot nearest `origin` that the caller also accepts.
+fn free_actor_position_where(
+    map: &Map,
+    origin: Point,
+    radius: f64,
+    bodies: &[(Point, f64)],
+    enemy: bool,
+    accept: impl Fn(Point) -> bool,
+) -> Option<Point> {
     let clear = |mut point: Point| {
         map.collide(&mut point, radius);
         let mut checked = point;
         map.collide(&mut checked, radius);
         (point.distance(checked) < 1e-8
             && !actor_blocked(point, radius, bodies)
-            && (!enemy || !map.in_city(point)))
+            && (!enemy || !map.in_city(point))
+            && accept(point))
         .then_some(point)
     };
     if let Some(point) = clear(origin) {
@@ -9094,7 +9124,14 @@ mod tests {
                                     w.maps[p.to].slimes.iter().any(|s| s.kind == o.target)
                                 })
                         ),
-                        "bring" => assert!(item(&o.target).is_some_and(|i| i.kind == "material")),
+                        // The seahorse quest asks for fish caught with a rod.
+                        "bring" => assert!(
+                            item(&o.target).is_some_and(|i| i.kind == "material"
+                                || i.kind == "fish" && q.id == "deep_seahorse"),
+                            "{} brings {}",
+                            q.id,
+                            o.target
+                        ),
                         "reach" => assert!(w.maps.iter().any(|m| m.name == o.target)),
                         "visit" | "hold" | "memory" | "echo" => {
                             assert!(area.places.iter().any(|p| p.id == o.target))
@@ -9111,7 +9148,8 @@ mod tests {
                 }
             }
         }
-        for npc in &map.npcs {
+        // Later overlays (Fishers at the shore, Meeting Stones at dungeon doors) have their own placement tests.
+        for npc in map.npcs.iter().filter(|n| !super::service_overlay_npc(&n.id)) {
             let point = Point { x: npc.x, y: npc.y };
             let mut clear = point;
             map.collide(&mut clear, PLAYER_RADIUS);
@@ -9426,6 +9464,7 @@ mod tests {
             let level = Slime::default_level(kind) + 1;
             w.slimes[id] = Slime::with_level(id, &w.spawns[id].clone(), level);
             let (xp, gold) = (w.slimes[id].xp, w.slimes[id].gold);
+            let xp = crate::model::level_adjusted_xp(xp, w.players[&1].character.level, w.slimes[id].level);
             w.hit_slime(id, 1, 1_000_000., false);
             let c = &w.players[&1].character;
             let paid: u32 = (1..c.level).map(xp_to_level).sum::<u32>() + c.xp;
@@ -9562,8 +9601,10 @@ mod tests {
             quest_interact(&mut w, npc, None);
         }
         assert_eq!(w.players[&1].character.quests[0].counts, vec![1, 1, 1, 1]);
+        let level = w.players[&1].character.level;
         quest_interact(&mut w, "rime_warden", Some("quest:claim:rime_welcome"));
-        let (xp, gold) = (xp_to_level(10) / 10, 200);
+        // A Human hero earns 5% more quest gold.
+        let (xp, gold) = (crate::model::level_adjusted_xp(xp_to_level(10) / 10, level, 10), 210);
         let c = &w.players[&1].character;
         assert_eq!(c.gold, gold);
         let paid: u32 = (1..c.level).map(xp_to_level).sum::<u32>() + c.xp;
@@ -9933,6 +9974,7 @@ mod tests {
             let level = Slime::default_level(kind) + 1;
             w.slimes[id] = Slime::with_level(id, &w.spawns[id].clone(), level);
             let (xp, gold) = (w.slimes[id].xp, w.slimes[id].gold);
+            let xp = crate::model::level_adjusted_xp(xp, w.players[&1].character.level, w.slimes[id].level);
             w.hit_slime(id, 1, 1_000_000., false);
             let c = &w.players[&1].character;
             let paid: u32 = (1..c.level).map(xp_to_level).sum::<u32>() + c.xp;
@@ -10363,8 +10405,10 @@ mod tests {
             w.players[&1].character.quests[0].counts,
             vec![1, 1, 1, 1, 1, 1]
         );
+        let level = w.players[&1].character.level;
         quest_interact(&mut w, "fen_reeve", Some("quest:claim:fen_welcome"));
-        let (xp, gold) = (xp_to_level(15) / 10, 300);
+        // A Human hero earns 5% more quest gold.
+        let (xp, gold) = (crate::model::level_adjusted_xp(xp_to_level(15) / 10, level, 15), 315);
         let c = &w.players[&1].character;
         assert_eq!(c.gold, gold);
         let paid: u32 = (1..c.level).map(xp_to_level).sum::<u32>() + c.xp;
@@ -11217,6 +11261,14 @@ mod tests {
 
     #[test]
     fn the_whole_city_questline_runs_from_the_gate_captain_to_the_steward() {
+        /// Claims a quest and returns the experience it owes at the hero's level at that moment.
+        fn claim(w: &mut World, npc: &str, quest: &str) -> u32 {
+            let q = w.maps[CITY].quests.iter().find(|q| q.id == quest).unwrap();
+            let due = crate::model::level_adjusted_xp(q.reward_xp, w.players[&1].character.level, q.level);
+            quest_interact(w, npc, Some(&format!("quest:claim:{quest}")));
+            due
+        }
+        let mut owed = 0;
         let mut w = world();
         city_player(&mut w);
         w.players.get_mut(&1).unwrap().character.quests.clear();
@@ -11231,7 +11283,7 @@ mod tests {
         ] {
             quest_interact(&mut w, npc, None);
         }
-        quest_interact(&mut w, "city_captain", Some("quest:claim:city_welcome"));
+        owed += claim(&mut w, "city_captain", "city_welcome");
         // Errands: people in the other maps ...
         quest_interact(&mut w, "city_herald", Some("quest:accept:city_seals"));
         quest_interact(&mut w, "city_bard", Some("quest:accept:city_hearths"));
@@ -11251,8 +11303,8 @@ mod tests {
             quest_interact(&mut w, npc, None);
         }
         w.players.get_mut(&1).unwrap().character.zone = CITY;
-        quest_interact(&mut w, "city_herald", Some("quest:claim:city_seals"));
-        quest_interact(&mut w, "city_bard", Some("quest:claim:city_hearths"));
+        owed += claim(&mut w, "city_herald", "city_seals");
+        owed += claim(&mut w, "city_bard", "city_hearths");
         // ... and goods from them.
         for (npc, quest, items) in [
             (
@@ -11303,7 +11355,7 @@ mod tests {
                 give(&mut w, own.map_or(item, |i| i.id.as_str()), n);
             }
             w.update_player(1);
-            quest_interact(&mut w, npc, Some(&format!("quest:claim:{quest}")));
+            owed += claim(&mut w, npc, quest);
         }
         let c = &w.players[&1].character;
         // This chain is the talk-and-bring errands. A progression quest finds the player by itself and is handed in on
@@ -11339,14 +11391,8 @@ mod tests {
             "every handed-in item was taken: {:?}",
             c.inventory
         );
-        let xp: u32 = w.maps[CITY]
-            .quests
-            .iter()
-            .filter(|q| in_chain(q))
-            .map(|q| q.reward_xp)
-            .sum();
         let paid: u32 = (1..c.level).map(xp_to_level).sum::<u32>() + c.xp;
-        assert_eq!(paid, xp, "every experience reward paid once");
+        assert_eq!(paid, owed, "every experience reward paid once");
     }
 
     #[test]
@@ -12082,6 +12128,35 @@ mod tests {
         assert_eq!(w.players[&1].character.gold, 51);
     }
 
+    #[test]
+    fn an_enemy_pushed_toward_a_blocked_spot_still_steps_clear_of_the_hero() {
+        let mut w = World::with_level_spread(Store::open(std::path::Path::new(":memory:")).unwrap(), 0);
+        let _rx = join(&mut w, 1, Class::Mage);
+        // Traced from live play: the nearest free spot away from this hero lies behind scenery.
+        let hero = Point { x: 215.001, y: 250.586 };
+        let start = Point { x: 215.481, y: 249.977 };
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        (c.zone, c.x, c.y) = (0, hero.x, hero.y);
+        let enemy = &mut w.slimes[125];
+        assert_eq!((enemy.kind.as_str(), enemy.zone, enemy.dead), ("blue", 0, false));
+        (enemy.x, enemy.y) = (start.x, start.y);
+        let r = enemy.r;
+        let bodies = w.actor_bodies(0, None, Some(125));
+        let away = hero.direction(start);
+        let pushed = Point {
+            x: hero.x + away.x * 1.01,
+            y: hero.y + away.y * 1.01,
+        };
+        let nearest = free_actor_position(&w.maps[0], pushed, r, &bodies, true).unwrap();
+        assert!(
+            !w.maps[0].line_clear(start, nearest, r.min(0.3)),
+            "the fixture no longer puts scenery between the enemy and the nearest free spot"
+        );
+        w.separate_enemies();
+        let after = w.slimes[125].point();
+        assert!(after.distance(hero) >= 1. - 1e-6, "still {:.2} from the hero", after.distance(hero));
+        assert!(w.maps[0].line_clear(start, after, r.min(0.3)));
+    }
     #[test]
     fn every_class_can_defeat_an_enemy_from_separate_tiles() {
         for class in [Class::Warrior, Class::Assassin, Class::Mage] {
@@ -12832,7 +12907,9 @@ mod tests {
         for s in w
             .slimes
             .iter()
-            .filter(|s| !overlay_enemy(&s.kind) && !s.kind.starts_with("ew_"))
+            .filter(|s| {
+                !overlay_enemy(&s.kind) && !s.kind.starts_with("ew_") && !w.maps[s.zone].gm_only
+            })
         {
             let default = if crate::cathedral::enemy(&s.kind).is_some()
                 || w.maps[s.zone].final_boss == "moonwell_echo"
@@ -12887,7 +12964,9 @@ mod tests {
         assert!(
             w.slimes
                 .iter()
-                .filter(|s| !overlay_enemy(&s.kind) && !s.kind.starts_with("ew_"))
+                .filter(|s| {
+                    !overlay_enemy(&s.kind) && !s.kind.starts_with("ew_") && !w.maps[s.zone].gm_only
+                })
                 .all(|s| s.level
                     == if crate::cathedral::enemy(&s.kind).is_some()
                         || w.maps[s.zone].final_boss == "moonwell_echo"
@@ -13207,6 +13286,7 @@ mod tests {
             let taken = ((damage - defense) * DAMAGE_TAKEN_SCALE).round().max(1.);
             assert_eq!(w.players[&1].character.hp, 1000. - taken, "{kind} damage");
             // Killing one pays its XP, gold and material in its own zone.
+            let xp = crate::model::level_adjusted_xp(xp, w.players[&1].character.level, w.slimes[id].level);
             w.hit_slime(id, 1, 100_000., false);
             let c = &w.players[&1].character;
             assert_eq!(c.kills, 1);
@@ -15610,7 +15690,7 @@ mod tests {
             .iter()
             .enumerate()
             // The Chained Forge wardens carry health phases that cap a single blow (world/boss_mechanics.rs).
-            .filter(|(_, s)| !s.dead && !s.kind.starts_with("cf_"))
+            .filter(|(_, s)| !s.dead && !s.kind.starts_with("cf_") && !w.maps[s.zone].gm_only)
             .max_by(|a, b| a.1.hp.total_cmp(&b.1.hp))
             .unwrap()
             .0;
@@ -15652,6 +15732,7 @@ mod tests {
         let sork = w.store.sso_account("Sork").unwrap();
         join_gm(&mut w, 1, &sork, GM_NAME).unwrap();
         let strongest: Vec<usize> = (0..w.maps.len())
+            .filter(|&zone| !w.maps[zone].gm_only) // training dummies never die
             .filter_map(|zone| {
                 w.slimes
                     .iter()
@@ -15789,7 +15870,7 @@ mod tests {
             .slimes
             .iter()
             .enumerate()
-            .filter(|(_, s)| !s.dead)
+            .filter(|(_, s)| !s.dead && !w.maps[s.zone].gm_only)
             .max_by(|a, b| a.1.hp.total_cmp(&b.1.hp))
             .unwrap()
             .0;

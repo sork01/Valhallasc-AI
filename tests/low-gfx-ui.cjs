@@ -40,6 +40,7 @@ const suite = {
     check(await page.locator('#low-gfx-suggestion').isHidden(), 'suggestion stays dismissed');
     await page.locator('#touch-actions [data-action="menu"]').click(); await page.locator('#p-settings').click();
     check(await page.locator('#set-low-graphics').isChecked(), 'Settings shows the saved preference');
+    await page.locator('#set-tab-video').click();
     await page.locator('#set-low-graphics').uncheck();
     check(await page.evaluate(() => !Prefs.lowGraphics && !document.documentElement.classList.contains('low-graphics')), 'normal graphics can be restored');
     fs.writeFileSync(`${out}/cpu-${width}x${height}.txt`, JSON.stringify({ normal, low, savingPercent: Math.round((1 - low.cpuPercentOfCore / normal.cpuPercentOfCore) * 100) }, null, 2) + '\n');

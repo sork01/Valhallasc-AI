@@ -33,7 +33,7 @@ const GROUND = ['The Blue Salt Pans', 'The Roc Crag'], lums = {};
   // a seam portal sits on the shared border, one tile outside the floor by design: it must touch the floor within 3 tiles
   const nearFloor = (x, y) => { for (let i = -3; i <= 3; i++) for (let j = -3; j <= 3; j++) if (onFloor(Z, x + i, y + j)) return true; return false; };
   for (const p of Z.portals) check(p.seam ? nearFloor(p.x, p.y) : onFloor(Z, p.x, p.y), `${p.id} stands on the floor${p.seam ? ' (seam: on the shared border)' : ''}`);
-  check(Z.regions.names.length === 14 && Z.camps.length === 4 && Z.quests.length === 29, 'fourteen regions, five hubs and 29 quests');
+  check(Z.regions.names.length === 14 && Z.camps.length === 4 && Z.quests.filter(q => !q.id.startsWith('fisher_')).length === 29, 'fourteen regions, five hubs and 29 quests (Fisher quests aside)');
   const wall = Z.objects.filter(o => o.kind === 'rampart' || o.kind === 'tower');
   check(wall.filter(o => o.kind === 'rampart').length >= 50 && wall.filter(o => o.kind === 'tower').length >= 4, `the wall is ${wall.length} isometric rampart and tower objects`);
   server = spawn(process.env.VALHALLA_BINARY, [], { cwd: root, stdio: 'ignore',

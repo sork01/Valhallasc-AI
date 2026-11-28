@@ -78,7 +78,7 @@ def outside():
         npc('healer','Ena Dew','Leaf healer',28,95,'Rest here. The tree carries cool water into every balcony.',[dict(id='blessing',label='Receive a healing blessing',cost=0,heal=10000),dict(id='potion',label='Buy Health Potion',cost=30,item='health_potion',tiered=True)]),
         npc('trader','Boro Coil','Canopy trader',43,100,'My wares travel in leaf baskets, never carts.',[dict(id='stew',label="Buy Traveler's Stew",cost=12,item='traveler_stew',tiered=True),dict(id='satchel',label='Buy Linen Satchel',cost=500,bag='linen_satchel')],True),
         npc('lookout','Sela Highleaf','Crown lookout',88,57,'From the upper loop you can see both the jungle and the golden heartwood windows.'),
-        npc('stone','Crown Meeting Stone','Gather a party · hire fighters',68,77,'Meet your companions here before the Seed Vault opens.',mercenary_offers.offers(open_=True),art='stone'),
+        npc('stone','Crown Meeting Stone','Gather your party',68,77,'Meet your companions here before the Seed Vault opens.',mercenary_offers.offers(open_=True),art='stone'),
     ]
     quests=[
         quest('welcome','A City Above the Rain','matriarch','Meet the healer, ranger and nectar keeper on the branching decks.',[talk('healer','Meet Ena'),talk('ranger','Meet Telo'),talk('apiarist','Meet Miri')],8500),

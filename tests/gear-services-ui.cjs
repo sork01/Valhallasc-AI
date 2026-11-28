@@ -42,7 +42,7 @@ async function call(name,args={}){const result=await client.callTool({name,argum
   await page.getByRole('button',{name:'Preview merge'}).click();
   await page.getByText(/Output: uncommon/).waitFor({timeout:10000});
   await page.getByRole('button',{name:'Confirm merge'}).click();
-  await page.getByText(/Merged into an? uncommon/i).waitFor({timeout:10000});
+  await page.locator('#npc-notice').filter({hasText:/Merged into an? uncommon/i}).waitFor({timeout:10000});
   await page.locator('#npc-back').click();
   await page.locator('[data-offer="refine"]').click();
   const select=page.locator('#npc-inventory .gear-service-select');
@@ -52,7 +52,7 @@ async function call(name,args={}){const result=await client.callTool({name,argum
   await page.getByRole('button',{name:'Preview refinement'}).click();
   await page.getByText(/Cost: 2 silver and 1 Uncommon Refinement Crystal/).waitFor({timeout:10000});
   await page.getByRole('button',{name:'Confirm refinement'}).click();
-  await page.getByText(/Refined .* to rank 1/).waitFor({timeout:10000});
+  await page.locator('#npc-notice').filter({hasText:/Refined .* to rank 1/}).waitFor({timeout:10000});
   // Orange copies use their own editor-exported art and retain individually visible stats.
   await page.locator('#npc-x').click();
   const ordinaryFrame=await page.evaluate(()=>Field.warriorSprites.frame('idle',0,0).toDataURL());

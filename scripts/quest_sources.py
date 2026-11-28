@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Export public bring-objective sources from the authoritative drop table.
 
+A fish is listed by water (zone and habitat); the client reads the casting spots from its own map.
 Secret crosses and gate-key materials intentionally retain giver guidance.
 Called by sync-world.cjs; --output permits private client validation.
 """
@@ -35,8 +36,16 @@ def sources():
                for o in q['objectives'] if o['kind'] == 'bring'}
     # A quest-only item (scripts/quest_items.py) drops from the monsters of the material it is made from.
     source_of = {i['id']: i['questMaterial'] for i in json.loads((ROOT / 'world/items.txt').read_text()) if i.get('questMaterial')}
+    fish = {row['item']: row for row in json.loads((ROOT / 'world/fish.txt').read_text())}
     out = {}
     for target in sorted(targets):
+        if target in fish:
+            # The server's catch rule: the water's habitat, and the species' own zone when it has one.
+            species = fish[target]
+            out[target] = [{'zone': zone, 'water': species['habitat']} for zone, area in enumerate(areas)
+                           if species['zone'] in (None, zone)
+                           and any(spot['habitat'] == species['habitat'] for spot in area.get('fishingSpots', []))]
+            continue
         points = []
         hidden = target.startswith(('hour_shard_', 'ember_shard_')) or target == 'ember_key'
         if not hidden:

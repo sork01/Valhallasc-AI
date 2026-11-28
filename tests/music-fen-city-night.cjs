@@ -27,7 +27,10 @@ const debug = (page, command) => page.evaluate(c => Online.send({ type: 'debug',
   if (process.env.MUTATE === 'wyrd') await page.route('**/game.js*', async route => { const r = await route.fetch(); await route.fulfill({ response: r, body: (await r.text()).replace('nightScores.set(6, wyrdNightMusic);', '') }); });
   await page.goto(world.url); await page.locator('#start').click(); await page.locator('#login-guest').click();
   await page.locator('#name').fill('MereLantern'); await page.locator('#go').click({ timeout: 60000 });
-  await page.waitForFunction(() => Online.connected && Field.zone === 0 && !!valhalla.fmusic?.running, null, { timeout: 60000 });
+  await page.waitForFunction(() => Online.connected && Field.zone === 0, null, { timeout: 60000 });
+  // The world clock may read night, when the meadow's night score plays instead of the day one.
+  await page.evaluate(() => Online.send({ type: 'debug', command: { op: 'set_time', hour: 12, freeze: true } }));
+  await page.waitForFunction(() => !!valhalla.fmusic?.running, null, { timeout: 60000 });
   await debug(page, { op: 'set_time', hour: 12, freeze: true });
   await debug(page, { op: 'teleport', zone: 3, x: 64, y: 9 });
   await page.waitForFunction(() => Field.zone === 3 && DayNight.nightMix === 0 && valhalla.gmusic.running && !valhalla.fenNightMusic.running, null, { timeout: 10000 });

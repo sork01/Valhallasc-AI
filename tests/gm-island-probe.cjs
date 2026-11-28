@@ -93,6 +93,8 @@ async function action(c,action,npc,extra={}){return c.ok({op:'gm_island',action,
     fs.writeFileSync(path.join(dir,'snapshot-timing.txt'),JSON.stringify({saveInclusive,steady},null,2));
     check(elapsed<=3000&&steady.intervals.every(s=>s.gap===2),`30 steady snapshots in ${elapsed} ms, tick gaps of 2`);
     const character=gm.id;gm.ws.close();await delay(700);gm=await connect(auth.session,character);
+    // The first broadcast after a join can be one from before it: wait for a view that lists this character.
+    await until(()=>gm.player(),'own view after reconnect');
     check(gm.player().zone===island&&gm.player().look.class==='hunter','test loadout survives reconnect');
     await action(gm,'enter'); // reconnect starts hidden; entering makes the lab visible again
     await beside(gm,'gmi_ferryman');await action(gm,'leave','gmi_ferryman');

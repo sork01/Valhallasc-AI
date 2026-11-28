@@ -2,8 +2,8 @@
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
-const { TestWorld } = require('../scripts/testing/driver.cjs');
-const root = path.resolve(__dirname, '..');
+const { TestWorld } = require('../../scripts/testing/driver.cjs');
+const root = path.resolve(__dirname, '../..');
 const read = name => JSON.parse(fs.readFileSync(path.join(root, name), 'utf8'));
 // Defaults describe the latest boss health change (1.15.13).
 const factor = Number(process.env.BOSS_HP_FACTOR || 1.5);

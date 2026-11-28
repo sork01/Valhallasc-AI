@@ -789,9 +789,7 @@ def design(world, write=False):
     d.reach = seen
     zone['slimes'] = d.spawns()
     zone['objects'] = objects
-    # Omit the year_blackhour teleport spur (foundry) while keeping Equinox spokes and the Sunward vault road.
-    visible_roads = [road for name, road in d.ROADMAP.items() if name != 'foundry']
-    zone['paths'] = [[[round(a, 2), round(b, 2)] for a, b in road] for road in visible_roads]
+    zone['paths'] = [[[round(a, 2), round(b, 2)] for a, b in road] for road in d.ROADLIST]
     zone['atlasPaths'] = []
     zone['exitRoutes'] = []
     zone['exitArches'] = [vault_arch(fr)]

@@ -89,10 +89,20 @@ class FishingData(unittest.TestCase):
         first, second = spots.build(world), spots.build(world)
         self.assertEqual(first, second)
         self.assertEqual(json.dumps(first, indent=2, ensure_ascii=False)+'\n', (ROOT / 'world/fishing-spots.txt').read_text())
+        # The overlay moves its ponds to the end of a zone's objects, behind later overlays' scenery: only that order may change.
+        def unordered(w):
+            w = copy.deepcopy(w)
+            for area in [w, *w['zones']]:
+                area['objects'] = sorted(area['objects'], key=lambda o: json.dumps(o, sort_keys=True))
+            return w
         before = copy.deepcopy(world)
         spots.install_ponds(world)
         spots.install(world, first)
-        self.assertEqual(before, world)
+        self.assertEqual(unordered(before), unordered(world))
+        again = copy.deepcopy(world)
+        spots.install_ponds(again)
+        spots.install(again, first)
+        self.assertEqual(again, world, 'a second run changes nothing')
         sync = (ROOT / 'scripts/sync-world.cjs').read_text()
         self.assertGreater(sync.index("'fishing_spots.py'"), sync.index("'apply'"))
         self.assertGreater(sync.index("'fish_catalog.py'"), sync.rindex("'vendor_weapons.py'"))

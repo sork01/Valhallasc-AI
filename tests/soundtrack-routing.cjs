@@ -6,6 +6,7 @@ const manifest = JSON.parse(fs.readFileSync('scripts/soundtrack-filedrop.txt', '
 const sandbox = { console, Map, setInterval() {}, scene: 'game', ensureWeatherSound() {},
   save: { sound: true, musicVol: .35 }, taper: v => v * v };
 sandbox.window = sandbox;
+sandbox.WORLD_MAP = JSON.parse(fs.readFileSync('world/map.txt', 'utf8'));
 const context = { state: 'running', currentTime: 0, addEventListener() {} };
 sandbox.audio = () => context;
 sandbox.ac = context;

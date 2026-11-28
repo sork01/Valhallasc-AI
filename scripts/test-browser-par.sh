@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Run every tests/*.cjs through the bounded runner, JOBS at a time (default 4), at low priority.
+# Run the browser suites through the bounded runner, JOBS at a time (default 4), at low priority. The design, artwork and
+# seasonal suites run only when something they cover differs from BASE (scripts/test_select.py); ALL=1 runs every suite.
 # Each suite keeps its own 1.5 GiB / 1 CPU cap (scripts/test-touch-bounded.sh); nothing is raised.
 # Results: $OUT/browser-results.tsv (name, exit code, seconds), logs in $OUT/browser/. Stop with: pkill -f test-browser-par
 set -u
@@ -13,5 +14,7 @@ run_one() {
   printf '%s\t%s\t%s\n' "$b" "$?" "$(( $(date +%s)-start ))" > "$OUT/browser-rc/$b.tsv"
 }
 export -f run_one
-ls tests/*.cjs | grep -v -E '/(public-smoke|test-driver)\.cjs$' | xargs -P "$JOBS" -I{} bash -c 'run_one {}'
-cat "$OUT"/browser-rc/*.tsv > "$OUT/browser-results.tsv"; echo DONE >> "$OUT/browser-results.tsv"
+: > "$OUT/browser-skipped.tsv"
+suites=$(python3 scripts/test_select.py browser --results "$OUT/browser-skipped.tsv") || exit 1
+printf 'tests/%s.cjs\n' $suites | grep -v -E '/test-driver\.cjs$' | xargs -P "$JOBS" -I{} bash -c 'run_one {}'
+{ cat "$OUT"/browser-rc/*.tsv "$OUT/browser-skipped.tsv"; echo DONE; } > "$OUT/browser-results.tsv"

@@ -1,7 +1,7 @@
 //! Sunward Vale (zone 20, levels 65-70) as an authored river valley on the shapes pilot: its data, the six seams (the Stormglass Flats, the Ribbonwild, the Tanglecrown, the Veyrroot
 //! Canopy, the Lapis Erg and the Frostwake Shelf) with a road across each, the wall along the Yearwheel border with its one vaulted opening, Millbridge and three outposts, the quests
 //! (holds, visits, brings, kills, the two elite quests) and the three elites.
-use super::wyrd_tests::{at, blocked, flood, join, place, reached, world};
+use super::wyrd_tests::{approached, at, blocked, flood, join, place, reached, world};
 use super::*;
 
 const VALE: usize = 20;
@@ -423,7 +423,7 @@ fn everyone_and_everything_in_the_vale_can_be_walked_to_from_millbridge() {
     let map = &w.maps[VALE];
     let open = flood(map, &blocked(map, &[]), map.spawn);
     for n in &map.npcs {
-        assert!(reached(map, &open, at(n.x, n.y)), "{} is cut off", n.id);
+        assert!(approached(map, &open, n), "{} is cut off", n.id);
     }
     for p in &map.places {
         assert!(

@@ -66769,6 +66769,18 @@
           [
             207.5,
             104
+          ],
+          [
+            207.5,
+            100.5
+          ],
+          [
+            206.5,
+            100.5
+          ],
+          [
+            206.5,
+            94.5
           ]
         ],
         [
@@ -66783,6 +66795,36 @@
           [
             192,
             102
+          ]
+        ],
+        [
+          [
+            150,
+            100
+          ],
+          [
+            150,
+            72
+          ],
+          [
+            153,
+            50
+          ],
+          [
+            156.5,
+            29.5
+          ],
+          [
+            156.5,
+            20.5
+          ],
+          [
+            154.5,
+            20.5
+          ],
+          [
+            154.5,
+            13.5
           ]
         ],
         [
@@ -319792,7 +319834,7 @@
           "x": 76.5,
           "y": 126.4,
           "color": "#5a7a9a",
-          "dialogue": "The Meeting Stone has stood here since before the walls. Wanderers who part at the Great Gate find each other again beside it. Gather your friends at the stone — and if you have too few, speak to the Stone itself: it will call fighters to your side for a fee. Mind the stairs beside it. They lead down to the Undervault, where the first Skalds sealed what they could not kill. Take five, and take a healer.",
+          "dialogue": "The Meeting Stone has stood here since before the walls. Wanderers who part at the Great Gate find each other again beside it. Use the stone to summon your party to your side — and if you have too few, the Repair Smith inside will hire fighters for you, for a fee. Mind the stairs beside it. They lead down to the Undervault, where the first Skalds sealed what they could not kill. Take five, and take a healer.",
           "offers": [],
           "buys": false,
           "look": {
@@ -352558,6 +352600,10 @@
           [
             222.5,
             156
+          ],
+          [
+            221.5,
+            146.5
           ]
         ],
         [
@@ -459115,6 +459161,14 @@
       "paths": [
         [
           [
+            91.5,
+            181.5
+          ],
+          [
+            122.5,
+            181.5
+          ],
+          [
             125.5,
             184.5
           ],
@@ -459295,6 +459349,28 @@
         ],
         [
           [
+            232.5,
+            303.5
+          ],
+          [
+            232.5,
+            306.5
+          ],
+          [
+            229.5,
+            309.5
+          ],
+          [
+            229.5,
+            334.5
+          ],
+          [
+            227.5,
+            338.5
+          ]
+        ],
+        [
+          [
             187.5,
             199.5
           ],
@@ -459329,6 +459405,58 @@
           [
             296.5,
             257.5
+          ]
+        ],
+        [
+          [
+            296.5,
+            257.5
+          ],
+          [
+            296.5,
+            222.5
+          ],
+          [
+            292.5,
+            218.5
+          ],
+          [
+            292.5,
+            192.5
+          ],
+          [
+            300.5,
+            186.5
+          ]
+        ],
+        [
+          [
+            296.5,
+            257.5
+          ],
+          [
+            311.5,
+            272.5
+          ],
+          [
+            311.5,
+            282.5
+          ],
+          [
+            316.5,
+            287.5
+          ],
+          [
+            316.5,
+            290.5
+          ],
+          [
+            323.5,
+            297.5
+          ],
+          [
+            330.5,
+            300.5
           ]
         ],
         [
@@ -492220,6 +492348,42 @@
               "label": "Buy Starter Mining Pick",
               "item": "smith_pick_1",
               "cost": 25
+            },
+            {
+              "id": "merc_warrior",
+              "label": "Hire a Warrior mercenary · holds the line",
+              "cost": 250,
+              "merc": "warrior"
+            },
+            {
+              "id": "merc_mage",
+              "label": "Hire a Mage mercenary · casts from range",
+              "cost": 250,
+              "merc": "mage"
+            },
+            {
+              "id": "merc_assassin",
+              "label": "Hire a Assassin mercenary · strikes fast",
+              "cost": 250,
+              "merc": "assassin"
+            },
+            {
+              "id": "merc_priest",
+              "label": "Hire a Priest mercenary · heals the party",
+              "cost": 250,
+              "merc": "priest"
+            },
+            {
+              "id": "merc_hunter",
+              "label": "Hire a Hunter mercenary · shoots from range",
+              "cost": 250,
+              "merc": "hunter"
+            },
+            {
+              "id": "merc_dismiss",
+              "label": "Send my mercenaries away",
+              "cost": 0,
+              "merc": "dismiss"
             }
           ],
           "buys": false,
@@ -492359,7 +492523,44 @@
           "y": 123,
           "color": "#8aa0c8",
           "dialogue": "Skadi taught me the pack and the pack taught me the wind. Every hound on this meadow came out of my kennel, and one of them came out of it bigger than the rest. Sköll hunts the meadow now, and the pack runs where he runs.",
-          "offers": [],
+          "offers": [
+            {
+              "id": "merc_warrior",
+              "label": "Hire a Warrior mercenary · holds the line",
+              "cost": 250,
+              "merc": "warrior"
+            },
+            {
+              "id": "merc_mage",
+              "label": "Hire a Mage mercenary · casts from range",
+              "cost": 250,
+              "merc": "mage"
+            },
+            {
+              "id": "merc_assassin",
+              "label": "Hire a Assassin mercenary · strikes fast",
+              "cost": 250,
+              "merc": "assassin"
+            },
+            {
+              "id": "merc_priest",
+              "label": "Hire a Priest mercenary · heals the party",
+              "cost": 250,
+              "merc": "priest"
+            },
+            {
+              "id": "merc_hunter",
+              "label": "Hire a Hunter mercenary · shoots from range",
+              "cost": 250,
+              "merc": "hunter"
+            },
+            {
+              "id": "merc_dismiss",
+              "label": "Send my mercenaries away",
+              "cost": 0,
+              "merc": "dismiss"
+            }
+          ],
           "buys": false,
           "look": {
             "skin": "#edc5a1",
@@ -532845,7 +533046,64 @@
           "t": 2
         }
       ],
-      "paths": [],
+      "paths": [
+        [
+          [
+            236.8,
+            44.0
+          ],
+          [
+            230.8,
+            44.0
+          ],
+          [
+            200.0,
+            44.0
+          ]
+        ],
+        [
+          [
+            204.8,
+            132.0
+          ],
+          [
+            198.8,
+            132.0
+          ],
+          [
+            180.0,
+            132.0
+          ]
+        ],
+        [
+          [
+            128.0,
+            228.8
+          ],
+          [
+            128.0,
+            222.8
+          ],
+          [
+            128.0,
+            200.0
+          ]
+        ],
+        [
+          [
+            41.0,
+            84.0
+          ],
+          [
+            47.0,
+            84.0
+          ],
+          [
+            60.0,
+            84.0
+          ]
+        ]
+      ],
       "objects": [
         {
           "kind": "void",
@@ -548151,7 +548409,64 @@
           "width": 4.8
         }
       ],
-      "atlasPaths": [],
+      "atlasPaths": [
+        [
+          [
+            236.8,
+            44.0
+          ],
+          [
+            230.8,
+            44.0
+          ],
+          [
+            200.0,
+            44.0
+          ]
+        ],
+        [
+          [
+            204.8,
+            132.0
+          ],
+          [
+            198.8,
+            132.0
+          ],
+          [
+            180.0,
+            132.0
+          ]
+        ],
+        [
+          [
+            128.0,
+            228.8
+          ],
+          [
+            128.0,
+            222.8
+          ],
+          [
+            128.0,
+            200.0
+          ]
+        ],
+        [
+          [
+            41.0,
+            84.0
+          ],
+          [
+            47.0,
+            84.0
+          ],
+          [
+            60.0,
+            84.0
+          ]
+        ]
+      ],
       "seasonDecor": [
         {
           "kind": "festivalWeb",
@@ -614594,6 +614909,46 @@
           [
             200,
             54
+          ]
+        ],
+        [
+          [
+            153,
+            294
+          ],
+          [
+            130,
+            296
+          ],
+          [
+            112,
+            296
+          ],
+          [
+            97.5,
+            296.5
+          ],
+          [
+            91.5,
+            296.5
+          ]
+        ],
+        [
+          [
+            130,
+            222
+          ],
+          [
+            110,
+            226
+          ],
+          [
+            91.5,
+            226.5
+          ],
+          [
+            85.5,
+            226.5
           ]
         ],
         [
@@ -717130,6 +717485,24 @@
         ],
         [
           [
+            54.5,
+            92.5
+          ],
+          [
+            60.5,
+            92.5
+          ],
+          [
+            70,
+            91
+          ],
+          [
+            80,
+            90
+          ]
+        ],
+        [
+          [
             27.5,
             248.5
           ],
@@ -811858,7 +812231,44 @@
           "y": 142,
           "color": "#a5e5ca",
           "dialogue": "Each ring of the forest remembers a different moon. Listen for the one that has gone silent.",
-          "offers": [],
+          "offers": [
+            {
+              "id": "merc_warrior",
+              "label": "Hire a Warrior mercenary · holds the line",
+              "cost": 250,
+              "merc": "warrior"
+            },
+            {
+              "id": "merc_mage",
+              "label": "Hire a Mage mercenary · casts from range",
+              "cost": 250,
+              "merc": "mage"
+            },
+            {
+              "id": "merc_assassin",
+              "label": "Hire a Assassin mercenary · strikes fast",
+              "cost": 250,
+              "merc": "assassin"
+            },
+            {
+              "id": "merc_priest",
+              "label": "Hire a Priest mercenary · heals the party",
+              "cost": 250,
+              "merc": "priest"
+            },
+            {
+              "id": "merc_hunter",
+              "label": "Hire a Hunter mercenary · shoots from range",
+              "cost": 250,
+              "merc": "hunter"
+            },
+            {
+              "id": "merc_dismiss",
+              "label": "Send my mercenaries away",
+              "cost": 0,
+              "merc": "dismiss"
+            }
+          ],
           "buys": false,
           "look": {
             "hair": "#bdeed5",
@@ -814875,6 +815285,16 @@
             90,
             18
           ]
+        ],
+        [
+          [
+            90.0,
+            5.5
+          ],
+          [
+            90.0,
+            30.0
+          ]
         ]
       ],
       "roads": [
@@ -817253,7 +817673,7 @@
         {
           "id": "asterion_stone",
           "name": "The Asterion Meeting Stone",
-          "role": "Gather a party · hire fighters",
+          "role": "Gather your party",
           "x": 120.5,
           "y": 88.0,
           "color": "#9ec8dd",
@@ -821920,7 +822340,18 @@
           "width": 6.0
         }
       ],
-      "atlasPaths": [],
+      "atlasPaths": [
+        [
+          [
+            90.0,
+            5.5
+          ],
+          [
+            90.0,
+            30.0
+          ]
+        ]
+      ],
       "seasonDecor": [
         {
           "kind": "festivalWeb",
@@ -866733,7 +867164,7 @@
           ],
           [
             177,
-            258
+            267
           ]
         ],
         [
@@ -866874,11 +867305,25 @@
         ],
         [
           [
+            238,
+            111
+          ],
+          [
+            252,
+            112
+          ]
+        ],
+        [
+          [
             210,
             114
           ],
           [
             228,
+            112
+          ],
+          [
+            238,
             112
           ]
         ],
@@ -866898,6 +867343,28 @@
         ],
         [
           [
+            262.5,
+            18.5
+          ],
+          [
+            262.5,
+            24.5
+          ],
+          [
+            250,
+            24
+          ],
+          [
+            232,
+            24
+          ],
+          [
+            216,
+            24
+          ]
+        ],
+        [
+          [
             137.5,
             306.5
           ],
@@ -866907,6 +867374,20 @@
           ],
           [
             137,
+            262
+          ]
+        ],
+        [
+          [
+            177.5,
+            271.0
+          ],
+          [
+            177.5,
+            264.0
+          ],
+          [
+            177,
             262
           ]
         ],
@@ -889645,7 +890126,44 @@
           "y": 255,
           "color": "#a8dfe4",
           "dialogue": "Asterion sent us to listen to the dry sea bed. The sea left in thunder, and the thunder has never stopped. Meet the crew before you follow its voice.",
-          "offers": [],
+          "offers": [
+            {
+              "id": "merc_warrior",
+              "label": "Hire a Warrior mercenary · holds the line",
+              "cost": 250,
+              "merc": "warrior"
+            },
+            {
+              "id": "merc_mage",
+              "label": "Hire a Mage mercenary · casts from range",
+              "cost": 250,
+              "merc": "mage"
+            },
+            {
+              "id": "merc_assassin",
+              "label": "Hire a Assassin mercenary · strikes fast",
+              "cost": 250,
+              "merc": "assassin"
+            },
+            {
+              "id": "merc_priest",
+              "label": "Hire a Priest mercenary · heals the party",
+              "cost": 250,
+              "merc": "priest"
+            },
+            {
+              "id": "merc_hunter",
+              "label": "Hire a Hunter mercenary · shoots from range",
+              "cost": 250,
+              "merc": "hunter"
+            },
+            {
+              "id": "merc_dismiss",
+              "label": "Send my mercenaries away",
+              "cost": 0,
+              "merc": "dismiss"
+            }
+          ],
           "buys": false,
           "look": {
             "skin": "#ac806c",
@@ -889923,7 +890441,7 @@
         {
           "id": "stormglass_stone",
           "name": "The Breakwater Meeting Stone",
-          "role": "Gather a party · hire fighters",
+          "role": "Gather your party",
           "x": 224,
           "y": 108,
           "color": "#a8dfe4",
@@ -912896,6 +913414,20 @@
           [
             176,
             66
+          ]
+        ],
+        [
+          [
+            178,
+            53
+          ],
+          [
+            178,
+            47.0
+          ],
+          [
+            176,
+            42.0
           ]
         ],
         [
@@ -938976,7 +939508,44 @@
           "y": 206.5,
           "color": "#ffe6a5",
           "dialogue": "There is a quick path through the western oakwood and a gentle one past the apple rows. Both reach the old crown at the north end of the trunk road.",
-          "offers": [],
+          "offers": [
+            {
+              "id": "merc_warrior",
+              "label": "Hire a Warrior mercenary · holds the line",
+              "cost": 250,
+              "merc": "warrior"
+            },
+            {
+              "id": "merc_mage",
+              "label": "Hire a Mage mercenary · casts from range",
+              "cost": 250,
+              "merc": "mage"
+            },
+            {
+              "id": "merc_assassin",
+              "label": "Hire a Assassin mercenary · strikes fast",
+              "cost": 250,
+              "merc": "assassin"
+            },
+            {
+              "id": "merc_priest",
+              "label": "Hire a Priest mercenary · heals the party",
+              "cost": 250,
+              "merc": "priest"
+            },
+            {
+              "id": "merc_hunter",
+              "label": "Hire a Hunter mercenary · shoots from range",
+              "cost": 250,
+              "merc": "hunter"
+            },
+            {
+              "id": "merc_dismiss",
+              "label": "Send my mercenaries away",
+              "cost": 0,
+              "merc": "dismiss"
+            }
+          ],
           "buys": false,
           "look": {
             "skin": "#b78865",
@@ -939136,7 +939705,44 @@
           "y": 65,
           "color": "#ffe6a5",
           "dialogue": "The roots have opened. Gather five companions before descending: the heart below has awakened. The Hollow door stands north of this camp.",
-          "offers": [],
+          "offers": [
+            {
+              "id": "merc_warrior",
+              "label": "Hire a Warrior mercenary · holds the line",
+              "cost": 250,
+              "merc": "warrior"
+            },
+            {
+              "id": "merc_mage",
+              "label": "Hire a Mage mercenary · casts from range",
+              "cost": 250,
+              "merc": "mage"
+            },
+            {
+              "id": "merc_assassin",
+              "label": "Hire a Assassin mercenary · strikes fast",
+              "cost": 250,
+              "merc": "assassin"
+            },
+            {
+              "id": "merc_priest",
+              "label": "Hire a Priest mercenary · heals the party",
+              "cost": 250,
+              "merc": "priest"
+            },
+            {
+              "id": "merc_hunter",
+              "label": "Hire a Hunter mercenary · shoots from range",
+              "cost": 250,
+              "merc": "hunter"
+            },
+            {
+              "id": "merc_dismiss",
+              "label": "Send my mercenaries away",
+              "cost": 0,
+              "merc": "dismiss"
+            }
+          ],
           "buys": false,
           "look": {
             "skin": "#835e4b",
@@ -939150,7 +939756,7 @@
         {
           "id": "sun_stone",
           "name": "Millbridge Meeting Stone",
-          "role": "Gather a party · hire fighters",
+          "role": "Gather your party",
           "x": 185.5,
           "y": 71.5,
           "color": "#ffe6a5",
@@ -964233,6 +964839,10 @@
           [
             293,
             192
+          ],
+          [
+            299,
+            190
           ]
         ],
         [
@@ -988971,7 +989581,44 @@
           "y": 183.0,
           "color": "#fff0b5",
           "dialogue": "The Thousandfold Pavilion remembers every performer. None may enter while the masks still sing outside.",
-          "offers": [],
+          "offers": [
+            {
+              "id": "merc_warrior",
+              "label": "Hire a Warrior mercenary · holds the line",
+              "cost": 250,
+              "merc": "warrior"
+            },
+            {
+              "id": "merc_mage",
+              "label": "Hire a Mage mercenary · casts from range",
+              "cost": 250,
+              "merc": "mage"
+            },
+            {
+              "id": "merc_assassin",
+              "label": "Hire a Assassin mercenary · strikes fast",
+              "cost": 250,
+              "merc": "assassin"
+            },
+            {
+              "id": "merc_priest",
+              "label": "Hire a Priest mercenary · heals the party",
+              "cost": 250,
+              "merc": "priest"
+            },
+            {
+              "id": "merc_hunter",
+              "label": "Hire a Hunter mercenary · shoots from range",
+              "cost": 250,
+              "merc": "hunter"
+            },
+            {
+              "id": "merc_dismiss",
+              "label": "Send my mercenaries away",
+              "cost": 0,
+              "merc": "dismiss"
+            }
+          ],
           "buys": false,
           "look": {
             "skin": "#bd8365",
@@ -988990,7 +989637,44 @@
           "y": 174,
           "color": "#fff0b5",
           "dialogue": "The macaws know each petal court by heart. Watch where the gold court meets the teal.",
-          "offers": [],
+          "offers": [
+            {
+              "id": "merc_warrior",
+              "label": "Hire a Warrior mercenary · holds the line",
+              "cost": 250,
+              "merc": "warrior"
+            },
+            {
+              "id": "merc_mage",
+              "label": "Hire a Mage mercenary · casts from range",
+              "cost": 250,
+              "merc": "mage"
+            },
+            {
+              "id": "merc_assassin",
+              "label": "Hire a Assassin mercenary · strikes fast",
+              "cost": 250,
+              "merc": "assassin"
+            },
+            {
+              "id": "merc_priest",
+              "label": "Hire a Priest mercenary · heals the party",
+              "cost": 250,
+              "merc": "priest"
+            },
+            {
+              "id": "merc_hunter",
+              "label": "Hire a Hunter mercenary · shoots from range",
+              "cost": 250,
+              "merc": "hunter"
+            },
+            {
+              "id": "merc_dismiss",
+              "label": "Send my mercenaries away",
+              "cost": 0,
+              "merc": "dismiss"
+            }
+          ],
           "buys": false,
           "look": {
             "skin": "#bd8365",
@@ -989145,7 +989829,7 @@
         {
           "id": "ribbon_stone",
           "name": "Jubilee Meeting Stone",
-          "role": "Gather a party · hire fighters",
+          "role": "Gather your party",
           "x": 287.0,
           "y": 201.0,
           "color": "#fff0b5",
@@ -1058352,7 +1059036,44 @@
           "y": 196,
           "color": "#d6f1a2",
           "dialogue": "The orchid mantises mimic flowers; the gliders carry pollen above the river.",
-          "offers": [],
+          "offers": [
+            {
+              "id": "merc_warrior",
+              "label": "Hire a Warrior mercenary · holds the line",
+              "cost": 250,
+              "merc": "warrior"
+            },
+            {
+              "id": "merc_mage",
+              "label": "Hire a Mage mercenary · casts from range",
+              "cost": 250,
+              "merc": "mage"
+            },
+            {
+              "id": "merc_assassin",
+              "label": "Hire a Assassin mercenary · strikes fast",
+              "cost": 250,
+              "merc": "assassin"
+            },
+            {
+              "id": "merc_priest",
+              "label": "Hire a Priest mercenary · heals the party",
+              "cost": 250,
+              "merc": "priest"
+            },
+            {
+              "id": "merc_hunter",
+              "label": "Hire a Hunter mercenary · shoots from range",
+              "cost": 250,
+              "merc": "hunter"
+            },
+            {
+              "id": "merc_dismiss",
+              "label": "Send my mercenaries away",
+              "cost": 0,
+              "merc": "dismiss"
+            }
+          ],
           "buys": false,
           "look": {
             "skin": "#a96c4e",
@@ -1058581,7 +1059302,7 @@
         {
           "id": "tangle_stone",
           "name": "Banyan Meeting Stone",
-          "role": "Gather a party · hire fighters",
+          "role": "Gather your party",
           "x": 260,
           "y": 148,
           "color": "#d6f1a2",
@@ -1108089,7 +1108810,7 @@
         {
           "id": "heart_stone",
           "name": "Crown Meeting Stone",
-          "role": "Gather a party · hire fighters",
+          "role": "Gather your party",
           "x": 222,
           "y": 245,
           "color": "#e4f7ae",
@@ -1108301,7 +1109022,44 @@
           "y": 97,
           "color": "#e4f7ae",
           "dialogue": "North of the post the Twin Roots climb out of the canopy, and above them the Lantern Queen keeps her hive. The Lapis road leaves the Veyrroot at the top of this stair. I keep the stair.",
-          "offers": [],
+          "offers": [
+            {
+              "id": "merc_warrior",
+              "label": "Hire a Warrior mercenary · holds the line",
+              "cost": 250,
+              "merc": "warrior"
+            },
+            {
+              "id": "merc_mage",
+              "label": "Hire a Mage mercenary · casts from range",
+              "cost": 250,
+              "merc": "mage"
+            },
+            {
+              "id": "merc_assassin",
+              "label": "Hire a Assassin mercenary · strikes fast",
+              "cost": 250,
+              "merc": "assassin"
+            },
+            {
+              "id": "merc_priest",
+              "label": "Hire a Priest mercenary · heals the party",
+              "cost": 250,
+              "merc": "priest"
+            },
+            {
+              "id": "merc_hunter",
+              "label": "Hire a Hunter mercenary · shoots from range",
+              "cost": 250,
+              "merc": "hunter"
+            },
+            {
+              "id": "merc_dismiss",
+              "label": "Send my mercenaries away",
+              "cost": 0,
+              "merc": "dismiss"
+            }
+          ],
           "buys": false,
           "look": {
             "skin": "#d9b08c",
@@ -1108414,7 +1109172,44 @@
           "y": 197,
           "color": "#e4f7ae",
           "dialogue": "The Eastern Roots run down to the coast, and half of what stands among them is not a tree. The Heartbark Colossus walks there. I keep the coast.",
-          "offers": [],
+          "offers": [
+            {
+              "id": "merc_warrior",
+              "label": "Hire a Warrior mercenary · holds the line",
+              "cost": 250,
+              "merc": "warrior"
+            },
+            {
+              "id": "merc_mage",
+              "label": "Hire a Mage mercenary · casts from range",
+              "cost": 250,
+              "merc": "mage"
+            },
+            {
+              "id": "merc_assassin",
+              "label": "Hire a Assassin mercenary · strikes fast",
+              "cost": 250,
+              "merc": "assassin"
+            },
+            {
+              "id": "merc_priest",
+              "label": "Hire a Priest mercenary · heals the party",
+              "cost": 250,
+              "merc": "priest"
+            },
+            {
+              "id": "merc_hunter",
+              "label": "Hire a Hunter mercenary · shoots from range",
+              "cost": 250,
+              "merc": "hunter"
+            },
+            {
+              "id": "merc_dismiss",
+              "label": "Send my mercenaries away",
+              "cost": 0,
+              "merc": "dismiss"
+            }
+          ],
           "buys": false,
           "look": {
             "skin": "#a87a5a",
@@ -1143828,7 +1144623,7 @@
         {
           "id": "hw_stone",
           "name": "Heartwood Meeting Stone",
-          "role": "Gather a party · hire fighters",
+          "role": "Gather your party",
           "color": "#e4f7ae",
           "dialogue": "Use this stone to invite your party members to join you here.",
           "offers": [
@@ -1182191,9 +1182986,27 @@
           [
             87.61,
             21.61
-          ]
-        ],
-        [
+          ],
+          [
+            93.04,
+            20.72
+          ],
+          [
+            98.51,
+            20.18
+          ],
+          [
+            104.0,
+            20.0
+          ],
+          [
+            109.49,
+            20.18
+          ],
+          [
+            114.96,
+            20.72
+          ],
           [
             120.39,
             21.61
@@ -1182415,6 +1183228,16 @@
         ],
         [
           [
+            104.0,
+            85.0
+          ],
+          [
+            104.0,
+            20.0
+          ]
+        ],
+        [
+          [
             117.44,
             90.56
           ],
@@ -1182435,12 +1183258,40 @@
         ],
         [
           [
+            84,
+            185.5
+          ],
+          [
+            92,
+            190.5
+          ],
+          [
+            104,
+            192
+          ]
+        ],
+        [
+          [
+            124,
+            185.5
+          ],
+          [
+            115,
+            183.5
+          ],
+          [
+            104,
+            192
+          ]
+        ],
+        [
+          [
             104,
             86
           ],
           [
             104,
-            30
+            28
           ]
         ]
       ],
@@ -1186754,6 +1187605,10 @@
           [
             130,
             78
+          ],
+          [
+            130,
+            67
           ]
         ],
         [
@@ -1212704,7 +1213559,44 @@
           "y": 74,
           "color": "#b7e5dc",
           "dialogue": "The Sunken Astrolabe is open beneath its turning lenses. Bring five travelers.",
-          "offers": [],
+          "offers": [
+            {
+              "id": "merc_warrior",
+              "label": "Hire a Warrior mercenary · holds the line",
+              "cost": 250,
+              "merc": "warrior"
+            },
+            {
+              "id": "merc_mage",
+              "label": "Hire a Mage mercenary · casts from range",
+              "cost": 250,
+              "merc": "mage"
+            },
+            {
+              "id": "merc_assassin",
+              "label": "Hire a Assassin mercenary · strikes fast",
+              "cost": 250,
+              "merc": "assassin"
+            },
+            {
+              "id": "merc_priest",
+              "label": "Hire a Priest mercenary · heals the party",
+              "cost": 250,
+              "merc": "priest"
+            },
+            {
+              "id": "merc_hunter",
+              "label": "Hire a Hunter mercenary · shoots from range",
+              "cost": 250,
+              "merc": "hunter"
+            },
+            {
+              "id": "merc_dismiss",
+              "label": "Send my mercenaries away",
+              "cost": 0,
+              "merc": "dismiss"
+            }
+          ],
           "buys": false,
           "look": {
             "skin": "#a77250",
@@ -1212718,7 +1213610,7 @@
         {
           "id": "lapis_stone",
           "name": "Lapis Meeting Stone",
-          "role": "Gather a party · hire fighters",
+          "role": "Gather your party",
           "x": 136,
           "y": 80,
           "color": "#b7e5dc",
@@ -1233951,6 +1234843,10 @@
         ],
         [
           [
+            43.5,
+            288.5
+          ],
+          [
             60,
             282
           ],
@@ -1254805,7 +1255701,7 @@
         {
           "id": "frostwake_stone",
           "name": "Frostwake Meeting Stone",
-          "role": "Gather a party · hire fighters",
+          "role": "Gather your party",
           "x": 177.5,
           "y": 45.5,
           "color": "#b5daef",
@@ -1277276,6 +1278172,28 @@
           [
             176,
             58
+          ]
+        ],
+        [
+          [
+            176,
+            58
+          ],
+          [
+            172,
+            48
+          ],
+          [
+            166,
+            40
+          ],
+          [
+            160.0,
+            34
+          ],
+          [
+            160.0,
+            29.3
           ]
         ],
         [
@@ -1303212,7 +1304130,7 @@
         {
           "id": "cairn_stone",
           "name": "Cairnspine Meeting Stone",
-          "role": "Gather a party · hire fighters",
+          "role": "Gather your party",
           "x": 185.5,
           "y": 63.5,
           "color": "#d4b8aa",
@@ -1322296,6 +1323214,20 @@
           [
             272,
             386
+          ]
+        ],
+        [
+          [
+            440,
+            480
+          ],
+          [
+            444,
+            482
+          ],
+          [
+            448,
+            480
           ]
         ],
         [
@@ -1609180,7 +1610112,44 @@
           "y": 84,
           "color": "#697184",
           "dialogue": "Chainmaw carries a broken link from the first chain. Bring companions and end its watch among the Broken Links.",
-          "offers": [],
+          "offers": [
+            {
+              "id": "merc_warrior",
+              "label": "Hire a Warrior mercenary · holds the line",
+              "cost": 250,
+              "merc": "warrior"
+            },
+            {
+              "id": "merc_mage",
+              "label": "Hire a Mage mercenary · casts from range",
+              "cost": 250,
+              "merc": "mage"
+            },
+            {
+              "id": "merc_assassin",
+              "label": "Hire a Assassin mercenary · strikes fast",
+              "cost": 250,
+              "merc": "assassin"
+            },
+            {
+              "id": "merc_priest",
+              "label": "Hire a Priest mercenary · heals the party",
+              "cost": 250,
+              "merc": "priest"
+            },
+            {
+              "id": "merc_hunter",
+              "label": "Hire a Hunter mercenary · shoots from range",
+              "cost": 250,
+              "merc": "hunter"
+            },
+            {
+              "id": "merc_dismiss",
+              "label": "Send my mercenaries away",
+              "cost": 0,
+              "merc": "dismiss"
+            }
+          ],
           "look": {
             "skin": "#c69a7b",
             "hair": "#533c39",
@@ -1609233,6 +1610202,42 @@
               "label": "Buy Starter Mining Pick",
               "item": "smith_pick_1",
               "cost": 25
+            },
+            {
+              "id": "merc_warrior",
+              "label": "Hire a Warrior mercenary · holds the line",
+              "cost": 250,
+              "merc": "warrior"
+            },
+            {
+              "id": "merc_mage",
+              "label": "Hire a Mage mercenary · casts from range",
+              "cost": 250,
+              "merc": "mage"
+            },
+            {
+              "id": "merc_assassin",
+              "label": "Hire a Assassin mercenary · strikes fast",
+              "cost": 250,
+              "merc": "assassin"
+            },
+            {
+              "id": "merc_priest",
+              "label": "Hire a Priest mercenary · heals the party",
+              "cost": 250,
+              "merc": "priest"
+            },
+            {
+              "id": "merc_hunter",
+              "label": "Hire a Hunter mercenary · shoots from range",
+              "cost": 250,
+              "merc": "hunter"
+            },
+            {
+              "id": "merc_dismiss",
+              "label": "Send my mercenaries away",
+              "cost": 0,
+              "merc": "dismiss"
             }
           ],
           "look": {
@@ -1609247,7 +1610252,7 @@
         {
           "id": "ew_stone",
           "name": "The Emberwake Meeting Stone",
-          "role": "Gather a party · hire fighters",
+          "role": "Gather your party",
           "x": 316,
           "y": 85,
           "color": "#697184",
@@ -1646140,6 +1647145,10 @@
       ],
       "paths": [
         [
+          [
+            62,
+            290
+          ],
           [
             75,
             283

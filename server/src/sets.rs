@@ -52,7 +52,13 @@ mod tests {
             .filter(|source| {
                 !matches!(
                     *source,
-                    "orange_pool" | "chained_forge_packs" | "raid_hierlooms"
+                    "orange_pool"
+                        | "chained_forge_packs"
+                        | "raid_hierlooms"
+                        // Profession items are not dungeon sets.
+                        | "enchanting"
+                        | "blacksmithing"
+                        | "alchemy"
                 )
             })
             .collect();

@@ -1,7 +1,7 @@
 //! The Lapis Erg (zone 25, levels 80-85) as an authored desert on the shapes pilot: its data, the Sunward Vale and Veyrroot Canopy gates, the Sunken Astrolabe's door, the wall that
 //! covers the Yearwheel (no crossing from either side), Azure Wells, the Astrolabe Rest and three outposts, the quests (holds, visits, brings, kills, the two elite quests) and the new
 //! elite with no quest.
-use super::wyrd_tests::{at, blocked, flood, join, lines, place, reached, world};
+use super::wyrd_tests::{approached, at, blocked, flood, join, lines, place, reached, world};
 use super::*;
 
 const ERG: usize = 25;
@@ -352,7 +352,7 @@ fn everyone_and_everything_in_the_lapis_erg_can_be_walked_to_from_azure_wells() 
     let map = &w.maps[ERG];
     let open = flood(map, &blocked(map, &[]), map.spawn);
     for n in &map.npcs {
-        assert!(reached(map, &open, at(n.x, n.y)), "{} is cut off", n.id);
+        assert!(approached(map, &open, n), "{} is cut off", n.id);
     }
     for p in &map.places {
         assert!(reached(map, &open, at(p.x, p.y)), "{} is cut off", p.id);

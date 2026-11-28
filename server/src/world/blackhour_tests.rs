@@ -1,3 +1,5 @@
+// Without the `tools` switch the measuring tools are left out, and with them the only users of some helpers here.
+#![cfg_attr(not(feature = "tools"), allow(dead_code, unused_imports))]
 //! Focused Foundry integration and full-blue/green hired-brain calibration.
 use super::ttk::*;
 use super::wyrd_tests::{at, blocked, flood, join, place, reached, world};
@@ -125,12 +127,12 @@ fn blackhour_data_and_actual_collision() {
     assert!(m.interior && m.slimes.len() == 15);
     assert!(!m.sealed_template, "the validated Foundry entrance is open");
     for (kind, health) in [
-        ("null_hauler", 18.),
-        ("null_breaker", 18.),
-        ("null_coil", 18.),
-        ("null_bell", 15.),
-        ("null_conductor", 15.),
-        ("null_hour", 8.5),
+        ("null_hauler", 27.),
+        ("null_breaker", 27.),
+        ("null_coil", 27.),
+        ("null_bell", 25.3125),
+        ("null_conductor", 25.3125),
+        ("null_hour", 14.34375),
     ] {
         let enemy = w
             .slimes
@@ -271,12 +273,18 @@ fn blackhour_gate_private_copies_epic_loot_and_clear() {
         assert!(!w.instance_cleared(other));
     }
     // Party votes hold their actual epic catalog pieces before pickup.
+    // Profession recipes sometimes drop beside the Foundry pools.
+    let pooled: Vec<_> = w
+        .rolls
+        .iter()
+        .filter(|r| item(&r.item).is_some_and(|i| i.source.as_deref() == Some("blackhour")))
+        .collect();
     assert_eq!(
-        w.rolls.len(),
+        pooled.len(),
         4,
         "side bosses give one pool each, final gives two"
     );
-    assert!(w.rolls.iter().all(|r| {
+    assert!(pooled.iter().all(|r| {
         item(&r.item)
             .is_some_and(|i| i.source.as_deref() == Some("blackhour") && i.rarity == "epic")
     }));
@@ -420,6 +428,7 @@ fn blackhour_chests_and_cold_restart_use_epic_equipment() {
     );
 }
 
+#[cfg(feature = "tools")]
 #[test]
 #[ignore = "Foundry-only full fights, run with --ignored --nocapture"]
 fn blackhour_blue_and_green_encounter_bands() {

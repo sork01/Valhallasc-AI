@@ -527,7 +527,7 @@ window.Tutorial = (() => {
       when: () => enemies().some(s => s.d?.elite && dist(s.x, s.y) <= 16),
       target: () => isShown($('hud-target')) ? $('hud-target') : $('skillbar'),
       title: 'An elite enemy',
-      body: 'Elites are much tougher than normal enemies. Bring a group, or hire mercenaries at a Meeting Stone, before you take one on.',
+      body: 'Elites are much tougher than normal enemies. Bring a group before you take one on. The quest giver can often hire mercenaries for you.',
     },
     rested: {
       when: () => !!hero?.rested && hero.rested.percent > 0,
@@ -557,7 +557,7 @@ window.Tutorial = (() => {
       when: () => !!window.Social?.hasPartyInvite || !!npcNear(n => (n.offers || []).some(o => o.merc), 6),
       target: () => window.Social?.hasPartyInvite ? $('social-open') : $('social-open'),
       title: 'Parties and mercenaries',
-      body: 'Open Friends (O) to invite players to a party; parties share experience and loot. At a Meeting Stone you can hire mercenaries to fight beside you.',
+      body: 'Open Friends (O) to invite players to a party; parties share experience and loot. Some quest givers, and the Repair Smiths inside dungeons, can hire mercenaries to fight beside you.',
     },
   };
   const MORE_ORDER = ['target_attack', 'loot', 'quest_turnin', 'elite', 'repair', 'bags_full', 'rested', 'mail_bank', 'spark_travel', 'party_mercs', 'map'];

@@ -39,7 +39,8 @@ function requireMemoryLimit() {
     await page.locator('#name').fill('NpcTarget'); await page.locator('#go').click({ timeout: 60000 });
     await page.waitForFunction(() => Online.connected && Field.hero?.hp > 0, null, { timeout: 60000 });
     if (await page.locator('#low-gfx-dismiss').isVisible()) await page.locator('#low-gfx-dismiss').click();
-    await page.evaluate(() => { const t = document.getElementById('tutorial-tip'); if (t && !t.hidden) document.getElementById('tutorial-disable')?.click(); });
+    // The tutorial can open after the first move and cover the person being clicked.
+    await page.evaluate(() => window.Tutorial?.disable?.());
     const debug = c => page.evaluate(x => Online.send({ type: 'debug', command: x }), c);
 
     // A shopkeeper-style person in zone 0 who stands still and has real art.
@@ -50,6 +51,8 @@ function requireMemoryLimit() {
     check(await page.locator('#hud-target').isHidden(), 'no target frame before clicking');
 
     if (process.env.MUTATE !== '1') {
+      // The camera still glides after the teleport: click only once the person holds still on screen.
+      await page.waitForFunction(id => { const n = City.npcs.find(n => n.id === id), [x, y] = Field.screenOf(n.x, n.y), last = window.__npcAt; window.__npcAt = [x, y]; return !!last && Math.hypot(x - last[0], y - last[1]) < .0005; }, npc.id, { polling: 200, timeout: 10000 });
       const [fx, fy] = await page.evaluate(p => { const n = City.npcs.find(n => n.id === p.id); return Field.screenOf(n.x, n.y); }, npc);
       const box = await page.locator('#fieldcv').boundingBox();
       await page.mouse.click(box.x + fx * box.width, box.y + fy * box.height - 24);

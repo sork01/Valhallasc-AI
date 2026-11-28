@@ -111,7 +111,7 @@ drawings per piece would be the only cure.
 
 Checks: `tests/headgear-directions.cjs` passes for all five classes and both
 bodies (382 layers, 51,952 poses, minimum 83 changed pixels). Contact sheets
-through the real compositor with `tests/gear-sheet.cjs` were reviewed for
+through the real compositor with `tests/tools/gear-sheet.cjs` were reviewed for
 hunter, mage, warrior and assassin (idle) and a hunter hurt pose.
 
 ## Headgear directions (1.47.2, superseded)

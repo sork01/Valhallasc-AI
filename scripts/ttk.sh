@@ -6,4 +6,4 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 export CARGO_PROFILE_TEST_OPT_LEVEL=2 CARGO_PROFILE_TEST_DEBUG=0
 export CARGO_TARGET_DIR="${CARGO_TARGET_DIR:-target/ttk}"
-exec bash scripts/cargo.sh test --offline ttk_report -- --ignored --nocapture
+exec bash scripts/cargo.sh test --offline --features valhalla-server/tools ttk_report -- --ignored --nocapture

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Generates the git-ignored inputs read by tests/character-hair-art.cjs and tests/female-torso-art.cjs.
+# Generates the git-ignored inputs read by tests/tools/character-hair-art.cjs and tests/tools/female-torso-art.cjs.
 #
 #   bash scripts/make_test_art_inputs.sh            # both sets, into <repo>/test-results/
 #   PYTHON=~/valhalla-py/bin/python3 bash scripts/make_test_art_inputs.sh hair

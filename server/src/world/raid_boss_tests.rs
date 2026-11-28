@@ -369,6 +369,7 @@ fn raid_boss_signs_loot_and_all_assigned_positions_obey_the_reach_rule() {
     }
 }
 
+#[cfg(feature = "tools")]
 #[test]
 #[ignore = "Boss-only ten-fighter calibration; use RAID_BOSSES/RAID_BOSS_SEEDS/RAID_BOSS_COUNT"]
 fn raid_boss_measure_first_three() {

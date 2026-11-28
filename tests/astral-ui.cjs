@@ -42,7 +42,7 @@ async function call(name, args = {}) {
     const g=Field._debug.zones[13].portals[0],screen=Field._debug.w2s(g.x,g.y);
     return {zone:Field.zone,near:Math.hypot(Field.hero.x-97.5,Field.hero.y-296.5),screen,theme:Field.zoneTheme,objects:Field._debug.objects.length,npcs:City.npcs.length};
   });
-  check(arrival.zone===13 && arrival.near<4.5 && arrival.theme==='astral' && arrival.objects>=400 && arrival.npcs===24,`The real Nacrehold gate arrives inside the inhabited Astralhollow sanctuary (${JSON.stringify(arrival)})`);
+  check(arrival.zone===13 && arrival.near<4.5 && arrival.theme==='astral' && arrival.objects>=400 && arrival.npcs===25,`The real Nacrehold gate arrives inside the inhabited Astralhollow sanctuary (${JSON.stringify(arrival)})`);
   check(arrival.screen[0]>100 && arrival.screen[0]<1500 && arrival.screen[1]>70 && arrival.screen[1]<830,'The return portal is visible on arrival');
   await page.screenshot({path:path.join(world.artifacts,'astral-arrival.png')});
   // The Astralhollow atlases load when its enemies are in the snapshot (after the arrival), not at login.
@@ -56,9 +56,9 @@ async function call(name, args = {}) {
       map: WorldMap._layout.length, legend: kinds.every(k => WorldMap._kinds[k]?.[1] >= 40),
       imageSizes: kinds.map(k => { const fr = Field.frameOf(Field.astralSprites, k); return [Field.astralSprites.img[k].naturalWidth,Field.astralSprites.img[k].naturalHeight,fr.w*8,fr.h*5]; }) };
   });
-  check(data.count === 47 && data.name === 'Astralhollow' && data.objects >= 400 && data.npcs === 28 && data.quests === 38, 'The complete zone, hub and quest catalog are loaded');
+  check(data.count === 48 && data.name === 'Astralhollow' && data.objects >= 400 && data.npcs === 29 && data.quests === 42, 'The complete zone, hub and quest catalog are loaded');
   check(data.gate[0] < 97.5 && Math.hypot(data.gate[0]-97.5,data.gate[1]-296.5) <= 6.5, 'The return gate stands six tiles west of the arrival plaza (97.5, 296.5)');
-  check(data.oldGate?.to === 13 && data.art && data.map === 47 && data.legend, 'Nacrehold gate, original scenery art and world-map legend are present');
+  check(data.oldGate?.to === 13 && data.art && data.map === 48 && data.legend, 'Nacrehold gate, original scenery art and world-map legend are present');
   check(STUB || data.imageSizes.every(([w,h,ew,eh]) => w === ew && h === eh), 'All five real 34-frame enemy atlases loaded');
   await debug({ op:'teleport',zone:13,x:95,y:296.5 });
   await page.waitForFunction(() => Field.zone===13 && Math.hypot(Field.hero.x-95,Field.hero.y-296.5)<2,null,{timeout:10000});

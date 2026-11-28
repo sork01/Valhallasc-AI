@@ -27,7 +27,10 @@ def main():
     assert changed[FILES[1]].count(old) == 1
     changed[FILES[1]] = changed[FILES[1]].replace(old, '''        if (band == 3 && std::env::var("FISH_CLIENT_MUTATION").as_deref() != Ok("announcement"))
             || std::env::var("FISH_CLIENT_MUTATION").as_deref() == Ok("ordinary") {''')
-    old = 'self.emit_zone(line.zone, json!({"type":"announce","kind":"treasure","actor":actor,"text":text}));'
+    old = '''self.emit_zone(
+                line.zone,
+                json!({"type":"announce","kind":"treasure","actor":actor,"text":text}),
+            );'''
     assert changed[FILES[1]].count(old) == 1
     changed[FILES[1]] = changed[FILES[1]].replace(old, '''if std::env::var("FISH_CLIENT_MUTATION").as_deref() == Ok("scope") {
                 self.emit_zone(0, json!({"type":"announce","kind":"treasure","text":text}));

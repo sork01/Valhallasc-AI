@@ -4,6 +4,11 @@ version = "0.1.0"
 edition = "2024"
 rust-version = "1.88"
 
+[features]
+# Measuring tools, balance checks and the database rehearsal. They are not part of the test suite: build them with
+# `--features tools` and run them with `-- --ignored` (docs/test-tools.md).
+tools = []
+
 [dependencies]
 axum = { version = "0.8", features = ["ws"] }
 tokio = { version = "1", features = ["full"] }

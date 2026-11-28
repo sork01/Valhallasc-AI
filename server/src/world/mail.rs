@@ -237,7 +237,8 @@ mod tests {
             .chain(raw["zones"].as_array().unwrap())
             .collect();
         let mut hubs = std::collections::BTreeSet::new();
-        for (zi, z) in zones.iter().enumerate() {
+        // The GM-only island has no mail service.
+        for (zi, z) in zones.iter().enumerate().filter(|(_, z)| z["gmOnly"] != true) {
             for c in std::iter::once(&z["city"]).chain(z["camps"].as_array().into_iter().flatten())
             {
                 if let Some(name) = c["name"].as_str() {

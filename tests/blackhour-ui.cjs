@@ -92,9 +92,11 @@ const call=async(name,args={})=>{const r=await client.callTool({name,arguments:a
   assert.ok(await page.evaluate(()=>Math.abs(valhalla.blackhourMusic.output.gain.value-.09)<.005),'Saved music volume reaches this score');
   await page.evaluate(()=>Prefs.set({sound:false}));await page.waitForTimeout(700);
   assert.ok(await page.evaluate(()=>valhalla.blackhourMusic.output.gain.value<.001),'Mute reaches this score');
+  await debug({op:'set_time',hour:12,freeze:true});   // outdoors, the day score
   await teleport(44,78,143);await page.evaluate(()=>Online.send({type:'move',x:72,y:143}));
   await page.waitForFunction(()=>Field.zone===28,null,{timeout:15000});
-  assert.ok(await page.evaluate(()=>!valhalla.blackhourMusic.running&&valhalla.yearMusic.running),'Returning selects The Yearwheel music');
+  // Returning selects The Yearwheel music: scores change through silence (client 1.14.7), so wait for the fade.
+  await page.waitForFunction(()=>!valhalla.blackhourMusic.running&&valhalla.yearMusic.running,null,{timeout:10000});
   assert.deepEqual(bad,[]);assert.deepEqual(errors,[]);
   console.log(JSON.stringify({passed:true,mode:STUB?'stub':'real',artifacts:world.artifacts}));
 })().catch(e=>{console.error(e);process.exitCode=1;}).finally(async()=>{

@@ -1,5 +1,6 @@
 // Foundry only: real protocol setup, kills and claims, no gear/progression grind.
 module.exports=(kit,map)=>({
+ clearTravelQuests: true,
  description:'Black Hour Foundry: level gate, private copies, both exits, epic drops, quests and persistence.',
  startLevel:99,levelSpread:0,godMode:true,
  async run(w,check){
@@ -39,7 +40,10 @@ module.exports=(kit,map)=>({
   const fs=require('node:fs'),path=require('node:path');
   const catalog=JSON.parse(fs.readFileSync(path.join(__dirname,'../../world/items.txt'))),gear=new Map(catalog.filter(i=>i.source==='blackhour').map(i=>[i.id,i]));
   for(const [n,kind]of ['null_hour','null_bell','null_conductor'].entries()){
-   const s=w.views.get(hero).slimes.find(s=>s.kind===kind&&!s.dead);await w.debug(hero,{op:'kill_enemy',id:s.id});
+   const s=w.views.get(hero).slimes.find(s=>s.kind===kind&&!s.dead);
+   // Gear is rolled between party members near the kill.
+   for(const bot of [hero,ally])await kit.teleport(w,bot,{zone:44,x:s.x-3,y:s.y});
+   await w.debug(hero,{op:'kill_enemy',id:s.id});
    await w.waitFor(()=>w.views.get(hero).slimes.find(e=>e.id===s.id)?.dead,5000,'Kill '+kind);
    check(w.views.get(hero).instance.cleared===(n===2),'Final-first kill still waits for both side bosses');
    const rolls=w.events.filter(e=>e.bot===hero&&e.type==='roll'&&e.op==='start'&&gear.has(e.item));

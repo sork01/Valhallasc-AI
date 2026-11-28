@@ -102,7 +102,8 @@ fn newyear_independent_daily_rolls_shared_city_claim_and_next_day() {
     w.time += 1.;
     let gold = w.players[&1].character.gold;
     w.interact(1, "nacre_gardener", Some("quest:claim:newyear_hunt"));
-    assert_eq!(w.players[&1].character.gold, gold + 300);
+    // 300 gold, and 5% more for a Human hero.
+    assert_eq!(w.players[&1].character.gold, gold + 315);
     assert_eq!(
         w.players[&1].character.seasonal_claims["newyear_hunt"],
         20261229

@@ -32,7 +32,7 @@ const GROUND = { 'The Obsidian Reaches': [45, null] };
   check(seams.map(p => p.to).sort((a, b) => a - b).join() === '1,13,14,16,19,45', 'the only seams are the ones to the Crags, Astralhollow, the Prismwaste, the Canopy, Stormglass and Emberwake');
   for (const to of [9]) check(Z.portals.some(p => p.to === to && p.walk && !p.seam), `the way to zone ${to} is a rim gate you walk through`);
   for (const p of Z.portals.filter(p => !p.seam)) check(onFloor(Z, p.x, p.y), `${p.id} stands on the floor`);
-  check(Z.regions.names.length === 12 && Z.camps.length === 3 && Z.quests.length === 27, 'twelve regions, three outposts and 27 quests');
+  check(Z.regions.names.length === 12 && Z.camps.length === 3 && Z.quests.filter(q => !q.id.startsWith('fisher_')).length === 27, 'twelve regions, three outposts and 27 quests (Fisher quests aside)');
   server = spawn(process.env.VALHALLA_BINARY, [], { cwd: root, stdio: 'ignore',
     env: { ...process.env, VALHALLA_BIND: `127.0.0.1:${port}`, VALHALLA_DB: path.join(tmp, 'v.sqlite'), VALHALLA_CLIENT_DIR: path.join(root, 'client'), VALHALLA_TEST_COMMANDS: '1', VALHALLA_GOD_MODE: '1', VALHALLA_START_LEVEL: '50', VALHALLA_LEVEL_SPREAD: '0' } });
   for (let i = 0; i < 100; i++) { try { if ((await fetch(`http://127.0.0.1:${port}/health`)).ok) break; } catch (_) {} await new Promise(r => setTimeout(r, 200)); }

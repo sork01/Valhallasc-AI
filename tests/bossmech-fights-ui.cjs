@@ -62,7 +62,8 @@ async function call(name, args = {}) {
   page.on('pageerror', e => errors.push(e.message));
   await page.addInitScript(() => localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false })));
   const replies = [];
-  page.on('websocket', ws => ws.on('framereceived', f => { if (typeof f.payload === 'string' && f.payload.startsWith('{"type":"debug"')) replies.push(f.payload.slice(0, 300)); }));
+  let connections = 0;   // a dropped client rejoins outside the raid, without its hires
+  page.on('websocket', ws => { connections++; ws.on('framereceived', f => { if (typeof f.payload === 'string' && f.payload.startsWith('{"type":"debug"')) replies.push(f.payload.slice(0, 300)); }); });
   await page.goto(world.url);
   await page.locator('#start').click(); await page.locator('#login-guest').click();
   await page.locator('#name').fill('Watcher'); await page.locator('#go').click({ timeout: 60000 });
@@ -129,7 +130,8 @@ async function call(name, args = {}) {
           const inside = await page.evaluate(() => {
             const f = BossMech.fights[0], hits = [];
             const w2s = Field._debug.w2s, cv = document.getElementById('fieldcv');
-            for (const t of f.tele || []) for (const s of t.shapes || []) {
+            // The fight can end between reading it and taking the screenshot (the boss died or the hero left).
+            for (const t of f?.tele || []) for (const s of t.shapes || []) {
               const polys = BossMech._polygons(s, null);
               for (const poly of polys) for (const p of poly) { const [sx, sy] = w2s(p[0], p[1]); hits.push([sx, sy]); }
             }
@@ -153,6 +155,7 @@ async function call(name, args = {}) {
       if (state && (state.brk || state.shield || shieldBoss)) await page.keyboard.press('Space');
       await page.waitForTimeout(500);
     }
+    if (!seen.size) console.log(`${kind}: nothing on screen (connections opened: ${connections})`, await page.evaluate(k => JSON.stringify({ zone: Field.zone, hero: [Field.hero.x, Field.hero.y, Field.hero.dead], allies: Field.remotePlayers.length, boss: Field.slimes.filter(s => s.kind === k).map(s => ({ dead: s.dead, hp: s.hp, max: s.maxHp, state: s.state })) }), kind));
     report.push({ kind, zone, fought: fightSeen, shots: [...seen.values()] });
     console.log(`${kind}: fight ${fightSeen ? 'seen' : 'NOT SEEN'}, ${seen.size} distinct screens: ${[...seen.values()].map(s => `${s.file} [${s.name || s.banner || '-'}]`).join('; ')}`);
     // Leave the arena before the next boss: the fight ends when the zone empties.

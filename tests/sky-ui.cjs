@@ -139,7 +139,10 @@ const look = (page, [x0, y0, x1, y1] = [.3, .35, .7, .65]) => page.evaluate(([x0
   // Windward Meadow: turquoise grass, windswept pines, nothing like the forest.
   await stageAt(119.5, 98.5);
   await shot('windward');
-  const grass = await colourAt(119.5, 98.5);
+  // The hero stands on the spot itself, so take the median of a ring around it.
+  const ground = [];
+  for (let i = 0; i < 8; i++) ground.push(await colourAt(119.5 + Math.cos(i * Math.PI / 4) * 2.5, 98.5 + Math.sin(i * Math.PI / 4) * 2.5));
+  const grass = ground.sort((p, q) => (p.g - p.r) - (q.g - q.r))[4];
   check(grass.g > grass.r + 25 && grass.g > 120, `Windward Meadow is turquoise grass (${grass.r | 0},${grass.g | 0},${grass.b | 0})`);
   const travelText = await page.locator('#city-travel').textContent().catch(() => '');
   // The nearest hub from this meadow is Windward Roost (a camp of its own), so the button offers that visit.
@@ -150,7 +153,7 @@ const look = (page, [x0, y0, x1, y1] = [.3, .35, .7, .65]) => page.evaluate(([x0
   const deck = [await colourAt(275.5, 307.5), await colourAt(286.5, 307.5), await colourAt(289.5, 307.5)];   // away from the hero's own sprite
   check(deck.every(c => Math.max(c.r, c.g, c.b) - Math.min(c.r, c.g, c.b) > 35 && c.r + c.g + c.b > 400), `The bridge deck is coloured glass (${deck.map(c => `${c.r | 0},${c.g | 0},${c.b | 0}`).join(' | ')})`);
   check(new Set(deck.map(c => `${c.r >> 4},${c.g >> 4},${c.b >> 4}`)).size >= 2, 'and the colour changes along the deck');
-  const sideways = await colourAt(280.5, 297.5);
+  const sideways = await colourAt(280.5, 317.5);   // south of the bridge; the shaped zone has an island on the north side
   check(Math.abs(sideways.g - grass.g) > 20 || Math.abs(sideways.r - grass.r) > 30, `Past the edge of the bridge is void, not grass (${sideways.r | 0},${sideways.g | 0},${sideways.b | 0})`);
   const storm = await colourAt(280.5, 315.5);
   // Pinned to midday (set_time above): the sky below the bridge is cool daylight, never grass.

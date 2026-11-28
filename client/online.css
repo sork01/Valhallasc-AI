@@ -401,6 +401,11 @@
 .mount-text small { color:#b9baa9; font-size:.74cqw; }
 .mount-select { flex:none; }
 .mount-select:disabled { opacity:.6; cursor:default; }
+/* Two columns with a mouse: one list of every mount runs off a 1280 x 720 screen, and this window does not scroll. */
+@media (pointer: fine) {
+  .character-mounts { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); column-gap:.9cqw; align-content:start; }
+  .character-mounts > h4, .character-mounts > .mount-help { grid-column:1 / -1; }
+}
 .set-card { padding:.4cqw 0; border-top:1px solid #73654855; }
 .character-sets .set-tier { font-size:.74cqw; }
 .item-tooltip p { margin: 6px 0; }

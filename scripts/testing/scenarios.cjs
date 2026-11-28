@@ -7,8 +7,13 @@ const kit = require('./tools.cjs');
 const map = JSON.parse(fs.readFileSync(path.join(root, 'world/map.txt'), 'utf8'));
 const items = JSON.parse(fs.readFileSync(path.join(root, 'world/items.txt'), 'utf8'));
 const distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+const { humanGold, scaledXp } = require('./rewards.cjs');
 // These quest scenarios join as unreborn Humans.
-const humanQuestCoin = quest => Math.floor((quest.rewardGold * 105 + 50) / 100);
+const humanQuestCoin = quest => humanGold(quest.rewardGold);
+// Undervault boss pools hold the vault set and the dungeon's cloak.
+const vaultPiece = id => kit.items.find(i => i.id === id)?.source === 'undervault';
+// A dungeon's exclusive gear: its set pieces and its own cloak, which a boss can drop in a set piece's place.
+const exclusivePiece = (id, source) => kit.items.some(i => i.id === id && i.source === source && i.kind !== 'material');
 // Where a walker starts and steps toward to cross a gate: a walk gate fires only moving out through its side; a seam
 // fires only within its reach on its own side of the border line (Seam.crossing), so start 2 tiles on that side.
 // The claim offer for a quest with class reward choices: the rewardItem is automatic, the warrior's first choice is picked.
@@ -381,7 +386,7 @@ const scenarios = {
       await w.waitFor(() => w.snapshot.slimes.find(s => s.id === enemy.id).dead, 30000, 'Defeat Ironhide');
       const after = w.player('Mage');
       // Greenmeadow kills pay half XP, rounded up (Beta 1.41.5, Slime::kill_xp).
-      const xp = Math.ceil(enemyXp(enemy.level) / 2), gold = Math.round(10 * scale(.1));
+      const xp = scaledXp(w, Math.ceil(enemyXp(enemy.level) / 2), before.level, enemy.level), gold = Math.round(10 * scale(.1));
       check(after.kills === before.kills + 1 && after.xp === before.xp + xp && after.hp > 0,
         `Real combat awards one kill and the level-${level} XP (${xp}) while the mage survives`);
       const defeated = w.snapshot.slimes.find(s => s.id === enemy.id);
@@ -449,16 +454,16 @@ const scenarios = {
       check(!quest(w, bot, 'welcome').claimed && w.player(bot).gold === 0, 'All three objectives are counted but the wrong NPC cannot pay the reward');
       const reward = await talk(w, bot, 'guide', 'quest:claim:welcome');
       await w.waitFor(() => quest(w, bot, 'welcome').claimed);
-      check(reward.gold === 12 && w.player(bot).xp === 10, 'Turn-in awards exactly 12 gold and 10 XP');
+      check(reward.gold === humanGold(12) && w.player(bot).xp === 10, 'Turn-in awards exactly 13 gold (12 and the Human 5%) and 10 XP');
       await talk(w, bot, 'guide', 'quest:claim:welcome');
       await talk(w, bot, 'guide', 'quest:accept:welcome');
-      check(w.player(bot).gold === 12 && quest(w, bot, 'welcome').completions === 1, 'One-time rewards cannot be replayed or reaccepted');
+      check(w.player(bot).gold === humanGold(12) && quest(w, bot, 'welcome').completions === 1, 'One-time rewards cannot be replayed or reaccepted');
       const database = w.db;
       await w.restart();
-      check(w.db === database && w.player(bot).id === id && quest(w, bot, 'welcome').claimed && w.player(bot).gold === 12 && w.player(bot).xp === 10,
+      check(w.db === database && w.player(bot).id === id && quest(w, bot, 'welcome').claimed && w.player(bot).gold === humanGold(12) && w.player(bot).xp === 10,
         'Quest completion and rewards survive restarting the actual Rust process');
       await talk(w, bot, 'guide', 'quest:claim:welcome');
-      check(w.player(bot).gold === 12 && w.player(bot).xp === 10, 'Replaying a claim after restart grants nothing');
+      check(w.player(bot).gold === humanGold(12) && w.player(bot).xp === 10, 'Replaying a claim after restart grants nothing');
     },
   },
   quest_combat: {
@@ -487,13 +492,14 @@ const scenarios = {
       check(!quest(w, bot, 'ironhide_hunt'), 'Completing objectives alone does not unlock the next quest');
       // Kill XP depends on the rolled enemy levels, so the mage is level 2 or 3 here. The patrol pays 20 XP: top the
       // bar up so that turning it in crosses exactly one level and leaves 10 XP over.
-      await w.debug(bot, { op: 'give_xp', amount: w.player(bot).xpNeed - 20 - w.player(bot).xp + 10 });
-      const before = { ...w.player(bot) }, next = before.level + 1;
-      check(before.level >= 2 && before.xp === before.xpNeed - 10, 'The top-up stops just short of the next level');
+      const patrolDue = () => scaledXp(w, 20, w.player(bot).level, 2);
+      await w.debug(bot, { op: 'give_xp', amount: w.player(bot).xpNeed - patrolDue() - w.player(bot).xp + 10 });
+      const before = { ...w.player(bot) }, next = before.level + 1, due = patrolDue();
+      check(before.level >= 2 && before.xp === before.xpNeed - due + 10, 'The top-up stops just short of the next level');
       await talk(w, bot, 'gatekeeper', 'quest:claim:slime_patrol');
       await w.waitFor(() => quest(w, bot, 'slime_patrol').claimed);
-      check(w.player(bot).gold === before.gold + 24 && w.player(bot).level === next && w.player(bot).xp === 10 && totalXp(w.player(bot)) === totalXp(before) + 20,
-        'Patrol turn-in awards 24 gold and 20 XP, levels the mage, and carries the remainder');
+      check(w.player(bot).gold === before.gold + humanGold(24) && w.player(bot).level === next && w.player(bot).xp === 10 && totalXp(w.player(bot)) === totalXp(before) + due,
+        'Patrol turn-in awards its gold and XP, levels the mage, and carries the remainder');
       const unlocks = skillCatalog.filter(k => k.class === 'mage' && k.level === next).map(k => k.id);
       const levelUp = w.events.find(e => e.bot === bot && e.kind === 'levelup' && e.actor === w.player(bot).id && e.level === next);
       check(levelUp && JSON.stringify(levelUp.unlocked) === JSON.stringify(unlocks), 'The level-up event carries the new level and its active-skill unlocks');
@@ -521,10 +527,10 @@ const scenarios = {
       const bountyBefore = { ...w.player(bot) };
       await talk(w, bot, 'merchant', 'quest:claim:meadow_bounty');
       await w.waitFor(() => quest(w, bot, 'meadow_bounty').claimed);
-      check(w.player(bot).gold === bountyBefore.gold + 25 && totalXp(w.player(bot)) === totalXp(bountyBefore) + 40,
+      check(w.player(bot).gold === bountyBefore.gold + humanGold(25) && totalXp(w.player(bot)) === totalXp(bountyBefore) + scaledXp(w, 40, bountyBefore.level, 3),
         'Eight mixed kills pay the promised bounty reward');
       await talk(w, bot, 'merchant', 'quest:claim:meadow_bounty');
-      check(w.player(bot).gold === bountyBefore.gold + 25, 'Repeated bounty claims cannot duplicate rewards');
+      check(w.player(bot).gold === bountyBefore.gold + humanGold(25), 'Repeated bounty claims cannot duplicate rewards');
       await talk(w, bot, 'merchant', 'quest:accept:meadow_bounty');
       await w.waitFor(() => !quest(w, bot, 'meadow_bounty').claimed);
       check(quest(w, bot, 'meadow_bounty').counts[0] === 0 && quest(w, bot, 'meadow_bounty').completions === 1,
@@ -677,7 +683,7 @@ const scenarios = {
       const after = w.player(bot);
       check(after.hp > 0, 'The warrior survives real combat in the Crags');
       // Enemy gold is halved where the kill pays (MOB_GOLD_SCALE, owner 2026-10-21); the authored value rolls 10% a level.
-      const xp = enemyXp(wisp.level), gold = Math.max(1, Math.round(Math.round(18 * (1 + .1 * (wisp.level - 5))) * .5));
+      const xp = scaledXp(w, enemyXp(wisp.level), before.level, wisp.level), gold = Math.max(1, Math.round(Math.round(18 * (1 + .1 * (wisp.level - 5))) * .5));
       check(after.kills === before.kills + 1 && after.xp === before.xp + xp, `The kill pays the level-${wisp.level} XP (${xp})`);
       const corpse = w.snapshot.slimes.find(s => s.id === wisp.id);
       await w.action(bot, { type: 'move', x: corpse.x, y: corpse.y });
@@ -1047,10 +1053,10 @@ const scenarios = {
         await w.waitFor(() => quest(w, bot, q.id).counts.every((n, i) => n === q.objectives[i].count));
         check(quest(w, bot, 'meadow_bounty').counts[0] === 0, `${q.title}: Crags actions leave the meadow bounty unchanged`);
         await kit.teleport(w, bot, { npc: q.npc });
-        const before = { gold: w.player(bot).gold, xp: totalXp(w.player(bot)) };
+        const before = { level: w.player(bot).level, gold: w.player(bot).gold, xp: totalXp(w.player(bot)) };
         await kit.talkTo(w, bot, q.npc, `quest:claim:${q.id}`);
         await w.waitFor(() => quest(w, bot, q.id).claimed);
-        check(w.player(bot).gold === before.gold + humanQuestCoin(q) && totalXp(w.player(bot)) === before.xp + q.rewardXp, `${q.title}: exact XP and gold reward`);
+        check(w.player(bot).gold === before.gold + humanQuestCoin(q) && totalXp(w.player(bot)) === before.xp + scaledXp(w, q.rewardXp, before.level, q.level), `${q.title}: exact XP and gold reward`);
         await kit.talkTo(w, bot, q.npc, `quest:claim:${q.id}`);
         check(w.player(bot).gold === before.gold + humanQuestCoin(q) && quest(w, bot, q.id).completions === 1, `${q.title}: duplicate turn-in pays nothing`);
       }
@@ -1159,7 +1165,7 @@ const scenarios = {
       await w.waitFor(() => w.snapshot.slimes.find(s => s.id === crab.id).dead, 90000, 'Defeat the crab');
       await w.action(bot, { type: 'stop' });
       // Enemy gold is halved where the kill pays (MOB_GOLD_SCALE, owner 2026-10-21); the authored value rolls 10% a level.
-      const xp = enemyXp(crab.level), gold = Math.max(1, Math.round(Math.round(60 * (1 + .1 * (crab.level - 10))) * .5));
+      const xp = scaledXp(w, enemyXp(crab.level), before.level, crab.level), gold = Math.max(1, Math.round(Math.round(60 * (1 + .1 * (crab.level - 10))) * .5));
       check(w.player(bot).kills === before.kills + 1 && totalXp(w.player(bot)) === totalXp(before) + xp, `The kill pays the level-${crab.level} XP (${xp})`);
       const corpse = w.snapshot.slimes.find(s => s.id === crab.id);
       await w.action(bot, { type: 'move', x: corpse.x, y: corpse.y });
@@ -1212,10 +1218,10 @@ const scenarios = {
         await w.waitFor(() => quest(w, bot, q.id).counts.every((n, i) => n === q.objectives[i].count));
         check(quest(w, bot, 'crags_bounty').counts[0] === 0, `${q.title}: glacier actions leave the Crags patrol unchanged`);
         await kit.teleport(w, bot, { npc: q.npc });
-        const before = { gold: w.player(bot).gold, xp: totalXp(w.player(bot)) };
+        const before = { level: w.player(bot).level, gold: w.player(bot).gold, xp: totalXp(w.player(bot)) };
         await kit.talkTo(w, bot, q.npc, `quest:claim:${q.id}`);
         await w.waitFor(() => quest(w, bot, q.id).claimed);
-        check(w.player(bot).gold === before.gold + humanQuestCoin(q) && totalXp(w.player(bot)) === before.xp + q.rewardXp, `${q.title}: exact XP and gold reward`);
+        check(w.player(bot).gold === before.gold + humanQuestCoin(q) && totalXp(w.player(bot)) === before.xp + scaledXp(w, q.rewardXp, before.level, q.level), `${q.title}: exact XP and gold reward`);
         await kit.talkTo(w, bot, q.npc, `quest:claim:${q.id}`);
         check(w.player(bot).gold === before.gold + humanQuestCoin(q) && quest(w, bot, q.id).completions === 1, `${q.title}: duplicate turn-in pays nothing`);
       }
@@ -1322,7 +1328,7 @@ const scenarios = {
       await w.waitFor(() => w.snapshot.slimes.find(s => s.id === toad.id).dead, 120000, 'Defeat the toad');
       await w.action(bot, { type: 'stop' });
       // Enemy gold is halved where the kill pays (MOB_GOLD_SCALE, owner 2026-10-21); the authored value rolls 10% a level.
-      const xp = enemyXp(toad.level), gold = Math.max(1, Math.round(Math.round(165 * (1 + .1 * (toad.level - 15))) * .5));
+      const xp = scaledXp(w, enemyXp(toad.level), before.level, toad.level), gold = Math.max(1, Math.round(Math.round(165 * (1 + .1 * (toad.level - 15))) * .5));
       check(w.player(bot).kills === before.kills + 1 && totalXp(w.player(bot)) === totalXp(before) + xp, `The kill pays the level-${toad.level} XP (${xp})`);
       const corpse = w.snapshot.slimes.find(s => s.id === toad.id);
       await w.action(bot, { type: 'move', x: corpse.x, y: corpse.y });
@@ -1469,10 +1475,10 @@ const scenarios = {
         await w.waitFor(() => q(x.id).counts.every((n, k) => n === x.objectives[k].count), 10000, `${x.title}: objectives fill`);
         check(bring.every(o => bag(o.target) >= o.count), `${x.title}: the bag holds every hand-in item`);
         await kit.teleport(w, bot, { npc: x.npc });
-        const before = { gold: w.player(bot).gold, xp: totalXp(w.player(bot)), bag: Object.fromEntries(bring.map(o => [o.target, bag(o.target)])) };
+        const before = { level: w.player(bot).level, gold: w.player(bot).gold, xp: totalXp(w.player(bot)), bag: Object.fromEntries(bring.map(o => [o.target, bag(o.target)])) };
         await kit.talkTo(w, bot, x.npc, `quest:claim:${x.id}`);
         await w.waitFor(() => q(x.id).claimed);
-        check(w.player(bot).gold === before.gold + humanQuestCoin(x) && totalXp(w.player(bot)) === before.xp + x.rewardXp, `${x.title}: exact XP and gold reward`);
+        check(w.player(bot).gold === before.gold + humanQuestCoin(x) && totalXp(w.player(bot)) === before.xp + scaledXp(w, x.rewardXp, before.level, x.level), `${x.title}: exact XP and gold reward`);
         check(bring.every(o => bag(o.target) === before.bag[o.target] - o.count), `${x.title}: exactly the handed-in items leave the bag`);
         await kit.talkTo(w, bot, x.npc, `quest:claim:${x.id}`);
         check(w.player(bot).gold === before.gold + humanQuestCoin(x) && q(x.id).completions === 1, `${x.title}: duplicate turn-in pays nothing`);
@@ -1551,10 +1557,10 @@ const scenarios = {
         await w.waitFor(() => quest(w, bot, q.id).counts.every((n, i) => n === q.objectives[i].count));
         check(quest(w, bot, 'crags_bounty').counts[0] === 0 && quest(w, bot, 'rime_bounty').counts[0] === 0, `${q.title}: fen actions leave the older patrols unchanged`);
         await kit.teleport(w, bot, { npc: q.npc });
-        const before = { gold: w.player(bot).gold, xp: totalXp(w.player(bot)) };
+        const before = { level: w.player(bot).level, gold: w.player(bot).gold, xp: totalXp(w.player(bot)) };
         await kit.talkTo(w, bot, q.npc, `quest:claim:${q.id}`);
         await w.waitFor(() => quest(w, bot, q.id).claimed);
-        check(w.player(bot).gold === before.gold + humanQuestCoin(q) && totalXp(w.player(bot)) === before.xp + q.rewardXp, `${q.title}: exact XP and gold reward`);
+        check(w.player(bot).gold === before.gold + humanQuestCoin(q) && totalXp(w.player(bot)) === before.xp + scaledXp(w, q.rewardXp, before.level, q.level), `${q.title}: exact XP and gold reward`);
         await kit.talkTo(w, bot, q.npc, `quest:claim:${q.id}`);
         check(w.player(bot).gold === before.gold + humanQuestCoin(q) && quest(w, bot, q.id).completions === 1, `${q.title}: duplicate turn-in pays nothing`);
       }
@@ -1747,8 +1753,17 @@ const scenarios = {
       const cinderPower = JSON.parse(fs.readFileSync(path.join(__dirname, '../../world/elite-power.txt'), 'utf8')).cinderlord[0];
       check(elite.elite && elite.level === 10 && elite.maxHp === Math.round(2400 * cinderPower) && elite.zone === 1, `Exactly the new level-10 elite is present with authoritative ${Math.round(2400 * cinderPower)} HP (2,400 x ${cinderPower}, world/elite-power.txt)`);
       for (const [i, bot] of bots.entries()) await kit.teleport(w, bot, { zone: 1, x: elite.x + (i ? 2 : -2), y: elite.y });
+      const current = () => w.snapshot.slimes.find(s => s.id === elite.id), lowest = {};
+      // The elite turns on whoever struck it last, so with both swinging one warrior can go unhit for the whole fight.
+      // Each first fights it alone until a blow lands.
+      for (const bot of bots) {
+        await w.action(bot, { type: 'target', id: elite.id });
+        await w.waitFor(() => w.player(bot).hp < w.player(bot).maxHp, 30000, `The elite strikes ${bot}`);
+        lowest[bot] = w.player(bot).hp;
+        await w.action(bot, { type: 'stop' });
+      }
       for (const bot of bots) await w.action(bot, { type: 'target', id: elite.id });
-      const current = () => w.snapshot.slimes.find(s => s.id === elite.id), began = Date.now(), lowest = {};
+      const began = Date.now();
       while (!current().dead && Date.now() - began < 180000) {
         for (const bot of bots) {
           const p = w.player(bot);
@@ -1772,13 +1787,13 @@ const scenarios = {
       check(bots.reduce((n, bot) => n + w.player(bot).kills, 0) === 1, 'The ordinary kill reward still has only one owner');
       for (const bot of bots) {
         await kit.teleport(w, bot, { npc: 'crags_captain' });
-        const before = { gold: w.player(bot).gold, xp: totalXp(w.player(bot)) };
+        const before = { level: w.player(bot).level, gold: w.player(bot).gold, xp: totalXp(w.player(bot)) };
         await kit.talkTo(w, bot, 'crags_captain', `quest:claim:${qid}`);
         await w.waitFor(() => quest(w, bot, qid).claimed && w.player(bot).inventory.some(s => s.item === reward));
-        check(w.player(bot).gold === before.gold + 200 && totalXp(w.player(bot)) === before.xp + levelXp[9] / 10, `${bot} gets exact quest XP and gold`);
+        check(w.player(bot).gold === before.gold + humanGold(200) && totalXp(w.player(bot)) === before.xp + scaledXp(w, levelXp[9] / 10, before.level, 10), `${bot} gets exact quest XP and gold`);
         check(w.player(bot).inventory.find(s => s.item === reward).quantity === 1 && kit.items.find(i => i.id === reward).rarity === 'rare', `${bot} gets one guaranteed blue necklace`);
         await kit.talkTo(w, bot, 'crags_captain', `quest:claim:${qid}`);
-        check(w.player(bot).gold === before.gold + 200 && w.player(bot).inventory.find(s => s.item === reward).quantity === 1, `${bot} cannot claim twice`);
+        check(w.player(bot).gold === before.gold + humanGold(200) && w.player(bot).inventory.find(s => s.item === reward).quantity === 1, `${bot} cannot claim twice`);
         await w.action(bot, { type: 'equip', slots: { necklace: reward } });
         await w.waitFor(() => w.player(bot).equipment.necklace === reward);
         check(true, `${bot} can equip the level-10 reward`);
@@ -1828,13 +1843,13 @@ const scenarios = {
       check(bots.reduce((n, bot) => n + w.player(bot).kills, 0) === 1, 'The ordinary kill reward still has only one owner');
       for (const bot of bots) {
         await kit.teleport(w, bot, { npc: 'fen_reeve' });
-        const before = { gold: w.player(bot).gold, xp: totalXp(w.player(bot)) };
+        const before = { level: w.player(bot).level, gold: w.player(bot).gold, xp: totalXp(w.player(bot)) };
         await kit.talkTo(w, bot, 'fen_reeve', `quest:claim:${qid}`);
         await w.waitFor(() => quest(w, bot, qid).claimed && w.player(bot).inventory.some(s => s.item === reward));
-        check(w.player(bot).gold === before.gold + 1500 && totalXp(w.player(bot)) === before.xp + levelXp[19] / 10, `${bot} gets exact quest XP and gold`);
+        check(w.player(bot).gold === before.gold + humanGold(1500) && totalXp(w.player(bot)) === before.xp + scaledXp(w, levelXp[19] / 10, before.level, 20), `${bot} gets exact quest XP and gold`);
         check(w.player(bot).inventory.find(s => s.item === reward).quantity === 1, `${bot} gets one guaranteed blue ring`);
         await kit.talkTo(w, bot, 'fen_reeve', `quest:claim:${qid}`);
-        check(w.player(bot).gold === before.gold + 1500 && w.player(bot).inventory.find(s => s.item === reward).quantity === 1, `${bot} cannot claim twice`);
+        check(w.player(bot).gold === before.gold + humanGold(1500) && w.player(bot).inventory.find(s => s.item === reward).quantity === 1, `${bot} cannot claim twice`);
         await w.action(bot, { type: 'equip', slots: { accessory1: reward } });
         await w.waitFor(() => w.player(bot).equipment.accessory1 === reward);
         check(true, `${bot} can equip the level-20 reward`);
@@ -1927,17 +1942,17 @@ const scenarios = {
       check(w.player(bot).zone === 0, 'The bot is back in the meadow');
       await w.waitFor(() => quest(w, bot, 'crags_onward').counts[0] === 1, 5000, 'Progress is kept after leaving');
       await kit.teleport(w, bot, { npc: 'crags_captain' });
-      const before = totalXp(w.player(bot)), gold = w.player(bot).gold;
+      const before = totalXp(w.player(bot)), gold = w.player(bot).gold, heroLevel = w.player(bot).level;
       const reply = await kit.talkTo(w, bot, 'crags_captain', 'quest:claim:crags_onward');
       await w.waitFor(() => quest(w, bot, 'crags_onward').claimed, 5000, 'The captain pays');
-      check(reply.notice.includes('Quest complete') && w.player(bot).gold === gold + 100 && totalXp(w.player(bot)) === before + levelXp[4] / 10, 'The captain pays 100 gold and a tenth of level 5\'s XP');
+      check(reply.notice.includes('Quest complete') && w.player(bot).gold === gold + humanGold(100) && totalXp(w.player(bot)) === before + scaledXp(w, levelXp[4] / 10, heroLevel, 5), 'The captain pays 100 gold and a tenth of level 5\'s XP');
       const refused = await kit.talkTo(w, bot, 'crags_captain', 'quest:accept:rime_onward');
       check(!quest(w, bot, 'rime_onward') && refused.notice !== undefined, 'A progression quest of another level cannot be taken at a giver');
       const id = w.player(bot).id;
       await w.restart();
       check(w.player(bot).id === id && quest(w, bot, 'crags_onward').claimed && quest(w, bot, 'crags_onward').completions === 1, 'The finished quest survives restarting the Rust process');
       await kit.talkTo(w, bot, 'crags_captain', 'quest:claim:crags_onward');
-      check(w.player(bot).gold === gold + 100, 'It cannot be paid twice');
+      check(w.player(bot).gold === gold + humanGold(100), 'It cannot be paid twice');
       // Levels 10, 15 and 20 each bring the next one, aimed at the next zone.
       for (const [level, quests] of [[10, 2], [15, 3], [20, 4]]) {
         await kit.setupCharacter(w, bot, { level });
@@ -2095,14 +2110,14 @@ const scenarios = {
       await kit.teleport(w, bot, { zone: 5, x: exit.x, y: exit.y });
       await w.advance(2000);
       check(w.player(bot).zone === 5, 'Standing on the closed exit does nothing');
-      const bag = b => w.player(b).inventory.filter(s => /_l20_vault$/.test(s.item)).reduce((n, s) => n + s.quantity, 0);
+      const bag = b => w.player(b).inventory.filter(s => vaultPiece(s.item)).reduce((n, s) => n + s.quantity, 0);
       for (const kind of ['gatewarden', 'choir', 'colossus', 'hollowking']) {
         const boss = view(bot).slimes.find(s => s.kind === kind), count = kind === 'hollowking' ? 2 : 1;
         await kit.teleport(w, bot, { zone: 5, x: boss.x - 3, y: boss.y });
         await kit.teleport(w, rival, { zone: 5, x: boss.x - 4, y: boss.y });
         const before = bag(bot) + bag(rival), earlier = new Set(w.events);
         await w.debug(bot, { op: 'kill_enemy', id: boss.id });
-        const starts = b => w.events.filter(e => !earlier.has(e) && e.bot === b && e.type === 'roll' && e.op === 'start' && /_l20_vault$/.test(e.item));
+        const starts = b => w.events.filter(e => !earlier.has(e) && e.bot === b && e.type === 'roll' && e.op === 'start' && vaultPiece(e.item));
         await w.waitFor(() => starts(bot).length === count && starts(rival).length === count, 5000, `${kind} starts shared boss rolls`);
         check(starts(bot).length === count && starts(rival).every(e => starts(bot).some(r => r.id === e.id && r.item === e.item)), `${kind} drops ${count} shared piece(s), both party members roll on the same items`);
         const winner = kind === 'hollowking' ? bot : rival, passer = winner === bot ? rival : bot;
@@ -2244,7 +2259,7 @@ const scenarios = {
       await w.debug(bot, { op: 'kill_enemy', id: king.id });
       await w.waitFor(() => view().instance.cleared && !mercs().length, 5000, 'Clearance dismisses the hired fighter');
       check(view().instance.cleared && !mercs().length, 'The final boss clears the instance and its mercenary departs');
-      const starts = w.events.filter(e => !earlier.has(e) && e.bot === bot && e.type === 'roll' && e.op === 'start' && /_l20_vault$/.test(e.item));
+      const starts = w.events.filter(e => !earlier.has(e) && e.bot === bot && e.type === 'roll' && e.op === 'start' && vaultPiece(e.item));
       check(starts.length === 2, 'Both final boss loot rolls are created before departure');
       check(w.player(bot).kills === 3, 'The runner retains all three kill credits');
     },
@@ -2320,7 +2335,7 @@ const scenarios = {
       await w.action(bot, { type: 'target', id: boar.id });
       await w.waitFor(() => w.snapshot.slimes.find(s => s.id === boar.id).dead, 120000, 'Defeat the boar');
       await w.action(bot, { type: 'stop' });
-      check(w.player(bot).kills === before.kills + 1 && totalXp(w.player(bot)) === totalXp(before) + enemyXp(1), `The kill pays the level-1 XP (${enemyXp(1)})`);
+      check(w.player(bot).kills === before.kills + 1 && totalXp(w.player(bot)) === totalXp(before) + scaledXp(w, enemyXp(1), before.level, 1), `The kill pays the level-1 XP (${enemyXp(1)}, scaled by the level gap)`);
       // Enemy gold is halved where the kill pays (MOB_GOLD_SCALE, owner 2026-10-21): the authored 54 becomes 27.
       await w.waitFor(() => w.player(bot).gold >= before.gold + 27, 15000, 'Pick up the gold');
       check(w.player(bot).gold === before.gold + 27, 'The kill drops 20% of the boar gold, halved (27)');
@@ -2409,13 +2424,13 @@ const scenarios = {
         }
         await w.waitFor(() => state(id).counts.every((c, i) => c >= q.objectives[i].count), 8000, `${id} is ready`);
         await kit.teleport(w, bot, { npc: q.npc });
-        const before = { gold: w.player(bot).gold, xp: totalXp(w.player(bot)) };
+        const before = { level: w.player(bot).level, gold: w.player(bot).gold, xp: totalXp(w.player(bot)) };
         const held = item => w.player(bot).inventory.filter(s => s.item === item).reduce((n, s) => n + s.quantity, 0);
         const bringing = q.objectives.filter(o => o.kind === 'bring').map(o => [o.target, o.count, held(o.target)]);
         await kit.talkTo(w, bot, q.npc, `quest:claim:${id}`);
         await w.waitFor(() => state(id).claimed, 5000, `Claim ${id}`);
         for (const [item, count, had] of bringing) check(held(item) === had - count, `${id}: the hand-in took exactly ${count} ${item}`);
-        check(w.player(bot).gold === before.gold + humanQuestCoin(q) && totalXp(w.player(bot)) === before.xp + levelXp[q.level - 1] / 10, `${id}: the claim pays ${humanQuestCoin(q)} gold and a tenth of level ${q.level}'s XP`);
+        check(w.player(bot).gold === before.gold + humanQuestCoin(q) && totalXp(w.player(bot)) === before.xp + scaledXp(w, levelXp[q.level - 1] / 10, before.level, q.level), `${id}: the claim pays ${humanQuestCoin(q)} gold and a tenth of level ${q.level}'s XP`);
         return q;
       }
       // Dependency order: every ordinary quest, none of the group quests, the escort or the progression quest (it arrives by itself).
@@ -2624,7 +2639,7 @@ const scenarios = {
       await w.action(bot, { type: 'target', id: hound.id });
       await w.waitFor(() => w.snapshot.slimes.find(s => s.id === hound.id).dead, 240000, 'Defeat the galehound');
       await w.action(bot, { type: 'stop' });
-      check(w.player(bot).kills === before.kills + 1 && totalXp(w.player(bot)) === totalXp(before) + enemyXp(1), `The kill pays the level-1 XP (${enemyXp(1)})`);
+      check(w.player(bot).kills === before.kills + 1 && totalXp(w.player(bot)) === totalXp(before) + scaledXp(w, enemyXp(1), before.level, 1), `The kill pays the level-1 XP (${enemyXp(1)}, scaled by the level gap)`);
       // Enemy gold is halved where the kill pays (MOB_GOLD_SCALE, owner 2026-10-21): the 86 of the authored table becomes 43.
       await w.waitFor(() => w.player(bot).gold >= before.gold + 43, 15000, 'Pick up the gold');
       check(w.player(bot).gold === before.gold + 43, 'The kill drops 20% of the galehound gold, halved (43)');
@@ -2707,7 +2722,7 @@ const scenarios = {
             const c1 = state(id).counts[i];
             check(c1 >= 4 && c1 <= 6, `${id}: five seconds in the circle count about five (${c1 - c0})`);
             // stepping out pauses the count
-            await kit.teleport(w, bot, { zone: 7, x: p.x + p.r + .9, y: p.y });
+            await kit.teleport(w, bot, { zone: 7, x: p.x + (p.holdRadius ?? p.r) + .9, y: p.y });
             await w.advance(800);
             const c2 = state(id).counts[i];
             await w.advance(2500);
@@ -2741,7 +2756,8 @@ const scenarios = {
             // The kinds are spread over islands: go from the nearest living one to the next until the count is met.
             let killed = 0;
             for (let round = 0; round < 8 && killed < o.count; round++) {
-              const targets = w.snapshot.slimes.filter(s => !s.dead && !sleeping.has(s.id) && s.kind === o.target);
+              // An enemy an outpost guard has wounded pays no quest credit: choose among the untouched ones.
+              const targets = w.snapshot.slimes.filter(s => !s.dead && !sleeping.has(s.id) && s.kind === o.target && s.hp >= s.maxHp);
               const first = targets.sort((a, b) => distance(a, w.player(bot)) - distance(b, w.player(bot)))[0];
               if (!first) {
                 // The last one of a kind in view is down: revive the dead of this kind here and go again.
@@ -2751,21 +2767,36 @@ const scenarios = {
               }
               const spot = beside(first) || { x: first.x, y: first.y };
               await kit.teleport(w, bot, { zone: 7, ...spot });
-              killed += (await kit.killEnemies(w, bot, { kind: o.target, max: o.count - killed })).count;
+              killed += (await kit.killEnemies(w, bot, { ids: targets.map(t => t.id), max: o.count - killed })).count;
             }
             assert.ok(killed >= o.count, `Killed enough ${o.target} (${killed} of ${o.count}; in view alive ${w.snapshot.slimes.filter(s => !s.dead && s.kind === o.target).length}, dead ${w.snapshot.slimes.filter(s => s.dead && s.kind === o.target).length})`);
           } else throw Error(`${id}: unexpected objective ${o.kind}`);
-          await w.waitFor(() => (state(id).counts[i] || 0) >= Math.min(o.count, o.kind === 'kill' ? 99 : o.count), 8000, `${id} objective ${i}`);
+          await w.waitFor(() => (state(id).counts[i] || 0) >= Math.min(o.count, o.kind === 'kill' ? 99 : o.count), 8000, `${id} objective ${i}`)
+            .catch(e => { const me = w.player(bot); throw Error(`${e.message} ${o.kind} ${o.target} ${state(id).counts[i]}/${o.count}, hero ${me.x},${me.y} zone ${me.zone}, bag ${me.bagUsed}/${me.bagCapacity}`); });
         }
         await w.waitFor(() => state(id).counts.every((c, i) => c >= q.objectives[i].count), 8000, `${id} is ready`);
         await kit.teleport(w, bot, { npc: q.npc });
-        const before = { gold: w.player(bot).gold, xp: totalXp(w.player(bot)) };
+        const before = { level: w.player(bot).level, gold: w.player(bot).gold, xp: totalXp(w.player(bot)) };
         const held = item => w.player(bot).inventory.filter(s => s.item === item).reduce((n, s) => n + s.quantity, 0);
         const bringing = q.objectives.filter(o => o.kind === 'bring').map(o => [o.target, o.count, held(o.target)]);
-        await kit.talkTo(w, bot, q.npc, `quest:claim:${id}`);
-        await w.waitFor(() => state(id).claimed, 5000, `Claim ${id}`);
+        // Rewards and random drops can fill the bag over this many quests, and a claim that hands over a piece is then
+        // refused: throw the loose loot away (worn pieces, quest items, bags and this hand-in stay).
+        if (w.player(bot).bagUsed >= w.player(bot).bagCapacity) {
+          for (const stack of [...w.player(bot).inventory]) {
+            if (stack.item.startsWith('qi_') || bringing.some(([id]) => id === stack.item) || items.find(i => i.id === stack.item)?.kind === 'bag') continue;
+            // The server keeps worn copies: take one fewer when one is worn, none when that was the only one.
+            for (let n = stack.quantity; n > 0; n--) {
+              const taken = await w.debug(bot, { op: 'take_item', item: stack.item, quantity: n }).then(() => true, e => { if (!/worn copies stay/.test(e.message)) throw e; return false; });
+              if (taken) break;
+            }
+          }
+          await w.waitFor(() => w.player(bot).bagUsed < w.player(bot).bagCapacity, 5000, 'Room for the reward');
+          before.gold = w.player(bot).gold;
+        }
+        const claim = await kit.talkTo(w, bot, q.npc, `quest:claim:${id}`);
+        await w.waitFor(() => state(id).claimed, 5000, `Claim ${id} (${claim.notice})`);
         for (const [item, count, had] of bringing) check(held(item) === had - count, `${id}: the hand-in took exactly ${count} ${item}`);
-        check(w.player(bot).gold === before.gold + humanQuestCoin(q) && totalXp(w.player(bot)) === before.xp + levelXp[q.level - 1] / 10, `${id}: the claim pays ${humanQuestCoin(q)} gold and a tenth of level ${q.level}'s XP`);
+        check(w.player(bot).gold === before.gold + humanQuestCoin(q) && totalXp(w.player(bot)) === before.xp + scaledXp(w, levelXp[q.level - 1] / 10, before.level, q.level), `${id}: the claim pays ${humanQuestCoin(q)} gold and a tenth of level ${q.level}'s XP`);
         return q;
       }
       // Dependency order: every ordinary quest, none of the group quest or the progression quest (it arrives by itself).
@@ -2905,7 +2936,7 @@ const scenarios = {
       await w.action(bot, { type: 'target', id: dead.id });
       await w.waitFor(() => w.snapshot.slimes.find(s => s.id === dead.id).dead, 240000, 'Defeat the draugr');
       await w.action(bot, { type: 'stop' });
-      check(w.player(bot).kills === before.kills + 1 && totalXp(w.player(bot)) === totalXp(before) + enemyXp(1), `The kill pays the level-1 XP (${enemyXp(1)})`);
+      check(w.player(bot).kills === before.kills + 1 && totalXp(w.player(bot)) === totalXp(before) + scaledXp(w, enemyXp(1), before.level, 1), `The kill pays the level-1 XP (${enemyXp(1)}, scaled by the level gap)`);
       // The pile's size is the map's and the server's to set: read it from the pickup, then check the purse took exactly that.
       await w.waitFor(() => w.events.some(e => e.bot === bot && e.kind === 'pickup' && !seenBefore.has(e)), 15000, 'Pick up the gold');
       const pile = w.events.filter(e => e.bot === bot && e.kind === 'pickup' && !seenBefore.has(e)).reduce((n, e) => n + e.value, 0);
@@ -3030,13 +3061,13 @@ const scenarios = {
         }
         await w.waitFor(() => state(id).counts.every((c, i) => c >= q.objectives[i].count), 8000, `${id} is ready`);
         await kit.teleport(w, bot, { npc: q.npc });
-        const before = { gold: w.player(bot).gold, xp: totalXp(w.player(bot)) };
+        const before = { level: w.player(bot).level, gold: w.player(bot).gold, xp: totalXp(w.player(bot)) };
         const held = item => w.player(bot).inventory.filter(s => s.item === item).reduce((n, s) => n + s.quantity, 0);
         const bringing = q.objectives.filter(o => o.kind === 'bring').map(o => [o.target, o.count, held(o.target)]);
         await kit.talkTo(w, bot, q.npc, `quest:claim:${id}`);
         await w.waitFor(() => state(id).claimed, 5000, `Claim ${id}`);
         for (const [item, count, had] of bringing) check(held(item) === had - count, `${id}: the hand-in took exactly ${count} ${item}`);
-        check(w.player(bot).gold === before.gold + humanQuestCoin(q) && totalXp(w.player(bot)) === before.xp + levelXp[q.level - 1] / 10, `${id}: the claim pays ${humanQuestCoin(q)} gold and a tenth of level ${q.level}'s XP`);
+        check(w.player(bot).gold === before.gold + humanQuestCoin(q) && totalXp(w.player(bot)) === before.xp + scaledXp(w, levelXp[q.level - 1] / 10, before.level, q.level), `${id}: the claim pays ${humanQuestCoin(q)} gold and a tenth of level ${q.level}'s XP`);
         return q;
       }
       // Dependency order: every ordinary quest, none of the elite quests, the capstone or the progression quest.
@@ -3193,12 +3224,12 @@ const scenarios = {
         }
         await w.waitFor(() => quest(w, bot, q.id).counts.every((n, i) => n === q.objectives[i].count));
         await kit.teleport(w, bot, { npc: q.npc });
-        const before = w.player(bot).gold, xp = totalXp(w.player(bot));
+        const before = w.player(bot).gold, xp = totalXp(w.player(bot)), heroLevel = w.player(bot).level;
         const bag = id => w.player(bot).inventory.find(i => i.item === id)?.quantity || 0;
         const handed = q.objectives.filter(o => o.kind === 'bring').map(o => [o, bag(o.target)]);
         await kit.talkTo(w, bot, q.npc, `quest:claim:${q.id}`);
         await w.waitFor(() => quest(w, bot, q.id).claimed);
-        check(w.player(bot).gold === before + humanQuestCoin(q) && totalXp(w.player(bot)) === xp + q.rewardXp, `${q.title}: exact level-table XP and gold`);
+        check(w.player(bot).gold === before + humanQuestCoin(q) && totalXp(w.player(bot)) === xp + scaledXp(w, q.rewardXp, heroLevel, q.level), `${q.title}: exact level-table XP and gold`);
         check(handed.every(([o, n]) => bag(o.target) === n - o.count), `${q.title}: hand-in consumes exactly the requested items`);
         await kit.talkTo(w, bot, q.npc, `quest:claim:${q.id}`);
         check(w.player(bot).gold === before + humanQuestCoin(q), `${q.title}: duplicate claim pays nothing`);
@@ -3283,10 +3314,10 @@ const scenarios = {
       const ordinary=[['miragejackal','mirage_fang'],['shardscarab','shard_carapace'],['glassharrier','harrier_pinions'],['prismsentinel','prism_heart']];
       for(const [kind,material] of ordinary){
         const enemy=await enemyOf(w,bot,14,area,kind);
-        const before=totalXp(w.player(bot));
+        const before=totalXp(w.player(bot)),heroLevel=w.player(bot).level;
         await w.debug(bot,{op:'kill_enemy',id:enemy.id});
         await w.waitFor(()=>w.snapshot.drops.some(d=>d.zone===14 && d.item===material),5000,`${material} drop`);
-        check(totalXp(w.player(bot))-before===enemyXp(enemy.level),`${kind} pays level-derived XP`);
+        check(totalXp(w.player(bot))-before===scaledXp(w,enemyXp(enemy.level),heroLevel,enemy.level),`${kind} pays level-derived XP`);
         check(w.snapshot.drops.some(d=>d.zone===14 && d.item===material),`${kind} drops its own material`);
       }
       await w.debug(bot,{op:'quest',id:'prism_sentinels',action:'finish'});
@@ -3341,10 +3372,10 @@ const scenarios = {
       const ordinary=[['bronzemantis','mantis_blade'],['gearling','gearling_tooth'],['orbitseer','seer_lens'],['chronoguard','chronoguard_plate']];
       for(const [kind,material] of ordinary){
         const enemy=await enemyOf(w,bot,15,area,kind);
-        const before=totalXp(w.player(bot));
+        const before=totalXp(w.player(bot)),heroLevel=w.player(bot).level;
         await w.debug(bot,{op:'kill_enemy',id:enemy.id});
         await w.waitFor(()=>w.snapshot.drops.some(d=>d.zone===15 && d.item===material),5000,`${material} drop`);
-        check(totalXp(w.player(bot))-before===enemyXp(enemy.level),`${kind} pays level-derived XP`);
+        check(totalXp(w.player(bot))-before===scaledXp(w,enemyXp(enemy.level),heroLevel,enemy.level),`${kind} pays level-derived XP`);
         check(w.snapshot.drops.some(d=>d.zone===15 && d.item===material),`${kind} drops its distinct material`);
       }
       await w.debug(bot,{op:'quest',id:'orrery_guards',action:'finish'});
@@ -3406,10 +3437,10 @@ const scenarios = {
       check(quest(w,bot,'moonspore_welcome').counts.length===3,'The introductory quest has three NPC objectives');
       for(const [kind,material] of [['glowcapgrazer','glowcap'],['silkwing','moon_silk'],['rootlurker','root_heart'],['lanternwraith','wraith_lantern']]){
         const enemy=await enemyOf(w,bot,16,area,kind);
-        const before=totalXp(w.player(bot));
+        const before=totalXp(w.player(bot)),heroLevel=w.player(bot).level;
         await w.debug(bot,{op:'kill_enemy',id:enemy.id});
         await w.waitFor(()=>w.snapshot.drops.some(d=>d.zone===16 && d.item===material),5000,`${material} drop`);
-        check(totalXp(w.player(bot))-before===enemyXp(enemy.level),`${kind} pays its rolled-level XP`);
+        check(totalXp(w.player(bot))-before===scaledXp(w,enemyXp(enemy.level),heroLevel,enemy.level),`${kind} pays its rolled-level XP`);
         check(w.snapshot.drops.some(d=>d.zone===16 && d.item===material),`${kind} drops ${material}`);
       }
       await w.debug(bot,{op:'quest',id:'moonspore_wraiths',action:'finish'});
@@ -3574,11 +3605,15 @@ const scenarios = {
       await kit.talkTo(w,bot,'stormglass_warden',claimOffer('stormglass_welcome'));
       await w.waitFor(()=>quest(w,bot,'stormglass_welcome').claimed,5000,'Claim introduction');
       for(const [kind,material] of [['saltclaw','saltclaw_shell'],['stormgull','stormgull_feather'],['glassray','glassfin'],['breakersentinel','breaker_core']]){
+        // The view carries only what is near the hero: stand by the map's own spot for this kind.
+        const spot=map.zones[18].slimes.find(s=>s.kind===kind&&!s.ambush);
+        await kit.teleport(w,bot,{zone:19,x:spot.x+3,y:spot.y});
+        await w.waitFor(()=>w.views.get(bot).slimes.some(s=>s.kind===kind&&!s.dead),5000,`A living ${kind} is in view`);
         const enemy=w.views.get(bot).slimes.find(s=>s.kind===kind&&!s.dead);
-        const before=totalXp(w.player(bot));
+        const before=totalXp(w.player(bot)),heroLevel=w.player(bot).level;
         await w.debug(bot,{op:'kill_enemy',id:enemy.id});
         await w.waitFor(()=>w.views.get(bot).drops.some(d=>d.item===material),5000,`${kind} material drop`);
-        check(totalXp(w.player(bot))-before===enemyXp(enemy.level),`${kind} grants authoritative level XP`);
+        check(totalXp(w.player(bot))-before===scaledXp(w,enemyXp(enemy.level),heroLevel,enemy.level),`${kind} grants authoritative level XP`);
         check(w.views.get(bot).drops.some(d=>d.item===material),`${kind} drops ${material}`);
       }
       await w.debug(bot,{op:'quest',id:'stormglass_guards',action:'finish'});
@@ -3654,10 +3689,10 @@ const scenarios = {
       await kit.talkTo(w,bot,'sun_miller',claimOffer('sun_welcome'));
       await w.waitFor(()=>quest(w,bot,'sun_welcome').claimed,5000,'Claim introductions');
       for(const [kind,material] of [['meadowhare','hare_whisker'],['sunbacksnail','sunback_shell'],['brushfox','fox_tail_tuft'],['spadebadger','badger_claw']]){
-        const enemy=w.views.get(bot).slimes.find(s=>s.kind===kind&&!s.dead),before=totalXp(w.player(bot));
+        const enemy=w.views.get(bot).slimes.find(s=>s.kind===kind&&!s.dead),before=totalXp(w.player(bot)),heroLevel=w.player(bot).level;
         await w.debug(bot,{op:'kill_enemy',id:enemy.id});
         await w.waitFor(()=>w.views.get(bot).drops.some(d=>d.item===material),5000,`${kind} material`);
-        check(totalXp(w.player(bot))-before===enemyXp(enemy.level),`${kind} pays level XP`);
+        check(totalXp(w.player(bot))-before===scaledXp(w,enemyXp(enemy.level),heroLevel,enemy.level),`${kind} pays level XP`);
         check(w.views.get(bot).drops.some(d=>d.item===material),`${kind} drops ${material}`);
       }
       for(const [kind,id,giver,material,reward] of [
@@ -3743,10 +3778,10 @@ const scenarios = {
       await w.waitFor(()=>quest(w,bot,'ribbon_welcome')?.claimed,5000,'Claim Jubilee introduction');
       check(quest(w,bot,'ribbon_welcome')?.claimed,'Hub introduction claims');
       for(const [kind,material] of [['ribbongecko','ribbon_tail'],['balloonbeetle','balloon_silk'],['paintedmacaw','macaw_plume'],['jesterling','jester_bell']]){
-        const enemy=w.views.get(bot).slimes.find(s=>s.kind===kind&&!s.dead),before=totalXp(w.player(bot));
+        const enemy=w.views.get(bot).slimes.find(s=>s.kind===kind&&!s.dead),before=totalXp(w.player(bot)),heroLevel=w.player(bot).level;
         await w.debug(bot,{op:'kill_enemy',id:enemy.id});
         await w.waitFor(()=>w.views.get(bot).drops.some(d=>d.item===material),5000,`${kind} drop`);
-        check(totalXp(w.player(bot))-before===enemyXp(enemy.level),`${kind} grants level XP`);
+        check(totalXp(w.player(bot))-before===scaledXp(w,enemyXp(enemy.level),heroLevel,enemy.level),`${kind} grants level XP`);
       }
       for(const [kind,id,giver,material,reward] of [
         ['paradegryphon','ribbon_gryphon','ribbon_naturalist','gryphon_feather','accessory_amber_l75_blue'],
@@ -3815,10 +3850,10 @@ const scenarios = {
       await w.waitFor(()=>quest(w,bot,'tangle_welcome')?.claimed,5000,'Claim landing introduction');
       check(quest(w,bot,'tangle_welcome')?.claimed,'Banyan introduction claims');
       for(const [kind,material] of [['orchidmantis','mantis_petals'],['canopyglider','glider_membrane'],['poolcaiman','caiman_scale'],['drumgorilla','gorilla_drumskin']]){
-        const enemy=w.views.get(bot).slimes.find(s=>s.kind===kind&&!s.dead),before=totalXp(w.player(bot));
+        const enemy=w.views.get(bot).slimes.find(s=>s.kind===kind&&!s.dead),before=totalXp(w.player(bot)),heroLevel=w.player(bot).level;
         await w.debug(bot,{op:'kill_enemy',id:enemy.id});
         await w.waitFor(()=>w.views.get(bot).drops.some(d=>d.item===material),5000,`${kind} drop`);
-        check(totalXp(w.player(bot))-before===enemyXp(enemy.level),`${kind} grants level XP`);
+        check(totalXp(w.player(bot))-before===scaledXp(w,enemyXp(enemy.level),heroLevel,enemy.level),`${kind} grants level XP`);
       }
       for(const [kind,id,giver,prereq,material,reward] of [
         ['jadeanaconda','tangle_anaconda','tangle_botanist','tangle_caimans','anaconda_jade','accessory_amber_l80_blue'],
@@ -3880,10 +3915,10 @@ const scenarios = {
       await w.waitFor(()=>quest(w,bot,'lapis_welcome')?.claimed,5000,'Claim caravan introduction');
       check(quest(w,bot,'lapis_welcome')?.claimed,'Oasis hub introduction claims');
       for(const [kind,material] of [['sandhopper','sandhopper_chitin'],['dunefennec','fennec_fur'],['glassscorpion','scorpion_glass'],['sunvulture','vulture_quill'],['dunecolossus','colossus_core'],['mirageroc','roc_plume']]){
-        const enemy=await enemyOf(w,bot,25,area,kind),before=totalXp(w.player(bot));
+        const enemy=await enemyOf(w,bot,25,area,kind),before=totalXp(w.player(bot)),heroLevel=w.player(bot).level;
         await w.debug(bot,{op:'kill_enemy',id:enemy.id});
         await w.waitFor(()=>w.views.get(bot).drops.some(d=>d.item===material),5000,`${kind} material`);
-        check(totalXp(w.player(bot))-before===enemyXp(enemy.level),`${kind} gives level XP and ${material}`);
+        check(totalXp(w.player(bot))-before===scaledXp(w,enemyXp(enemy.level),heroLevel,enemy.level),`${kind} gives level XP and ${material}`);
       }
       await kit.teleport(w,bot,{zone:25,x:132,y:29});
       check(area.portals.some(p=>p.id==='lapis_astrolabe_gate'&&p.to===34)&&area.futureInstance.name==='The Sunken Astrolabe','The astrolabe has a playable entrance');
@@ -3923,10 +3958,10 @@ const scenarios = {
       await w.waitFor(()=>quest(w,bot,'frostwake_welcome')?.claimed,5000,'Claim snow introduction');
       check(quest(w,bot,'frostwake_welcome')?.claimed,'The quest hub introduction claims');
       for(const [kind,material] of [['snowhare','snowhare_fur'],['iceotter','iceotter_pelt'],['frostheron','heron_feather'],['glaciercrab','glaciercrab_shell'],['bellmammoth','mammoth_bell'],['auroramanta','manta_aurora'],['crevasseleviathan','leviathan_fang']]){
-        const enemy=await enemyOf(w,bot,26,area,kind),before=totalXp(w.player(bot));
+        const enemy=await enemyOf(w,bot,26,area,kind),before=totalXp(w.player(bot)),heroLevel=w.player(bot).level;
         await w.debug(bot,{op:'kill_enemy',id:enemy.id});
         await w.waitFor(()=>w.views.get(bot).drops.some(d=>d.item===material),5000,`${kind} material`);
-        check(totalXp(w.player(bot))-before===enemyXp(enemy.level),`${kind} gives level XP and ${material}`);
+        check(totalXp(w.player(bot))-before===scaledXp(w,enemyXp(enemy.level),heroLevel,enemy.level),`${kind} gives level XP and ${material}`);
       }
       await kit.teleport(w,bot,{zone:26,x:119,y:25});
       await w.restart();
@@ -3937,6 +3972,7 @@ const scenarios = {
     },
   },
   cairn: {
+    clearTravelQuests: true,
     description: 'Cairnspine: two High Pass gates, Boulderwatch quests, seven drops, three elites and persistence.',
     startLevel: 90,
     levelSpread: 0,
@@ -3962,10 +3998,10 @@ const scenarios = {
       await w.waitFor(()=>quest(w,bot,'cairn_welcome')?.claimed,5000,'Claim Boulderwatch introduction');
       check(quest(w,bot,'cairn_welcome')?.claimed,'The hub introduction claims');
       for(const [kind,material] of [['screeferret','screeferret_pelt'],['stoneibex','ibex_horn'],['slateraven','slate_raven_feather'],['ridgeadder','ridgeadder_scale'],['cairnbehemoth','behemoth_heartstone'],['whitebarktitan','whitebark_core'],['stormcondor','stormcondor_plume']]){
-        const enemy=await enemyOf(w,bot,27,area,kind),before=totalXp(w.player(bot));
+        const enemy=await enemyOf(w,bot,27,area,kind),before=totalXp(w.player(bot)),heroLevel=w.player(bot).level;
         await w.debug(bot,{op:'kill_enemy',id:enemy.id});
         await w.waitFor(()=>w.views.get(bot).drops.some(d=>d.item===material),5000,`${kind} material`);
-        check(totalXp(w.player(bot))-before===enemyXp(enemy.level),`${kind} gives level XP and ${material}`);
+        check(totalXp(w.player(bot))-before===scaledXp(w,enemyXp(enemy.level),heroLevel,enemy.level),`${kind} gives level XP and ${material}`);
       }
       await kit.teleport(w,bot,{zone:27,x:134,y:26});
       await w.restart();
@@ -4259,8 +4295,8 @@ const scenarios = {
       const gear = [
         ...w.views.get(hero).drops,
         ...w.events.filter(e => e.bot === hero && e.type === 'roll' && e.op === 'start'),
-      ].filter(d => typeof d.item === 'string' && d.item.endsWith('_l75_pavilion'));
-      check(gear.length >= 3, 'Boss kills create the three guaranteed exclusive gear drops');
+      ].filter(d => exclusivePiece(d.item, 'thousandfold'));
+      check(gear.length >= 3, `Boss kills create the three guaranteed exclusive gear drops (${gear.map(d => d.item)})`);
       await w.debug(hero, { op: 'quest', id: 'ribbon_final', action: 'claim' });
       check(quest(w, hero, 'ribbon_final')?.claimed &&
         w.player(hero).inventory.some(i => i.item === 'accessory_amber_l75_blue'),
@@ -4459,7 +4495,7 @@ const scenarios = {
         'Outsider gets no quest credit or clear');
       check(w.views.get('RainLead').instance.cleared,'The Rain Crown clears the private copy');
       const gear=[...w.views.get('RainLead').drops,...w.events.filter(e=>e.bot==='RainLead'&&e.type==='roll'&&e.op==='start')]
-        .filter(d=>typeof d.item==='string'&&d.item.endsWith('_l80_rain'));
+        .filter(d=>exclusivePiece(d.item,'rain_crown'));
       check(gear.length>=3,'Three boss kills create exclusive level-80 gear');
       await w.debug('RainLead',{op:'quest',id:'tangle_crown_final',action:'claim'});
       check(quest(w,'RainLead','tangle_crown_final')?.claimed &&
@@ -4509,6 +4545,8 @@ const scenarios = {
         for(const foe of w.views.get('AstroLead').slimes.filter(e=>e.kind===kind&&!e.dead))
           await w.debug('AstroLead',{op:'kill_enemy',id:foe.id});
       check(quest(w,'AstroLead','lapis_astro_trials')?.counts.every((n,i)=>n===[1,1,3][i]),'Trial records its kills');
+      // The ally's own snapshot can be a tick behind the killer's.
+      await w.waitFor(()=>quest(w,'AstroAlly','lapis_astro_trials')?.counts.every((n,i)=>n===[1,1,3][i]),5000,'The ally shares the trial credit').catch(()=>{});
       check(quest(w,'AstroAlly','lapis_astro_trials')?.counts.every((n,i)=>n===[1,1,3][i]),'Party member shares accepted credit');
       for(const bot of ['AstroLead','AstroAlly']) {
         await w.debug(bot,{op:'quest',id:'lapis_astro_trials',action:'claim'});
@@ -4533,6 +4571,7 @@ const scenarios = {
     },
   },
   thunderheart_gate: {
+    clearTravelQuests: true,
     description: 'Thunderheart Gate level gate, party copies, linked quests, boss drops, clear exit and persistence.',
     startLevel: 95, levelSpread: 0, godMode: true,
     async run(w,check) {
@@ -4626,6 +4665,7 @@ const scenarios = {
     },
   },
   blooming_quests: {
+    clearTravelQuests: true,
     description: 'Blooming Labyrinth staged party quest credit, boss loot, isolated clear and persistence.',
     startLevel:97,levelSpread:0,godMode:true,
     async run(w,check) {
@@ -4664,6 +4704,7 @@ const scenarios = {
     },
   },
   blooming_open: {
+    clearTravelQuests: true,
     description: 'Blooming Labyrinth level gate, party isolation, return routes, boss clear and rewards.',
     startLevel:97,levelSpread:0,godMode:true,
     async run(w,check) {
@@ -4719,6 +4760,7 @@ const scenarios = {
     },
   },
   solar_crucible: {
+    clearTravelQuests: true,
     description: 'Solar Crucible level gate, party isolation, clear, loot, return and persistence.',
     startLevel:98,levelSpread:0,godMode:true,
     async run(w,check) {
@@ -4784,6 +4826,7 @@ const scenarios = {
     },
   },
   amber_archive: {
+    clearTravelQuests: true,
     description:'Amber Archive level gate, party isolation, quest credit, boss clear, rewards and return.',
     startLevel:99,levelSpread:0,godMode:true,
     async run(w,check){await yearwheelDungeonOpening(w,check,{
@@ -4794,6 +4837,7 @@ const scenarios = {
     });},
   },
   silent_solstice: {
+    clearTravelQuests: true,
     description:'Silent Solstice level gate, party isolation, quest credit, boss clear, rewards and return.',
     startLevel:99,levelSpread:0,godMode:true,
     async run(w,check){await yearwheelDungeonOpening(w,check,{
@@ -4888,6 +4932,7 @@ async function runScenario(name, world = new TestWorld()) {
   let result;
   try {
     if (scenarios[name].startLevel) world.startLevel = scenarios[name].startLevel;
+    world.clearTravelQuests = !!scenarios[name].clearTravelQuests;
     if (scenarios[name].godMode !== undefined) world.godMode = scenarios[name].godMode;
     if (scenarios[name].levelSpread !== undefined) world.levelSpread = scenarios[name].levelSpread;
     await world.start();

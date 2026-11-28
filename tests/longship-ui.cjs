@@ -83,9 +83,11 @@ const call=async(name,args={})=>{const r=await client.callTool({name,arguments:a
   assert.ok(await page.evaluate(()=>Math.abs(valhalla.longshipMusic.output.gain.value-.09)<.005),'Saved music volume reaches this score');
   await page.evaluate(()=>Prefs.set({sound:false}));await page.waitForTimeout(700);
   assert.ok(await page.evaluate(()=>valhalla.longshipMusic.output.gain.value<.001),'Mute reaches this score');
+  await debug({op:'set_time',hour:12,freeze:true});   // outdoors, the day score
   await teleport(43,60,110);await page.evaluate(()=>Online.send({type:'move',x:56,y:110}));
   await page.waitForFunction(()=>Field.zone===8,null,{timeout:15000});
-  assert.ok(await page.evaluate(()=>!valhalla.longshipMusic.running&&valhalla.dmusic.running),'Returning selects Rán’s Deep music');
+  // Returning selects Rán’s Deep music: scores change through silence (client 1.14.7), so wait for the fade.
+  await page.waitForFunction(()=>!valhalla.longshipMusic.running&&valhalla.dmusic.running,null,{timeout:10000});
   assert.deepEqual(bad,[]);assert.deepEqual(errors,[]);
   console.log(JSON.stringify({passed:true,mode:STUB?'stub':'real',artifacts:world.artifacts}));
 })().catch(e=>{console.error(e);process.exitCode=1;}).finally(async()=>{

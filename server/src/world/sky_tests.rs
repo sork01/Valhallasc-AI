@@ -1,3 +1,5 @@
+// Without the `tools` switch the measuring tools are left out, and with them the only users of some helpers here.
+#![cfg_attr(not(feature = "tools"), allow(dead_code, unused_imports))]
 //! Bifrost Reach (zone 7, levels 30-35): its floating islands and the void between them, the five monster kinds, the hub, the
 //! Stormrift gate pair, the Spark flight and the new `hold` quest objective ("hold the ward").
 use super::wyrd_tests::{at, blocked, calm, drain, flood, join, lines, place, reached, world};
@@ -461,6 +463,7 @@ fn every_bifrost_monster_has_its_own_stats_attacks_materials_and_rewards() {
             .unwrap();
         w.slimes[id] = Slime::with_level(id, &w.spawns[id].clone(), level + 1);
         let (xp, gold) = (w.slimes[id].xp, w.slimes[id].gold);
+        let xp = crate::model::level_adjusted_xp(xp, w.players[&1].character.level, w.slimes[id].level);
         w.hit_slime(id, 1, 1e9, false);
         let c = &w.players[&1].character;
         let paid: u32 = (1..c.level).map(xp_to_level).sum::<u32>() + c.xp;
@@ -723,7 +726,7 @@ fn the_questline_has_forty_one_quests_with_six_holds_and_the_old_objective_kinds
     let quests: Vec<_> = map
         .quests
         .iter()
-        .filter(|q| !q.id.starts_with("span_") && !q.id.starts_with("es_"))
+        .filter(|q| !q.id.starts_with("span_") && !q.id.starts_with("es_") && !q.id.starts_with("fisher_"))
         .collect();
     assert_eq!(
         quests.len(),
@@ -1384,8 +1387,9 @@ fn ward_fight(quest_id: &str, pre: &[&str], level: u32, classes: &[&str], limit:
     }
 }
 
+#[cfg(feature = "tools")]
 #[test]
-#[ignore = "balance probe: prints how parties fare at the three wards (cargo test --release ward_balance_probe -- --ignored --nocapture)"]
+#[ignore = "balance probe: prints how parties fare at the three wards (cargo test --features valhalla-server/tools --release ward_balance_probe -- --ignored --nocapture)"]
 fn ward_balance_probe() {
     let report = |label: &str, f: WardFight| {
         eprintln!(
@@ -1478,8 +1482,9 @@ fn duel(kind: &str, level: u32) -> (bool, f64, f64) {
     )
 }
 
+#[cfg(feature = "tools")]
 #[test]
-#[ignore = "balance probe: one level-matched hero against one monster of each older and newer kind (cargo test --release duel_probe -- --ignored --nocapture)"]
+#[ignore = "balance probe: one level-matched hero against one monster of each older and newer kind (cargo test --features valhalla-server/tools --release duel_probe -- --ignored --nocapture)"]
 fn duel_probe() {
     for (kind, level) in [
         ("boar", 21),

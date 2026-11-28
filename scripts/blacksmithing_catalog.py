@@ -8,6 +8,7 @@ from pathlib import Path
 import numpy as np
 
 from fishing_spots import SCALE, SURFACES, clear_of_hubs_and_seams, radius, walkable
+from gear_levels import budget
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = 'blacksmithing'
@@ -86,6 +87,11 @@ def apply(catalog, world, items):
         entry = {key: template[key] for key in ('kind', 'rarity', 'class', 'attack', 'defense', 'bonusStats', 'tint')
                  if key in template}
         factor = .90 if entry['rarity'] == 'epic' else 1.
+        # A piece made for another level than the one it copies gets the ladder's attack and defense for its own.
+        # (Attribute bonuses step every five levels and the templates are never a step away.)
+        if spec['level'] != template.get('requiredLevel', 1) and (entry.get('attack') or entry.get('defense')):
+            assert not template.get('source'), spec['id']
+            entry['attack'], entry['defense'] = budget(entry['kind'], entry.get('class'), entry['rarity'], spec['level'])
         for key in ('attack', 'defense'):
             entry[key] = round(entry.get(key, 0) * factor, 1)
         if 'bonusStats' in entry:
@@ -105,12 +111,33 @@ def apply(catalog, world, items):
     for zone, area in enumerate(regions):
         smiths = SMITHS.get(zone, set())
         for npc in area.get('npcs', []):
-            npc['offers'] = [o for o in npc['offers'] if o['id'] != WORKSHOP and not o['id'].startswith('buy_smith_')]
+            def forge(offer):
+                return offer['id'] == WORKSHOP or offer['id'].startswith('buy_smith_')
+            start = next((i for i, offer in enumerate(npc['offers']) if forge(offer)), len(npc['offers']))
+            npc['offers'] = [offer for offer in npc['offers'] if not forge(offer)]
             if npc['id'] in smiths:
-                npc['offers'].extend([dict(id=WORKSHOP, label='Blacksmithing workshop', cost=0), *stock])
+                npc['offers'][start:start] = [dict(id=WORKSHOP, label='Blacksmithing workshop', cost=0), *stock]
         if smiths - {npc['id'] for npc in area.get('npcs', [])}:
             raise ValueError(f"Missing town smith in zone {zone}")
     return {str(zone): candidates(regions[zone]) for tier in catalog['tiers'] for zone in tier['zones']}
+
+
+def alias_icons(catalog, root=ROOT):
+    """Crafted pieces wear their template's art: show the template's inventory cell (the tint is copied with the art).
+
+    Idempotent. Any generator that moves cells in items.txt must run this afterwards."""
+    path = root / 'client/assets/items.txt'
+    meta = json.loads(path.read_text())
+    at = meta['at']
+    wanted = {spec['id']: at[spec['template']] for spec in catalog['gear'] if spec['template'] in at}
+    if all(at.get(key) == cell for key, cell in wanted.items()):
+        return
+    at.update(wanted)
+    path.write_text(json.dumps(meta, indent=1) + '\n')
+    script = root / 'client/itemicons.js'
+    head = script.read_text().split('window.ITEM_ICONS = ', 1)[0]
+    data = {key: meta[key] for key in ('size', 'cols', 'rows', 'at')}
+    script.write_text(head + 'window.ITEM_ICONS = ' + json.dumps(data, separators=(',', ':')) + ';\n')
 
 
 def write(path, data, **options):
@@ -136,6 +163,7 @@ def main():
     for filename, (key, data) in results.items():
         encoded = json.dumps(data, separators=(',', ':'), ensure_ascii=False)
         (ROOT / f'client/{filename}.js').write_text(f"'use strict';\nwindow.{key} = {encoded};\n")
+    alias_icons(catalog)
     print('Mining candidates:', ', '.join(f"{key}={len(value)}" for key, value in veins.items()))
 
 

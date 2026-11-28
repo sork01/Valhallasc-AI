@@ -11,7 +11,7 @@ The pre-change table is pinned in
 `tests/fixtures/dungeon-power-before-boss-hp-plus50.txt`. The spawn test rounds the
 combined factor to the table's 10 decimals: Mournsister two levels down lands on
 exactly 670,234.5, and multiplying the factors one at a time rounds it the other way.
-`tests/dungeon-boss-health-probe.cjs` defaults to this change (`BOSS_HP_FACTOR`,
+`tests/tools/dungeon-boss-health-probe.cjs` defaults to this change (`BOSS_HP_FACTOR`,
 `BOSS_HP_FIXTURE` override it; 0.75 with `dungeon-power-before-boss-hp.txt`
 reproduces 1.15.11).
 
@@ -48,7 +48,7 @@ No world regeneration, mechanics changes or save migration.
 
 The three focused `dungeon_difficulty_` checks cover every power value, unchanged
 speed/scale and damage, default and ±2 spawn levels, all 65 bosses and every
-private copy. `tests/dungeon-boss-health-probe.cjs` compares the retained public
+private copy. `tests/tools/dungeon-boss-health-probe.cjs` compares the retained public
 and candidate executables in private worlds: all 65 boss max-HP values become
 75%, and representative dungeon packs and all raid enemy kinds retain exact HP.
 No encounter grinding or win-rate sweep. This follow-up is included with the
@@ -125,7 +125,7 @@ current doubled factors gives Abyss Zealot 94,000 HP instead of 70,500; halving
 current factors gives 47,000 instead of 70,500. This checks the clarified 25%
 reduction rather than either of the earlier interpretations.
 
-`tests/dungeon-difficulty-probe.cjs` compares the retained live and candidate
+`tests/tools/dungeon-difficulty-probe.cjs` compares the retained live and candidate
 executables in separate private worlds: authoritative health must be 75% of the
 previous value in all 20 dungeons, with matching kinds and levels. The native
 checks cover every kind and damage value. The candidate also checks 30 snapshots

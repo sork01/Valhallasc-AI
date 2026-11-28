@@ -40,7 +40,7 @@ assert all(len({zone_tiers[zone] for zone in band}) == 1 for band in bands)
 assert [zone_tiers[band[0]] for band in expert] == [7] * 4 + [8] * 3 + [9] * 3
 assert all(len(veins[str(zone)]) >= 2 for band in bands for zone in band), 'Every band has reachable vein candidates'
 
-eligible = {str(i) for i,z in enumerate(regions) if z['slimes'] and not z.get('copies') and not z.get('interior')}
+eligible = {str(i) for i,z in enumerate(regions) if z['slimes'] and not z.get('copies') and not z.get('interior') and not z.get('gmOnly')}
 assert set(veins) == eligible
 for key, points in veins.items():
     assert len(points) >= 2, f'No alternate vein location in {key}'
@@ -122,6 +122,17 @@ art = generated('client/blacksmithing-art.js')
 expected = {i['id'] for i in items if i.get('source') == 'blacksmithing'
             and i['kind'] in {'material','mining_pick','smith_blueprint'}}
 assert set(art['at']) == expected | {f'vein_{n}' for n in range(10)}
+# Crafted gear: its own inventory cell, or a tinted base piece that has one (the lookup in client/inventory.js).
+inventory = read('client/assets/items.txt')['at']
+assert generated('client/itemicons.js')['at'] == inventory
+if os.getenv('MUTATE') == 'no-icon':
+    inventory = {key: cell for key, cell in inventory.items() if not key.startswith('smith_gear_')}
+def has_icon(piece):
+    return piece['id'] in inventory or any(
+        base.get('variant') == piece['art'] and (base['kind'], base.get('class')) == (piece['kind'], piece.get('class'))
+        and base['id'] in inventory for base in items)
+iconless = [spec['id'] for spec in catalog['gear'] if not has_icon(by_id[spec['id']])]
+assert not iconless, f'crafted gear without an inventory icon: {iconless}'
 atlas = Image.open(ROOT / 'client/assets/blacksmithing.png').convert('RGBA')
 cells = set()
 for x,y in art['at'].values():

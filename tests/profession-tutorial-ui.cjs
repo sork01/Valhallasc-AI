@@ -51,9 +51,9 @@ let browser;
 
   const lessons = [
     {key:'fishing', instructor:'fisher_meadow_1', view:'fisher', title:'Fiske', text:/Kvistspö.*Kroka!/},
-    {key:'blacksmithing', instructor:'smith', view:'smith', title:'Smide', text:/Bram Emberforge.*Spåra.*Bryt malm/},
+    {key:'blacksmithing', instructor:'smith', view:'smith', title:'Smide', text:/Bram Emberforge.*minikartan.*Bryt malm/},
     {key:'enchanting', instructor:'alder_enchanting', title:'Förtrollning', text:/Mira Moonleaf.*Avförtrolla/},
-    {key:'alchemy', instructor:'alchemy_alderhaven', view:'alchemy', title:'Alkemi', text:/Maera Petalbrook.*Blommor.*brygga/},
+    {key:'alchemy', instructor:'alchemy_alderhaven', view:'alchemy', title:'Alkemi', text:/Maera Petalbrook.*minikartan.*brygga/},
   ];
   for (const lesson of lessons) {
     const npc = map.npcs.find(n => n.id === lesson.instructor);

@@ -1,4 +1,5 @@
 module.exports = (kit,map) => ({
+  clearTravelQuests: true,
   description:'Ember Key: real camp acceptance, interrupted channel, personal shard and permanent raid door gate.',
   startLevel:99,levelSpread:0,godMode:true,
   async run(w,check) {

@@ -126,7 +126,8 @@ fn mail_offline_delivery_exact_identity_read_collect_save_and_duplicate_receipts
 #[test]
 fn mail_unknown_self_npc_names_missing_funds_and_invalid_attachments_change_nothing() {
     let (store, a, b, ta, _) = fixture();
-    let before = serde_json::to_value(&a).unwrap();
+    // Loading a save marks its wardrobe as migrated, so compare loaded with loaded.
+    let before = serde_json::to_value(held(&store, &ta)).unwrap();
     for name in [
         a.look.name.as_str(),
         "No Such Character",
@@ -539,7 +540,8 @@ fn dungeon_award_mail_persists_exact_bound_copy_and_receipt_after_collection() {
     let id = store.mail(&c, Request::Open).unwrap().1["letters"][0]["id"]
         .as_i64()
         .unwrap();
-    let before = serde_json::to_value(&c).unwrap();
+    // Loading a save marks its wardrobe as migrated, so compare loaded with loaded.
+    let before = serde_json::to_value(held(&store, &token)).unwrap();
     assert!(store.mail(&c, Request::Collect { id }).is_err());
     assert_eq!(serde_json::to_value(held(&store, &token)).unwrap(), before);
     assert!(

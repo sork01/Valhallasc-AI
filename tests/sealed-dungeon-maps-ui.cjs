@@ -255,7 +255,7 @@ async function call(name, args = {}) {
         typeof ElderHollowArt.portal === 'function' && typeof window.createElderHollowMusic === 'function' };
   });
   assert.equal(elderScene.status, 200);
-  assert.ok(elderScene.art && elderScene.seconds > 90 && elderScene.seconds < 93);
+  assert.ok(elderScene.art && Math.abs(elderScene.seconds - require('./lib/soundtrack.cjs')('elder_hollow')) < .5);
   const maps = await page.evaluate(() => Field._debug.zones.slice(29,40).map(z => ({
     name: z.name, sealed: z.sealedTemplate, copies: z.copies, rooms: z.rooms?.length,
     portals: z.portals.map(p => p.to), theme: z.theme,

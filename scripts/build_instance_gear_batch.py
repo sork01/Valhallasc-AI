@@ -57,7 +57,7 @@ def main():
             if task['done']:
                 continue
             job = task['id']
-            run([NODE, 'tests/gear-piece-art.cjs', job], log)
+            run([NODE, 'tests/tools/gear-piece-art.cjs', job], log)
             record = json.loads(gear.MANIFEST.read_text())[job]
             evidence = ['scripts/late_instance_gear_shapes.py', 'world/gear-art.txt',
                         *record['files'], 'test-results/gear-redesign/' + job + '.png',

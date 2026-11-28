@@ -62,7 +62,7 @@ PEOPLE = [
             'Linen satchels, packs, cloaks and green blades: everything travels well in a leaf basket. Sold at the sap-market rate.'), 'trader'),
     (person(5, 'hw_innkeeper', 'Innkeeper Marit Sapwell', 'Innkeeper',
             'The Amber Cup has a bunk in every burl and a bowl on every table. Rest costs five gold, and the stew is free if you tell a good story.'), 'inn'),
-    (person(0, 'hw_stone', 'Heartwood Meeting Stone', 'Gather a party · hire fighters',
+    (person(0, 'hw_stone', 'Heartwood Meeting Stone', 'Gather your party',
             'Meet your companions here before the Seed Vault opens.', art='stone'), 'stone'),
     (person(1, 'hw_captain', 'Captain Elva Barkshield', 'Captain of the Watch',
             'The Watch walks the Rim Walk and the three rings every night. Nothing wild has ever come in by the Hollow Arch, and I mean to keep it so.'), 'captain'),

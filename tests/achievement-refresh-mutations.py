@@ -15,8 +15,8 @@ SOURCE = ROOT / 'server/src/achievements.rs'
 PREFIX = 'achievements::refresh_tests::'
 CASES = {
     'early': 'achievements_refresh_numeric_goals_award_at_the_exact_boundary_once',
-    'species': 'achievements_refresh_collections_match_real_fish_and_distinct_fisher_quests',
-    'fisher': 'achievements_refresh_collections_match_real_fish_and_distinct_fisher_quests',
+    'species': 'achievements_refresh_collections_keep_the_original_fish_and_fisher_circuits',
+    'fisher': 'achievements_refresh_collections_keep_the_original_fish_and_fisher_circuits',
     'seahorse': 'achievements_refresh_fisher_circuits_require_each_claim_across_lifetimes',
     'title': 'achievements_refresh_new_titles_unlock_and_survive_rebirth_and_legacy_saves',
     'legacy': 'achievements_refresh_preserves_the_entire_old_catalog',

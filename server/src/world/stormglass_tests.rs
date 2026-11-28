@@ -1,7 +1,7 @@
 //! The Stormglass Flats (zone 19, levels 60-65; formerly "The Stormglass Shore") as an authored night plain on the shapes pilot: its data, the three rim gates, the
 //! Asterion gate on the compass rose, the two seams (the Prismwaste on the north, the Obsidian Orrery on the west), Breakwater Camp and three outposts, the
 //! quests (holds, visits, brings, kills, the two elite quests) and the two new elites.
-use super::wyrd_tests::{at, blocked, flood, join, lines, place, reached, world};
+use super::wyrd_tests::{approached, at, blocked, flood, join, lines, place, reached, world};
 use super::*;
 
 const FLATS: usize = 19;
@@ -310,7 +310,7 @@ fn everyone_and_everything_in_the_flats_can_be_walked_to_from_the_camp() {
     let map = &w.maps[FLATS];
     let open = flood(map, &blocked(map, &[]), map.spawn);
     for n in &map.npcs {
-        assert!(reached(map, &open, at(n.x, n.y)), "{} is cut off", n.id);
+        assert!(approached(map, &open, n), "{} is cut off", n.id);
     }
     for p in map
         .places

@@ -11,12 +11,22 @@ sys.path.insert(0, str(ROOT/'scripts'))
 import transmog_npcs as m
 from enchanting_catalog import MASTERS as ENCHANTING_MASTERS
 
+def by_id(world):
+    """The same world with each zone's people in id order: a first install appends, so only their order may differ."""
+    world = copy.deepcopy(world)
+    for area in [world, *world['zones']]:
+        area['npcs'] = sorted(area['npcs'], key=lambda n: n['id'])
+    return world
+
 def main():
     world = json.loads((ROOT/'world/map.txt').read_text())
     art = json.loads((ROOT/'client/assets/npc.txt').read_text())
     before = copy.deepcopy(world)
     art_before = copy.deepcopy(art)
     all_ids = {key for key, _ in m.MASTERS.values()}
+    again, again_art = copy.deepcopy(before), copy.deepcopy(art_before)
+    m.install(again, again_art)
+    assert again == before and again_art == art_before, 'overlay already installed and idempotent in place'
     baseline, base_art = copy.deepcopy(before), copy.deepcopy(art_before)
     for area in [baseline, *baseline['zones']]:
         area['npcs'] = [n for n in area['npcs'] if n['id'] not in all_ids]
@@ -31,15 +41,16 @@ def main():
     m.install(world, art)
     for area, additions in zip(areas, later):
         area['npcs'].extend(additions)
-    assert world == before, 'overlay already installed and idempotent'
+    assert by_id(world) == by_id(before), 'a fresh install reproduces the released masters'
+    installed = copy.deepcopy(world)
     m.install(world, art)
-    assert world == before, 'updating Transmog in place keeps later overlay ordering'
+    assert world == installed, 'updating Transmog in place keeps the order'
     assert art == art_before, 'art assignments already installed and idempotent'
     cleaned = copy.deepcopy(world)
     for area in [cleaned, *cleaned['zones']]:
         area['npcs'] = [n for n in area['npcs'] if n['id'] not in all_ids]
     if os.getenv('MUTATE') == 'preserve': cleaned['npcs'][0]['x'] += 1
-    assert cleaned == baseline, 'existing world geometry, people, quests, waters and spawns stay unchanged'
+    assert by_id(cleaned) == by_id(baseline), 'existing world geometry, people, quests, waters and spawns stay unchanged'
     for key in all_ids: art['npcs'].pop(key)
     assert art == base_art, 'existing art assignments stay unchanged'
     for zone, (key, template) in m.MASTERS.items():
@@ -54,7 +65,7 @@ def main():
         assert art_before['npcs'][key] == art_before['npcs'][template]
         print(f'{key}: reachable at ({npc["x"]}, {npc["y"]}) with existing local artwork')
     client = (ROOT/'client/world.js').read_text()
-    assert json.loads(client.split('window.WORLD_MAP = ', 1)[1].rstrip(';\n')) == world, 'client world matches authoritative map'
+    assert json.loads(client.split('window.WORLD_MAP = ', 1)[1].rstrip(';\n')) == before, 'client world matches authoritative map'
     print('Transmog data: four reachable masters, idempotence, art and full world preservation passed')
 
 if __name__ == '__main__': main()

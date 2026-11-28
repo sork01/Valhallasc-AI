@@ -1,3 +1,5 @@
+// Without the `tools` switch the measuring tools are left out, and with them the only users of some helpers here.
+#![cfg_attr(not(feature = "tools"), allow(dead_code, unused_imports))]
 //! Dungeon difficulty rules (owner, 2026-10-16): a lone player may or may not beat a single dungeon mob (not a
 //! rule, only reported), but a pack of mobs must definitely kill a lone player, and so must a boss.
 //!
@@ -201,6 +203,7 @@ fn the_dungeons_are_found_with_mobs_packs_and_bosses() {
 }
 
 /// Not a rule: a single mob may be soloable or not. This only prints how each class fares, one line per fight.
+#[cfg(feature = "tools")]
 #[test]
 #[ignore = "report only: run scripts/dungeon-solo-parallel.sh"]
 fn report_how_a_lone_player_fares_against_single_dungeon_mobs() {
@@ -225,6 +228,7 @@ fn report_how_a_lone_player_fares_against_single_dungeon_mobs() {
     }
 }
 
+#[cfg(feature = "tools")]
 #[test]
 #[ignore = "slow: run scripts/dungeon-solo-parallel.sh"]
 fn a_dungeon_pack_kills_a_lone_player() {
@@ -273,6 +277,7 @@ fn a_dungeon_pack_kills_a_lone_player() {
 /// one who dies. Purple gear five levels above may clear it (owner, 2026-10-16: fine), so it is only reported. Bosses
 /// a lone player can kill get a soft enrage (`world/enrage.txt`); Choir, Colossus, Hollowking, Bloom Heart and Solstice
 /// Heart have none, see `docs/dungeon-solo-report.md`.
+#[cfg(feature = "tools")]
 #[test]
 #[ignore = "slow: run scripts/dungeon-solo-parallel.sh"]
 fn a_dungeon_boss_kills_a_lone_player() {
@@ -335,6 +340,7 @@ const PARTY: [Class; 5] = [
 /// The control for both rules: a party of five in ordinary green gear at the dungeon's level, with every potion and
 /// meal, must beat every pack and every boss in the dungeon (`DUNGEON_PARTY_RARITY=epic` tries purple gear).
 /// `DUNGEON_PARTY_SHARD=i/n` runs every n-th dungeon so shards can run side by side.
+#[cfg(feature = "tools")]
 #[test]
 #[ignore = "slow: run scripts/dungeon-party-parallel.sh"]
 fn a_party_of_five_beats_every_dungeon_pack_and_boss() {
@@ -434,6 +440,7 @@ fn a_party_of_five_beats_every_dungeon_pack_and_boss() {
 /// mercenaries' code (`auto_play`). The hired five must win at least half the runs (no bot party any more: owner, 2026-10-19:
 /// test with the five hired fighters only). Each line lists the seconds of every run and the DPS of each class.
 /// `DUNGEON_SOLO_DUNGEONS` / `DUNGEON_SOLO_KINDS` / `DUNGEON_SOLO_SEEDS` limit it.
+#[cfg(feature = "tools")]
 #[test]
 #[ignore = "slow: one fight per boss per seed"]
 fn a_hired_party_of_five_beats_every_final_boss() {
@@ -502,6 +509,7 @@ fn a_hired_party_of_five_beats_every_final_boss() {
 /// alone must lose (`BOSSMECH-MERC-ALONE`) was removed by the owner on 2026-10-23. Measure the raw times with the
 /// enrage off (`ENRAGE_FILE=<a file holding {}>`). `DUNGEON_MERC_ALONE_ALL=1` adds every other boss and every pack of the
 /// chosen dungeons. `DUNGEON_SOLO_DUNGEONS` / `_KINDS` / `_SEEDS` limit it.
+#[cfg(feature = "tools")]
 #[test]
 #[ignore = "slow: four fights per boss per seed"]
 fn merc_alone_party_times_report() {
@@ -578,8 +586,9 @@ fn merc_alone_party_times_report() {
     }
 }
 
-/// Do dungeon monsters actually hurt? `DUNGEON_SOLO_DUNGEONS=undervault DUNGEON_SOLO_CLASS=priest cargo test dungeon_probe -- --ignored --nocapture`
+/// Do dungeon monsters actually hurt? `DUNGEON_SOLO_DUNGEONS=undervault DUNGEON_SOLO_CLASS=priest cargo test --features valhalla-server/tools dungeon_probe -- --ignored --nocapture`
 /// prints damage, hits and health for every boss and the first mob of the chosen dungeons, in green and purple gear.
+#[cfg(feature = "tools")]
 #[test]
 #[ignore = "debug probe"]
 fn dungeon_probe() {
@@ -609,7 +618,8 @@ fn dungeon_probe() {
     }
 }
 
-/// Prints what each dungeon holds, for planning: `cargo test dungeon_inventory -- --ignored --nocapture`.
+/// Prints what each dungeon holds, for planning: `cargo test --features valhalla-server/tools dungeon_inventory -- --ignored --nocapture`.
+#[cfg(feature = "tools")]
 #[test]
 #[ignore = "report only"]
 fn dungeon_inventory() {
@@ -644,6 +654,7 @@ fn dungeon_inventory() {
 
 /// Cloak release calibration: the real hired five, full-gear hirer, ordinary hired gear.
 /// Four shards keep one test executable and separate logs; raid timings remain deferred.
+#[cfg(feature = "tools")]
 #[test]
 #[ignore = "scoped cloak release measurements; use scratch ELITE_POWER_FILE and ENRAGE_FILE"]
 fn cloak_recal_measure_hired_encounters() {

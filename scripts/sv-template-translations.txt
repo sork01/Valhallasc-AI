@@ -452,6 +452,7 @@
   "You need {0} more to repair everything.": "Du behöver {0} till för att reparera allt.",
   "You need {0} more.": "Du behöver {0} till.",
   "You pick up {0}.": "Du plockar upp {0}.",
+  "You pick up {0} × {1}.": "Du plockar upp {0} × {1:t}.",
   "sells for {0}{1}": "säljs för {0}{1}",
   "Bought back for {0}.": "Köpte tillbaka för {0}.",
   "Items sold for {0}.": "Sålde föremål för {0}.",

@@ -54,13 +54,14 @@ def apply(catalog, items, world, art):
             npc['offers'] = [offer for offer in npc['offers'] if not offer['id'].startswith('buy_enchant_recipe_')]
     for zone, (key, anchor, template) in MASTERS.items():
         area = areas[zone]
+        old_index = next((index for index, npc in enumerate(area['npcs']) if npc['id'] == key), len(area['npcs']))
         area['npcs'] = [npc for npc in area['npcs'] if npc['id'] != key]
         at = next(npc for npc in area['npcs'] if npc['id'] == anchor)
         look = next(npc for npc in area['npcs'] if npc['id'] == template)
         pos = reachable_service_position(area, at)
         if pos is None:
             raise ValueError(f'No reachable Enchanting Master position for {anchor}')
-        area['npcs'].append(dict(
+        area['npcs'].insert(old_index, dict(
             id=key, name='Enchanting Master', role='Enchanting trainer and recipe vendor',
             x=round(pos[0], 3), y=round(pos[1], 3), color=look['color'], look=copy.deepcopy(look.get('look', {})),
             dialogue=DIALOGUE, offers=[dict(id='learn_enchanting', label='Learn Enchanting', cost=0), *stock],

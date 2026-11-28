@@ -68,6 +68,13 @@ async function call(name, args = {}) {
   await openBuy();
   check(await (await slot('bag_l20')).isEnabled() && await (await slot('bag_l30')).isDisabled(), 'The level in the reply controls tier unlocks');
   check(await (await slot('bag_l20')).textContent().then(t => t.includes('+10 slots') && t.includes('Lv 20')), 'Trail Pack shows +10 slots at level 20');
+  // The shop trusts the fitted bags in the server's reply, so really fill all four slots.
+  await page.evaluate(() => Online.send({ type: 'debug', command: { op: 'set_level', level: 50 } }));
+  for (const offer of ['satchel', 'bag_l10', 'bag_l20', 'bag_l30']) {
+    await page.waitForTimeout(600);
+    await page.evaluate(([npc, offer]) => Online.send({ type: 'interact', npc, offer }), [trader.id, offer]);
+  }
+  await page.waitForFunction(() => Field.hero.bags?.length === 4, null, { timeout: 15000 });
   await show(50, 100000, ['linen_satchel', 'adventurer_satchel', 'trail_pack_l20', 'ranger_pack_l30']);
   await openBuy();
   check(await (await slot('satchel')).isDisabled(), 'A full set of four refuses a same-size bag');

@@ -10,7 +10,7 @@ function check(ok,message){assert.ok(ok,message);checks++;console.log(message);}
  let latest;const errors=[];page.on('pageerror',e=>errors.push(e.message));
  page.on('websocket',s=>s.on('framereceived',({payload})=>{const p=frameJson(payload);if(p.type==='snapshot')latest=p;}));
  await page.addInitScript(()=>localStorage.setItem('valhallasc.save.v1',JSON.stringify({lang:'en',sound:false})));
- await page.goto(world.url);await page.locator('#start').click();await page.locator('#login-guest').click();await page.locator('#cls-hunter').click();await page.locator('#name').fill('EmberTester');await page.locator('#go').click({timeout:60000});
+ await require('./lib/travel-quests.cjs')(page);await page.goto(world.url);await page.locator('#start').click();await page.locator('#login-guest').click();await page.locator('#cls-hunter').click();await page.locator('#name').fill('EmberTester');await page.locator('#go').click({timeout:60000});
  await page.waitForFunction(()=>Online.connected&&Field.hero.level===99);
  const HOME=await page.evaluate(()=>{const c=WORLD_MAP.crosses.find(c=>c.id==='raid_cross_0');return {x:c.x,y:c.y+1};});
  const send=a=>page.evaluate(a=>Online.send(a),a),debug=command=>send({type:'debug',command});

@@ -71,7 +71,7 @@ def build():
   npc('stonesinger','Edda Flintvoice','Stone singer',54,74,'The behemoth answers the old cairn bells. Bring two allies before you ring them.',mercenary_offers.offers(),art='cairn_stonesinger'),
   npc('grovekeeper','Tala Whitebark','Bare grove keeper',102,83,'The leafless giant still grows. It remembers the mountain before these roads.',mercenary_offers.offers(),art='cairn_grovekeeper'),
   npc('windseer','Oren Highwind','Summit windseer',133,53,'The storm-ring is open. Gather five travelers for the Thunderheart Gate.',mercenary_offers.offers(),art='cairn_windseer'),
-  npc('stone','Cairnspine Meeting Stone','Gather a party · hire fighters',131,30,'Gather here before the Thunderheart Gate.',mercenary_offers.offers(open_=True),art='stone'),
+  npc('stone','Cairnspine Meeting Stone','Gather your party',131,30,'Gather here before the Thunderheart Gate.',mercenary_offers.offers(open_=True),art='stone'),
  ]
  quests=[
   quest('welcome','The Four Turns','warden','Meet the healer, surveyor and peak scout at Boulderwatch.',[talk('healer','Meet Pella'),talk('surveyor','Meet Daro'),talk('scout','Meet Noll')],90,9200),

@@ -19,16 +19,18 @@ if cargo.exists():
 py = out / 'py-results.tsv'
 if py.exists():
     rows = [l.split('\t') for l in py.read_text().splitlines()]
-    bad = [r for r in rows if r[1] != '0']
-    L.append(f"\n## Python (`tests/*.py`): {len(bad)} failed of {len(rows)}\n")
+    skipped = [r for r in rows if r[1] == 'skip']
+    bad = [r for r in rows if r[1] not in ('0', 'skip')]
+    L.append(f"\n## Python (`tests/*.py`): {len(bad)} failed of {len(rows) - len(skipped)} ({len(skipped)} left out as unaffected)\n")
     for n, rc in bad:
         t = (out / f'py-{n}.log').read_text(errors='replace').strip().splitlines()
         L.append(f"- [ ] `tests/{n}.py` (exit {rc}) — {t[-1][:200] if t else '(no output, timed out?)'}")
 br = out / 'browser-results.tsv'
 if br.exists():
     rows = [l.split('\t') for l in br.read_text().splitlines() if '\t' in l]
-    bad = [r for r in rows if r[1] != '0']
-    L.append(f"\n## Node/browser (`tests/*.cjs`, bounded runner): {len(bad)} failed of {len(rows)} run{'' if 'DONE' in br.read_text() else ' so far (run unfinished)'}\n")
+    skipped = [r for r in rows if r[1] == 'skip']
+    bad = [r for r in rows if r[1] not in ('0', 'skip')]
+    L.append(f"\n## Node/browser (`tests/*.cjs`, bounded runner): {len(bad)} failed of {len(rows) - len(skipped)} run{'' if 'DONE' in br.read_text() else ' so far (run unfinished)'} ({len(skipped)} left out as unaffected)\n")
     for n, rc, sec in bad:
         lg = [x for x in (out / 'browser' / f'{n}.log').read_text(errors='replace').splitlines()
               if re.search(r'error|assert|fail|timeout|not defined|cannot', x, re.I) and not x.lstrip().startswith('at ')]

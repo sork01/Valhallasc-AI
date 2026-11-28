@@ -117,7 +117,7 @@ def build():
   npc('scout','Tarek Windstep','Dune scout',51,105,'The fennecs cross the north flats at dusk. The scorpions favor the glassy salt.',mercenary_offers.offers()),
   npc('warden','Ruma Sunward','Oasis warden',77,86,'The stone giant stirs beyond the mirrored pool. Bring two friends before you face it.',mercenary_offers.offers(),art='lapis_warden'),
   npc('seer','Laleh of the Lens','Astrolabe seer',127,45,'The Sunken Astrolabe is open beneath its turning lenses. Bring five travelers.',art='lapis_seer'),
-  npc('stone','Lapis Meeting Stone','Gather a party · hire fighters',130,38,'Gather here before descending into the Sunken Astrolabe.',mercenary_offers.offers(open_=True),art='stone'),
+  npc('stone','Lapis Meeting Stone','Gather your party',130,38,'Gather here before descending into the Sunken Astrolabe.',mercenary_offers.offers(open_=True),art='stone'),
  ]
  quests=[
   quest('welcome','Three Waters','keeper','Meet the healer, cartographer and scout at Azure Wells.',[talk('healer','Meet Nima'),talk('cartographer','Meet Ivo'),talk('scout','Meet Tarek')],80,8000),

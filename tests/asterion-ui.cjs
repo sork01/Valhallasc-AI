@@ -28,10 +28,11 @@ async function call(name,args={}){const r=await client.callTool({name,arguments:
   const debug=command=>page.evaluate(([command,ref])=>Online.send({type:'debug',ref,command}),[command,debugRef++]);
   const stage=async(zone,x,y)=>{const sent=await debug({op:'teleport',zone,x,y});check(sent,`Send private teleport to ${zone}:${x},${y}`);try{await page.waitForFunction(([z,x,y])=>Field.zone===z&&Math.hypot(Field.hero.x-x,Field.hero.y-y)<2,[zone,x,y],{timeout:15000,polling:100});}catch(error){const at=await page.evaluate(()=>({connected:Online.connected,zone:Field.zone,x:Field.hero.x,y:Field.hero.y}));throw Error(`Teleport to ${zone}:${x},${y} ended at ${JSON.stringify(at)}; debug ${JSON.stringify(debugPackets.at(-1))}: ${error.message}`);}await page.waitForTimeout(500);};
   await stage(17,90,153);
+  await debug({op:'set_time',hour:12,freeze:true});
   await page.waitForFunction(()=>valhalla.hmusic?.loaded&&valhalla.hmusic.running,null,{timeout:15000,polling:100});
-  check(await page.evaluate(()=>valhalla.hmusic.duration>68&&valhalla.hmusic.duration<69),'The dybase2 Asterion score decodes and plays in the city');
+  check(await page.evaluate(seconds=>Math.abs(valhalla.hmusic.duration-seconds)<.5,require('./lib/soundtrack.cjs')('asterion')),'The dybase2 Asterion score decodes and plays in the city');
   await page.screenshot({path:path.join(world.artifacts,'asterion-arrival.png')});
-  check(await page.evaluate(()=>Field.zoneTheme==='asterion'&&City.npcs.length===25&&City.npcs.some(n=>n.id==='asterion_transmog')),'Asterion includes its Transmog Master (32 entries less six inactive seasonal dances and the spirit guide, alive)');
+  check(await page.evaluate(()=>Field.zoneTheme==='asterion'&&City.npcs.length===28&&City.npcs.some(n=>n.id==='asterion_transmog')),'Asterion includes its Transmog Master (35 entries less six inactive seasonal dances and the spirit guide, alive)');
   await stage(17,90,99);
   await page.screenshot({path:path.join(world.artifacts,'asterion-astrolabe.png')});
   const moving=await page.evaluate(()=>City.npcs.filter(n=>n.route).map(n=>[n.id,n.x,n.y]));
@@ -53,7 +54,7 @@ async function call(name,args={}){const r=await client.callTool({name,arguments:
     return {zones:Field._debug.zones.length,city:city.name,theme:city.theme,size:city.size,
       houses:houses.length,labels:new Set(houses.map(o=>o.label)).size,npcs:city.npcs.length,
       walkers:city.npcs.filter(n=>n.route).length,looks:new Set(city.npcs.filter(n=>n.look?.prop).map(n=>n.look.prop)).size,
-      quests:city.quests.length,art:['aetherhouse','astrolabe','moonobelisk','glasslamp'].every(k=>!!City.art[k]),
+      quests:city.quests.filter(q=>!q.id.startsWith('fisher_')).length,art:['aetherhouse','astrolabe','moonobelisk','glasslamp'].every(k=>!!City.art[k]),
       travel:city.npcs.find(n=>n.id==='travel_asterion')?.travelLinks,
       stone:city.npcs.find(n=>n.id==='asterion_stone')?.art,
       well:[well.name,well.theme,well.copies,well.min_level,well.final_boss,well.slimes.length,well.slimes.filter(s=>['tideglass_heron','hourpetal_stag','moonskein_weaver','moonwell_echo'].includes(s.kind)).length],
@@ -64,14 +65,14 @@ async function call(name,args={}){const r=await client.callTool({name,arguments:
   });
   check(data.zones>=19&&data.city==='Asterion'&&data.theme==='asterion'&&data.size===180,'The full city loads as zone 17');
   check(data.houses>=120&&data.labels===data.houses,'Every one of the glass-roof houses has a unique address');
-  check(data.npcs===31&&data.walkers===10&&data.looks>=8,'Moving townspeople carry distinct clothes and props');
-  check(data.quests===23&&data.travel?.join()==='travel_breakwater,travel_rodstead,travel_fulgur,travel_bankhold'&&data.stone==='stone','Quest hub (23 quests), Travel Master (its four Spark links) and interactive Meeting Stone load');
+  check(data.npcs===35&&data.walkers===10&&data.looks>=8,'Moving townspeople carry distinct clothes and props');
+  check(data.quests===23&&data.travel?.join()==='travel_breakwater,travel_rodstead,travel_fulgur,travel_bankhold'&&data.stone==='stone','Quest hub (23 quests, Fisher quests aside), Travel Master (its four Spark links) and interactive Meeting Stone load');
   check(data.art&&data.map>=19&&data.legend===60&&data.music,'Art, world map and dybase2 music hook load');
   check(data.well.join(',')==='The Moonwell,moonwell,4,60,moonwell_echo,20,4'&&data.gardenArt,'Floating Moonwell garden and four bosses load');
   check(STUB||data.sprite.join(',')==='768,480','PixelFlow boss atlas loads in its five-clip format');
   check(STUB||data.gardenSprite===768,'Six new five-clip monster atlases load');
-  await page.waitForFunction(()=>valhalla.mmusic?.running&&!valhalla.hmusic?.running,null,{timeout:10000,polling:100});
-  check(await page.evaluate(()=>valhalla.mmusic.running&&!valhalla.hmusic.running),'The garden has its own luminous score');
+  await page.waitForFunction(()=>valhalla.moonwellMusic?.running&&!valhalla.hmusic?.running,null,{timeout:10000,polling:100});
+  check(await page.evaluate(()=>valhalla.moonwellMusic.running&&!valhalla.hmusic.running),'The garden has its own luminous score');
   await stage(18,102,104);
   await page.waitForTimeout(4300);
   await page.screenshot({path:path.join(world.artifacts,'moonwell-boss.png')});

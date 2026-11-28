@@ -1,5 +1,5 @@
 //! Veyrroot's wild canopy and Heartwood's hollow are reachable public maps (the Veyrroot became a wild jungle on the shapes pilot, 2026-11-09: `veyrroot_tests`).
-use super::wyrd_tests::{at, blocked, flood, reached, world};
+use super::wyrd_tests::{approached, at, blocked, flood, reached, world};
 use super::*;
 
 #[test]
@@ -18,14 +18,9 @@ fn canopy_meeting_stone_has_visible_scenery_and_a_clear_hiring_spot() {
     let mut foot = stone.position_at(0.);
     map.collide(&mut foot, PLAYER_RADIUS);
     assert!(foot.distance(stone.position_at(0.)) < 1e-6);
-    assert_eq!(
-        stone
-            .offers
-            .iter()
-            .filter(|o| o.open && o.merc.is_some())
-            .count(),
-        5
-    );
+    // Meeting Stones summon the party; open hiring belongs to the dungeon Repair Smiths.
+    assert!(stone.offers.iter().any(|o| o.id == "summon_party"));
+    assert!(stone.offers.iter().all(|o| o.merc.is_none()));
     let seen = flood(map, &blocked(map, &[]), map.spawn);
     assert!(reached(map, &seen, foot));
 }
@@ -73,7 +68,7 @@ fn worldheart_gates_and_both_city_floors_are_reachable() {
     for (id, map) in [(23, outer), (24, inner)] {
         let seen = flood(map, &blocked(map, &[]), map.spawn);
         for n in &map.npcs {
-            assert!(reached(map, &seen, n.position_at(0.)), "{}", n.id);
+            assert!(approached(map, &seen, n), "{}", n.id);
         }
         for p in &map.portals {
             assert!(reached(map, &seen, at(p.x, p.y)), "{}", p.id);

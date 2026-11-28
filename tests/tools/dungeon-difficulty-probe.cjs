@@ -2,9 +2,9 @@
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
-const { TestWorld } = require('../scripts/testing/driver.cjs');
-const { frameJson } = require('./lib/frames.cjs');
-const raw = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../world/map.txt'), 'utf8'));
+const { TestWorld } = require('../../scripts/testing/driver.cjs');
+const { frameJson } = require('../lib/frames.cjs');
+const raw = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../../world/map.txt'), 'utf8'));
 const fixtures = [raw, ...raw.zones].flatMap((map, zone) => {
   if (!map.copies || map.raid) return [];
   const spawn = map.slimes.find(s => !s.ambush && s.kind !== map.final_boss) || map.slimes.find(s => !s.ambush);
@@ -48,7 +48,7 @@ async function capture(binary, performance = false) {
     assert.deepEqual([row.zone, row.kind, row.level], [prior.zone, prior.kind, prior.level]);
     assert.ok(Math.abs(row.maxHp - prior.maxHp * 0.75) <= 1, `${row.name}: health must be 75% of the previous value (${prior.maxHp} -> ${row.maxHp})`);
   }
-  const output = path.resolve(__dirname, '../test-results/dungeon-difficulty/protocol.json'); fs.mkdirSync(path.dirname(output), { recursive: true });
+  const output = path.resolve(__dirname, '../../test-results/dungeon-difficulty/protocol.json'); fs.mkdirSync(path.dirname(output), { recursive: true });
   fs.writeFileSync(output, JSON.stringify({ before, after }, null, 2) + '\n');
   console.log(`PASS dungeon-difficulty-probe: 20 private dungeon health comparisons; ${after.timing.count} snapshots in ${after.timing.milliseconds}ms, tick gaps ${after.timing.tickGap}`);
 })().catch(error => { console.error(error); process.exitCode = 1; });

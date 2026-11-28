@@ -4,6 +4,8 @@ A hired fighter wears the hirer's gear in the fighter's own class. The hire uses
 
 The Repair Smith at each dungeon or raid entrance handles hiring, dismissal and repairs. A hire belongs to that instance copy until the party clears it or the hirer leaves. Deaths and party wipes do not end an instance contract: fallen hires revive under the existing pack/boss rules and can retry with the hirer. The old hirer-death doom applies only to outdoor hires. Outdoor group-quest contracts last until the quest objective is complete or the hirer enters an instance.
 
+Every elite quest hunted outdoors can be hired for at its giver, who needs the quest to be accepted. `scripts/dungeon_services.py` (`elite_hires`) adds the offers to any such giver that has none, including the two Bifrost hunts without shared group credit (`sky_h_shardking`, `sky_wr_alpha`); the server accepts a quest that is either a group quest or wants more than one fighter.
+
 Meeting Stones offer summon invitations to online party members. Each dungeon has a stone near its Repair Smith. A party member who accepts arrives beside the stone in the sender's copy if they meet the destination's minimum level. Walking through the normal entrance uses the dungeon's usual gates.
 
 `scripts/dungeon_services.py` installs these services after zone shaping. `node tests/dungeon-services.cjs` checks the catalog and tests the service over a private connection.

@@ -48,7 +48,9 @@ async function reloadGuest(world) {
   // Equipment icons: every piece of gear has its own pixel icon (assets/items.png), no two alike, and the bag/gear slots draw them.
   const icons = await page.evaluate(async () => {
     const at0 = ITEM_ICONS.at;
-    const all = WORLD_ITEMS.filter(i => !['material', 'bag', 'food', 'potion', 'mount_licence'].includes(i.kind));
+    // Profession items draw from their own atlases; enchanting scrolls and recipes are not equipment.
+    const ownAtlas = i => [window.ALCHEMY_ART, window.BLACKSMITHING_ART, window.FISHING_ICONS].some(art => art?.at[i.id]);
+    const all = WORLD_ITEMS.filter(i => !['material', 'bag', 'food', 'potion', 'mount_licence', 'enchant_recipe', 'enchant_scroll'].includes(i.kind) && !ownAtlas(i));
     // Original pieces have their own icon; a recolouring (art + tint) has none and shows its base piece through a colour filter.
     const gear = all.filter(i => !i.art && i.source !== 'orange_pool'), recoloured = all.filter(i => i.art);
     // A piece with its own atlas icon (e.g. the Nornroot set's bespoke "fatewoven" art) needs no tint or base; a piece
@@ -175,6 +177,8 @@ async function reloadGuest(world) {
     window.Online = { connected:true, send: message => { sent.push(message); return true; } };
   });
   // money.js first: inventory.js formats every price through Money (COIN-DENOMINATIONS).
+  // quests.js translates quest text as it loads.
+  await fixture.evaluate(() => { window.Locale = { translate: text => text, lang: 'en' }; });
   for (const script of ['money.js', 'inventory.js', 'quest-guidance.js', 'quests.js', 'city.js']) await fixture.addScriptTag({ path:path.join(root, 'client', script) });
   await fixture.evaluate(() => {
     Inventory.update([{item:'mage_weapon_crystal_l10_purple',quantity:1},{item:'warrior_weapon_royal',quantity:1},{item:'mage_armor_runic',quantity:2},{item:'headgear_upgrade',quantity:1},{item:'pants_upgrade',quantity:1},{item:'mage_armor_apprentice_l5_blue',quantity:1},{item:'slime_gel',quantity:3}], { class:'mage', mageArmor:'runic', mageWeapon:'ash' });

@@ -17,7 +17,7 @@ const check=(v,s)=>{assert.ok(v,s);console.log(++checks+': '+s);};
   const WS=window.WebSocket;window.WebSocket=class extends WS{constructor(...a){super(...a);this.addEventListener('message',e=>{if(typeof e.data==='string'){try{take(JSON.parse(e.data));}catch{}return;}const buf=e.data instanceof ArrayBuffer?Promise.resolve(e.data):e.data.arrayBuffer();buf.then(b=>take(JSON.parse(window.pako.inflateRaw(new Uint8Array(b),{to:'string'})))).catch(()=>{});});}};
   window.__self=()=>window.__snap?.players.find(p=>p.id===window.Online?.id);
  });
- await p.goto(w.url);await p.locator('#start').click();await playGuest(p);await p.locator('#cls-warrior').click();await p.locator('#name').fill('SunGuest');await p.locator('#go').click({timeout:60000});
+ await require('./lib/travel-quests.cjs')(p);await p.goto(w.url);await p.locator('#start').click();await playGuest(p);await p.locator('#cls-warrior').click();await p.locator('#name').fill('SunGuest');await p.locator('#go').click({timeout:60000});
  const wait=(fn,arg)=>p.waitForFunction(fn,arg,{timeout:25000}),send=m=>p.evaluate(m=>Online.send(m),m),debug=command=>send({type:'debug',command});
  await wait(()=>Online.connected&&Field.hero.hp>0);
  const stand=async(z,x,y)=>{await p.evaluate(()=>{City.close();Quests.close();WorldMap.close();Field.clearInput();Online.send({type:'stop'});});await debug({op:'teleport',zone:z,x,y});await wait(([z,x,y])=>Field.zone===z&&Math.hypot(Field.hero.nx-x,Field.hero.ny-y)<1.3,[z,x,y]);await p.waitForTimeout(250);await p.evaluate(()=>ZoneJourney.clear());};
@@ -62,7 +62,7 @@ const check=(v,s)=>{assert.ok(v,s);console.log(++checks+': '+s);};
  check(await p.evaluate(()=>__self().seasonalRolls.solstice_hunt===20270617),'The credited kill consumes the independent personal daily mount attempt');
  await debug({op:'give_mount',mount:'sunwoven'}); // Persistence fixture; Rust verifies the actual 5% outcomes.
  await npc('nacre_gardener');const gold=await p.evaluate(()=>__self().gold);await interact('nacre_gardener','quest:claim:solstice_hunt');await wait(()=>__self().seasonalClaims.solstice_hunt===20270617);
- check(await p.evaluate(g=>__self().gold===g+300&&__self().mounts.includes('sunwoven'),gold),'Another city host pays the shared reward and preserves mount ownership');
+ check(await p.evaluate(g=>__self().gold===g+Math.floor((300*105+50)/100)/* Human +5% */&&__self().mounts.includes('sunwoven'),gold),'Another city host pays the shared reward and preserves mount ownership');
  check(await p.evaluate(()=>['baker','city_bard','nacre_gardener','asterion_singer'].every(n=>!Quests.offered(n).some(q=>q.id==='solstice_hunt'))),'Changing hosts cannot reopen the same daily hunt');
  await debug({op:'season_time',unix:1813269600});await wait(()=>__snap.seasons.find(s=>s.id==='solstice').day===20270618);
  check(await p.evaluate(()=>Quests.offered('baker').some(q=>q.id==='solstice_hunt')),'Stockholm midnight opens the next daily hunt');

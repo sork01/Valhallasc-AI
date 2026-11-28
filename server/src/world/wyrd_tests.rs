@@ -227,6 +227,47 @@ pub(super) fn flood(map: &Map, grid: &[bool], from: Point) -> Vec<bool> {
 pub(super) fn reached(map: &Map, seen: &[bool], p: Point) -> bool {
     seen[((p.y / STEP) as usize) * grid_size(map) + (p.x / STEP) as usize]
 }
+/// Sets aside the automatic travel quests ("Onward to ..."): a hero raised straight to a high level in a test would
+/// otherwise have a full quest log.
+pub(super) fn set_aside_travel_quests(w: &mut World, session: u64) {
+    let travel: Vec<String> = w
+        .maps
+        .iter()
+        .flat_map(|m| &m.quests)
+        .filter(|q| q.id.ends_with("_onward"))
+        .map(|q| q.id.clone())
+        .collect();
+    assert!(travel.len() >= 19, "{} travel quests", travel.len());
+    let c = &mut w.players.get_mut(&session).unwrap().character;
+    c.quests.retain(|p| !travel.contains(&p.id));
+    c.abandoned_quests.extend(travel);
+}
+/// A person can be walked up to: their own spot is reached or, for a solid Meeting Stone, ground inside the server's
+/// 2.8 tile talk range.
+pub(super) fn approached(map: &Map, seen: &[bool], npc: &Npc) -> bool {
+    let at = npc.position_at(0.);
+    let reach_of = |p: Point| {
+        p.x >= 0. && p.y >= 0. && p.x < map.size as f64 && p.y < map.size as f64 && reached(map, seen, p)
+    };
+    reach_of(at)
+        || npc.art.as_deref() == Some("stone")
+            && (0..32).any(|i| {
+                let a = f64::from(i) * std::f64::consts::TAU / 32.;
+                [1.2, 1.8, 2.4].iter().any(|d| reach_of(Point { x: at.x + a.cos() * d, y: at.y + a.sin() * d }))
+            })
+}
+#[test]
+fn a_meeting_stone_walled_off_from_the_ground_is_not_approachable() {
+    let w = world();
+    let map = &w.maps[WYRD];
+    let seen = flood(map, &blocked(map, &[]), map.spawn);
+    let mut stone = map.npcs.iter().find(|n| n.art.as_deref() == Some("stone")).unwrap().clone();
+    assert!(!reached(map, &seen, stone.position_at(0.)), "the stone itself is solid");
+    assert!(approached(map, &seen, &stone));
+    // The same stone out in the void beside the zone has no ground within talk range.
+    (stone.x, stone.y) = (2., 2.);
+    assert!(!approached(map, &seen, &stone));
+}
 /// A straight walk from a to b with the real collision: true when nothing stops it.
 fn walkable(map: &Map, a: Point, b: Point) -> bool {
     let mut p = a;
@@ -503,6 +544,7 @@ fn every_wyrdwood_monster_has_its_own_stats_attacks_materials_and_rewards() {
             .unwrap();
         w.slimes[id] = Slime::with_level(id, &w.spawns[id].clone(), level + 1);
         let (xp, gold) = (w.slimes[id].xp, w.slimes[id].gold);
+        let xp = crate::model::level_adjusted_xp(xp, w.players[&1].character.level, w.slimes[id].level);
         w.hit_slime(id, 1, 1e9, false);
         let c = &w.players[&1].character;
         let paid: u32 = (1..c.level).map(xp_to_level).sum::<u32>() + c.xp;
@@ -572,7 +614,7 @@ fn both_hubs_have_valid_connected_quests_with_every_kind_of_objective_across_lev
     assert_eq!(
         map.npcs
             .iter()
-            .filter(|n| !n.id.starts_with("spirit_guide_"))
+            .filter(|n| !n.id.starts_with("spirit_guide_") && !super::service_overlay_npc(&n.id))
             .count(),
         36,
         "7 + 7 people, the stranded Eydis, the barrow's two, nine at the outposts, five travel masters, five mailboxes"
@@ -663,7 +705,13 @@ fn both_hubs_have_valid_connected_quests_with_every_kind_of_objective_across_lev
         levels.len() >= 9,
         "every level from 20 to 30 has work: {levels:?}"
     );
-    assert_eq!(map.quests.iter().filter(|q| q.repeatable).count(), 4);
+    assert_eq!(
+        map.quests
+            .iter()
+            .filter(|q| q.repeatable && !q.id.starts_with("fisher_"))
+            .count(),
+        4
+    );
     // the two elite quests: group-credited, a guaranteed gear reward that is not in the ordinary drop pool of new items
     let oak = quest(&w, "wyrd_oakhorn");
     let storm = quest(&w, "wyrd_hrungnir");
@@ -1019,7 +1067,7 @@ fn hrungnir_credits_five_pays_an_epic_necklace_and_returns_in_five_minutes() {
     let (text, _, changed) = quest_action(c, &q, "claim");
     assert!(changed, "{text}");
     assert_eq!(c.quantity(&reward), 1);
-    assert_eq!(c.gold, 3000);
+    assert_eq!(c.gold, 3150, "3000 gold and the Human 5%");
 }
 
 // ---- the escort ---------------------------------------------------------------------------------------------------------------
@@ -1350,8 +1398,10 @@ fn enemies_pick_the_escort_as_a_target_and_hurt_her() {
         .unwrap();
     w.slimes[id] = Slime::with_level(id, &w.spawns[id].clone(), 21);
     // Level-gap aggro (Beta 1.40.3) shrinks a boar's notice radius towards its 3 tile floor: stand inside it.
-    w.slimes[id].x = here.x + 2.5;
-    w.slimes[id].y = here.y;
+    // Beside her, not behind the tree to her east: a monster needs a clear view to notice anyone.
+    w.slimes[id].x = here.x;
+    w.slimes[id].y = here.y + 2.5;
+    assert!(w.maps[WYRD].line_clear(w.slimes[id].point(), here, 0.05));
     (w.slimes[id].hx, w.slimes[id].hy) = (w.slimes[id].x, w.slimes[id].y);
     w.update_slime(id);
     assert_eq!(
@@ -1704,8 +1754,9 @@ fn fight(
     }
 }
 
+#[cfg(feature = "tools")]
 #[test]
-#[ignore = "balance probe: prints how parties fare against the two elites (cargo test --release wyrd_balance_probe -- --ignored --nocapture)"]
+#[ignore = "balance probe: prints how parties fare against the two elites (cargo test --features valhalla-server/tools --release wyrd_balance_probe -- --ignored --nocapture)"]
 fn wyrd_balance_probe() {
     let report = |label: &str, f: Fight| {
         eprintln!(

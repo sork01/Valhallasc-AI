@@ -5,7 +5,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 mkdir -p test-results
 run_dir="$(realpath "$(mktemp -d test-results/dungeon-solo-XXXXXX)")"
-binary="$(bash scripts/cargo.sh test --no-run --message-format=json 2>/dev/null |
+binary="$(bash scripts/cargo.sh test --features valhalla-server/tools --no-run --message-format=json 2>/dev/null |
   python3 -c 'import sys,json
 for line in sys.stdin:
     try: m = json.loads(line)

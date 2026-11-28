@@ -67,7 +67,7 @@ const call=async(name,args={})=>{const r=await client.callTool({name,arguments:a
  // Probe localization in a fresh Swedish document, as language is fixed on load.
  const sw=await browser.newPage();await sw.addInitScript(()=>localStorage.setItem('valhallasc.save.v1',JSON.stringify({lang:'sv',sound:false})));await sw.goto(world.url);
  check(await sw.evaluate(()=>Locale.translate('The Chained Forge')==='Den fjättrade smedjan'),'Swedish raid name');
- check(await sw.evaluate(()=>Locale.translate('Repair Smith')==='Kvartermästare Halla'),'Swedish quartermaster');await sw.close();
+ check(await sw.evaluate(()=>Locale.translate('Quartermaster Halla')==='Kvartermästare Halla'),'Swedish quartermaster');check(await sw.evaluate(()=>Locale.translate('Repair Smith')==='Reparationssmed'),'Swedish repair smith');await sw.close();
  check(bad.length===0,'No missing raid assets');check(errors.length===0,JSON.stringify(errors));
  fs.writeFileSync(path.join(world.artifacts,'chained-forge-ui-result.txt'),JSON.stringify({checks,real:!STUB,errors,bad},null,2));
  console.log(JSON.stringify({passed:true,checks,artifacts:world.artifacts}));

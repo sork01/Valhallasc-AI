@@ -59,7 +59,8 @@ const call = async (name, args = {}) => {
   assert.ok(Math.hypot(door.x - 187, door.y - 194) > 100, 'The Span is away from the Perch');
   await teleport(7, door.x, door.y + 5);
   await shot('entrance');
-  assert.ok(await page.evaluate(() => !Cutscene.active));
+  // The teleport up from the meadow plays the climb to the sky first.
+  await page.waitForFunction(() => !Cutscene.active, null, { timeout: 30000 });
   await page.evaluate(({ x, y }) => Online.send({ type: 'move', x, y }), door);
   await page.waitForFunction(() => Field.zone === 42, null, { timeout: 15000 });
   await page.evaluate(() => Online.send({ type: 'stop' }));

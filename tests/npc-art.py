@@ -28,10 +28,12 @@ for key,spec in plan['designs'].items():
    assert len({f[81:91,24:74].tobytes() for f in frames})>=3,(key,'feet frozen')
  assert meta['tops'][key]>35 and len(meta['bounds'][key])==4
 assert len(silhouettes)>=20 and len(full)>=24,(len(silhouettes),len(full))
+# GM-only island staff reuse general designs although their map entry names another one.
+gm={n['id'] for z in [world]+world['zones'] if z.get('gmOnly') for n in z.get('npcs',[])}
 for person in people:
  assignment=meta['npcs'][person['id']]
  if assignment['art'] not in plan['designs']: continue  # named/player-style designs: covered by tests/npcp-art.py
  spec=plan['designs'][assignment['art']]
- if person.get('art') or person.get('look',{}).get('species')=='merfolk':assert not spec['general'],person['id']
+ if person['id'] not in gm and (person.get('art') or person.get('look',{}).get('species')=='merfolk'):assert not spec['general'],person['id']
  if person.get('look',{}).get('species')=='merfolk':assert spec['build']=='merfolk'
 print(f'NPC art: {len(plan["designs"])} designs, {len(people)} identities, {len(silhouettes)} general silhouettes; all frames/anchors/feet checked')

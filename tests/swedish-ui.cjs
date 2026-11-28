@@ -32,7 +32,7 @@ async function call(name,args={}){const reply=await client.callTool({name,argume
   check(await page.evaluate(()=>Locale.translate('You cannot train stats while defeated.'))!=='You cannot train stats while defeated.','server refusal text is translated');
   check(await page.evaluate(()=>Locale.translate('Your purse: 12 gold'))==='Din börs: 12 guld','dynamic gold text uses Swedish grammar');
   check(await page.evaluate(()=>Locale.translate('You and Wren are now friends.'))==='Du och Wren är nu vänner.','dynamic server notice keeps the player name');
-  await page.locator('#start').click();await page.locator('#login-guest').click();
+  await page.locator('#start').click();await require('./lib/guest.cjs').playGuest(page);
   await page.waitForFunction(()=>Online.connected,null,{timeout:60000});
   await page.keyboard.press('Escape');await page.locator('#p-settings').click(); await page.locator('#set-tab-general').click();
   check(await page.locator('#set-language').inputValue()==='sv','language selector restores Swedish');

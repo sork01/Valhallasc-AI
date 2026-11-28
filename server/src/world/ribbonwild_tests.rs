@@ -1,6 +1,6 @@
 //! The Ribbonwild (zone 21, levels 70-75) as an authored wheel of colour courts on the shapes pilot: its data, the two gates and the Emberwake seam, Jubilee
 //! Crossroads, the Pavilion camp and three outposts, the quests (holds, visits, brings, kills, the two elite quests) and the new elite with no quest.
-use super::wyrd_tests::{at, blocked, flood, join, lines, place, reached, world};
+use super::wyrd_tests::{approached, at, blocked, flood, join, lines, place, reached, world};
 use super::*;
 
 const FAIR: usize = 21;
@@ -232,7 +232,7 @@ fn everyone_and_everything_in_the_ribbonwild_can_be_walked_to_from_the_crossroad
     let map = &w.maps[FAIR];
     let open = flood(map, &blocked(map, &[]), map.spawn);
     for n in &map.npcs {
-        assert!(reached(map, &open, at(n.x, n.y)), "{} is cut off", n.id);
+        assert!(approached(map, &open, n), "{} is cut off", n.id);
     }
     for p in &map.places {
         assert!(reached(map, &open, at(p.x, p.y)), "{} is cut off", p.id);

@@ -40,11 +40,17 @@ fn cloak_catalog_ladder_and_all_ten_bodies_equip_only_the_cloak_slot() {
             i.kind == "cloak"
                 && !matches!(
                     i.source.as_deref(),
-                    Some("chained_forge" | "raid_hierlooms")
+                    Some("chained_forge" | "raid_hierlooms" | "blacksmithing")
                 )
         })
         .collect();
     assert_eq!(cloaks.len(), 240);
+    let crafted: Vec<_> = ITEMS
+        .iter()
+        .filter(|i| i.kind == "cloak" && i.source.as_deref() == Some("blacksmithing"))
+        .collect();
+    assert_eq!(crafted.len(), 4);
+    assert!(crafted.iter().all(|i| i.class.is_none() && i.attack == 0. && i.defense == 0.));
     assert!(EXTRA_SLOTS.contains(&"cloak"));
     assert!(
         cloaks
@@ -145,7 +151,9 @@ fn cloak_mercenaries_and_sources_use_the_tenth_slot() {
         i.kind == "cloak"
             && i.source
                 .as_deref()
-                .is_some_and(|s| !matches!(s, "orange_pool" | "chained_forge" | "raid_hierlooms"))
+                .is_some_and(|s| {
+                    !matches!(s, "orange_pool" | "chained_forge" | "raid_hierlooms" | "blacksmithing")
+                })
     }) {
         let source = piece.source.as_deref().unwrap();
         let mut found = false;

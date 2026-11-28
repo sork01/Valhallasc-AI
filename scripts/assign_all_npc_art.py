@@ -48,9 +48,11 @@ def assign():
         old['npcs'][p['id']] = entry
     from enchanting_catalog import assign_art as assign_enchanting_art
     from fisher_npcs import assign_art as assign_fisher_art
+    from alchemy_catalog import assign_art as assign_alchemy_art
     world = json.loads((ROOT/'world/map.txt').read_text())
     assign_fisher_art(old, world)
     assign_enchanting_art(old, world)
+    assign_alchemy_art(old, world)
     assert set(old['npcs']) == {n['id'] for n in people()}
     for key, value in original.items():
         if key != 'npcs':

@@ -83,7 +83,7 @@ def people_and_quests():
                   item='traveler_stew', tiered=True),
              dict(id='satchel', label='Buy Linen Satchel', cost=500,
                   bag='linen_satchel')], True),
-        npc('stone', 'Jubilee Meeting Stone', 'Gather a party · hire fighters', 107, 76,
+        npc('stone', 'Jubilee Meeting Stone', 'Gather your party', 107, 76,
             'Five companions may face the masked giant. The Pavilion itself stays sealed.',
             mercenary_offers.offers(open_=True)),
     ]

@@ -11,10 +11,11 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
 import gear_levels as gear
 import vendor_weapons
+import blacksmithing_catalog
 
 
 # Pieces other generators own (they run after gear_levels.py in the pipeline).
-OTHER_OWNERS = ('orange_pool', 'chained_forge', 'chained_forge_packs', 'raid_hierlooms')
+OTHER_OWNERS = ('orange_pool', 'chained_forge', 'chained_forge_packs', 'raid_hierlooms', 'blacksmithing')
 
 
 class GearGeneratorTests(unittest.TestCase):
@@ -30,9 +31,11 @@ class GearGeneratorTests(unittest.TestCase):
     def run_generator(self, fn=None):
         with contextlib.redirect_stdout(io.StringIO()):
             (fn or gear.main)()
-        # sync-world runs the vendor-weapon overlay right after the generator; gear_levels.py alone drops it.
+        # gear_levels.py alone drops the vendor-weapon and Blacksmithing overlays; sync-world runs both after it.
         items = json.loads(gear.ITEMS.read_text())
-        vendor_weapons.apply(items, json.loads((ROOT / 'world/map.txt').read_text()))
+        world = json.loads((ROOT / 'world/map.txt').read_text())
+        vendor_weapons.apply(items, world)
+        blacksmithing_catalog.apply(json.loads((ROOT / 'world/blacksmithing.txt').read_text()), world, items)
         gear.ITEMS.write_text(json.dumps(items, indent=2, ensure_ascii=False) + '\n')
 
     def test_extending_old_catalog_preserves_every_old_item_and_game_master_gear(self):
@@ -69,7 +72,8 @@ class GearGeneratorTests(unittest.TestCase):
         self.run_generator()
         seen = set()
         for i in json.loads(gear.ITEMS.read_text()):
-            if not i.get('art') or 'tint' not in i:  # unique dungeon art is not a recolour
+            # Unique dungeon art is not a recolour; crafted pieces deliberately wear their template's colours.
+            if not i.get('art') or 'tint' not in i or i.get('source') == 'blacksmithing':
                 continue
             t = i['tint']
             self.assertFalse(t['hue'] % 360 == 0 and t['saturate'] == t['brightness'] == 1, i['id'])

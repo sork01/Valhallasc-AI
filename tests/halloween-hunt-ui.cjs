@@ -18,7 +18,7 @@ async function create(name,duplicate=false){
   const WS=window.WebSocket;window.WebSocket=class extends WS{constructor(...a){super(...a);this.addEventListener('message',e=>{if(typeof e.data==='string'){try{take(JSON.parse(e.data));}catch{}return;}if(e.data instanceof ArrayBuffer){try{take(JSON.parse(window.pako.inflateRaw(new Uint8Array(e.data),{to:'string'})));}catch{}return;}e.data.arrayBuffer().then(b=>take(JSON.parse(window.pako.inflateRaw(new Uint8Array(b),{to:'string'})))).catch(()=>{});});}};
   window.__self=()=>window.__snap?.players.find(p=>p.id===window.Online?.id);
  });
- await p.goto(world.url);await p.locator('#start').click();await playGuest(p);await p.locator('#cls-warrior').click();await p.locator('#name').fill(name);await p.locator('#go').click({timeout:60000});
+ await require('./lib/travel-quests.cjs')(p);await p.goto(world.url);await p.locator('#start').click();await playGuest(p);await p.locator('#cls-warrior').click();await p.locator('#name').fill(name);await p.locator('#go').click({timeout:60000});
  if(duplicate)await p.locator('#name-change-form').waitFor({state:'visible'});else await wait(p,()=>Online.connected&&Field.hero.hp>0);
  return p;
 }
@@ -70,7 +70,7 @@ async function npc(p,id){const n=await p.evaluate(id=>[WORLD_MAP,...WORLD_MAP.zo
  await wait(p,()=>__self().seasonalRolls.halloween_hunt===20261026&&__self().quests.find(q=>q.id==='halloween_hunt').counts[0]===1);
  check(true,'An authoritative kill completes the daily hunt and persists the personal daily mount attempt');
  await npc(p,'nacre_gardener');const gold=await p.evaluate(()=>__self().gold);await p.waitForTimeout(600);await send(p,{type:'interact',npc:'nacre_gardener',offer:'quest:claim:halloween_hunt'});await wait(p,()=>__self().seasonalClaims.halloween_hunt===20261026);
- check(await p.evaluate(g=>__self().gold===g+250,gold),'A different city host pays the daily reward exactly once');
+ check(await p.evaluate(g=>__self().gold===g+Math.floor((250*105+50)/100)/* Human +5% */,gold),'A different city host pays the daily reward exactly once');
  check(await p.evaluate(()=>['baker','city_bard','nacre_gardener','asterion_singer'].every(id=>!Quests.offered(id).some(q=>q.id==='halloween_hunt'))),'All four city hosts share the same completed daily allowance');
  await debug(p,{op:'season_time',unix:1793055600});await wait(p,()=>__snap.seasons[0].day===20261027);
  check(await p.evaluate(()=>Quests.offered('asterion_singer').some(q=>q.id==='halloween_hunt')),'Stockholm midnight opens a new daily quest');

@@ -294,6 +294,7 @@ pub(super) struct Fight {
 impl Fight {
     /// Test builds: the shield's helpers still alive, for the harness trace.
     #[cfg(test)]
+    #[cfg_attr(not(feature = "tools"), allow(dead_code))]
     pub(super) fn frozen_count(&self) -> usize {
         self.frozen.len()
     }
@@ -302,6 +303,7 @@ impl Fight {
         self.live.iter().any(|l| matches!(l, Live::Gaze(_)))
     }
     #[cfg(test)]
+    #[cfg_attr(not(feature = "tools"), allow(dead_code))]
     pub(super) fn shield_alive(&self, w: &World) -> Option<usize> {
         self.shield
             .as_ref()

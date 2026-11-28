@@ -1961,7 +1961,10 @@ mod tests {
     #[test]
     fn dungeon_set_epic_copy_has_independent_threshold_and_sale_value() {
         for piece in ITEMS.iter().filter(|i| {
-            i.rarity == "rare" && i.source.as_deref().is_some_and(|s| s != "orange_pool")
+            i.rarity == "rare"
+                && i.source.as_deref().is_some_and(|s| {
+                    !matches!(s, "orange_pool" | "enchanting" | "blacksmithing" | "alchemy")
+                })
         }) {
             let epic = set_piece_copy(piece, 0.0499).unwrap();
             assert!(set_piece_copy(piece, 0.05).is_none(), "{}", piece.id);
@@ -2115,7 +2118,13 @@ mod tests {
                         assert!(name == "stamina", "{} carries only stamina", i.id);
                         continue;
                     }
-                    let expected = match i.required_level {
+                    // Crafted pieces sit between the ladder's levels and carry the bonus of the step below.
+                    let crafted = i.source.as_deref() == Some("blacksmithing");
+                    let step = match i.required_level {
+                        level if crafted && level < 99 => (level / 5 * 5).max(5),
+                        level => level,
+                    };
+                    let expected = match step {
                         1 | 5 => 1,
                         10 => 3,
                         15 => 5,
@@ -2136,9 +2145,15 @@ mod tests {
                         90 => 100,
                         95 => 108,
                         // The cloak ladder's 99 rung continues the climb (docs/cloaks.md); other gear stays at 108.
-                        99 if i.kind == "cloak" && i.source.is_none() => 114,
+                        99 if i.kind == "cloak" && (i.source.is_none() || crafted) => 114,
                         99 => 108,
                         level => panic!("unexpected gear level {level}"),
+                    };
+                    // A crafted epic keeps 90% of it.
+                    let expected = if crafted && i.rarity == "epic" {
+                        expected * 9 / 10
+                    } else {
+                        expected
                     };
                     assert_eq!(value, expected, "{}", i.id);
                     assert!(useful.contains(&name), "{} has irrelevant {name}", i.id);
@@ -2667,7 +2682,10 @@ mod tests {
                 i.id,
                 i.rarity
             );
-            if i.starter || i.kind == "material" {
+            // Profession materials and fishing finds carry their own rarities.
+            let found = i.id.starts_with("fishing_")
+                || matches!(i.source.as_deref(), Some("enchanting" | "alchemy" | "blacksmithing"));
+            if i.starter || i.kind == "material" && !found {
                 assert_eq!(i.rarity, "common", "{}", i.id);
             }
         }
@@ -3232,6 +3250,14 @@ mod tests {
                 assert_eq!(i.rarity, "epic");
                 continue;
             }
+            // Professions have their own items (rods, fish, dishes, picks, recipes, flasks), and crafted gear sits
+            // between the ladder's steps.
+            if matches!(i.source.as_deref(), Some("enchanting" | "alchemy" | "blacksmithing"))
+                || matches!(i.kind.as_str(), "fish" | "rod")
+                || i.food_bonus.is_some()
+            {
+                continue;
+            }
             // The orange pieces follow their own ladder (ten levels from 10 to 99; see items/orange.rs).
             if i.source.as_deref() == Some("orange_pool") {
                 continue;
@@ -3367,6 +3393,18 @@ mod tests {
             "every class's boss gear can drop"
         );
     }
+    fn crafted_bonus(i: &Item) -> f64 {
+        let catalog: serde_json::Value =
+            serde_json::from_str(include_str!("../../world/blacksmithing.txt")).unwrap();
+        let spec = catalog["gear"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|g| g["id"] == i.id.as_str())
+            .unwrap();
+        let instance = item(spec["template"].as_str().unwrap()).unwrap().source.is_some();
+        (if instance { 1.15 } else { 1. }) * if i.rarity == "epic" { 0.9 } else { 1. }
+    }
     #[test]
     fn stats_follow_the_level_and_rarity_ladder() {
         let factor = |level: u32| -> f64 {
@@ -3413,8 +3451,15 @@ mod tests {
                 _ => 1.,
             };
             let total = i.attack + i.defense;
-            // Instance gear is its wing's blue set recoloured and made 15% stronger.
-            let bonus = if i.source.is_some() { 1.15 } else { 1. };
+            // Instance gear is its wing's blue set recoloured and made 15% stronger. Crafted gear follows the ordinary
+            // ladder of its own level (or the instance piece it copies), and a crafted epic keeps 90% of that.
+            let bonus = if i.source.as_deref() == Some("blacksmithing") {
+                crafted_bonus(i)
+            } else if i.source.is_some() {
+                1.15
+            } else {
+                1.
+            };
             let expected = base * factor(i.required_level) * tier(&i.rarity) * bonus;
             assert!(
                 (total - expected).abs() <= if bonus > 1. { 0.2 } else { 0.1 } + 1e-9,
@@ -3687,7 +3732,8 @@ mod tests {
             Err("Your level is too low for this bag.")
         );
         assert!(c.can_collect("linen_satchel"));
-        assert!(!c.can_collect("adventurer_satchel"));
+        // A looted bag can still be carried above the hero's level (docs/bag-tiers.md); only fitting it is refused.
+        assert!(c.can_collect("adventurer_satchel"));
     }
     #[test]
     fn nine_slots_validate_ownership_kind_class_and_accessory_copies_atomically() {

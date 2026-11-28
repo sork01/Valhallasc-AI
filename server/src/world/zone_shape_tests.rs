@@ -1541,7 +1541,7 @@ fn every_crags_quest_can_be_done_on_the_map() {
     let w = world();
     let map = &w.maps[1];
     let mut played = 0;
-    for q in map.quests.iter().filter(|q| !q.id.starts_with("es_")) {
+    for q in map.quests.iter().filter(|q| !q.id.starts_with("es_") && !q.id.starts_with("fisher_")) {
         assert!((5..=10).contains(&q.level), "{}: level {}", q.id, q.level);
         for o in &q.objectives {
             match o.kind.as_str() {
@@ -1605,28 +1605,14 @@ fn the_crags_have_three_elites_two_with_a_quest() {
 fn a_crags_road_reaches_every_gate() {
     let w = world();
     let map = &w.maps[1];
-    // the road network reaches every real crossing (seams / vaults), while teleport gates have no brown spur ending on them
+    // the road network reaches every crossing: each gate has a road end within a step of it
     let data: Value = serde_json::from_str(include_str!("../../../world/map.txt")).unwrap();
     let paths = data["zones"][0]["paths"].as_array().unwrap();
-    for p in map.portals.iter().filter(|p| p.vault.is_some()) {
+    for p in map.portals.iter().filter(|p| p.seam.is_none()) {
         let near = paths.iter().flat_map(|r| r.as_array().unwrap()).any(|q| {
             at(q[0].as_f64().unwrap(), q[1].as_f64().unwrap()).distance(at(p.x, p.y)) < 2.
         });
-        assert!(near, "a road reaches vault {}", p.id);
-    }
-    for p in map
-        .portals
-        .iter()
-        .filter(|p| p.seam.is_none() && p.vault.is_none())
-    {
-        let end_near = paths.iter().any(|r| {
-            let pts = r.as_array().unwrap();
-            [pts.first(), pts.last()]
-                .into_iter()
-                .flatten()
-                .any(|q| at(q[0].as_f64().unwrap(), q[1].as_f64().unwrap()).distance(at(p.x, p.y)) < 5.)
-        });
-        assert!(!end_near, "no brown path ends at teleport {}", p.id);
+        assert!(near, "a road reaches {}", p.id);
     }
 }
 
@@ -1800,7 +1786,7 @@ fn every_glacier_quest_can_be_done_on_the_map() {
     let w = world();
     let map = &w.maps[2];
     let mut played = 0;
-    for q in map.quests.iter().filter(|q| !q.id.starts_with("es_")) {
+    for q in map.quests.iter().filter(|q| !q.id.starts_with("es_") && !q.id.starts_with("fisher_")) {
         assert!((10..=15).contains(&q.level), "{}: level {}", q.id, q.level);
         assert_eq!(q.reward_xp, xp_to_level(q.level) / 10, "{}", q.id);
         for o in &q.objectives {
@@ -2116,7 +2102,7 @@ fn every_fen_quest_can_be_done_on_the_map() {
     let w = world();
     let map = &w.maps[3];
     let mut played = 0;
-    for q in map.quests.iter().filter(|q| !q.id.starts_with("es_")) {
+    for q in map.quests.iter().filter(|q| !q.id.starts_with("es_") && !q.id.starts_with("fisher_")) {
         assert!((15..=20).contains(&q.level), "{}: level {}", q.id, q.level);
         assert_eq!(q.reward_xp, xp_to_level(q.level) / 10, "{}", q.id);
         for o in &q.objectives {
@@ -2612,19 +2598,12 @@ fn a_wyrdwood_road_reaches_every_gate_and_the_river_is_solid() {
         });
         assert!(near, "a road reaches seam {}", p.id);
     }
-    for p in map
-        .portals
-        .iter()
-        .filter(|p| p.seam.is_none() && p.vault.is_none())
-    {
-        let end_near = paths.iter().any(|r| {
-            let pts = r.as_array().unwrap();
-            [pts.first(), pts.last()]
-                .into_iter()
-                .flatten()
-                .any(|q| at(q[0].as_f64().unwrap(), q[1].as_f64().unwrap()).distance(at(p.x, p.y)) < 5.)
+    // and a trail leads up to every door
+    for p in map.portals.iter().filter(|p| p.seam.is_none()) {
+        let near = paths.iter().flat_map(|r| r.as_array().unwrap()).any(|q| {
+            at(q[0].as_f64().unwrap(), q[1].as_f64().unwrap()).distance(at(p.x, p.y)) < 2.
         });
-        assert!(!end_near, "no brown path ends at teleport {}", p.id);
+        assert!(near, "a road reaches {}", p.id);
     }
     let water: Vec<&Value> = z["objects"]
         .as_array()
@@ -2787,62 +2766,4 @@ fn the_gale_stones_wake_the_highmoor_and_count_twenty_seconds() {
 #[test]
 fn the_bridgehead_wakes_the_bank_and_counts_twenty_seconds() {
     wyrd_hold("wyrd_bridge_m", 26, "wyrd_s_bridge", "wyrd_bridge_m");
-}
-
-#[test]
-fn no_brown_path_ends_at_a_teleport_or_warp() {
-    // Vaults, Cathedral aisles, city cobbles, and dungeon/sky floor themes paint stone/floor geometry rather than brown dirt paths.
-    let non_dirt = [
-        "city",
-        "nacre",
-        "sky",
-        "arena",
-        "moonwell",
-        "cathedral_left",
-        "cathedral_right",
-        "cathedral_main",
-        "nornroot",
-        "skybridge",
-        "longship",
-        "blackhour",
-    ];
-    let data = bundled();
-    let mut zones: Vec<&Value> = vec![&data];
-    if let Some(arr) = data["zones"].as_array() {
-        zones.extend(arr.iter());
-    }
-    for (zi, z) in zones.iter().enumerate() {
-        let theme = z["theme"].as_str().unwrap_or("");
-        if non_dirt.contains(&theme) || z.get("rooms").is_some_and(|v| v.is_array()) {
-            continue;
-        }
-        let Some(paths) = z["paths"].as_array() else {
-            continue;
-        };
-        let Some(portals) = z["portals"].as_array() else {
-            continue;
-        };
-        for p in portals {
-            if p.get("seam").is_some_and(|v| !v.is_null())
-                || p.get("vault").is_some_and(|v| !v.is_null())
-            {
-                continue;
-            }
-            let px = p["x"].as_f64().unwrap();
-            let py = p["y"].as_f64().unwrap();
-            let id = p["id"].as_str().unwrap_or("?");
-            for (ri, r) in paths.iter().enumerate() {
-                let pts = r.as_array().unwrap();
-                for end in [pts.first(), pts.last()].into_iter().flatten() {
-                    let ex = end[0].as_f64().unwrap();
-                    let ey = end[1].as_f64().unwrap();
-                    let d = at(ex, ey).distance(at(px, py));
-                    assert!(
-                        d >= 5.0,
-                        "zone {zi} ({theme}) path[{ri}] endpoint ({ex},{ey}) is {d:.2} tiles from teleport/warp portal {id}"
-                    );
-                }
-            }
-        }
-    }
 }

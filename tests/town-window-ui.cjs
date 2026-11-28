@@ -139,7 +139,7 @@ const suite = {
     console.log('non-buying vendor explanation, real sale and outside confirmation cancellation passed');
     await page.evaluate(() => Prefs.set({ uiScale: .8 }));
     await Promise.all([page.waitForEvent('load'), page.evaluate(() => Prefs.set({ lang: 'sv' }))]);
-    await page.locator('#start').click(); await page.locator('#login-guest').click();
+    await page.locator('#start').click(); await require('./lib/guest.cjs').playGuest(page);
     await page.waitForFunction(() => Online.connected && Field.hero?.hp > 0);
     check(await page.evaluate(() => Prefs.uiScale === .8), 'explicit UI size is preserved after reload');
     await visit('apothecary');

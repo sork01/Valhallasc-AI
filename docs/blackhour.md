@@ -105,7 +105,7 @@ python3 scripts/build_blackhour_gear.py         # resumes saved PixelFlow record
 node scripts/sync-world.cjs
 python3 scripts/build_swedish.py
 bash scripts/cargo.sh test blackhour -- --nocapture
-BLACKHOUR_SEEDS=4 bash scripts/cargo.sh test blackhour_blue_and_green_encounter_bands -- --ignored --nocapture
+BLACKHOUR_SEEDS=4 bash scripts/cargo.sh test --features valhalla-server/tools blackhour_blue_and_green_encounter_bands -- --ignored --nocapture
 bash scripts/cargo.sh build
 VALHALLA_BINARY=target/debug/valhalla-server node scripts/test-via-mcp.cjs run blackhour
 PLAYWRIGHT_BROWSERS_PATH=/tmp/valhallasc-playwright node tests/blackhour-gear-art.cjs

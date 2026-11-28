@@ -252,7 +252,7 @@ fn rans_deep_is_a_sea_floor_zone_with_six_kinds_one_hub_and_a_maelstrom_gate_pai
     assert_eq!(
         map.npcs
             .iter()
-            .filter(|n| !n.id.starts_with("spirit_guide_"))
+            .filter(|n| !n.id.starts_with("spirit_guide_") && !super::service_overlay_npc(&n.id))
             .count(),
         26,
         "Keelhaven's eleven and the three camps' fifteen"
@@ -324,6 +324,7 @@ fn rans_deep_is_a_sea_floor_zone_with_six_kinds_one_hub_and_a_maelstrom_gate_pai
     for n in &map.npcs {
         assert!(
             n.id.starts_with("keel_") // (the Longship door's two people stand beside the door, just west of the plaza)
+                || n.id.starts_with("dungeon_stone_") // Meeting Stones stand outside their dungeon doors
                 || city.contains(at(n.x, n.y))
                 || map.camps.iter().any(|c| c.contains(at(n.x, n.y))),
             "{} is in Keelhaven or a camp",
@@ -332,7 +333,8 @@ fn rans_deep_is_a_sea_floor_zone_with_six_kinds_one_hub_and_a_maelstrom_gate_pai
         let mut clear = at(n.x, n.y);
         map.collide(&mut clear, PLAYER_RADIUS);
         assert!(
-            clear.distance(at(n.x, n.y)) < 1e-6,
+            // A Meeting Stone is itself the scenery.
+            n.id.starts_with("dungeon_stone_") || clear.distance(at(n.x, n.y)) < 1e-6,
             "{} stands in scenery",
             n.id
         );
@@ -518,6 +520,7 @@ fn every_deep_monster_has_its_own_stats_attacks_materials_and_rewards() {
             .unwrap();
         w.slimes[id] = Slime::with_level(id, &w.spawns[id].clone(), level + 1);
         let (xp, gold) = (w.slimes[id].xp, w.slimes[id].gold);
+        let xp = crate::model::level_adjusted_xp(xp, w.players[&1].character.level, w.slimes[id].level);
         w.hit_slime(id, 1, 1e9, false);
         let c = &w.players[&1].character;
         let paid: u32 = (1..c.level).map(xp_to_level).sum::<u32>() + c.xp;
@@ -614,7 +617,7 @@ fn the_kraken_credits_five_pays_an_epic_necklace_and_returns_in_five_minutes() {
     let (text, _, changed) = quest_action(c, &q, "claim");
     assert!(changed, "{text}");
     assert_eq!(c.quantity(&reward), 1);
-    assert_eq!(c.gold, 5000);
+    assert_eq!(c.gold, 5250, "5000 gold and the Human 5%");
 }
 
 #[test]
@@ -658,7 +661,7 @@ fn both_three_player_elites_credit_nearby_heroes_and_pay_gear() {
     let (text, _, changed) = quest_action(c, &q, "claim");
     assert!(changed, "{text}");
     assert_eq!(c.quantity(&reward), 1);
-    assert_eq!(c.gold, 3000);
+    assert_eq!(c.gold, 3150, "3000 gold and the Human 5%");
     // Thora's quest credits the same three nearby contributors; the Ghostmaw
     // drops its tooth and comes back after ten minutes.
     let g = w.slimes.iter().position(|s| s.kind == "ghostmaw").unwrap();
@@ -701,7 +704,7 @@ fn both_three_player_elites_credit_nearby_heroes_and_pay_gear() {
     let (text, _, changed) = quest_action(c, &ghost_quest, "claim");
     assert!(changed, "{text}");
     assert_eq!(c.quantity("necklace_moonstone_l40_blue"), 1);
-    assert_eq!(c.gold, 6800);
+    assert_eq!(c.gold, 7140, "plus 3800 and the Human 5%");
 }
 
 // ---- the questline -----------------------------------------------------------------------------------------------------------------

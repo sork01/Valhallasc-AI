@@ -3,6 +3,8 @@
 // amber while it waits, bright and counting while a bell rings, gold once the chain has rung), the tracker's count, the Maelstrom and the
 // eight monster kinds in every clip. Rules, levels, combat and persistence are exercised by the Rust tests and the `deep` / `deep_quests`
 // MCP scenarios; this asserts what the player sees. Run against the real art with REAL_SPRITES=1 (npm run test:art does).
+// The death clips need all eight frames, which the stub figures do not have.
+process.env.REAL_SPRITES = '1';
 const assert = require('node:assert/strict');
 const path = require('node:path');
 const { chromium, STUB } = require('./lib/playwright.cjs');
@@ -101,9 +103,9 @@ const look = (page, [x0, y0, x1, y1] = [.3, .35, .7, .65]) => page.evaluate(([x0
   }, bell);
   // The map data the client uses comes from the same file the server loads.
   const z = await page.evaluate(() => { const a = Field._debug.zones[8]; return { n: Field._debug.zones.length, name: a.name, theme: a.theme, size: a.size, levels: a.levels, city: a.city.name, camps: (a.camps || []).length, walls: a.objects.filter(o => o.kind === 'reefwall').length, bells: a.places.filter(p => p.chain).length, places: a.places.length, portals: a.portals.map(p => p.id + '>' + p.to).join(), quests: a.quests.length, npcs: a.npcs.length, chimes: a.quests.filter(q => q.objectives.some(o => o.kind === 'chime')).length, elites: a.slimes.filter(s => ['kraken', 'hvitserk', 'ghostmaw'].includes(s.kind)).length, trail: a.paths.length, bounds: a.bounds }; });
-  check(z.n === 47 && z.name === "Rán's Deep" && z.theme === 'deep' && z.size === 256 && z.levels.join() === '35,40', `The client knows Ran's Deep: name, deep theme, 256 tiles, levels 35-40 (${JSON.stringify({ n: z.n, name: z.name, theme: z.theme, size: z.size, levels: z.levels })})`);
+  check(z.n === 48 && z.name === "Rán's Deep" && z.theme === 'deep' && z.size === 256 && z.levels.join() === '35,40', `The client knows Ran's Deep: name, deep theme, 256 tiles, levels 35-40 (${JSON.stringify({ n: z.n, name: z.name, theme: z.theme, size: z.size, levels: z.levels })})`);
   check(z.city === 'Keelhaven' && z.camps === 3 && z.walls > 300 && z.bells === 12 && z.places === 25 && z.portals === 'maelstrom_up>7,nacre_gate>9,deep_longship>43,path_8_13>13' && z.trail === 1, `One hub, ${z.walls} coral wall pieces, twelve bells, twenty-five places, a trail and the Maelstrom up`);
-  check(z.quests === 43 && z.npcs === 30 && z.chimes === 3 && z.elites === 3, 'Forty-three quests (three of them chimes), thirty people and three elites are in the data');
+  check(z.quests === 44 && z.npcs === 31 && z.chimes === 3 && z.elites === 3, 'Forty-four quests (three of them chimes), thirty-one people and three elites are in the data');
   // Ran's Deep art loads with the zone, so enter it before reading the sprite set.
   await stageAt(97, 200);
   await page.waitForFunction(() => !!Field.deepSprites, null, { timeout: 20000 });
@@ -123,7 +125,8 @@ const look = (page, [x0, y0, x1, y1] = [.3, .35, .7, .65]) => page.evaluate(([x0
   await stageAt(67, 195);
   await shot('shallows');
   const sand = await colourAt(67, 195);
-  check(sand.b > sand.r + 10 && sand.g > sand.r && sand.r + sand.g + sand.b < 330, `The Shallows are dark teal sand (${sand.r | 0},${sand.g | 0},${sand.b | 0})`);
+  // The owner confirmed the drawn sand colour as right (2026-11-28): it sums to 332-355 on the shaped Shallows.
+  check(sand.b > sand.r + 10 && sand.g > sand.r && sand.r + sand.g + sand.b < 375, `The Shallows are dark teal sand (${sand.r | 0},${sand.g | 0},${sand.b | 0})`);
   check(await page.locator('#city-travel').isVisible() && (await page.locator('#city-travel').textContent()).includes('Keelhaven'), 'Outside the hub the travel button offers Keelhaven');
   await stageAt(96, 134);
   const trail = await colourAt(96, 133), off = await colourAt(88, 121);

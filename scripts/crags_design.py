@@ -399,9 +399,7 @@ def design(world, write=False):
     d.reach = seen
     zone['slimes'] = d.spawns()
     zone['objects'] = objects
-    # Keep terrain/ford ROADS intact above, but omit teleport spurs from visible brown paths (path_1_7, path_1_9).
-    visible_roads = [road[:5] if i == 7 else road for i, road in enumerate(ROADS) if i != 9]
-    zone['paths'] = [[list(p) for p in road] for road in visible_roads]
+    zone['paths'] = [[list(p) for p in road] for road in ROADS]
     zone['atlasPaths'] = []
     zone['groundSpans'] = ground_spans(d.ground, d.floor)
     zone['regions'] = dict(names=[r['name'] for r in REGIONS.values()], spans=ground_spans(d.region + 1, d.floor))

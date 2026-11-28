@@ -1,5 +1,5 @@
 //! Nacrehold: the safe merfolk city, its real offers/visits, tideway and future instance landmark.
-use super::wyrd_tests::{at, blocked, drain, flood, join, place, reached, world};
+use super::wyrd_tests::{approached, at, blocked, drain, flood, join, place, reached, world};
 use super::*;
 
 const NACRE: usize = 9;
@@ -37,7 +37,7 @@ fn nacre_city_is_large_safe_and_has_120_distinct_addressed_homes() {
     assert_eq!(
         m.npcs
             .iter()
-            .filter(|n| !n.id.starts_with("spirit_guide_"))
+            .filter(|n| !n.id.starts_with("spirit_guide_") && !super::service_overlay_npc(&n.id))
             .count(),
         40
     );
@@ -53,8 +53,9 @@ fn nacre_every_house_door_person_place_and_swim_route_is_reachable() {
     let m = &w.maps[NACRE];
     let seen = flood(m, &blocked(m, &[]), m.spawn);
     for n in &m.npcs {
-        assert!(reached(m, &seen, n.position_at(0.)), "{}", n.id);
-        for t in 0..600 {
+        assert!(approached(m, &seen, n), "{}", n.id);
+        // A Meeting Stone is a solid prop; everyone else swims their route unobstructed.
+        for t in (0..600).filter(|_| n.art.as_deref() != Some("stone")) {
             let p = n.position_at(t as f64 * 0.5);
             let mut c = p;
             m.collide(&mut c, PLAYER_RADIUS);

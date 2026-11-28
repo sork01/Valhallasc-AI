@@ -19,6 +19,7 @@ function crossingPath(gate) {
   };
 }
 module.exports=(kit,map)=>({
+  clearTravelQuests: true,
   description:'Emberwake Caldera: walk from Asterion to the raid door, quests, outdoor loot and return.',
   startLevel:99,levelSpread:0,godMode:true,
   async run(w,check){

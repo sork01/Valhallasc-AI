@@ -1,3 +1,5 @@
+// Without the `tools` switch the measuring tools are left out, and with them the only users of some helpers here.
+#![cfg_attr(not(feature = "tools"), allow(dead_code, unused_imports))]
 //! Best-rotation search (`DPS-ROTATION`). For a class and level it looks for the priority list (`dps_tests::Rotation`)
 //! that deals the most damage to the training dummy in a minute, by hill climbing over the order of the skills and
 //! whether each one is off, cast when affordable, or held for. The search runs on a few seeds; the finalists and the
@@ -220,26 +222,31 @@ fn report(class: Class) {
     println!("{}", serde_json::to_string_pretty(&rows).unwrap());
 }
 
+#[cfg(feature = "tools")]
 #[test]
 #[ignore = "search; run with scripts/best-rotation-parallel.sh"]
 fn best_warrior() {
     report(Class::Warrior);
 }
+#[cfg(feature = "tools")]
 #[test]
 #[ignore = "search; run with scripts/best-rotation-parallel.sh"]
 fn best_mage() {
     report(Class::Mage);
 }
+#[cfg(feature = "tools")]
 #[test]
 #[ignore = "search; run with scripts/best-rotation-parallel.sh"]
 fn best_assassin() {
     report(Class::Assassin);
 }
+#[cfg(feature = "tools")]
 #[test]
 #[ignore = "search; run with scripts/best-rotation-parallel.sh"]
 fn best_priest() {
     report(Class::Priest);
 }
+#[cfg(feature = "tools")]
 #[test]
 #[ignore = "search; run with scripts/best-rotation-parallel.sh"]
 fn best_hunter() {
@@ -251,6 +258,7 @@ fn best_hunter() {
 /// search, `DPS_ROTATION_LEVEL` is the level whose rotation is played (default 99), `DPS_LEVELS` the levels it is played
 /// at (default 99; a rotation found at 99 is a good, not a proven best, rotation at the levels below) and `DPS_CLASSES`
 /// limits the classes. Lines look like `REPLAY 40 warrior 9876`.
+#[cfg(feature = "tools")]
 #[test]
 #[ignore = "replay; DPS_ROTATIONS_DIR=test-results/best-rotation-XXXX"]
 fn replay_best_rotations() {

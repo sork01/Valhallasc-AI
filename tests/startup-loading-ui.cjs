@@ -61,7 +61,7 @@ const check=(v,label)=>{assert.ok(v,label);checks++;};
     window.requestIdleCallback=function(...args){__loads.idles++;return idle.apply(this,args);};
   },{look,token});
   const loginAt=Date.now();
-  await page.goto(world.url);await page.locator('#start').click();await page.locator('#login-guest').click();
+  await page.goto(world.url);await page.locator('#start').click();await require(root+'/tests/lib/guest.cjs').playGuest(page);
   await page.waitForFunction(()=>Online.connected&&Field.zone===2&&!!Field.rimeSprites,null,{timeout:60000});
   // Gloamfen is Rimeveil's seam neighbour in the shaped world: field.js loads a near neighbour's art with its zone context, so it may arrive early.
   // Rimeveil holds a live Empty Seat foe (ember_firelord) drawn from the shared Cathedral bank, so cathedral.txt is expected at login; the dungeon and late-zone banks are not.

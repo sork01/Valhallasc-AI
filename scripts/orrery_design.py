@@ -456,9 +456,7 @@ def design(world, write=False):
             d.late_dropped += drop_near_seam(zone, d, late)
     d.clear_seams(zone)
     zone['objects'] = objects
-    # Omit non-seam gate road (path_15_9) from visible brown paths.
-    visible_roads = [road for i, road in enumerate(d.ROADLIST) if i != 28]
-    zone['paths'] = [[[round(a, 2), round(b, 2)] for a, b in road] for road in visible_roads]
+    zone['paths'] = [[[round(a, 2), round(b, 2)] for a, b in road] for road in d.ROADLIST]
     zone['atlasPaths'] = []
     seamed = {p['id'] for p in zone['portals'] if p.get('seam')}      # the Prismwaste's seam (pilot, 2026-11-08) replaced the north-east rim gate: its line is the border, not a gate
     zone['exitRoutes'] = [dict(portal=g, points=[[round(gx, 2), round(gy, 2)], [round(arr[0], 2), round(arr[1], 2)]]) for g, (gx, gy, walk, arr) in G.items() if g not in seamed]

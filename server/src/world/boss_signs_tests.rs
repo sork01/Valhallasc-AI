@@ -351,7 +351,10 @@ fn a_sign_cannot_be_read_from_afar_when_defeated_or_by_a_wrong_name() {
 fn chests_keep_clear_of_the_sign() {
     let (mut w, _rx, zone) = rig(1., true);
     // Put the sign where a chest would go, then ask for many chests: none may land within three tiles of it.
-    let first = w.chest_spot(zone).expect("a chest spot in the Undervault");
+    // One call samples a handful of random tiles and may find none; the game simply tries again later.
+    let first = (0..200)
+        .find_map(|_| w.chest_spot(zone))
+        .expect("a chest spot in the Undervault");
     let sign = w.signs.get_mut("hollowking").unwrap();
     (sign.x, sign.y) = (first.x, first.y);
     let mut placed = 0;

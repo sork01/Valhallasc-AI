@@ -26,7 +26,10 @@ const debug = (page, command) => page.evaluate(c => Online.send({ type: 'debug',
   await page.addInitScript(() => localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: true, musicVol: 1 })));
   await page.goto(world.url); await page.locator('#start').click(); await page.locator('#login-guest').click();
   await page.locator('#name').fill('ShoreBard'); await page.locator('#go').click({ timeout: 60000 });
-  await page.waitForFunction(() => Online.connected && !!valhalla.fmusic?.running, null, { timeout: 60000 });
+  await page.waitForFunction(() => Online.connected, null, { timeout: 60000 });
+  // The world clock may read night, when the meadow's night score plays instead of the day one.
+  await page.evaluate(() => Online.send({ type: 'debug', command: { op: 'set_time', hour: 12, freeze: true } }));
+  await page.waitForFunction(() => !!valhalla.fmusic?.running, null, { timeout: 60000 });
   await debug(page, { op: 'set_time', hour: 12, freeze: true });
   const spawn = await page.evaluate(() => WORLD_MAP.zones[18].spawn);
   await debug(page, { op: 'teleport', zone: 19, x: spawn.x, y: spawn.y });
@@ -36,7 +39,8 @@ const debug = (page, command) => page.evaluate(c => Online.send({ type: 'debug',
   assert.ok(Math.abs(duration - soundtrack('stormglass')) < 1, `Stormglass MP3 duration ${duration}`);
   await debug(page, { op: 'set_time', hour: 0, freeze: true });
   await page.waitForFunction(() => DayNight.nightMix === 1 && valhalla.activeNightMusic === valhalla.stormglassNightMusic && valhalla.stormglassNightMusic?.running, null, { timeout: 10000 });
-  assert.equal(await page.evaluate(() => valhalla.stormglassMusic.running), true, 'day score stays available for the dawn crossfade');
+  // Scores change through silence and never overlap (client 1.14.7).
+  await page.waitForFunction(() => !valhalla.stormglassMusic.running, null, { timeout: 10000 });
   await debug(page, { op: 'set_time', hour: 12, freeze: true });
   await page.waitForFunction(() => DayNight.nightMix === 0 && !valhalla.stormglassNightMusic.running, null, { timeout: 10000 });
   assert.deepEqual(errors, [], 'no browser errors');

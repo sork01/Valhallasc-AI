@@ -18,6 +18,7 @@ class Element {
   replaceChildren(...nodes) { this.children = []; this.append(...nodes); }
   set textContent(t) { this._text = t; } get textContent() { return this._text + this.children.map(n => n.textContent).join(''); }
   setAttribute(k, v) { this.attributes[k] = v; }
+  removeAttribute(k) { delete this.attributes[k]; }
   addEventListener(k, fn) { (this.listeners[k] ||= []).push(fn); }
   fire(k) { for (const fn of this.listeners[k] || []) fn({ target: this }); }
   matches(selector) {

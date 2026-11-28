@@ -177,6 +177,7 @@ fn dungeon_admission_level_bell_expiry_and_vigil_pause_and_death() {
         assert!(!w.players[&1].character.quests.iter().any(|p| p.id == id));
     }
     w.players.get_mut(&1).unwrap().character.level = 99;
+    super::wyrd_tests::set_aside_travel_quests(&mut w, 1);
     talk(
         &mut w,
         "asterion_bellkeeper",

@@ -152,12 +152,14 @@ const figure = (page, cls, armor, weapon, extras = {}, female = false) => page.e
         const reference = wearable ? base.visible : silhouetteOf.get(key);
         recolourOk += w.hash !== base.hash; silhouetteOk += w.visible === reference; if (w.visible !== reference) reshaped.push(`${kind}:${variant} ${w.visible}/${reference}`);
         if (w.hash === base.hash) unchanged.push(kind + ':' + variant);
+        // Crafted pieces are copies of a drop and wear its colours (docs/blacksmithing.md).
+        if (variant.startsWith('smith_gear_')) continue;
         byArt.set(key, (byArt.get(key) || new Set()).add(w.hash));
         const hashKey = key + '|' + w.hash; colourGroups.set(hashKey, [...(colourGroups.get(hashKey) || []), variant]);
       }
       check(recoloured.length >= 60 && recolourOk === recoloured.length, `${cls}: all ${recoloured.length} recoloured pieces draw in colours of their own (${recolourOk}; unchanged: ${unchanged.join(', ')})`);
       check(silhouetteOk === recoloured.length, `${cls}: a recolouring keeps the drawing's silhouette (${silhouetteOk}/${recoloured.length}; reshaped: ${reshaped.join(', ')})`);
-      const perArt = recoloured.reduce((m, [k, , art]) => m.set(k + '|' + art, (m.get(k + '|' + art) || 0) + 1), new Map());
+      const perArt = recoloured.filter(([, variant]) => !variant.startsWith('smith_gear_')).reduce((m, [k, , art]) => m.set(k + '|' + art, (m.get(k + '|' + art) || 0) + 1), new Map());
       check([...byArt].every(([key, hashes]) => hashes.size === perArt.get(key)), `${cls}: no two sets of one drawing share their colours (duplicates: ${JSON.stringify([...colourGroups].filter(([, variants]) => variants.length > 1))})`);
       check(await page.evaluate(cls => valhalla[cls].portrait().length > 2000, cls), `${cls}: the portrait renders`);
       // The female set: its own atlases, the same equipment, a body that is not the male one.
@@ -190,10 +192,10 @@ const figure = (page, cls, armor, weapon, extras = {}, female = false) => page.e
         const wearable = await page.evaluate(([kind, art]) => MageSprite.hasGear({}, kind, art), [kind, art]);      // see the male loop: an art name that is not wearable has no base to compare with
         if (!wearable && !femaleShapes.has(key)) femaleShapes.set(key, worn.visible);
         femaleChanged += worn.hash !== base.hash; femaleSilhouette += worn.visible === (wearable ? base.visible : femaleShapes.get(key));
-        femaleColours.set(key, (femaleColours.get(key) || new Set()).add(worn.hash));
+        if (!variant.startsWith('smith_gear_')) femaleColours.set(key, (femaleColours.get(key) || new Set()).add(worn.hash));
       }
       check(newPieces.length >= 192 && femaleChanged === newPieces.length && femaleSilhouette === newPieces.length, `${cls} (female): every new tier and wing piece draws with its own colours and the base silhouette`);
-      check([...femaleColours].every(([key, hashes]) => hashes.size === newPieces.filter(([kind, , art]) => kind + '|' + art === key).length), `${cls} (female): no new tier or wing piece shares its colours`);
+      check([...femaleColours].every(([key, hashes]) => hashes.size === newPieces.filter(([kind, variant, art]) => kind + '|' + art === key && !variant.startsWith('smith_gear_')).length), `${cls} (female): no new tier or wing piece shares its colours`);
       // Save a contact sheet of complete ordinary/wing outfits, both bodies, attack at two facings and death.
       const contact = await page.evaluate(async cls => {
         const outfits = [25, 30, 35, 40, 45, 50, 'cathedral_cloister', 'cathedral_reliquary', 'cathedral_nave'];

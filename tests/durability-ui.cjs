@@ -91,7 +91,7 @@ async function call(name,args={}){const result=await client.callTool({name,argum
   assert.equal(await offer.count(),1);
   assert.match(await page.locator('#npc-inventory [data-action="repair_all"]').textContent(),/60 copper/);
   await offer.click();
-  await page.getByText(/Repaired one piece for 60 copper/).waitFor({timeout:10000});
+  await page.locator('#npc-notice').filter({hasText:/Repaired one piece for 60 copper/}).waitFor({timeout:10000});
   await page.waitForFunction(()=>Field.hero.gold===940,null,{timeout:15000});
   await page.locator('#npc-x').click();
   await page.keyboard.press('e');
@@ -109,7 +109,7 @@ async function call(name,args={}){const result=await client.callTool({name,argum
     await page.locator('[data-offer="repair"]').click();
     assert.match(await page.locator('#npc-inventory').textContent(),/four times the town price/);
     await page.locator('#npc-inventory [data-action="repair_all"]').click();
-    await page.getByText(/Repaired one piece for 24 copper/).waitFor();
+    await page.locator('#npc-notice').filter({hasText:/Repaired one piece for 24 copper/}).waitFor();
     await page.waitForFunction(()=>Field.hero.gold===916);
   }
   assert.deepEqual(errors,[]);

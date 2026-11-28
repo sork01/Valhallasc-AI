@@ -4,9 +4,9 @@ const fs = require('node:fs');
 const path = require('node:path');
 const http = require('node:http');
 const { chromium } = require('playwright');
-const root = path.resolve(__dirname, '..');
+const root = path.resolve(__dirname, '../..');
 const job = process.argv[2];
-if (!job) { console.error('usage: node tests/gear-piece-art.cjs <checklist-job-id>   (e.g. moonwell-shared-necklace)\nA tool, not a suite: it checks one exported piece per job id. Exits 2 without an id; it is not a pass.'); process.exit(2); }
+if (!job) { console.error('usage: node tests/tools/gear-piece-art.cjs <checklist-job-id>   (e.g. moonwell-shared-necklace)\nA tool, not a suite: it checks one exported piece per job id. Exits 2 without an id; it is not a pass.'); process.exit(2); }
 const states = ['docs/gear-redesign-state.txt', 'docs/high-gear-state.txt', 'docs/dungeon-gear-state.txt', 'docs/instance-gear-state.txt']
   .filter(file => fs.existsSync(path.join(root, file)))
   .flatMap(file => JSON.parse(fs.readFileSync(path.join(root, file))).tasks);

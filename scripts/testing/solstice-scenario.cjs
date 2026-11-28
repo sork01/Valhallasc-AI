@@ -1,3 +1,4 @@
+const { humanGold } = require('./rewards.cjs');
 // Private protocol fixtures only: no grinding or encounter balance measurements.
 module.exports = kit => ({
   description: 'Summer Solstice: shared city daily quest, five hired fighters, ritual summon, daily 5% stag roll, cross-city claim, persistence and event expiry.',
@@ -28,12 +29,13 @@ module.exports = kit => ({
     await w.debug(bot,{op:'kill_enemy',id:enemy.id});
     await w.waitFor(()=>q().counts[0]===1);
     check(w.player(bot).seasonalRolls[id]===20270617,'A credited kill consumes exactly one daily personal stag roll');
-    await w.debug(bot,{op:'give_mount',mount:'sunwoven'}); // Persistence fixture; threshold/outcomes covered by Rust.
+    // Persistence fixture; threshold/outcomes covered by Rust. The kill's own roll may already have awarded it.
+    if(!w.player(bot).mounts.includes('sunwoven'))await w.debug(bot,{op:'give_mount',mount:'sunwoven'});
     await kit.teleport(w,bot,{npc:'nacre_gardener'});
     const gold=w.player(bot).gold;
     await kit.talkTo(w,bot,'nacre_gardener',`quest:claim:${id}`);
     await w.waitFor(()=>q().claimed&&w.player(bot).seasonalClaims[id]===20270617);
-    check(w.player(bot).gold===gold+300&&w.player(bot).mounts.includes('sunwoven'),'A third-city host pays the shared reward and stag');
+    check(w.player(bot).gold===gold+humanGold(300)&&w.player(bot).mounts.includes('sunwoven'),'A third-city host pays the shared reward and stag');
     await kit.teleport(w,bot,{npc:'asterion_singer'});
     await kit.talkTo(w,bot,'asterion_singer',`quest:accept:${id}`);
     await w.advance(300);

@@ -403,7 +403,7 @@ def main():
             import gear_art_catalog
             gear_art_catalog.wire()
             subprocess.run([node, 'scripts/sync-world.cjs'], cwd=ROOT, check=True, stdout=subprocess.DEVNULL)
-            subprocess.run([node, 'tests/gear-piece-art.cjs', job], cwd=ROOT, check=True)
+            subprocess.run([node, 'tests/tools/gear-piece-art.cjs', job], cwd=ROOT, check=True)
             record = json.loads(MANIFEST.read_text())[job]
             evidence = ['scripts/gear_shapes.py', 'world/gear-art.txt', *record['files'],
                         'test-results/gear-redesign/' + job + '.png', 'test-results/gear-redesign/' + job + '-browser.json']

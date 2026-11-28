@@ -1,3 +1,4 @@
+const soundtrack=require('./lib/soundtrack.cjs');
 // One new outdoor zone only: real travel, exported art, maps and both music routes.
 const assert=require('node:assert/strict');
 const path=require('node:path');
@@ -61,9 +62,13 @@ const call=async(name,args={})=>{const r=await client.callTool({name,arguments:a
   await page.evaluate(()=>Online.send({type:'stop'}));
   await debug({op:'set_time',hour:12,freeze:true});
   await debug({op:'set_weather',kind:'clear'});
-  await page.waitForFunction(()=>valhalla.emberwakeMusic?.loaded&&valhalla.emberwakeNightMusic?.loaded,null,{timeout:60000});
-  assert.ok(await page.evaluate(()=>Math.abs(valhalla.emberwakeMusic.duration-96)<.05),'Day loop decodes');
-  assert.ok(await page.evaluate(()=>Math.abs(valhalla.emberwakeNightMusic.duration-80)<.05),'Night loop decodes');
+  // One score plays at a time (client 1.14.7), so each loop loads at its own time of day.
+  await page.waitForFunction(()=>valhalla.emberwakeMusic?.loaded,null,{timeout:60000});
+  assert.ok(await page.evaluate(seconds=>Math.abs(valhalla.emberwakeMusic.duration-seconds)<.05,soundtrack('emberwake')),'Day loop decodes');
+  await debug({op:'set_time',hour:0,freeze:true});
+  await page.waitForFunction(()=>valhalla.emberwakeNightMusic?.loaded,null,{timeout:60000});
+  assert.ok(await page.evaluate(seconds=>Math.abs(valhalla.emberwakeNightMusic.duration-seconds)<.05,soundtrack('emberwake_night')),'Night loop decodes');
+  await debug({op:'set_time',hour:12,freeze:true});
   assert.equal(await page.evaluate(()=>Field.zoneTheme),'emberwake');
   assert.ok(await page.locator('#world-weather').textContent().then(t=>!t.includes('Indoors')),'The caldera has outdoor weather');
   assert.ok(await page.evaluate(()=>WORLD_MAP.zones[44].objects.some(o=>o.kind==='meetingstone')),'The summon service has a visible Meeting Stone');

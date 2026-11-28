@@ -2,6 +2,7 @@
 // separate runs at once. No fight is ground out: winning a whole run is covered by the Rust tests (`gauntlet_tests.rs`), so this
 // plays the protocol up to the first landed blow, leaves, and then hands in a finished trial.
 module.exports = (kit, map) => ({
+  clearTravelQuests: true,
   description: 'Arena gauntlet quests: accept, one trial per level, private rings, countdown, the opponent, a landed blow, leaving, the weapon turn-in and a restart.',
   startLevel:20, levelSpread:0,
   async run(w,check) {

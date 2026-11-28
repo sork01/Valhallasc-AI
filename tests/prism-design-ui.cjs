@@ -30,7 +30,7 @@ const GROUND = { 'The Broken Crown': [null, 150], 'The Broken Watch': [118, null
   const seams = Z.portals.filter(p => p.seam);
   check(seams.map(p => p.to).sort((a, b) => a - b).join() === '13,15,19,27', 'the seams are the ones to Astralhollow, the Orrery, the Stormglass Flats and the Cairnspine (no rim gates left)');
   for (const p of Z.portals.filter(p => !p.seam)) check(onFloor(Z, p.x, p.y), `${p.id} stands on the floor`);
-  check(Z.regions.names.length === 12 && Z.camps.length === 3 && Z.quests.length === 27, 'twelve regions, three outposts and 27 quests');
+  check(Z.regions.names.length === 12 && Z.camps.length === 3 && Z.quests.filter(q => !q.id.startsWith('fisher_')).length === 27, 'twelve regions, three outposts and 27 quests (Fisher quests aside)');
   server = spawn(process.env.VALHALLA_BINARY, [], { cwd: root, stdio: 'ignore',
     env: { ...process.env, VALHALLA_BIND: `127.0.0.1:${port}`, VALHALLA_DB: path.join(tmp, 'v.sqlite'), VALHALLA_CLIENT_DIR: path.join(root, 'client'), VALHALLA_TEST_COMMANDS: '1', VALHALLA_GOD_MODE: '1', VALHALLA_START_LEVEL: '50', VALHALLA_LEVEL_SPREAD: '0' } });
   for (let i = 0; i < 100; i++) { try { if ((await fetch(`http://127.0.0.1:${port}/health`)).ok) break; } catch (_) {} await new Promise(r => setTimeout(r, 200)); }

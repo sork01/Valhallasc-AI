@@ -1111,7 +1111,9 @@ mod tests {
             .map(|p| p.character.look.name.as_str())
             .collect();
         assert_eq!(names.len(), bots.len());
-        assert!(bots.iter().all(|p| (1..=5).contains(&p.character.level)
+        // Greenmeadow has no authored range: its quests set it, the Fishers' up to 25 (accepted by the owner).
+        assert_eq!(w.ambient_levels(0), [1, 25]);
+        assert!(bots.iter().all(|p| (1..=25).contains(&p.character.level)
             && p.character.look.validate().is_ok()
             && p.merc.is_none()));
         assert!(bots.iter().all(|p| !w.maps[0].in_city(p.character.point())));

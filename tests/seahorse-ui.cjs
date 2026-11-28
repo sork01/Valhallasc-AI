@@ -1,4 +1,6 @@
 // Focused private quest/mount picker and real seahorse rendering. Run only on an approved browser host.
+// The picker and the rider need the mount artwork, which the stub switch turns off.
+process.env.REAL_SPRITES='1';
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const path=require('node:path');

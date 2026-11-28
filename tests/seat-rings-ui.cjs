@@ -11,7 +11,7 @@ const check=(v,t)=>{assert.ok(v,t);checks++;console.log(t);};
  page=await browser.newPage({viewport:{width:1024,height:768},reducedMotion:'reduce'});
  const errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.addInitScript(()=>localStorage.setItem('valhallasc.save.v1',JSON.stringify({lang:'en',sound:false})));
- await page.goto(world.url);await page.locator('#start').click();await page.locator('#login-guest').click();
+ await require('./lib/travel-quests.cjs')(page);await page.goto(world.url);await page.locator('#start').click();await page.locator('#login-guest').click();
  await page.locator('#cls-hunter').click();await page.locator('#name').fill('RingTester');await page.locator('#go').click({timeout:60000});
  await page.waitForFunction(()=>Online.connected&&Field.hero.level===99);
  const send=p=>page.evaluate(p=>Online.send(p),p),debug=command=>send({type:'debug',command});

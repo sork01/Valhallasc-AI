@@ -53,6 +53,8 @@ const dbgOn = (page, command) => page.evaluate(c => Online.send({ type: 'debug',
 
   // --- a real fight: damage dealt, damage taken, the kill ---
   const here = await page.evaluate(() => ({ x: Field.hero.x, y: Field.hero.y }));
+  // Neighbours crowd the hero and can keep the new slime from ever reaching them.
+  for (const id of await page.evaluate(() => Field.slimes.filter(s => !s.dead && Math.hypot(s.x - Field.hero.x, s.y - Field.hero.y) < 12).map(s => s.id))) await debug({ op: 'kill_enemy', id });
   await debug({ op: 'spawn_enemy', kind: 'green', x: here.x + 1.4, y: here.y, level: 1 });
   await page.waitForFunction(() => Field.slimes.some(s => s.kind === 'green' && !s.dead && Math.hypot(s.x - Field.hero.x, s.y - Field.hero.y) < 3));
   await page.waitForFunction(() => /Green Slime \(Lv 1\) hits you for \d+\./.test(document.getElementById('system-log').textContent), null, { timeout: 20000 }).catch(async e => {
@@ -61,9 +63,9 @@ const dbgOn = (page, command) => page.evaluate(c => Online.send({ type: 'debug',
   });
   check(true, 'Damage taken names the enemy, its level and the amount');
   check(await page.locator('#system-log .sys-taken').count() > 0, 'Damage taken has its own colour class');
-  await page.evaluate(() => { const s = Field.slimes.find(s => s.kind === 'green' && !s.dead); window.__slimeId = s.id; });
+  await page.evaluate(() => { const s = Field.slimes.find(s => s.kind === 'green' && s.level === 1 && !s.dead); window.__slimeId = s.id; });
   for (let i = 0; i < 40; i++) {
-    if (/was defeated/.test(await system())) break;
+    if (/Green Slime \(Lv 1\) was defeated/.test(await system())) break;
     await page.evaluate(() => { const s = Field.slimes.find(s => s.id === window.__slimeId); if (s && !s.dead) { Online.send({ type: 'target', id: s.id }); Online.send({ type: 'attack', fx: s.x - Field.hero.x, fy: s.y - Field.hero.y }); } });
     await page.waitForTimeout(450);
   }
@@ -78,9 +80,9 @@ const dbgOn = (page, command) => page.evaluate(c => Online.send({ type: 'debug',
   await debug({ op: 'reset_cooldowns' }); await debug({ op: 'set_resource', amount: 1e9 });
   const at = await page.evaluate(() => ({ x: Field.hero.x, y: Field.hero.y }));
   await debug({ op: 'spawn_enemy', kind: 'blue', x: at.x + 1.2, y: at.y, level: 1 });
-  await page.waitForFunction(() => Field.slimes.some(s => s.kind === 'blue' && !s.dead && Math.hypot(s.x - Field.hero.x, s.y - Field.hero.y) < 3));
+  await page.waitForFunction(() => Field.slimes.some(s => s.kind === 'blue' && s.level === 1 && !s.dead && Math.hypot(s.x - Field.hero.x, s.y - Field.hero.y) < 3));
   const skill = await page.evaluate(() => WORLD_SKILLS.find(s => s.id === 'cleave'));
-  await page.evaluate(id => { const s = Field.slimes.find(s => s.kind === 'blue' && !s.dead); Online.send({ type: 'skill', id, fx: s.x - Field.hero.x, fy: s.y - Field.hero.y }); }, skill.id);
+  await page.evaluate(id => { const s = Field.slimes.find(s => s.kind === 'blue' && s.level === 1 && !s.dead); Online.send({ type: 'skill', id, fx: s.x - Field.hero.x, fy: s.y - Field.hero.y }); }, skill.id);
   await page.waitForFunction(name => new RegExp(`You hit Blue Slime \\(Lv 1\\) for \\d+ .*with ${name}\\.`).test(document.getElementById('system-log').textContent), skill.name, { timeout: 8000 });
   check(true, `A skill hit says which skill landed (${skill.name})`);
   await page.waitForFunction(name => document.getElementById('system-log').textContent.includes(`You cast ${name}.`), skill.name, { timeout: 5000 });

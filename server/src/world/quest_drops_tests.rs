@@ -51,6 +51,11 @@ fn every_bring_objective_asks_for_an_unsellable_item_and_every_remapped_chance_l
     for q in w.maps.iter().flat_map(|m| &m.quests) {
         for o in q.objectives.iter().filter(|o| o.kind == "bring") {
             let i = item(&o.target).unwrap_or_else(|| panic!("{}: unknown {}", q.id, o.target));
+            // Fish quests (the Fishers and the seahorse) take ordinary, sellable fish caught with a rod.
+            if q.id.starts_with("fisher_") || q.id == "deep_seahorse" {
+                assert_eq!(i.kind, "fish", "{}", q.id);
+                continue;
+            }
             assert!(is_quest_item(i), "{}: {} is still sold by merchants", q.id, i.id);
             if i.quest_material.is_some() {
                 remapped_count += 1;
@@ -236,8 +241,9 @@ fn the_migration_keeps_banked_shards_and_keys_but_a_quest_item_cannot_be_banked(
     assert_eq!(c.quantity(&item_id), 2);
 }
 
-/// Release rehearsal (`REHEARSE_DB=<copy of the live database> cargo test rehearse_migration -- --ignored --nocapture`): every stored
+/// Release rehearsal (`REHEARSE_DB=<copy of the live database> cargo test --features valhalla-server/tools rehearse_migration -- --ignored --nocapture`): every stored
 /// character goes through the tutorial v2 step, the level clamp and the quest-item migration, and the counts are printed.
+#[cfg(feature = "tools")]
 #[test]
 #[ignore = "needs REHEARSE_DB, a copy of the live database"]
 fn rehearse_migration_on_a_copy_of_the_live_database() {

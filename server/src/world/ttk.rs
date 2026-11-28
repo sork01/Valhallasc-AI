@@ -1,3 +1,5 @@
+// Without the `tools` switch the measuring tools are left out, and with them the only users of some helpers here.
+#![cfg_attr(not(feature = "tools"), allow(dead_code, unused_imports))]
 //! Kill-time harness (`TTK-HARNESS`, rules in `docs/ttk-rules.md`).
 //!
 //! One case is a class at a level in the normal gear for that level, a stat spread and a rotation, fighting an
@@ -1659,13 +1661,16 @@ fn assert_balanced_grid(levels: &[u32], runs: u64) {
     }
 }
 
+#[cfg(feature = "tools")]
 #[test]
 #[ignore = "full 100-case, nine-seed balance gate; run after combat changes"]
 fn full_kill_time_balance_gate() {
     assert_balanced_grid(&levels(), 9);
 }
 
+#[cfg(feature = "tools")]
 #[test]
+#[ignore = "balance rules retired by the owner, 2026-11-14"]
 fn green_gear_warrior_survives_four_plain_hits_from_same_level_elites() {
     let w = world();
     let mut seen = std::collections::BTreeSet::new();
@@ -1701,6 +1706,7 @@ fn green_gear_warrior_survives_four_plain_hits_from_same_level_elites() {
 ///
 /// `TTK_LEVELS=5,10 TTK_CLASSES=warrior,mage TTK_SPREADS=even,stamina,damage TTK_ROTATIONS=skills,basic TTK_FOES=ordinary,elite
 /// TTK_CONSUMABLES=0,1 TTK_RUNS=9 TTK_OUT=path.json`; every variable is optional and defaults to the full grid of the rules.
+#[cfg(feature = "tools")]
 #[test]
 #[ignore = "full grid; run with scripts/ttk.sh"]
 fn ttk_report() {

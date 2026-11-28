@@ -29,7 +29,7 @@ EDITS={
   ('p.buff(BuffKind::FishingLuck)','if progression_mutant("luck") { 0. } else { p.buff(BuffKind::FishingLuck) }'),
  ],
  'server/src/world/fishing_workshop.rs':[
-  ('if !next.consume_item(&id, count) {','if !progression_mutant("consume") && !next.consume_item(&id, count) {'),
+  ('let costs = ingredients(recipe, &p.character);','let mut costs = ingredients(recipe, &p.character); if progression_mutant("consume") { costs.retain(|(id, _)| !id.starts_with("rod_")); }'),
  ],
  'server/src/world/consumables.rs':[
   ('if let Some(bonus) = &it.food_bonus {','if let Some(bonus) = &it.food_bonus && !progression_mutant("food") {'),

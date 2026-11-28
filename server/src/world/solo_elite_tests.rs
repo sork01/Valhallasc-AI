@@ -1,3 +1,5 @@
+// Without the `tools` switch the measuring tools are left out, and with them the only users of some helpers here.
+#![cfg_attr(not(feature = "tools"), allow(dead_code, unused_imports))]
 //! `ELITE-SOLO-TEST`: an elite or boss that its quest recommends 2 or more players for must not die to one player.
 //!
 //! The list comes from the quests in `world/map.txt` (`group` and `recommendedPlayers` of 2 or more) and the kill
@@ -197,6 +199,7 @@ fn lone_wins(
 
 // The owner's rule (2026-10-16): a group elite is not for a lone player at its own level in ordinary green gear, but
 // it is soloable with good enough gear or about five levels above it.
+#[cfg(feature = "tools")]
 #[test]
 #[ignore = "slow (about 12 minutes on 4 cores): run scripts/elite-solo-parallel.sh"]
 fn lone_player_in_green_gear_at_the_same_level_cannot_kill_a_group_elite() {
@@ -212,6 +215,7 @@ fn lone_player_in_green_gear_at_the_same_level_cannot_kill_a_group_elite() {
     );
 }
 
+#[cfg(feature = "tools")]
 #[test]
 #[ignore = "slow (about 12 minutes on 4 cores): run scripts/elite-solo-parallel.sh"]
 fn lone_player_can_kill_every_group_elite_with_purple_gear_or_five_levels_above() {
@@ -251,6 +255,7 @@ fn shard() -> (usize, usize) {
         .unwrap_or((0, 1))
 }
 
+#[cfg(feature = "tools")]
 #[test]
 #[ignore = "slow: run scripts/elite-party-parallel.sh"]
 fn a_party_of_the_recommended_size_kills_each_group_elite() {

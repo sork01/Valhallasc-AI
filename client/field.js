@@ -28,6 +28,20 @@
   const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
   const lerp = (a, b, t) => a + (b - a) * t;
   const segDist = (px, py, ax, ay, bx, by) => { const dx = bx - ax, dy = by - ay, t = clamp(((px - ax) * dx + (py - ay) * dy) / (dx * dx + dy * dy || 1), 0, 1); return Math.hypot(px - ax - dx * t, py - ay - dy * t); };
+  // The distance from each tile's centre to the nearest trail, where that is within TRAIL_REACH (99 or any larger value
+  // elsewhere). Each stretch visits only the tiles around it: testing every tile against every stretch took most of a
+  // second on entering the world. TRAIL_REACH is the widest a trail's ragged edge gets (see buildMap).
+  const TRAIL_REACH = 1.75;
+  function trailDistances(paths, size) {
+    const near = new Float64Array(size * size).fill(99), first = v => Math.max(0, Math.floor(v - TRAIL_REACH - .5)), last = v => Math.min(size - 1, Math.ceil(v + TRAIL_REACH - .5));
+    for (const p of paths) for (let k = 0; k < p.length - 1; k++) {
+      const [ax, ay] = p[k], [bx, by] = p[k + 1];
+      for (let y = first(Math.min(ay, by)), yEnd = last(Math.max(ay, by)); y <= yEnd; y++) for (let x = first(Math.min(ax, bx)), xEnd = last(Math.max(ax, bx)); x <= xEnd; x++) {
+        const i = y * size + x, d = segDist(x + .5, y + .5, ax, ay, bx, by); if (d < near[i]) near[i] = d;
+      }
+    }
+    return near;
+  }
   const w2sRaw = (x, y) => [(x - y) * TW / 2, (x + y) * TH / 2];
   const canvasOf = (w, h, scale) => { const c = document.createElement('canvas'); c.width = Math.ceil(w * scale); c.height = Math.ceil(h * scale); const g = c.getContext('2d'); g.scale(scale, scale); return [c, g]; };
   const shade = (hex, k) => { const n = parseInt(hex.slice(1), 16), t = k < 0 ? 0 : 255, p = Math.abs(k); return '#' + [n >> 16, (n >> 8) & 255, n & 255].map(v => Math.round(v + (t - v) * p).toString(16).padStart(2, '0')).join(''); };
@@ -57,12 +71,13 @@
     map.dirt = new Uint8Array(MAP * MAP); map.tone = new Float32Array(MAP * MAP);
     map.gk = null; if (zdef.groundSpans) { map.gk = new Uint8Array(MAP * MAP); for (const [gy, a, b, k] of zdef.groundSpans) map.gk.fill(k, gy * MAP + a, gy * MAP + b + 1); }
     const paths = zdef.paths || PATHS, ember = zdef.theme === 'ember', frost = zdef.theme === 'frost', fen = zdef.theme === 'fen', city = zdef.theme === 'city' || zdef.theme === 'asterion', vault = zdef.theme === 'chained_forge' || zdef.theme === 'blackhour' || zdef.theme === 'longship' || zdef.theme === 'skybridge' || zdef.theme === 'nornroot' || zdef.theme === 'vault' || zdef.theme === 'eye_below' || zdef.theme === 'elder_hollow' || zdef.theme === 'thousandfold' || zdef.theme === 'rain_crown' || zdef.theme === 'seed_vault' || zdef.theme === 'sunken_astrolabe' || zdef.theme === 'thunderheart_gate' || SeasonDungeonArt.isTheme(zdef.theme) || CathedralArt.isTheme(zdef.theme), wyrd = zdef.theme === 'wyrd', sky = zdef.theme === 'sky', astral = zdef.theme === 'astral', prism = zdef.theme === 'prismwaste', orrery = zdef.theme === 'orrery', moonspore = zdef.theme === 'moonspore', deep = zdef.theme === 'deep' || zdef.theme === 'nacre';
+    const near = trailDistances(paths, MAP);
     for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) {
       const i = y * MAP + x, cx = x + .5, cy = y + .5;
       map.tone[i] = vnoise(cx * .16, cy * .16, ember ? 11 : frost ? 21 : fen ? 31 : city ? 41 : vault ? 51 : wyrd ? 61 : sky ? 71 : astral ? 91 : prism ? 101 : orrery ? 111 : moonspore ? 121 : zdef.theme === 'stormglass' ? 131 : zdef.theme === 'sunward' ? 141 : zdef.theme === 'ribbonwild' ? 151 : zdef.theme === 'tanglecrown' ? 161 : zdef.theme === 'worldtree' ? 171 : zdef.theme === 'heartwood' ? 181 : zdef.theme === 'lapiserg' ? 191 : zdef.theme === 'frostwake' ? 201 : zdef.theme === 'cairnspine' ? 211 : zdef.theme === 'yearwheel' ? 221 : deep ? 81 : 1) * .65 + vnoise(cx * .55, cy * .55, ember ? 12 : frost ? 22 : fen ? 32 : city ? 42 : vault ? 52 : wyrd ? 62 : sky ? 72 : astral ? 92 : prism ? 102 : orrery ? 112 : moonspore ? 122 : zdef.theme === 'stormglass' ? 132 : zdef.theme === 'sunward' ? 142 : zdef.theme === 'ribbonwild' ? 152 : zdef.theme === 'tanglecrown' ? 162 : zdef.theme === 'worldtree' ? 172 : zdef.theme === 'heartwood' ? 182 : zdef.theme === 'lapiserg' ? 192 : zdef.theme === 'frostwake' ? 202 : zdef.theme === 'cairnspine' ? 212 : zdef.theme === 'yearwheel' ? 222 : deep ? 82 : 2) * .35;
-      let d = 99; for (const p of paths) for (let k = 0; k < p.length - 1; k++) d = Math.min(d, segDist(cx, cy, p[k][0], p[k][1], p[k + 1][0], p[k + 1][1]));
+      let d = near[i];
       if (!ember && !frost && !fen && !city && !vault && !wyrd && !sky && !astral && !prism && !orrery && !moonspore && zdef.theme !== 'stormglass' && zdef.theme !== 'sunward' && zdef.theme !== 'ribbonwild' && zdef.theme !== 'tanglecrown' && zdef.theme !== 'worldtree' && zdef.theme !== 'heartwood' && zdef.theme !== 'lapiserg' && zdef.theme !== 'frostwake' && zdef.theme !== 'cairnspine' && zdef.theme !== 'yearwheel' && zdef.theme !== 'emberwake' && !deep) d = Math.min(d, Math.hypot(cx - 36 - SHIFT[0], cy - 36 - SHIFT[1]) - 2.4);
-      map.dirt[i] = d < 1.15 + vnoise(cx * .5, cy * .5, 3) * .6 ? 1 : 0;
+      map.dirt[i] = d < TRAIL_REACH && d < 1.15 + vnoise(cx * .5, cy * .5, 3) * .6 ? 1 : 0;
     }
     if (city || zdef.theme === 'nacre') paintRoads(zdef.roads);
     if (vault) paintRooms(zdef.rooms);

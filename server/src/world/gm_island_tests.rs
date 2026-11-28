@@ -311,9 +311,14 @@ fn gm_island_all_class_loadouts_are_normal_and_original_character_survives_save(
         command("leave", Some("gmi_ferryman"), None, None, None, None, None),
     )
     .unwrap();
+    // The rested clock is stamped with the current second, which may have moved on since the checkpoint.
+    let timeless = |mut v: Value| {
+        v["rested"].as_object_mut().unwrap().remove("lastSeen");
+        v
+    };
     assert_eq!(
-        serde_json::to_value(&w.players[&1].character).unwrap(),
-        original
+        timeless(serde_json::to_value(&w.players[&1].character).unwrap()),
+        timeless(original)
     );
 }
 

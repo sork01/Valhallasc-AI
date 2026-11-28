@@ -318,7 +318,8 @@ impl World {
                 .iter()
                 .flat_map(|m| &m.quests)
                 .filter(|q| {
-                    q.group
+                    // A hunt that wants several fighters is hireable even without shared group credit.
+                    (q.group || q.recommended_players > 1)
                         && (q.npc == npc_id || crate::seasonal::giver(&q.id, npc_id))
                         && (crate::seasonal::quest_event(&q.id).is_none()
                             || crate::seasonal::period(&q.id, &seasons)
