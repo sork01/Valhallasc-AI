@@ -74,8 +74,8 @@ living, awake monster within 12 tiles (a bolt's flight) with clear sight, sends
 `target`, then sends the skill. The server aims it at that monster and keeps
 autoattacking. Damaging means `cone`, `nova`, `volley`, `strike`, `chain`,
 `meteor`, or a `dash` with damage; heals, buffs, Blink, Roll Away and Shadowstep
-pick nothing. The basic Attack in the skill bar and on the Attack key does the
-same, and leaves the swing to autoattack once it has picked a target.
+pick nothing. The basic Attack in the skill bar and on the Attack key keeps
+swinging where the player aims.
 
 Nothing is picked while movement keys, the touch stick or click-to-walk are
 held, because movement would cancel the autoattack at once. A short skill is not

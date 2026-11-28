@@ -70,8 +70,7 @@ for (const skill of skills) {
 assert.ok(damaging >= 30 && harmless >= 10, `both kinds of skill were swept (${damaging}, ${harmless})`);
 
 T.reset('warrior', crowd());
-assert.deepEqual(T.use('attack').log, picked, 'a basic attack picks a target and leaves the swing to autoattack');
-assert.deepEqual(T.use('attack').log, ['swing'], 'with a target the basic attack swings as before');
+assert.deepEqual(T.use('attack').log, ['swing'], 'the basic attack still swings where the player aims');
 T.reset('assassin', crowd());
 assert.deepEqual(T.use('shadowstep').log, ['dash'], 'Shadowstep picks nothing');
 
@@ -86,7 +85,6 @@ assert.deepEqual(T.use('cleave').log, [...picked, 'skill:cleave'], 'a player who
 
 T.reset('warrior', crowd()); T.hold([1, 0]);
 assert.deepEqual(T.use('cleave').log, ['skill:cleave'], 'held movement keeps steering');
-assert.deepEqual(T.use('attack').log, ['swing'], 'a basic attack while moving swings as before');
 T.reset('warrior', crowd()); T.pointer.down = true;
 assert.deepEqual(T.use('cleave').log, ['skill:cleave'], 'a held click-to-walk is left alone');
 T.reset('warrior', crowd()); raw.hero.sparkTravel = {};

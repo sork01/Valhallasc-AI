@@ -5995,8 +5995,7 @@
     },
     useSkill(id) {
       if (!running || paused || !Online.connected || hero.dead) return false;
-      // The server walks into reach and swings at a new target, so a basic attack that picks one sends no swing of its own.
-      if (id === 'attack' && hero.atkCd <= 0 && hero.dashT <= 0) { if (!acquireTarget()) swing(); return true; }
+      if (id === 'attack' && hero.atkCd <= 0 && hero.dashT <= 0) { swing(); return true; }
       if (id === 'shadowstep' && isAssassin() && hero.dashCd <= 0 && hero.dashT <= 0 && hero.resource >= 20) { shadowstep(); return true; }
       const def = SKILL_BY_ID[id];
       if (def && def.class === hero.look.class && hero.level >= def.level && !(hero.skillCd?.[id] > 0) && hero.dashT <= 0 && hero.resource >= (window.Skillbar?.price(def) ?? def.cost)) { if (dealsDamage(def.effect)) acquireTarget(); castSkill(def); return true; }
