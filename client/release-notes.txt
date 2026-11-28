@@ -1,5 +1,26 @@
 [
   {
+    "version": "1.15.15",
+    "date": "2026-11-28",
+    "new": [
+      "Tracking a Fisher errand now marks the nearest shore where that fish can be caught.",
+      "Alchemists have new character art.",
+      "Thirty pieces of crafted equipment that had no picture in your bags now have one."
+    ],
+    "changed": [
+      "Quest givers for group elite hunts out in the world can hire mercenaries for you again.",
+      "In dungeons, a monster that loses its target now goes after anyone who is still fighting.",
+      "Crafted equipment strength now matches the level of the item, so some pieces are stronger and a few are weaker.",
+      "Dirt trails lead up to doors again.",
+      "Enemies no longer stay overlapped with your hero when scenery is in the way.",
+      "The Mounts list now fits on smaller screens.",
+      "Meeting Stones, tips and the Skaldholm Stonewarden no longer say that the stones hire fighters.",
+      "The Swedish message for picking up several items is corrected.",
+      "Entering the world is faster."
+    ],
+    "removed": []
+  },
+  {
     "version": "1.15.14",
     "date": "2026-11-27",
     "new": [],
