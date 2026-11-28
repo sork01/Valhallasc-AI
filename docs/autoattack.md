@@ -66,3 +66,25 @@ two living monsters, held movement, repeated basic attack events, cooldown
 selection, an empty city and desktop Attack. Run it through
 `scripts/test-touch-bounded.sh`; `MUTATE=1` restores the one-shot action in the
 served browser copy and must fail selection.
+
+## Skills with nothing selected (1.15.16)
+
+A damaging skill used with no monster or player selected picks the nearest
+living, awake monster within 12 tiles (a bolt's flight) with clear sight, sends
+`target`, then sends the skill. The server aims it at that monster and keeps
+autoattacking. Damaging means `cone`, `nova`, `volley`, `strike`, `chain`,
+`meteor`, or a `dash` with damage; heals, buffs, Blink, Roll Away and Shadowstep
+pick nothing. The basic Attack in the skill bar and on the Attack key does the
+same, and leaves the swing to autoattack once it has picked a target.
+
+Nothing is picked while movement keys, the touch stick or click-to-walk are
+held, because movement would cancel the autoattack at once. A short skill is not
+delayed until the hero arrives: Cleave, Whirlwind and similar fire where the
+hero stands. The touch Attack button keeps its uncapped nearest-monster rule.
+This is client only and needs no restart.
+
+Checks: `node tests/skill-autotarget-client.cjs` sweeps every skill
+(`MUTATE=select|move|cap|damage|fps`), and `tests/skill-autotarget-ui.cjs`
+(bounded runner, `MUTATE=1`) casts against a private server and checks the FPS
+counter. The counter (Settings > Video > Show FPS, `Prefs.showFps`, off by
+default) counts painted frames, so Low graphics reads about 30.

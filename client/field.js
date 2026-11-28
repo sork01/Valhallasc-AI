@@ -1686,6 +1686,29 @@
     if (def.effect.effect === 'dash') { const [dx, dy] = keyboardDirection(); if (dx || dy) { fx = dx; fy = dy; } }
     Online.send({ type: 'skill', id: def.id, fx, fy });
   }
+  // The living, awake monster closest to the hero within `range`; `visible` skips those behind a wall.
+  function nearestEnemy(range = Infinity, visible = false) {
+    const here = { x: hero.nx ?? hero.x, y: hero.ny ?? hero.y };
+    let nearest = null, bestDistance = Infinity;
+    for (const enemy of slimes) {
+      if (enemy.dead || enemy.hp <= 0 || enemy.state === 'waiting') continue;
+      const at = { x: enemy.nx ?? enemy.x, y: enemy.ny ?? enemy.y }, distance = Math.hypot(at.x - here.x, at.y - here.y);
+      if (distance < bestDistance && distance <= range && (!visible || segmentFree(here, at, .05))) { nearest = enemy; bestDistance = distance; }
+    }
+    return nearest;
+  }
+  // A damaging ability used with nothing selected picks the nearest monster, so it aims there and autoattack follows.
+  // A bolt flies 12 tiles. Moving players keep steering: movement would cancel the autoattack at once.
+  const ACQUIRE_RANGE = 12, DAMAGE_EFFECTS = ['cone', 'nova', 'volley', 'strike', 'chain', 'meteor'];
+  const dealsDamage = ({ effect, mult }) => effect === 'dash' ? mult > 0 : DAMAGE_EFFECTS.includes(effect);
+  function acquireTarget() {
+    if (hero.sparkTravel || (hero.target && !hero.target.dead) || remotePlayers.has(hero.pvpTargetId)
+      || pointer?.down || keyboardDirection().some(Boolean)) return false;
+    const enemy = nearestEnemy(ACQUIRE_RANGE, true);
+    if (!enemy) return false;
+    Field.clearInput(); marker = null;
+    return Field.targetEnemy(enemy.id);
+  }
   function shadowstep() { const [dx, dy] = keyboardDirection(); Online.send({ type: 'dash', dx, dy }); }
   const classSprite = look => (look.class === 'mage' ? MageSprite : look.class === 'assassin' ? AssassinSprite : look.class === 'priest' ? PriestSprite : look.class === 'hunter' ? HunterSprite : WarriorSprite).variant(look);
   let curSnapTime;                                                // the server clock of the snapshot being applied (ActorMotion measures velocity on it)
@@ -5829,6 +5852,21 @@
     const cs = Math.min(1.5, dpr * zoom); if (Math.abs(cs - chunkScale) > .05) { chunkScale = cs; clearGroundChunks(); }
   }
   let lastPaint = 0;
+  // Settings > Video > Show FPS: painted frames per second, rewritten twice a second.
+  let fpsFrames = 0, fpsSince = 0;
+  function countFrame(now) {
+    const box = document.getElementById('fps-counter'), on = !!window.Prefs?.showFps;
+    if (!box) return;
+    if (box.hidden === on) { box.hidden = !on; fpsSince = 0; box.lastElementChild.textContent = '–'; }
+    if (!on) return;
+    // A gap (a hidden tab, a stopped game) starts a new measurement instead of reading as a slow frame.
+    if (!fpsSince || now - fpsSince > 2000) { fpsSince = now; fpsFrames = 0; return; }
+    fpsFrames++;
+    if (now - fpsSince < 500) return;
+    const text = String(Math.round(fpsFrames * 1000 / (now - fpsSince)));
+    if (box.lastElementChild.textContent !== text) box.lastElementChild.textContent = text;
+    fpsSince = now; fpsFrames = 0;
+  }
   function loop(now) {
     if (!running) return; raf = requestAnimationFrame(loop);
     if (!last) last = now;                                  // the first frame's timestamp can precede start()
@@ -5838,7 +5876,7 @@
     window.DayNight?.tick(dt);
     window.Weather?.tick(dt, hero.x, hero.y, !!hero.inside);
     if (!document.hidden && (!window.Prefs?.lowGraphics || now - lastPaint >= 1000 / 30 - .5)) {
-      lastPaint = now; draw(now / 1000);
+      lastPaint = now; draw(now / 1000); countFrame(now);
     }
   }
   const cancelHeldInput = () => {
@@ -5894,13 +5932,7 @@
     tapAt(clientX, clientY) { onPointerDown({ clientX, clientY, pointerType: 'touch' }); pointer.down = false; },
     startNearestAutoattack() {
       if (!Field.canAct || hero.sparkTravel) return false;
-      let nearest = null, bestDistance = Infinity;
-      const x = hero.nx ?? hero.x, y = hero.ny ?? hero.y;
-      for (const enemy of slimes) {
-        if (enemy.dead || enemy.hp <= 0 || enemy.state === 'waiting') continue;
-        const distance = Math.hypot((enemy.nx ?? enemy.x) - x, (enemy.ny ?? enemy.y) - y);
-        if (distance < bestDistance) { nearest = enemy; bestDistance = distance; }
-      }
+      const nearest = nearestEnemy();
       if (!nearest) return false;
       Field.clearInput();
       marker = null;
@@ -5963,10 +5995,11 @@
     },
     useSkill(id) {
       if (!running || paused || !Online.connected || hero.dead) return false;
-      if (id === 'attack' && hero.atkCd <= 0 && hero.dashT <= 0) { swing(); return true; }
+      // The server walks into reach and swings at a new target, so a basic attack that picks one sends no swing of its own.
+      if (id === 'attack' && hero.atkCd <= 0 && hero.dashT <= 0) { if (!acquireTarget()) swing(); return true; }
       if (id === 'shadowstep' && isAssassin() && hero.dashCd <= 0 && hero.dashT <= 0 && hero.resource >= 20) { shadowstep(); return true; }
       const def = SKILL_BY_ID[id];
-      if (def && def.class === hero.look.class && hero.level >= def.level && !(hero.skillCd?.[id] > 0) && hero.dashT <= 0 && hero.resource >= (window.Skillbar?.price(def) ?? def.cost)) { castSkill(def); return true; }
+      if (def && def.class === hero.look.class && hero.level >= def.level && !(hero.skillCd?.[id] > 0) && hero.dashT <= 0 && hero.resource >= (window.Skillbar?.price(def) ?? def.cost)) { if (dealsDamage(def.effect)) acquireTarget(); castSkill(def); return true; }
       return false;
     },
     get canAct() { return running && !paused && Online.connected && !hero.dead; },

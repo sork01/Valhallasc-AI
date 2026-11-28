@@ -356,6 +356,7 @@
     for (const input of floatingChecks) input.checked = window.Prefs.floatingText[input.dataset.floatingText];
     language.value = window.Prefs.lang;
     $('set-low-graphics').checked = window.Prefs.lowGraphics;
+    $('set-show-fps').checked = window.Prefs.showFps;
     $('set-quest-arrow').checked = window.Prefs.questArrow;
     $('set-track-ore').checked = window.Prefs.trackOre;
     $('set-track-flowers').checked = window.Prefs.trackFlowers;
@@ -373,6 +374,7 @@
   $('set-track-flowers').addEventListener('change', () => window.Prefs.set({ trackFlowers: $('set-track-flowers').checked }));
   $('set-quest-arrow').addEventListener('change', () => window.Prefs.set({ questArrow: $('set-quest-arrow').checked }));
   $('set-low-graphics').addEventListener('change', () => window.Prefs.set({ lowGraphics: $('set-low-graphics').checked }));
+  $('set-show-fps').addEventListener('change', () => window.Prefs.set({ showFps: $('set-show-fps').checked }));
   master.addEventListener('input', () => window.Prefs.set({ masterVol: master.value / 100 }));
   music.addEventListener('input', () => window.Prefs.set({ musicVol: music.value / 100 }));
   language.addEventListener('change', () => window.Prefs.set({ lang: language.value }));

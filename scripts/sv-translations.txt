@@ -24,6 +24,7 @@
   "Keybinds": "Tangenter",
   "Master volume": "Huvudvolym",
   "Quest arrow": "Uppdragspil",
+  "Show FPS": "Visa FPS",
   "Settings categories": "Inställningskategorier",
   "Sound": "Ljud",
   "Video": "Bild",

@@ -3,7 +3,7 @@
   // ---------- tiny persistent state ----------
   const KEY = 'valhallasc.save.v1';
   const FLOATING_TEXT = ['damage', 'incoming', 'healing', 'misses', 'loot', 'xp', 'professions', 'combat', 'skills', 'levels', 'notices'];
-  const defaults = { lang: /^ko/i.test(navigator.language || '') ? 'ko' : /^sv/i.test(navigator.language || '') ? 'sv' : 'en', sound: true, masterVol: 1, musicVol: .35, sfxVol: 1, night: 1, weather: 1, weatherAudio: .7, lowGraphics: false, touchGraphicsSuggested: false, ui: {}, uiScale: .8, winScale: {}, panelSize: {}, char: null, draft: null };
+  const defaults = { lang: /^ko/i.test(navigator.language || '') ? 'ko' : /^sv/i.test(navigator.language || '') ? 'sv' : 'en', sound: true, masterVol: 1, musicVol: .35, sfxVol: 1, night: 1, weather: 1, weatherAudio: .7, lowGraphics: false, showFps: false, touchGraphicsSuggested: false, ui: {}, uiScale: .8, winScale: {}, panelSize: {}, char: null, draft: null };
   let save = { ...defaults };
   try { Object.assign(save, JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) { /* private mode */ }
   save.combatSounds = save.combatSounds === 'recorded' ? 'recorded' : 'synthesized';
@@ -1590,6 +1590,7 @@
     get trackOre() { return save.trackOre !== false; },
     get trackFlowers() { return save.trackFlowers !== false; },
     get lowGraphics() { return save.lowGraphics === true; },
+    get showFps() { return save.showFps === true; },
     get dpsMeter() { return save.dpsMeter !== false; },
     get touchGraphicsSuggested() { return save.touchGraphicsSuggested === true; },
     get night() { return save.night; },
@@ -1624,6 +1625,7 @@
       if ('trackOre' in patch) save.trackOre = !!patch.trackOre;
       if ('trackFlowers' in patch) save.trackFlowers = !!patch.trackFlowers;
       if ('lowGraphics' in patch) save.lowGraphics = !!patch.lowGraphics;
+      if ('showFps' in patch) save.showFps = !!patch.showFps;
       if ('dpsMeter' in patch) save.dpsMeter = !!patch.dpsMeter;
       if ('touchGraphicsSuggested' in patch) save.touchGraphicsSuggested = !!patch.touchGraphicsSuggested;
       if ('night' in patch) save.night = vol(patch.night);

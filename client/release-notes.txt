@@ -1,5 +1,16 @@
 [
   {
+    "version": "1.15.16",
+    "date": "2026-11-28",
+    "new": [
+      "Settings has a Show FPS option under Video. The frame rate appears in the corner of the minimap."
+    ],
+    "changed": [
+      "With nothing selected, a damaging skill or your basic attack now picks the nearest monster you can see within 12 tiles and keeps attacking it. Skills used while you are moving work as before, and a skill with a short reach is still used where you stand."
+    ],
+    "removed": []
+  },
+  {
     "version": "1.15.15",
     "date": "2026-11-28",
     "new": [
