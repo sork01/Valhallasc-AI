@@ -18,7 +18,8 @@ async function call(name, args = {}) {
   browser = await chromium.launch({ headless: true });
   const errors = [];
   const pages = {};
-  for (const cls of ['warrior', 'assassin', 'hunter', 'mage', 'priest']) {
+  // One page at a time keeps the suite inside the test memory limit. The mage comes last: its page stays for the rest.
+  for (const cls of ['warrior', 'assassin', 'hunter', 'priest', 'mage']) {
     const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' }); pages[cls] = page;
     page.on('pageerror', e => errors.push(e.message));
     await page.addInitScript(() => localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false })));
@@ -37,6 +38,11 @@ async function call(name, args = {}) {
     const skill = await page.locator('#skill-library .skill-card').nth(cls === 'assassin' ? 2 : 1).textContent();
     check(skill.toLowerCase().includes(kind), `${cls} skill library displays resource cost`);
     await page.keyboard.press('k');
+    if (cls !== 'mage') {
+      const shot = { warrior: 'resources-rage.png', assassin: 'resources-energy.png' }[cls];
+      if (shot) await page.screenshot({ path: path.join(world.artifacts, shot) });
+      await page.close();
+    }
   }
   const mage = pages.mage;
   const debug = (page, command) => page.evaluate(c => Online.send({ type: 'debug', command: c }), command);
@@ -75,8 +81,6 @@ async function call(name, args = {}) {
   check(await mage.evaluate(() => Inventory.effect(WORLD_ITEMS.find(i => i.id === 'mana_potion')).includes('100 mana')), 'Bag description names mana recovery');
   await mage.keyboard.press('i');
   await mage.screenshot({ path: path.join(world.artifacts, 'resources-mana.png') });
-  await pages.warrior.screenshot({ path: path.join(world.artifacts, 'resources-rage.png') });
-  await pages.assassin.screenshot({ path: path.join(world.artifacts, 'resources-energy.png') });
   await mage.setViewportSize({ width: 800, height: 450 });
   const boxes = await mage.locator('#resource-bar, #quickuse').evaluateAll(nodes => nodes.map(n => { const r = n.getBoundingClientRect(); return { x: r.x, y: r.y, right: r.right, bottom: r.bottom }; }));
   check(boxes.every(r => r.x >= 0 && r.y >= 0 && r.right <= 800 && r.bottom <= 450), 'Resource HUD and three quick slots fit a phone landscape viewport');

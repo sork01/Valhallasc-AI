@@ -83,22 +83,18 @@ const { TestWorld } = require('../scripts/testing/driver.cjs');
     await page.waitForSelector('.mount-card[data-mount="sabertooth"][data-owned="true"]');
     await page.keyboard.press('Escape');
     await page.waitForFunction(() => document.getElementById('equipment').hidden);
-    // Another player sees the rider's selected mount in the snapshot.
-    const watcher = await browser.newPage({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
-    watcher.on('pageerror', e => errors.push(e.message));
-    await watcher.addInitScript(() => { if (!localStorage.getItem('valhallasc.save.v1')) localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false, char: null, draft: null })); });
-    await watcher.goto(world.url); await watcher.locator('#start').click(); await playGuest(watcher);
-    await watcher.locator('#cls-warrior').click(); await watcher.locator('#name').fill('Watcher'); await watcher.locator('#go').click({ timeout: 60000 });
-    await watcher.waitForFunction(() => Online.connected && Field.hero.id);
-    const spot = await watcher.evaluate(() => ({ zone: Field.zone, x: Field.hero.x, y: Field.hero.y }));
-    await page.evaluate(spot => Online.send({ type: 'debug', ref: 904, command: { op: 'teleport', zone: spot.zone, x: spot.x + 2, y: spot.y } }), spot);
-    await page.waitForFunction(zone => Field.zone === zone, spot.zone, { timeout: 10000 });
+    // Another player sees the rider's selected mount in the snapshot. A protocol player watches: a second browser page
+    // does not fit the test memory limit.
+    await world.connect({ bot: 'Watcher', class: 'warrior' });
+    const rider = await page.evaluate(() => Online.id), spot = world.player('Watcher');
+    await page.evaluate(spot => Online.send({ type: 'debug', ref: 904, command: { op: 'teleport', zone: spot.zone || 0, x: spot.x + 2, y: spot.y } }), spot);
+    await page.waitForFunction(zone => Field.zone === zone, spot.zone || 0, { timeout: 10000 });
     await page.evaluate(() => { document.activeElement?.blur?.(); });
     await page.keyboard.press('h');
     await page.waitForFunction(() => Field.hero.mounted, null, { timeout: 10000 });
-    await watcher.waitForFunction(() => Field.remotePlayers.some(p => p.mounted && p.mount === 'raptor'), null, { timeout: 10000 });
-    await watcher.close();
+    await world.waitFor(() => world.views.get('Watcher')?.players.some(p => p.id === rider && p.mounted && p.mount === 'raptor'), 10000, 'the watcher sees the raptor');
     await page.evaluate(() => Online.stop());
+    await world.disconnect('Watcher');
     await world.waitFor(async () => (await (await fetch(world.url + 'health')).json()).online === 0, 10000, 'guest disconnect');
     await page.reload(); await page.locator('#start').click(); await playGuest(page);
     await page.waitForFunction(() => Online.connected && Field.hero.mountOwned, null, { timeout: 60000 }).catch(async error => {

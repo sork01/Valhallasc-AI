@@ -17,8 +17,20 @@ async function call(name, args = {}) {
   await client.connect(new StdioClientTransport({ command: process.execPath, args: [path.join(root, 'scripts/test-mcp.cjs')], cwd: root, stderr: 'pipe' }));
   const world = await call('start_world'); started = true;
   browser = await chromium.launch({ headless: true });
-  const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
+  const view = { viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' };
+  let page = await browser.newPage(view);
   const errors = []; page.on('pageerror', e => errors.push(e.message));
+  // A return visit in a new browser, with the same saved guest. A reload keeps the old page's memory, and the suite
+  // then outgrows the test memory limit.
+  async function revisit() {
+    const storageState = await page.context().storageState();
+    await browser.close();
+    for (let n = 0; n < 100 && (await (await fetch(world.url + 'health')).json()).online; n++) await new Promise(resolve => setTimeout(resolve, 100));
+    browser = await chromium.launch({ headless: true });
+    page = await browser.newPage({ ...view, storageState });
+    page.on('pageerror', e => errors.push(e.message));
+    await page.goto(world.url); await page.locator('#start').click(); await playGuest(page);
+  }
   await page.addInitScript(() => { if (!localStorage.getItem('valhallasc.save.v1')) localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false, char: null, draft: null })); });
   await page.goto(world.url); await page.locator('#start').click(); await playGuest(page);
   await page.locator('#cls-mage').click(); await page.locator('#name').fill('SkillMage'); await page.locator('#go').click({ timeout: 60000 });
@@ -60,7 +72,7 @@ async function call(name, args = {}) {
   await page.locator('#bag-search').fill('robe');
   check(await page.locator('#inventory-list .inventory-item').count() === 1 && await page.locator('#equipment').isVisible(), 'Search filters bag contents without triggering letter hotkeys');
   await page.locator('#bag-search').fill('');
-  await page.reload(); await page.locator('#start').click(); await playGuest(page);
+  await revisit();
   await page.waitForFunction(() => Online.connected && !!Field.mageSprites, null, { timeout: 60000 });
   await page.keyboard.press('e');
   check(await page.locator('#inventory-list [data-position="11"]').getAttribute('data-item') === 'mage_weapon_ash', 'Bag positions and unequipped gear survive reload');
@@ -124,7 +136,7 @@ async function call(name, args = {}) {
   check(await page.locator('#chat-input').inputValue() === '9ek', 'Skill and panel keys remain text while chatting');
   check(await page.locator('#equipment').isHidden() && await page.locator('#skills-panel').isHidden(), 'Chat typing opens no menus');
   await page.locator('#chat-input').press('Escape');
-  await page.reload(); await page.locator('#start').click(); await playGuest(page);
+  await revisit();
   await page.waitForFunction(() => Online.connected && !!Field.mageSprites && document.querySelector('#skillbar-slots [data-slot="9"]')?.dataset.skill === 'attack', null, { timeout: 60000 });
   check(await page.locator('#skillbar-slots [data-slot="1"]').getAttribute('data-skill') === '' && await page.locator('#skillbar-slots [data-slot="3"]').getAttribute('data-skill') === 'attack', 'Custom skill layout survives reload');
   await page.screenshot({ path: path.join(world.artifacts, 'skillbar-mage.png') });
@@ -210,6 +222,9 @@ async function call(name, args = {}) {
   check(bounds.x >= 0 && bounds.x + bounds.width <= 800, 'Twelve-slot bar fits a small landscape viewport');
   check(errors.length === 0, `No runtime errors: ${errors.join('; ')}`);
 
+  // The display fixtures need only the game's window markup: take it, then a new browser gives the memory back.
+  const workspace = await page.locator('.equipment-workspace').innerHTML();
+  await browser.close(); browser = await chromium.launch({ headless: true });
   const fixture = await browser.newPage({ viewport: { width: 1440, height: 900 }, bypassCSP: true });
   await fixture.goto(new URL('health', world.url).href);
   await fixture.setContent('<div id="equipped-slots"></div><div id="inventory-list"></div><div id="npc-inventory"></div>');
@@ -226,7 +241,6 @@ async function call(name, args = {}) {
   check(await fixture.locator('[data-slot="accessory2"] b').textContent() === 'Amber Ring', 'Both accessory slots show equipped copies');
   // Merchant lists are now server-fed by client/shop.js (Shop.render), not Inventory.renderShop: that check moved out of this suite.
   // Full-bag fixtures check overflow and loose copies without forging combat.
-  const workspace = await page.locator('.equipment-workspace').innerHTML();
   await fixture.setContent(`<main id="stage" class="stage" data-scene="game"><div class="pause" id="equipment"><div class="equipment-workspace" data-view="both">${workspace}</div></div></main>`);
   await fixture.addStyleTag({ path: path.join(root, 'client/style.css') });
   await fixture.addStyleTag({ path: path.join(root, 'client/online.css') });

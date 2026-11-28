@@ -17,23 +17,32 @@ const suite = {
     check(await page.locator('#low-gfx-suggestion').isVisible(), 'first touch visit offers Low graphics');
     check(await page.evaluate(() => !Prefs.lowGraphics), 'Low graphics is never forced');
     await page.evaluate(() => {
-      window.paintCount = 0; const set = CanvasRenderingContext2D.prototype.setTransform;
-      CanvasRenderingContext2D.prototype.setTransform = function(...args) { if (this.canvas.id === 'fieldcv') paintCount++; return set.apply(this, args); };
+      // The field sees a steady 60 Hz clock, one tick per real frame, so the paint cap shows on a host of any speed.
+      const next = window.requestAnimationFrame.bind(window);
+      let real = null, clock = performance.now();
+      window.frameNumber = 0;
+      window.requestAnimationFrame = callback => next(now => {
+        if (now !== real) { real = now; clock += 1000 / 60; frameNumber++; }
+        callback(clock);
+      });
+      window.paintCount = 0; window.paintedFrames = new Set(); const set = CanvasRenderingContext2D.prototype.setTransform;
+      CanvasRenderingContext2D.prototype.setTransform = function(...args) { if (this.canvas.id === 'fieldcv') { paintCount++; paintedFrames.add(frameNumber); } return set.apply(this, args); };
     });
     const cdp = await browser.newBrowserCDPSession();
     async function sample() {
-      await page.evaluate(() => { paintCount = 0; });
+      await page.evaluate(() => { paintCount = 0; paintedFrames.clear(); window.firstFrame = frameNumber; });
       const start = performance.now(), before = await ticks(cdp); await sleep(3000);
       const elapsed = performance.now() - start, after = await ticks(cdp);
-      const state = await page.evaluate(() => ({ paints: paintCount, animations: document.getAnimations().filter(a => a.playState === 'running').length, backing: document.querySelector('#fieldcv').width, css: document.querySelector('#fieldcv').clientWidth }));
+      const state = await page.evaluate(() => ({ paints: paintCount, frames: frameNumber - firstFrame, painted: paintedFrames.size, animations: document.getAnimations().filter(a => a.playState === 'running').length, backing: document.querySelector('#fieldcv').width, css: document.querySelector('#fieldcv').clientWidth }));
       return { ...state, elapsedMs: elapsed, cpuPercentOfCore: (after - before) / hz / (elapsed / 1000) * 100, fps: state.paints / (elapsed / 1000) };
     }
     await sleep(350); const normal = await sample();
     await page.locator('#low-gfx-accept').click(); await sleep(350); const low = await sample();
     check(await page.evaluate(() => Prefs.lowGraphics && Prefs.touchGraphicsSuggested), 'accepting saves the setting and suggestion answer');
     check(low.backing === low.css && normal.backing >= normal.css * 1.9, `backing scale drops (${normal.backing} -> ${low.backing})`);
-    // Needs a host that can paint above 30 fps at 2x: under the 1-CPU production cap headless paints only ~8 frames/s and MUTATE=1 cannot fail. On the cloud box (8 vCPU) normal mode paints 17-35 fps and MUTATE=1 reaches 53.
-    check(low.fps <= 31.5 && normal.fps > 10, `paint rate is capped while input updates continue (${normal.fps.toFixed(1)} -> ${low.fps.toFixed(1)})`);
+    const share = state => state.painted / state.frames;
+    check(normal.frames > 3 && low.frames > 3 && share(normal) > .8 && share(low) > .3 && share(low) < .65,
+      `Low graphics paints every other 60 Hz frame while the loop runs on every one (${share(normal).toFixed(2)} -> ${share(low).toFixed(2)} of ${normal.frames}/${low.frames} frames)`);
     check(await page.evaluate(() => document.documentElement.classList.contains('low-graphics')), 'Low graphics applies cosmetic rules');
     await page.reload(); await page.locator('#start').click(); await playGuest(page); await page.waitForFunction(() => Online.connected && Field.hero?.hp > 0);
     check(await page.evaluate(() => Prefs.lowGraphics), 'setting survives reload');

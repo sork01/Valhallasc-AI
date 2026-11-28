@@ -28,7 +28,9 @@ const suite = {
     await page.waitForFunction(() => Field.hero.skillCd.arcaneward > 0);
     const countdown = skill.locator('.touch-cooldown'); await countdown.waitFor();
     check(await skill.isDisabled(), 'cooling skill cannot be recast');
-    const appearance = await countdown.evaluate(n => {
+    // The arc redraws its countdown on every update, so find and measure it in one step inside the page.
+    const appearance = await page.evaluate(() => {
+      const n = document.querySelector('#touch-skills [data-skill="arcaneward"] .touch-cooldown');
       const r = n.getBoundingClientRect(), b = n.parentElement.getBoundingClientRect(), css = getComputedStyle(n);
       return { font: parseFloat(css.fontSize) * b.width / n.parentElement.offsetWidth,
         opacity: getComputedStyle(n.parentElement).opacity, color: css.color,

@@ -118,18 +118,27 @@ const MAGE = ['attack', 'twinbolt', 'arcaneward', 'fireball', 'barrage', 'chainl
 
   // --- full motion: the real animation ---
   await page.emulateMedia({ reducedMotion: 'no-preference' });
-  // Sample the flash on every frame: its peak, not one instant, shows whether the screen really lights up.
-  const peak = await page.evaluate(() => new Promise(resolve => {
+  // Walk the animations along their own timelines. Sampling live frames after a fixed wait missed the flash, or found
+  // the banner already gone, whenever the capped test host drew slowly.
+  const { peak, full } = await page.evaluate(() => {
     Field._debug.event({ type: 'event', kind: 'levelup', actor: Online.id, x: Field.hero.x, y: Field.hero.y, value: 1, level: 22, unlocked: [] });
-    const flash = document.getElementById('levelup-flash'), start = performance.now(); let max = 0;
-    const tick = () => { max = Math.max(max, +getComputedStyle(flash).opacity); performance.now() - start < 900 ? requestAnimationFrame(tick) : resolve(max); };
-    tick();
-  }));
+    const flash = document.getElementById('levelup-flash'), banner = document.getElementById('levelup-banner'), [animation] = flash.getAnimations();
+    let max = 0;
+    if (animation) {
+      const { duration } = animation.effect.getComputedTiming();
+      animation.pause();
+      for (let step = 0; step <= 20; step++) {
+        animation.currentTime = duration * step / 20;
+        const style = getComputedStyle(flash);
+        if (style.display !== 'none') max = Math.max(max, +style.opacity);
+      }
+    }
+    // Two seconds in, the banner has landed and has not begun to leave.
+    for (const part of banner.getAnimations({ subtree: true })) { part.pause(); part.currentTime = 2000; }
+    return { peak: max, full: { title: +getComputedStyle(banner.querySelector('.lu-title')).opacity, rays: getComputedStyle(banner.querySelector('.lu-rays')).animationName, shown: !banner.hidden } };
+  });
   check(peak > .75, `The screen flashes gold as the level-up lands (peak opacity ${peak.toFixed(2)})`);
-  await page.screenshot({ path: path.join(world.artifacts, 'levelup-flash.png') });
-  await page.waitForTimeout(600);
-  const full = await page.evaluate(() => ({ title: +getComputedStyle(document.querySelector('.lu-title')).opacity, rays: getComputedStyle(document.querySelector('.lu-rays')).animationName, shown: !document.getElementById('levelup-banner').hidden }));
-  check(full.shown && full.title === 1 && full.rays.includes('lu-rays'), 'The full-motion banner settles with spinning rays behind it');
+  check(full.shown && full.title === 1 && full.rays.includes('lu-rays'), `The full-motion banner settles with spinning rays behind it (${JSON.stringify(full)})`);
   check(await page.locator('#lu-hint').textContent() === 'Fully healed · spend stat points in Character (E)', 'A level without a new skill points to stat points instead');
   await page.screenshot({ path: path.join(world.artifacts, 'levelup-full.png') });
   // Five high-level reworks have distinct display paths while their IDs remain valid on the bar.

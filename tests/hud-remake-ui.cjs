@@ -76,10 +76,14 @@ const errors = [];
   const top = await rect(page, '#stage');
   check(s.t > top.t + 10, 'Nothing is left at the top centre');
   check(await text(page) === online(1), `One player online reads "${await text(page)}"`);
-  const second = await enter(browser, world.url, 'Visitor', { width: 1440, height: 900 }, { lang: 'en', sound: false, char: null, draft: null });
+  // The second player is a protocol bot, and each later page opens after the earlier one closes: several browser pages
+  // do not fit the test memory limit.
+  await call('connect_bot', { bot: 'Visitor', class: 'mage' });
   await page.waitForFunction(want => document.getElementById('network-status').textContent === want, online(2), { timeout: 10000 });
   check(true, 'A second player makes it 2 online');
-  await second.close();
+  // Not `call`: after closing the bot the tool waits for a world holding only bots, which the browser player prevents.
+  // The pill check below is what proves they left.
+  await client.callTool({ name: 'disconnect_bot', arguments: { bot: 'Visitor' } });
   await page.waitForFunction(want => document.getElementById('network-status').textContent === want, online(1), { timeout: 15000 });
   check(true, 'The count drops again when they leave');
   const home = await page.evaluate(() => ({ x: Field.hero.x, y: Field.hero.y })), crags = await page.evaluate(() => WORLD_MAP.zones[0].spawn);
@@ -117,6 +121,7 @@ const errors = [];
   check(await log.evaluate(n => n.scrollHeight > n.clientHeight), 'The chat log scrolls');
 
   // --- the stylesheet arrangement (a player who chose the plain layout): 80% by default, then the same arrangement at 100% ---
+  await page.close();
   const lay = await enter(browser, world.url, 'Layouter', { width: 1440, height: 900 }, { lang: 'en', sound: false, char: null, draft: null, uiSet: true, ui: {}, panelSizeSet: true, panelSize: {} });
   await lay.waitForFunction(() => /online$/.test(document.getElementById('network-status').textContent));
   check(await lay.evaluate(() => Prefs.uiScale) === .8, 'UI size defaults to 80%');
@@ -142,6 +147,7 @@ const errors = [];
   await arrange('100%');
 
   // --- phone width ---
+  await lay.close();
   const phone = await enter(browser, world.url, 'Phoner', { width: 844, height: 390 }, { lang: 'en', sound: false, char: null, draft: null });
   await phone.waitForFunction(() => /^.+ · \d+ online$/.test(document.getElementById('network-status').textContent), null, { timeout: 10000 });
   const pm = await rect(phone, '#minimap'), ps = await rect(phone, '#network-status'), pst = await rect(phone, '#stage');
